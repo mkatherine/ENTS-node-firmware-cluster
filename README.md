@@ -1,5 +1,21 @@
 # soil-power-sensor-firmware
+
 Firmware for STM32 and ESP32 microcontrollers on the Soil Power Sensor board
+
+## Steps to load into the STM32 bootloader
+
+The `Wio-E5 mini` board can be programed via *SWD* through the debug header `D1`. The following are instructions for connecting a `ST-Link` debugger to the bootloader.
+
+1. Connect the `ST-Link` debugger to header `D1`
+1. Power the device
+2. Press `RST` button
+3. Press `BOOT` button
+4. Release `RST` button
+5. Release `BOOT` button
+6. Press connect on the TSM32CubeProgrammer interface.
+	- If this is a new board, the stock firmware will be flashed. You will see the error message `Error: data read failed`. This is expected since the stock firmware has read protection.
+	- Otherwise, you see the current device memory.
+7. Verify the target information in the lower right hand corner.
 
 ## Process for setting up new stm32 project
 

@@ -31,7 +31,8 @@ jobs:
 
     - name: Upload pages artifact
       uses: actions/upload-pages-artifact@v2
-      path: ${{ matrix.project }}/docs/html
+      with:
+        path: ${{ matrix.project }}/docs/html
 
     - name: Deploy to GitHub Pages
       id: deployment

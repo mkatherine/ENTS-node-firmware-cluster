@@ -2,7 +2,7 @@ name: Doxygen Build and Deploy
 
 on:
   push:
-    branch:
+    branches:
       - main
 
 jobs:

@@ -1,0 +1,38 @@
+name: Doxygen Build and Deploy
+
+on:
+  - push
+
+jobs:
+  build:
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: gh-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ["stm32", "esp32"]
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Install Doxygen
+      run: sudo apt-get install -y doxygen graphviz
+
+    - name: Generate Doxygen Documentation
+      working-directory: ${{ matrix.project }}
+      run: doxygen Doxyfile  # Adjust this to match your Doxyfile location and name
+
+    - name: Upload pages artifact
+      uses: actions/upload-pages-artifact@v2
+      path: ${{ matrix.project }}/docs/html
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2

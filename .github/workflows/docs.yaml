@@ -50,7 +50,7 @@ jobs:
     - name: Upload pages artifact
       uses: actions/upload-pages-artifact@v2
       with:
-        path: ${{ matrix.project }}/docs/html
+        path: docs/html
 
 
   deploy:

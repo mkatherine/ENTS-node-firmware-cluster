@@ -54,3 +54,19 @@ In `platformio.ini` change `platform = atmelavr` to `platform = ststm32`
 ```bash
 pio run
 ```
+
+
+## Generating documentation
+
+HTML documentation is generated with `doxygen` per project. Running the following command in `stm32/` and `esp32/` results in docs being generated in `stm32/docs/html/` and `stm32/docs/html` respectively.
+
+```bash
+doxygen Doxyfile
+```
+
+Online versions of the documentation is available for the main branch at
+
+| Project | URL                                                  |
+|---------|------------------------------------------------------|
+| stm32   | https://jlab-sensing.github.io/soil-power-sensor-firmware/stm32/ |
+| esp32   | https://jlab-sensing.github.io/soil-power-sensor-firmware/esp32/ |

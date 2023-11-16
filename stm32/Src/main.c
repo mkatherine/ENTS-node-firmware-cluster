@@ -18,11 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,8 +86,17 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_ADC_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  MX_GPIO_Init();
+  //uint32_t value_adc;
+  const unsigned char * hello = "hello world\n";
+  HAL_UART_Transmit(&huart1, hello, 12, 1000);
+
+  char buffer[100];
+
+  //HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
+  //HAL_ADC_Start_DMA(&hadc,(uint32_t*)&value_adc,1); 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -95,8 +106,23 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    HAL_ADC_Start(&hadc);
+
+    while (HAL_ADC_PollForConversion(&hadc, 100))
+    {
+
+    }
+
+    uint32_t bat = HAL_ADC_GetValue(&hadc);
+    int len = sprintf(buffer, "%d\n", bat);
+
+    HAL_UART_Transmit(&huart1, buffer, len, 1000);
+
+    HAL_ADC_Stop(&hadc);
+
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(500);
+
   }
   /* USER CODE END 3 */
 }

@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
+#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -34,6 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 
 /* USER CODE END PD */
 
@@ -86,17 +87,22 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC_Init();
   MX_USART1_UART_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+
   //uint32_t value_adc;
   const unsigned char * hello = "hello world\n";
+  const unsigned char * success = "FRAM responded\n";
+  const unsigned char * failure = "FRAM did not respond\n";
   HAL_UART_Transmit(&huart1, hello, 12, 1000);
+  if (HAL_I2C_IsDeviceReady(&hi2c2, 0b10100000, 1, 50) == HAL_OK){
+    HAL_UART_Transmit(&huart1, success, 16, 1000);
+  } else {
+    HAL_UART_Transmit(&huart1, failure, 21, 1000);
+  }
 
-  char buffer[100];
 
-  //HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
-  //HAL_ADC_Start_DMA(&hadc,(uint32_t*)&value_adc,1); 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,19 +112,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_ADC_Start(&hadc);
 
-    while (HAL_ADC_PollForConversion(&hadc, 100))
-    {
 
-    }
 
-    uint32_t bat = HAL_ADC_GetValue(&hadc);
-    int len = sprintf(buffer, "%d\n", bat);
-
-    HAL_UART_Transmit(&huart1, buffer, len, 1000);
-
-    HAL_ADC_Stop(&hadc);
+    //HAL_UART_Transmit(&huart1, buffer, len, 1000);
 
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(500);

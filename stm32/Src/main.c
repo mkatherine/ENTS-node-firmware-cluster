@@ -57,6 +57,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+  
+// Global variable for all return codes
+HAL_StatusTypeDef rc;
 
 /* USER CODE END 0 */
 
@@ -91,14 +94,27 @@ int main(void)
   MX_ADC_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  //uint32_t value_adc;
-  const unsigned char * hello = "hello world\n";
-  HAL_UART_Transmit(&huart1, hello, 12, 1000);
 
-  char buffer[100];
+  // Print the compilation time at startup
+  char info_str[100];
+  int info_len;
+  info_len = sprintf(
+    info_str,
+    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
+    __DATE__,__TIME__
+    );
+  HAL_UART_Transmit(&huart1, info_str, info_len, 1000);
 
-  //HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
-  //HAL_ADC_Start_DMA(&hadc,(uint32_t*)&value_adc,1); 
+  uint32_t battery_voltage = 0;
+
+
+  // Calibrate and start conversion process
+  rc = HAL_ADCEx_Calibration_Start(&hadc);
+  if (rc != HAL_OK) Error_Handler();
+
+  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
+  if (rc != HAL_OK) Error_Handler();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,21 +124,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_ADC_Start(&hadc);
 
-    while (HAL_ADC_PollForConversion(&hadc, 100))
-    {
 
-    }
+    char buf[10];
+    int buf_len = sprintf(buf, "%d\n", battery_voltage);
 
-    uint32_t bat = HAL_ADC_GetValue(&hadc);
-    int len = sprintf(buffer, "%d\n", bat);
+    HAL_UART_Transmit(&huart1, buf, buf_len, 1000);
 
-    HAL_UART_Transmit(&huart1, buffer, len, 1000);
+    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 
-    HAL_ADC_Stop(&hadc);
-
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(500);
 
   }
@@ -185,6 +195,10 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
+  char error[100];
+  int error_len = sprintf(error, "Error: %d\n", rc);
+  HAL_UART_Transmit(&huart1, error, error_len, 1000);
+
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)

@@ -1,10 +1,12 @@
 #MicroXplorer Configuration settings - do not modify
-ADC.ClockPrescaler=ADC_CLOCK_ASYNC_DIV64
+ADC.ClockPrescaler=ADC_CLOCK_ASYNC_DIV1
 ADC.ContinuousConvMode=ENABLE
 ADC.DMAContinuousRequests=ENABLE
 ADC.EnableRegularConversion=DISABLE
-ADC.IPParameters=NbrOfConversion,SelectedChannel,ClockPrescaler,ContinuousConvMode,DMAContinuousRequests,EnableRegularConversion
+ADC.IPParameters=NbrOfConversion,SelectedChannel,ClockPrescaler,ContinuousConvMode,DMAContinuousRequests,EnableRegularConversion,SamplingTimeCommon1,SamplingTimeCommon2
 ADC.NbrOfConversion=1
+ADC.SamplingTimeCommon1=ADC_SAMPLETIME_1CYCLE_5
+ADC.SamplingTimeCommon2=ADC_SAMPLETIME_1CYCLE_5
 ADC.SelectedChannel=ADC_CHANNEL_0
 CAD.formats=
 CAD.pinconfig=

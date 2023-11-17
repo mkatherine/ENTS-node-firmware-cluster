@@ -34,7 +34,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
+#define FM24_READ 0xA1 // Device address of FM24 in read mode
 
 /* USER CODE END PD */
 
@@ -95,9 +96,20 @@ int main(void)
   const unsigned char * hello = "hello world\n";
   const unsigned char * success = "FRAM responded\n";
   const unsigned char * failure = "FRAM did not respond\n";
+  //const unsigned char * succ2 = "Read 255\n";
+  uint8_t test = 255;
+  uint8_t recieved;
   HAL_UART_Transmit(&huart1, hello, 12, 1000);
-  if (HAL_I2C_IsDeviceReady(&hi2c2, 0b10100000, 1, 50) == HAL_OK){
+  if (HAL_I2C_Mem_Write(&hi2c2, FM24_WRITE, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50) == HAL_OK){
     HAL_UART_Transmit(&huart1, success, 16, 1000);
+  } else {
+    HAL_UART_Transmit(&huart1, failure, 21, 1000);
+  } 
+
+  if (HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50) == HAL_OK){
+    if (recieved == test){
+      HAL_UART_Transmit(&huart1, success, 21, 1000);
+    }
   } else {
     HAL_UART_Transmit(&huart1, failure, 21, 1000);
   }

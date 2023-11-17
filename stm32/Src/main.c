@@ -105,6 +105,7 @@ int main(void)
     );
   HAL_UART_Transmit(&huart1, info_str, info_len, 1000);
 
+
   uint32_t battery_voltage = 0;
 
 
@@ -124,8 +125,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-
     char buf[10];
     int buf_len = sprintf(buf, "%d\n", battery_voltage);
 
@@ -194,9 +193,12 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+
+
   /* USER CODE BEGIN Error_Handler_Debug */
-  char error[100];
-  int error_len = sprintf(error, "Error: %d\n", rc);
+  char error[30];
+  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

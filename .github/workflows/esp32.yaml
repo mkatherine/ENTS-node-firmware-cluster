@@ -35,15 +35,5 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: esp32.elf
-          path: esp32/.pio/build/esp32/firmware.elf
-      
-      - uses: actions/upload-artifact@v3
-        with:
-          name: esp32.bin
-          path: esp32/.pio/build/esp32/firmware.bin
-      
-      - uses: actions/upload-artifact@v3
-        with:
-          name: esp-build
+          name: build
           path: esp32/.pio/build/

@@ -35,15 +35,5 @@ jobs:
       
       - uses: actions/upload-artifact@v3
         with:
-          name: stm32.elf
-          path: stm32/.pio/build/stm32/firmware.elf
-      
-      - uses: actions/upload-artifact@v3
-        with:
-          name: stm32.bin
-          path: stm32/.pio/build/stm32/firmware.bin
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: stm32-build
+          name: build
           path: stm32/.pio/build

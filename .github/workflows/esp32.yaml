@@ -42,3 +42,8 @@ jobs:
         with:
           name: esp32.bin
           path: .pio/build/esp32/firmware.bin
+      
+      - uses: actions/upload-artifact@v3
+        with:
+          name: esp-build
+          path: .pio/build

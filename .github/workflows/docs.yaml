@@ -1,4 +1,4 @@
-name: Doxygen Build and Deploy
+name: Doxygen
 
 on:
   workflow_dispatch:

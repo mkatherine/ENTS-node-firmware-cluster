@@ -36,14 +36,14 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: esp32.elf
-          path: .pio/build/esp32/firmware.elf
+          path: esp32/.pio/build/esp32/firmware.elf
       
       - uses: actions/upload-artifact@v3
         with:
           name: esp32.bin
-          path: .pio/build/esp32/firmware.bin
+          path: esp32/.pio/build/esp32/firmware.bin
       
       - uses: actions/upload-artifact@v3
         with:
           name: esp-build
-          path: .pio/build
+          path: esp32/.pio/build/

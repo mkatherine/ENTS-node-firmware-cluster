@@ -2,6 +2,10 @@
  * @file test_battery.c
  * @brief Prints out battery voltage levels
  * 
+ * In an infinite loop the battery voltage level is retrieved then outputted over serial. The user should check if the voltage levels are expected. When connected to USB the voltage should be ~5V. The battery voltage level should be checked and compared to a multimeter measurement.
+ * 
+ * @see battery.h
+ * 
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-17
 */

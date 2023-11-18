@@ -58,9 +58,6 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
   
-// Global variable for all return codes
-HAL_StatusTypeDef rc;
-
 /* USER CODE END 0 */
 
 /**

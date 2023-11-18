@@ -1,9 +1,9 @@
 name: Doxygen Build and Deploy
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
+  pull_request:
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
 
   combine:
     needs: build
-
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest 
     steps:
     - name: Download stm32 docs
@@ -55,6 +55,8 @@ jobs:
 
   deploy:
     needs: combine
+
+    if: github.ref == 'refs/heads/main'
 
     permissions:
       pages: write      # to deploy to Pages

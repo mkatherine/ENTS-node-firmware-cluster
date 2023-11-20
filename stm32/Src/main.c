@@ -96,7 +96,7 @@ int main(void)
   const unsigned char * hello = "hello world\n";
   const unsigned char * success = "FRAM responded\n";
   const unsigned char * failure = "FRAM did not respond\n";
-  //const unsigned char * succ2 = "Read 255\n";
+  const unsigned char * succ2 = "Read 255\n";
   uint8_t test = 255;
   uint8_t recieved;
   HAL_UART_Transmit(&huart1, hello, 12, 1000);
@@ -113,6 +113,7 @@ int main(void)
   } else {
     HAL_UART_Transmit(&huart1, failure, 21, 1000);
   }
+
 
 
   /* USER CODE END 2 */

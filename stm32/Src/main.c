@@ -118,13 +118,13 @@ int main(void)
   // } else {
   //   HAL_UART_Transmit(&huart1, failure, 21, 1000);
   // }
-  if (FRAM_Write(byte, 1) == HAL_OK){
+  if (FRAM_Write(data, 4) == HAL_OK){
     HAL_UART_Transmit(&huart1, success, 16, 1000);
   }
 
   HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50);
-  sprintf(output, "\n%d\n", recieved);
-  HAL_UART_Transmit(&huart1, output, 3, 10);
+ sprintf(output, "\n%d\n", recieved);
+ HAL_UART_Transmit(&huart1, output, 4, 10);
   // if (FRAM_Read(rec, 4) == HAL_OK){
   //   sprintf(output, "%d\n", rec[0]);
   //   if (rec[0] == data[3]){

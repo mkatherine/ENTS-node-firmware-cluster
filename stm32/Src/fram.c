@@ -21,6 +21,7 @@ int page_memory = 0x00;
 /**
   ******************************************************************************
   * @brief    This function writes a dynamic number of bytes to FRAM.
+  * 
   *           This function is a wrapper for the STM32 HAl I2C library. The FM24CL16B uses
   *           I2C the I2C communication protocol. This function uses global variables
   *           to keep track of what bytes have been written to, and than uses the HAL library
@@ -35,11 +36,18 @@ int page_memory = 0x00;
   ******************************************************************************
   */
  HAL_StatusTypeDef FRAM_Write(const uint8_t *data, uint8_t num_bytes){
+
+    char output[10];
+    const char * success = "FRAM responded\n";
+
     HAL_StatusTypeDef status = HAL_OK;
     uint8_t byte;
     for (int i = 0; i < num_bytes; i++){ // For every byte to be read
         byte = data[i]; // Use individual byte from given array
         status = HAL_I2C_Mem_Write(&hi2c2, (FM24_WRITE | page_memory), address_memory, I2C_MEMADD_SIZE_8BIT, &byte, 1, 10); // Write to a paticular segement (by ORing with page memory), and address. Write 8 bits at a time. Timeout after 10ms.
+        // if (status == HAL_OK){
+        //     HAL_UART_Transmit(&huart1, success, 16, 10);
+        // }
         address_memory += 1; // Iterate address memory
         if (address_memory > MAXIMUM_MEMORY_ADDRESS) { // If segment is full, move onto the next one
             page_memory += 1;
@@ -48,6 +56,8 @@ int page_memory = 0x00;
         if (page_memory > MAXIMUM_PAGE_ADDRESS) { // If all segments are full, begin to overwrite from the beginning
             page_memory = 0;
         }
+        sprintf(output, "\n%d\n", address_memory);
+        HAL_UART_Transmit(&huart1, output, 6, 10);
     }
     return status;
  }
@@ -55,6 +65,7 @@ int page_memory = 0x00;
  /**
   ******************************************************************************
   * @brief    This function reads a dynamic number of bytes to FRAM.
+  * 
   *           This function is a wrapper for the STM32 HAl I2C library. The FM24CL16B uses
   *           I2C the I2C communication protocol. This function uses global variables
   *           to keep track of what bytes have been read from, and than uses the HAL library

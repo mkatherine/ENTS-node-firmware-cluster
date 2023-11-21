@@ -54,6 +54,26 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+ /**
+  ******************************************************************************
+  * @brief    Helper function to reverse array
+  * @param    arr array
+  * @param    start start of array
+  * @param    end end of array
+  * @return   none
+  ******************************************************************************
+  */
+void reverseArray(int arr[], int start, int end) 
+{ 
+    int temp; 
+    while (start < end) { 
+        temp = arr[start]; 
+        arr[start] = arr[end]; 
+        arr[end] = temp; 
+        start++; 
+        end--; 
+    } 
+}
 
 /* USER CODE END PFP */
 
@@ -94,39 +114,108 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //uint32_t value_adc;
-  char output[40];
-  const char * success = "FRAM responded\n";
-  //const unsigned char * failure = "FRAM did not respond\n";
-  const unsigned char * succ2 = "Read 100\n";
+  char output[100];
+  char output1[42];
+  const unsigned char * test_intro = "\r\nThis is the FRAM library test harness\r\n";
+  const unsigned char * HAL_intto = "Testing HAL libraries\r\n";
+  const unsigned char * FRAM_failure = "FRAM did not respond\r\n";
+  const unsigned char * mem_failure = "Failed to read/write to mem_address 0\r\n";
+  const unsigned char * success = "Success\r\n";
+  const unsigned char * failure = "Failure\r\n";
+  const unsigned char * Basic_intro = "Testing basic read/write functions\r\n";
   uint8_t test = 34;
   uint8_t recieved;
   uint8_t data[] = {25, 50, 75, 100};
-  uint8_t byte = {12};
   uint8_t rec[4];
-  // Hanging onto for posterity and future reference
-  // HAL_UART_Transmit(&huart1, hello, 12, 1000);
-  // if (HAL_I2C_Mem_Write(&hi2c2, FM24_WRITE, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50) == HAL_OK){
-  //   HAL_UART_Transmit(&huart1, success, 16, 1000);
-  // } else {
-  //   HAL_UART_Transmit(&huart1, failure, 21, 1000);
-  // } 
+  uint8_t data1[] = {3, 4, 9, 100, 10, 50, 25, 23, 25, 25, 7, 9, 10, 11, 12};
+  uint8_t rec1[10];
+  uint8_t rec2[5];
 
-  // if (HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50) == HAL_OK){
-  //   if (recieved == test){
-  //     HAL_UART_Transmit(&huart1, success, 21, 1000);
-  //   }
-  // } else {
-  //   HAL_UART_Transmit(&huart1, failure, 21, 1000);
-  // }
+  HAL_UART_Transmit(&huart1, test_intro, 42, 1000);
+
+  /**
+  ******************************************************************************
+  HAL Library Tests
+  ******************************************************************************
+  **/
+  HAL_UART_Transmit(&huart1, HAL_intto, 24, 1000);
+
+  if (HAL_I2C_Mem_Write(&hi2c2, FM24_WRITE, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50) == HAL_OK){
+    HAL_UART_Transmit(&huart1, success, 10, 1000);
+  } else {
+    HAL_UART_Transmit(&huart1, failure, 10, 1000);
+    HAL_UART_Transmit(&huart1, FRAM_failure, 22, 1000);
+  } 
+
+  if (HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50) == HAL_OK){
+    if (recieved == test){
+      HAL_UART_Transmit(&huart1, success, 10, 1000);
+    } else {
+      HAL_UART_Transmit(&huart1, failure, 10, 1000);
+      HAL_UART_Transmit(&huart1, mem_failure, 22, 1000);
+    }
+  } else {
+    HAL_UART_Transmit(&huart1, failure, 10, 1000);
+    HAL_UART_Transmit(&huart1, FRAM_failure, 22, 1000);
+  }
+  /**
+  ******************************************************************************
+  FRAM Library Basic Read/Write
+  ******************************************************************************
+  **/
+  HAL_UART_Transmit(&huart1, Basic_intro, 37, 1000);
+
   FRAM_Write(data, 4);
 
-//  HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x03, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50);
-
   if (FRAM_Read(rec, 4) == HAL_OK){
-    HAL_UART_Transmit(&huart1, success, 16, 1000);
+    if ((data[3] == rec[0]) && (data[2] == rec[1]) && (data[1] == rec[2]) && (data[0] == rec[3])){
+      HAL_UART_Transmit(&huart1, success, 10, 1000);
+    } else {
+      HAL_UART_Transmit(&huart1, failure, 10, 1000);
+    }
   }
-    sprintf(output, "Rec: %d,%d,%d,%d\n", rec[0],rec[1],rec[2],rec[3]);
-    HAL_UART_Transmit(&huart1, output, 18, 10);
+  sprintf(output, "Wrote: %d,%d,%d,%d\r\n", data[0],data[1],data[2],data[3]);
+  HAL_UART_Transmit(&huart1, output, 21, 10);
+  sprintf(output, "Read: %d,%d,%d,%d\r\n", rec[0],rec[1],rec[2],rec[3]);
+  HAL_UART_Transmit(&huart1, output, 20, 10);
+
+  FRAM_Write(data1, 15);
+  if (FRAM_Read(rec1, 10) == HAL_OK){
+    if ((data1[14] == rec1[0])&& 
+    (data1[13] == rec1[1]) && 
+    (data1[12] == rec1[2]) && 
+    (data1[11] == rec1[3]) &&
+    (data1[10] == rec1[4]) &&
+    (data1[9] == rec1[5]) &&
+    (data1[8] == rec1[6]) &&
+    (data1[7] == rec1[7]) &&
+    (data1[6] == rec1[8]) &&
+    (data1[5] == rec1[9])){
+      HAL_UART_Transmit(&huart1, success, 10, 1000);
+    } else {
+      HAL_UART_Transmit(&huart1, failure, 10, 1000);
+    }
+  }
+
+  FRAM_Read(rec2, 5);
+  reverseArray(rec2, rec2[0], rec2[4]);
+  if ((data1[0] == rec2[0])&& 
+    (data1[1] == rec2[1]) && 
+    (data1[2] == rec2[2]) && 
+    (data1[3] == rec2[3]) &&
+    (data1[4] == rec2[4])){
+     HAL_UART_Transmit(&huart1, success, 10, 1000);
+    } else {
+      HAL_UART_Transmit(&huart1, failure, 10, 1000);
+    }
+
+  sprintf(output1, "Wrote: %d,%d,%d,%d,%d\r\n", data1[0],data1[1],data1[2],data1[3],data1[4]);
+  HAL_UART_Transmit(&huart1, output1, 24, 10);
+  sprintf(output, "Read: %d,%d,%d,%d,%d\r\n", rec2[0],rec2[1],rec2[2],rec2[3],rec2[4]);
+  HAL_UART_Transmit(&huart1, output, 23, 10);
+  
+
+
 
 
 

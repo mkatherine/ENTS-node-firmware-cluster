@@ -70,11 +70,10 @@ HAL_StatusTypeDef FRAM_Read(uint8_t *data, uint8_t num_bytes) {
 
 char output[10];
     const char * success = "FRAM responded\n";
-    address_memory -= 1;
     HAL_StatusTypeDef status = HAL_OK;
     uint8_t byte;
     for (int i = 0; i < num_bytes; i++){ 
-        status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | page_memory), address_memory, I2C_MEMADD_SIZE_8BIT, &byte, 1, 10);
+        status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | page_memory), (address_memory - 1), I2C_MEMADD_SIZE_8BIT, &byte, 1, 10);
         data[i] = byte;
         address_memory -= 1;
         // Will need to think about segment below more
@@ -87,5 +86,7 @@ char output[10];
             address_memory = MAXIMUM_MEMORY_ADDRESS;
         }
     }
+    // sprintf(output, "AM: %d\n", address_memory);
+    // HAL_UART_Transmit(&huart1, output, 5, 10);
     return status;
  }

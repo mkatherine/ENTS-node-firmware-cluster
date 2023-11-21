@@ -94,7 +94,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //uint32_t value_adc;
-  char output[10];
+  char output[40];
   const char * success = "FRAM responded\n";
   //const unsigned char * failure = "FRAM did not respond\n";
   const unsigned char * succ2 = "Read 100\n";
@@ -118,21 +118,15 @@ int main(void)
   // } else {
   //   HAL_UART_Transmit(&huart1, failure, 21, 1000);
   // }
-  if (FRAM_Write(data, 4) == HAL_OK){
+  FRAM_Write(data, 4);
+
+//  HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x03, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50);
+
+  if (FRAM_Read(rec, 4) == HAL_OK){
     HAL_UART_Transmit(&huart1, success, 16, 1000);
   }
-
-  HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50);
- sprintf(output, "\n%d\n", recieved);
- HAL_UART_Transmit(&huart1, output, 4, 10);
-  // if (FRAM_Read(rec, 4) == HAL_OK){
-  //   sprintf(output, "%d\n", rec[0]);
-  //   if (rec[0] == data[3]){
-  //     HAL_UART_Transmit(&huart1, succ2, 9, 10);
-  //   }
-  //   HAL_UART_Transmit(&huart1, output, 2, 10);
-  // }
-
+    sprintf(output, "Rec: %d,%d,%d,%d\n", rec[0],rec[1],rec[2],rec[3]);
+    HAL_UART_Transmit(&huart1, output, 18, 10);
 
 
 

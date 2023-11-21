@@ -14,6 +14,9 @@
  /* Includes ------------------------------------------------------------------*/
 #include "fram.h"
 
+int address_memory = 0x00;
+int page_memory = 0x00;
+
 
 /**
   ******************************************************************************
@@ -32,7 +35,7 @@
   ******************************************************************************
   */
  HAL_StatusTypeDef FRAM_Write(const uint8_t *data, uint8_t num_bytes){
-    HAL_StatusTypeDef status;
+    HAL_StatusTypeDef status = HAL_OK;
     uint8_t byte;
     for (int i = 0; i < num_bytes; i++){ // For every byte to be read
         byte = data[i]; // Use individual byte from given array
@@ -56,26 +59,27 @@
   *           I2C the I2C communication protocol. This function uses global variables
   *           to keep track of what bytes have been read from, and than uses the HAL library
   *           to read from the FM24CL16B.
+  * @param    data Array to be read into
   * @param    num_bytes The number of bytes to be read.
-  * @return   An array of bytes 
+  * @return   HAL_StatusTypeDef, status of the I2C function
   ******************************************************************************
   */
- uint8_t * FRAM_Read(uint8_t num_bytes) {
-    uint8_t bytes[];
+HAL_StatusTypeDef FRAM_Read(uint8_t *data, uint8_t num_bytes) {
+    HAL_StatusTypeDef status = HAL_OK;
     uint8_t byte;
     for (int i = 0; i < num_bytes; i++){ 
-        HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | page_memory), address_memory, I2C_MEMADD_SIZE_8BIT, &byte, 1, 10);
-        bytes[i] = byte;
+        status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | page_memory), address_memory, I2C_MEMADD_SIZE_8BIT, &byte, 1, 10);
+        data[i] = byte;
         address_memory -= 1;
         // Will need to think about segment below more
-        if (address_memory > 0) { // If segment is full, move back by 1
+        if (address_memory < 0) { // If segment is full, move back by 1
             page_memory -= 1;
-            address_memory = 0;
+            address_memory = MAXIMUM_MEMORY_ADDRESS;
         }
-        if (page_memory > MAXIMUM_PAGE_ADDRESS) { // If all segments are full, begin to overwrite from the beginning
-            page_memory = 0;
+        if (page_memory > MINIMUM_PAGE_ADDRES) { // If all segments are full, begin to overwrite from the beginning
+            page_memory = MAXIMUM_PAGE_ADDRESS;
+            address_memory = MAXIMUM_MEMORY_ADDRESS;
         }
-
-        
     }
+    return status;
  }

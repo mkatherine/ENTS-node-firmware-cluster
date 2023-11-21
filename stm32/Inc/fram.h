@@ -22,15 +22,16 @@
 #define FM24_READ 0xA1 // Device address of FM24 in read mode
 #define MAXIMUM_MEMORY_ADDRESS 255
 #define MAXIMUM_PAGE_ADDRESS 7
+#define MINIMUM_PAGE_ADDRES 0
 
 /* USER CODE END PD */
 
 /* USER CODE BEGIN 1 */
-int page_memory = 0x00; // Global tracker of the page memory
-int address_memory = 0x00; // Global tracker of the address memory
+extern int page_memory; // Global tracker of the page memory
+extern int address_memory; // Global tracker of the address memory
 
 HAL_StatusTypeDef FRAM_Write(const uint8_t *data, uint8_t num_bytes);
-uint8_t * FRAM_Read(uint8_t num_bytes);
+HAL_StatusTypeDef FRAM_Read(uint8_t *data,  uint8_t num_bytes);
 
 
 /* USER CODE END 1 */

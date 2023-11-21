@@ -21,6 +21,7 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "fram.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -93,26 +94,45 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //uint32_t value_adc;
-  const unsigned char * hello = "hello world\n";
-  const unsigned char * success = "FRAM responded\n";
-  const unsigned char * failure = "FRAM did not respond\n";
-  const unsigned char * succ2 = "Read 255\n";
-  uint8_t test = 255;
+  char output[10];
+  const char * success = "FRAM responded\n";
+  //const unsigned char * failure = "FRAM did not respond\n";
+  const unsigned char * succ2 = "Read 100\n";
+  uint8_t test = 34;
   uint8_t recieved;
-  HAL_UART_Transmit(&huart1, hello, 12, 1000);
-  if (HAL_I2C_Mem_Write(&hi2c2, FM24_WRITE, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50) == HAL_OK){
-    HAL_UART_Transmit(&huart1, success, 16, 1000);
-  } else {
-    HAL_UART_Transmit(&huart1, failure, 21, 1000);
-  } 
+  uint8_t data[] = {25, 50, 75, 100};
+  uint8_t byte = {12};
+  uint8_t rec[4];
+  // Hanging onto for posterity and future reference
+  // HAL_UART_Transmit(&huart1, hello, 12, 1000);
+  // if (HAL_I2C_Mem_Write(&hi2c2, FM24_WRITE, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50) == HAL_OK){
+  //   HAL_UART_Transmit(&huart1, success, 16, 1000);
+  // } else {
+  //   HAL_UART_Transmit(&huart1, failure, 21, 1000);
+  // } 
 
-  if (HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50) == HAL_OK){
-    if (recieved == test){
-      HAL_UART_Transmit(&huart1, success, 21, 1000);
-    }
-  } else {
-    HAL_UART_Transmit(&huart1, failure, 21, 1000);
+  // if (HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50) == HAL_OK){
+  //   if (recieved == test){
+  //     HAL_UART_Transmit(&huart1, success, 21, 1000);
+  //   }
+  // } else {
+  //   HAL_UART_Transmit(&huart1, failure, 21, 1000);
+  // }
+  if (FRAM_Write(byte, 1) == HAL_OK){
+    HAL_UART_Transmit(&huart1, success, 16, 1000);
   }
+
+  HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50);
+  sprintf(output, "\n%d\n", recieved);
+  HAL_UART_Transmit(&huart1, output, 3, 10);
+  // if (FRAM_Read(rec, 4) == HAL_OK){
+  //   sprintf(output, "%d\n", rec[0]);
+  //   if (rec[0] == data[3]){
+  //     HAL_UART_Transmit(&huart1, succ2, 9, 10);
+  //   }
+  //   HAL_UART_Transmit(&huart1, output, 2, 10);
+  // }
+
 
 
 

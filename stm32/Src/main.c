@@ -21,10 +21,12 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,6 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 
 /* USER CODE END PD */
 
@@ -51,6 +54,17 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+void delay(int number_of_seconds)
+{
+    // Converting time into milli_seconds
+    int milli_seconds = 1000 * number_of_seconds;
+ 
+    // Storing start time
+    clock_t start_time = clock();
+ 
+    // looping till required time is not achieved
+    while (clock() < start_time + milli_seconds);
+}
 
 /* USER CODE END PFP */
 
@@ -90,6 +104,17 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   MX_GPIO_Init();
+  uint8_t ADC_Reading[3];
+  const unsigned char * intro = "Hello\r\n";
+  const unsigned char * hal_res = "I2C responded\r\n";
+  const unsigned char * hal_fal = "I2C did not respond\r\n";
+  const unsigned char * here = "Here\r\n";
+  char output[100];
+  HAL_UART_Transmit(&huart1, intro, 8, 19);
+
+  HAL_I2C_Master_Receive(&hi2c2, ADS12_WRITE, ADC_Reading, 3, 10);
+  sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
+  HAL_UART_Transmit(&huart1, output, 17, 19);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -97,6 +122,14 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    if (HAL_I2C_Master_Receive(&hi2c2, ADS12_WRITE, ADC_Reading, 3, 10) == HAL_OK){
+      sprintf(output, "Read: %x\r\n", ADC_Reading[0]);
+      HAL_UART_Transmit(&huart1, output, 11, 19);
+    } else {
+      HAL_UART_Transmit(&huart1, output, 17, 19);
+    }
+    HAL_UART_Transmit(&huart1, here, 7, 19);
+    //delay(10000);
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);

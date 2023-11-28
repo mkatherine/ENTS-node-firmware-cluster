@@ -24,7 +24,7 @@
 /** Private variable that stores battery voltage */
 volatile uint32_t adc_reading = 0;
 
-unsigned char battery_init(void)
+HAL_StatusTypeDef battery_init(void)
 {
   // Calibrate and start conversion process
   rc = HAL_ADCEx_Calibration_Start(&hadc);
@@ -33,6 +33,8 @@ unsigned char battery_init(void)
   // Start continuous measurements
   rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &adc_reading, 1);
   if (rc != HAL_OK) Error_Handler();
+
+  return rc;
 }
 
 unsigned int battery_voltage(void)

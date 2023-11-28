@@ -116,6 +116,7 @@ int main(void)
   //uint32_t value_adc;
   char output[100];
   char output1[42];
+  char output2[30];
   const unsigned char * test_intro = "\r\nThis is the FRAM library test harness\r\n";
   const unsigned char * HAL_intto = "Testing HAL libraries\r\n";
   const unsigned char * FRAM_failure = "FRAM did not respond\r\n";
@@ -168,7 +169,7 @@ int main(void)
   FRAM_Write(data, 4);
 
   if (FRAM_Read(rec, 4) == HAL_OK){
-    if ((data[3] == rec[0]) && (data[2] == rec[1]) && (data[1] == rec[2]) && (data[0] == rec[3])){
+    if ((data[0] == rec[0]) && (data[1] == rec[1]) && (data[2] == rec[2]) && (data[3] == rec[3])){
       HAL_UART_Transmit(&huart1, success, 10, 1000);
     } else {
       HAL_UART_Transmit(&huart1, failure, 10, 1000);
@@ -181,16 +182,16 @@ int main(void)
 
   FRAM_Write(data1, 15);
   if (FRAM_Read(rec1, 10) == HAL_OK){
-    if ((data1[14] == rec1[0])&& 
-    (data1[13] == rec1[1]) && 
-    (data1[12] == rec1[2]) && 
-    (data1[11] == rec1[3]) &&
-    (data1[10] == rec1[4]) &&
-    (data1[9] == rec1[5]) &&
-    (data1[8] == rec1[6]) &&
+    if ((data1[0] == rec1[0])&& 
+    (data1[1] == rec1[1]) && 
+    (data1[2] == rec1[2]) && 
+    (data1[3] == rec1[3]) &&
+    (data1[4] == rec1[4]) &&
+    (data1[5] == rec1[5]) &&
+    (data1[6] == rec1[6]) &&
     (data1[7] == rec1[7]) &&
-    (data1[6] == rec1[8]) &&
-    (data1[5] == rec1[9])){
+    (data1[8] == rec1[8]) &&
+    (data1[9] == rec1[9])){
       HAL_UART_Transmit(&huart1, success, 10, 1000);
     } else {
       HAL_UART_Transmit(&huart1, failure, 10, 1000);
@@ -198,21 +199,20 @@ int main(void)
   }
 
   FRAM_Read(rec2, 5);
-  reverseArray(rec2, rec2[0], rec2[4]);
-  if ((data1[0] == rec2[0])&& 
-    (data1[1] == rec2[1]) && 
-    (data1[2] == rec2[2]) && 
-    (data1[3] == rec2[3]) &&
-    (data1[4] == rec2[4])){
+  if ((data1[10] == rec2[0])&& 
+    (data1[11] == rec2[1]) && 
+    (data1[12] == rec2[2]) && 
+    (data1[13] == rec2[3]) &&
+    (data1[14] == rec2[4])){
      HAL_UART_Transmit(&huart1, success, 10, 1000);
     } else {
       HAL_UART_Transmit(&huart1, failure, 10, 1000);
     }
 
-  sprintf(output1, "Wrote: %d,%d,%d,%d,%d\r\n", data1[0],data1[1],data1[2],data1[3],data1[4]);
-  HAL_UART_Transmit(&huart1, output1, 24, 10);
-  sprintf(output, "Read: %d,%d,%d,%d,%d\r\n", rec2[0],rec2[1],rec2[2],rec2[3],rec2[4]);
-  HAL_UART_Transmit(&huart1, output, 23, 10);
+  sprintf(output1, "Wrote: %d,%d,%d,%d,%d\r\n", data1[10],data1[11],data1[12],data1[13],data1[14]);
+  HAL_UART_Transmit(&huart1, output1, 25, 10);
+  sprintf(output2, "Read: %d,%d,%d,%d,%d\r\n", rec2[0],rec2[1],rec2[2],rec2[3],rec2[4]);
+  HAL_UART_Transmit(&huart1, output2, 26, 10);
   
 
 

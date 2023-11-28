@@ -14,8 +14,10 @@
  /* Includes ------------------------------------------------------------------*/
 #include "fram.h"
 
-int address_memory = 0x00;
-int page_memory = 0x00;
+int write_address_memory = 0x00;
+int write_page_memory = 0x00;
+int read_address_memory = 0x00;
+int read_page_memory = 0x00;
 
 
 /**
@@ -40,14 +42,14 @@ int page_memory = 0x00;
     uint8_t byte;
     for (int i = 0; i < num_bytes; i++){ // For every byte to be read
         byte = data[i]; // Use individual byte from given array
-        status = HAL_I2C_Mem_Write(&hi2c2, (FM24_WRITE | page_memory), address_memory, I2C_MEMADD_SIZE_8BIT, &byte, 1, 10); // Write to a paticular segement (by ORing with page memory), and address. Write 8 bits at a time. Timeout after 10ms.
-        address_memory += 1; // Iterate address memory
-        if (address_memory > MAXIMUM_MEMORY_ADDRESS) { // If segment is full, move onto the next one
-            page_memory += 1;
-            address_memory = 0;
+        status = HAL_I2C_Mem_Write(&hi2c2, (FM24_WRITE | write_page_memory), write_address_memory, I2C_MEMADD_SIZE_8BIT, &byte, 1, 10); // Write to a paticular segement (by ORing with page memory), and address. Write 8 bits at a time. Timeout after 10ms.
+        write_address_memory += 1; // Iterate address memory
+        if (write_address_memory > MAXIMUM_MEMORY_ADDRESS) { // If segment is full, move onto the next one
+            write_page_memory += 1;
+            write_address_memory = 0;
         }
-        if (page_memory > MAXIMUM_PAGE_ADDRESS) { // If all segments are full, begin to overwrite from the beginning
-            page_memory = 0;
+        if (write_page_memory > MAXIMUM_PAGE_ADDRESS) { // If all segments are full, begin to overwrite from the beginning
+            write_page_memory = 0;
         }
     }
     return status;
@@ -73,20 +75,17 @@ char output[10];
     HAL_StatusTypeDef status = HAL_OK;
     uint8_t byte;
     for (int i = 0; i < num_bytes; i++){ 
-        status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | page_memory), (address_memory - 1), I2C_MEMADD_SIZE_8BIT, &byte, 1, 10);
+        status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | read_page_memory), read_address_memory, I2C_MEMADD_SIZE_8BIT, &byte, 1, 10);
         data[i] = byte;
-        address_memory -= 1;
+        read_address_memory += 1;
         // Will need to think about segment below more
-        if (address_memory < 0) { // If segment is full, move back by 1
-            page_memory -= 1;
-            address_memory = MAXIMUM_MEMORY_ADDRESS;
+        if (read_address_memory > MAXIMUM_MEMORY_ADDRESS) { // If segment is full, move forward by 1
+            read_page_memory += 1;
+            read_address_memory = 0;
         }
-        if (page_memory > MINIMUM_PAGE_ADDRES) { // If all segments are full, begin to overwrite from the beginning
-            page_memory = MAXIMUM_PAGE_ADDRESS;
-            address_memory = MAXIMUM_MEMORY_ADDRESS;
+        if (read_page_memory > MAXIMUM_PAGE_ADDRESS) { // If all segments are full, begin to overwrite from the beginning
+            read_page_memory = 0;
         }
     }
-    // sprintf(output, "AM: %d\n", address_memory);
-    // HAL_UART_Transmit(&huart1, output, 5, 10);
     return status;
  }

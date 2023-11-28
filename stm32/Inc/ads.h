@@ -1,11 +1,11 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file     fram.h
-  * @author Stephen Taylor
+  * @file     ads.h
+  * @author   Stephen Taylor
   * @brief    This file contains all the function prototypes for
-  *           the fram.c file
-  * @date     11/17/2023
+  *           the ads.c file
+  * @date     11/27/2023
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -16,20 +16,22 @@
 
 #include <stdio.h>
 
+
 /* USER CODE END Includes */
 /* USER CODE BEGIN PD */
-#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
-#define FM24_READ 0xA1 // Device address of FM24 in read mode
-#define MAXIMUM_MEMORY_ADDRESS 255
-#define MAXIMUM_PAGE_ADDRESS 7
-#define MINIMUM_PAGE_ADDRES 0
+#define ADS12_WRITE 0x80
+#define ADS12_READ 0x81
 
+#define ADS12_STARTUP_CODE 0x08
+#define ADS12_RESET_CODE 0x06
+#define ADS12_POWERDOWN_CODE 0x02
+#define ADS12_READ_DATA_CODE 0x10
 /* USER CODE END PD */
 
 /* USER CODE BEGIN 1 */
 
-HAL_StatusTypeDef FRAM_Write(const uint8_t *data, uint8_t num_bytes);
-HAL_StatusTypeDef FRAM_Read(uint8_t *data,  uint8_t num_bytes);
+HAL_StatusTypeDef ADC_init(void);
+int ADC_read(void);
 
 
 /* USER CODE END 1 */

@@ -20,6 +20,11 @@
 #endif
 #endif
 
+/** Allow float comparisons */
+#define UNITY_INCLUDE_FLOAT
+/** Allow double comparisons*/
+#define UNITY_INCLUDE_DOUBLE
+
 /** Timeout for UART transmission */
 #define UART_TIMEOUT 1000
 

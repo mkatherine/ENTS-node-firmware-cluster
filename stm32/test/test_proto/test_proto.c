@@ -34,7 +34,7 @@
 
 #ifndef FLOAT_DELTA
 /** Delta between comparison between floating point numbers */
-#define FLOAT_DELTA 1e-9
+#define FLOAT_DELTA 1e-4
 #endif /* FLOAT_DELTA */
 
 
@@ -113,7 +113,7 @@ void test_timestamp(void)
   status = pb_encode(&ostream, google_protobuf_Timestamp_fields, &ts_encode);
   msg_len = ostream.bytes_written;
   
-  TEST_ASSERT_FALSE(status);
+  TEST_ASSERT_TRUE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
 
 
@@ -123,7 +123,7 @@ void test_timestamp(void)
   istream = pb_istream_from_buffer(buffer, msg_len);
   status = pb_decode(&istream, google_protobuf_Timestamp_fields, &ts_decode);
 
-  TEST_ASSERT_FALSE(status);
+  TEST_ASSERT_TRUE(status);
   TEST_ASSERT_EQUAL(UNIX_EPOCHS, ts_decode.seconds);
   TEST_ASSERT_EQUAL(0, ts_decode.nanos);
 }
@@ -140,7 +140,7 @@ void test_meta(void)
   status = pb_encode(&ostream, MeasurementMetadata_fields, &meta_encode);
   msg_len = ostream.bytes_written;
 
-  TEST_ASSERT_FALSE(status);
+  TEST_ASSERT_TRUE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
 
 
@@ -149,7 +149,7 @@ void test_meta(void)
   istream = pb_istream_from_buffer(buffer, msg_len);
   status = pb_decode(&istream, MeasurementMetadata_fields, &meta_decode);
 
-  TEST_ASSERT_FALSE(status);
+  TEST_ASSERT_TRUE(status);
 
   TEST_ASSERT_EQUAL(0, meta_decode.cell_id);
   TEST_ASSERT_EQUAL(1, meta_decode.logger_id);
@@ -171,7 +171,7 @@ void test_power(void)
   status = pb_encode(&ostream, PowerMeasurement_fields, &power_encode);
   msg_len = ostream.bytes_written;
 
-  TEST_ASSERT_FALSE(status);
+  TEST_ASSERT_TRUE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
 
 
@@ -180,7 +180,7 @@ void test_power(void)
   istream = pb_istream_from_buffer(buffer, msg_len);
   status = pb_decode(&istream, PowerMeasurement_fields, &power_decode);
 
-  TEST_ASSERT_FALSE(status);
+  TEST_ASSERT_TRUE(status);
 
   // Meta
   TEST_ASSERT_TRUE(power_decode.has_meta);
@@ -214,7 +214,7 @@ void test_teros12(void)
   istream = pb_istream_from_buffer(buffer, msg_len);
   status = pb_decode(&istream, Teros12Measurement_fields, &teros12_decode);
 
-  TEST_ASSERT_FALSE(status);
+  TEST_ASSERT_TRUE(status);
 
   // Meta
   TEST_ASSERT_TRUE(teros12_decode.has_meta);

@@ -40,11 +40,37 @@
 
 void SystemClock_Config(void);
   
-/** Global variable for all return codes */
-HAL_StatusTypeDef rc;
 
+/** Buffer for encoded data */
+uint8_t buffer[256];
+/** message length */
+size_t msg_len;
 
+/** Nanopb output buffer */
+pb_ostream_t ostream;
+/** Nanopb input buffer */
+pb_istream_t istream;
 
+/** Nanopb status code */
+bool status;
+
+/**
+ * @brief Default google_protobuf_Timestamp
+ *
+ * Used as submessage when testing parent messages. Defaults on each tests to
+ * UNIX_EPOCHS.
+ */ 
+google_protobuf_Timestamp ts_default;
+
+/**
+ * @brief Default MeasurementMetadata
+ * 
+ * Uses as submessage when testing parent messages. Defaults to zeros with
+ * ts_default
+ * 
+ * @see ts_default
+*/
+MeasurementMetadata meta_default;
 
 /**
  * @brief Setup code that runs at the start of every test
@@ -56,26 +82,14 @@ HAL_StatusTypeDef rc;
 */
 void setUp(void)
 {
-  // buffer to store encoded data
-  uint8_t buffer[256];
-  // message length
-  size_t msg_len;
+  // create output buffer
+  ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
-  // output buffer
-  pb_ostream_t ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-  // input buffer
-  pb_istream_t istream;
-
-  // status code for nanopb
-  bool status;
-
-  // Default timestamp
-  google_protobuf_Timestamp ts_default;
+  // Set default timestamp
   ts_default.seconds = UNIX_EPOCHS;
   ts_default.nanos = 0;
 
-  // Default measurement metadata
-  MeasurementMetadata meta_default;
+  // Set default measurement metadata
   meta_default.has_ts = true;
   meta_default.ts = ts_default;
   meta_default.cell_id = 0;
@@ -155,7 +169,7 @@ void test_power(void)
   power_encode.current = 120.1;
 
   status = pb_encode(&ostream, PowerMeasurement_fields, &power_encode);
-  msg_len = status.bytes_written;
+  msg_len = ostream.bytes_written;
 
   TEST_ASSERT_FALSE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
@@ -192,7 +206,7 @@ void test_teros12(void)
   teros12_encode.vwc_raw = 3200.2;
 
   status = pb_encode(&ostream, Teros12Measurement_fields, &teros12_encode);
-  msg_len = status.bytes_written;
+  msg_len = ostream.bytes_written;
 
 
   Teros12Measurement teros12_decode;

@@ -18,11 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,7 +57,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+  
 /* USER CODE END 0 */
 
 /**
@@ -84,8 +87,32 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_ADC_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  MX_GPIO_Init();
+
+  // Print the compilation time at startup
+  char info_str[100];
+  int info_len;
+  info_len = sprintf(
+    info_str,
+    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
+    __DATE__,__TIME__
+    );
+  HAL_UART_Transmit(&huart1, info_str, info_len, 1000);
+
+
+  uint32_t battery_voltage = 0;
+
+
+  // Calibrate and start conversion process
+  rc = HAL_ADCEx_Calibration_Start(&hadc);
+  if (rc != HAL_OK) Error_Handler();
+
+  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
+  if (rc != HAL_OK) Error_Handler();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -95,8 +122,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+    char buf[10];
+    int buf_len = sprintf(buf, "%d\n", battery_voltage);
+
+    HAL_UART_Transmit(&huart1, buf, buf_len, 1000);
+
+    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+
     HAL_Delay(500);
+
   }
   /* USER CODE END 3 */
 }
@@ -116,8 +150,10 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
@@ -154,7 +190,14 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+
+
   /* USER CODE BEGIN Error_Handler_Debug */
+  char error[30];
+  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  HAL_UART_Transmit(&huart1, error, error_len, 1000);
+
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)

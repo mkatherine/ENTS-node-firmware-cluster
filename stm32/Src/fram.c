@@ -116,9 +116,9 @@ HAL_StatusTypeDef FRAM_Read(uint8_t *data, uint8_t num_bytes) {
   */
  HAL_StatusTypeDef configure_Settings(uint64_t cell_ID, uint64_t logger_ID, uint64_t gateway_EUI, uint64_t application_EUI, uint64_t end_device_EUI){
     HAL_StatusTypeDef status = HAL_OK;
-    int byte_address = 0;
+
     for (int i = 0; i < 8; i++){
-        status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | USER_DATA_PAGE_ADDRESS), (CELL_ID_MEMORY_ADDRESS + byte_address), I2C_MEMADD_SIZE_8BIT, &byte, 1, 10); // Store 1 byte of the cell ID
+        status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | USER_DATA_PAGE_ADDRESS), (CELL_ID_MEMORY_ADDRESS + i), I2C_MEMADD_SIZE_8BIT, &byte, 1, 10); // Store 1 byte of the cell ID
         if (status != HAL_OK){ return status; }
     }
  }

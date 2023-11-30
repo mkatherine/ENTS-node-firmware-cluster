@@ -22,14 +22,15 @@
 #define ADS12_WRITE 0x80
 #define ADS12_READ 0x81
 
-#define ADS12_STARTUP_CODE 0x8
+#define ADS12_START_CODE 0x8
 #define ADS12_RESET_CODE 0x6
 #define ADS12_POWERDOWN_CODE 0x2
+#define ADS12_READ_DATA_CODE 0x10
 /* USER CODE END PD */
 
 /* USER CODE BEGIN 1 */
 
-void ADC_init(void);
+HAL_StatusTypeDef ADC_init(void);
 int ADC_read(void);
 
 

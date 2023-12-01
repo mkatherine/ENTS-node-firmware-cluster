@@ -38,22 +38,37 @@ public:
    * Allows for setting of URL on initialization.
    * 
    * @param url API URL
+   * @param port API port number
    */ 
-  Dirtviz(const std::string& url);
+  Dirtviz(const std::string& url, const uint16_t& port);
 
   /**
    * @brief Setter for @p url
    * 
    * @param new_url New API URL
   */
-  void SetPowerUrl(const std::string& new_url);
+  void SetUrl(const std::string& new_url);
 
   /**
    * @brief Getter for @p url
    * 
    * @returns Value of @p url
   */
-  std::string GetPowerUrl(void) const;
+  std::string GetUrl(void) const;
+
+  /**
+   * @brief Setter for @p port
+   * 
+   * @param new_port New port number
+  */
+  void SetPort(const uint16_t& new_port);
+
+  /**
+   * @brief Getter for @p port
+   * 
+   * @returns value of @p url
+  */
+  uint16_t GetPort(void) const;
 
   /**
    * @brief Send serialized measurement to the API

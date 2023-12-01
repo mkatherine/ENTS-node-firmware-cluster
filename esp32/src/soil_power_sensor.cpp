@@ -6,17 +6,20 @@
  */
 
 #include <Arduino.h>
-
 #include <WiFi.h>
+
+#include "dirtviz.hpp"
 
 /** Baud rate for serial interface */
 #define SERIAL_BAUD 115200
 
-
 const char ssid[] = "my-ssid";
 const char pass[] = "pass";
 
-wl_status_t rc;
+Dirtviz api("dirtviz.jlab.ucsc.edu", 443);
+
+const char data[] = "hello world";
+const size_t data_len = 12;
 
 /**
  * @brief Initialization code run on startup
@@ -25,14 +28,16 @@ wl_status_t rc;
 */
 void setup()
 {
-  #if DEBUG 
   // Start serial interface
   Serial.begin(115200);
   // Wait for serial connection
   while (!Serial) { delay(100); }
 
-  Serial.println("Connect to SSID: " + ssid + ", PASS: " + pass);
-  #endif
+  Serial.print("SSID: ");
+  Serial.println(ssid);
+  Serial.print("Password: ");
+  Serial.println(pass);
+  Serial.print("Connecting");
 
   // Connect to WiFi network
   WiFi.begin(ssid, pass);
@@ -43,9 +48,22 @@ void setup()
     delay(500);
     Serial.print(".");
   }
+
+  Serial.println("");
+  Serial.println("Connected!");
+  Serial.println(WiFi.localIP());
 }
 
 void loop()
 {
-  Serial.println(WiFi.status());
+  // Buffer to store response
+  static uint8_t resp[256];
+  static size_t resp_len;
+
+  // Send example measurement
+  resp_len = api.SendMeasurement((const uint8_t*) data, data_len, resp);
+
+  // Print response
+  Serial.print("Response:");
+  Serial.println((char*) resp);
 }

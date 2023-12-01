@@ -95,31 +95,3 @@ HAL_StatusTypeDef pop(uint8_t *data, uint8_t num_bytes) {
     return status;
  }
 
-/**
-  ******************************************************************************
-  * @brief    This function stores user configurable settings to non-volatile memory.
-  *           Specifically cell ID, logger ID, LoRaWAN gateway EUI, LoRaWAN application EUI and 
-  *           end device EUI.
-  * 
-  *           This function is a wrapper for the STM32 HAl I2C library. The FM24CL16B uses
-  *           I2C the I2C communication protocol. This function stores the cell ID, logger ID, LoRaWAN gateway EUI, LoRaWAN application EUI and 
-  *           end device EUI at the hard-coded memory adresses: 0x00, 0x08, 0x10, 0x17 and 0x1f respectivley. This data is stored on the FM24CL16B's 
-  *           8th page of memory.
-  *           
-  * @param    cell_ID The 64 bit microbial fuel cell identifier. Pass in hex format.
-  * @param    logger_ID The 64 bit logger identifier. Pass in hex format.
-  * @param    gateway_EUI The 64 bit LoRaWAN gateway extended unique identifier. Pass in hex format.
-  * @param    application_EUI The 64 bit LoRaWAN application extended unique identifier. Pass in hex format.
-  * @param    end_device_EUI The 64 bit LoRaWAN end-device extended unique identifier. Pass in hex format.
-  * @return   HAL_StatusTypeDef, status of the I2C function
-  ******************************************************************************
-  */
- HAL_StatusTypeDef configure_Settings(uint64_t cell_ID, uint64_t logger_ID, uint64_t gateway_EUI, uint64_t application_EUI, uint64_t end_device_EUI){
-    HAL_StatusTypeDef status = HAL_OK;
-
-//     for (int i = 0; i < 8; i++){
-//         status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | USER_DATA_PAGE_ADDRESS), (CELL_ID_MEMORY_ADDRESS + i), I2C_MEMADD_SIZE_8BIT, &byte, 1, 10); // Store 1 byte of the cell ID
-//         if (status != HAL_OK){ return status; }
-//     }
-    return status;
-  }

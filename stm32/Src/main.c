@@ -114,24 +114,35 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //uint32_t value_adc;
-  char output[100];
-  char output1[42];
-  char output2[30];
+  // char output[100];
+  // char output1[42];
+  // char output2[30];
   const unsigned char * test_intro = "\r\nThis is the FRAM library test harness\r\n";
-  const unsigned char * HAL_intto = "Testing HAL libraries\r\n";
-  const unsigned char * FRAM_failure = "FRAM did not respond\r\n";
-  const unsigned char * mem_failure = "Failed to read/write to mem_address 0\r\n";
+  //const unsigned char * HAL_intto = "Testing HAL libraries\r\n";
+  //const unsigned char * FRAM_failure = "FRAM did not respond\r\n";
+  //const unsigned char * mem_failure = "Failed to read/write to mem_address 0\r\n";
   const unsigned char * success = "Success\r\n";
   const unsigned char * failure = "Failure\r\n";
   const unsigned char * Basic_intro = "Testing basic read/write functions\r\n";
-  uint8_t test = 34;
-  uint8_t recieved;
+  // uint8_t test = 34;
+  // uint8_t recieved;
   uint8_t data[] = {25, 50, 75, 100};
   uint8_t rec[4];
   uint8_t data1[] = {3, 4, 9, 100, 10, 50, 25, 23, 25, 25, 7, 9, 10, 11, 12};
   uint8_t data2[5] = {36, 29, 20, 20, 0};
   uint8_t rec1[15];
   uint8_t rec2[5];
+
+  configuration c;
+  c.cell_ID = 0x00000000;
+  c.logger_ID = 0x11111111;
+  c.gateway_EUI = 0x22222222;
+  c.application_EUI = 0x33333333;
+  c.end_device_EUI = 0x44444444;
+  c.logging_interval = 0x5555;
+  c.upload_interval = 0x6666;
+  configuration r;
+
 
   HAL_UART_Transmit(&huart1, test_intro, 42, 1000);
 
@@ -180,10 +191,6 @@ int main(void)
   // HAL_UART_Transmit(&huart1, output, 21, 10);
   // sprintf(output, "Read: %d,%d,%d,%d\r\n", rec[0],rec[1],rec[2],rec[3]);
   // HAL_UART_Transmit(&huart1, output, 20, 10);
-  uint8_t len;
-  len = sizeof(data1); // calculate length of data in bytes
-  sprintf(output, "len: %d\r\n", len);
-    HAL_UART_Transmit(&huart1, output, 11, 10);
   FRAM_Write(data1, 15);
   if (FRAM_Read(rec1) == HAL_OK){
     if ((data1[0] == rec1[0])&& 
@@ -223,6 +230,8 @@ int main(void)
   // HAL_UART_Transmit(&huart1, output1, 23, 10);
   // sprintf(output2, "Read: %d,%d,%d,%d,%d\r\n", rec3[0],rec3[1],rec3[2],rec3[3],rec3[4]);
   // HAL_UART_Transmit(&huart1, output2, 23, 10);
+  configure_Settings(c);
+  r = read_Settings();
   
 
 

@@ -23,12 +23,7 @@
 #define MAXIMUM_MEMORY_ADDRESS 255
 #define MAXIMUM_PAGE_ADDRESS 6
 #define MINIMUM_PAGE_ADDRES 0
-#define USER_DATA_PAGE_ADDRESS 0x07
-#define CELL_ID_MEMORY_ADDRESS 0x00
-#define LOGGER_ID_MEMORY_ADDRESS 0x08
-#define LORA_GATEWAY_EUI_MEMORY_ADDRESS 0x10
-#define LORA_APPLICATION_EUI_MEMORY_ADDRESS 0x17
-#define LORA_END_DEVICE_EUI_MEMORY_ADDRESS 0x1f
+
 
 /* USER CODE END PD */
 
@@ -36,7 +31,7 @@
 
 HAL_StatusTypeDef push(const uint8_t *data, uint8_t num_bytes);
 HAL_StatusTypeDef pop(uint8_t *data,  uint8_t num_bytes);
-HAL_StatusTypeDef configure_Settings(uint64_t cell_ID, uint64_t logger_ID, uint64_t gateway_EUI, uint64_t application_EUI, uint64_t end_device_EUI);
+
 
 
 

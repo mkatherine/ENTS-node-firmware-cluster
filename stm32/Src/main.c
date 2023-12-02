@@ -100,7 +100,7 @@ int main(void)
     "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
     __DATE__,__TIME__
     );
-  HAL_UART_Transmit(&huart1, info_str, info_len, 1000);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
 
   uint32_t battery_voltage = 0;
@@ -123,9 +123,9 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     char buf[10];
-    int buf_len = sprintf(buf, "%d\n", battery_voltage);
+    int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
-    HAL_UART_Transmit(&huart1, buf, buf_len, 1000);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
 
     //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 
@@ -196,7 +196,7 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
   int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
-  HAL_UART_Transmit(&huart1, error, error_len, 1000);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();

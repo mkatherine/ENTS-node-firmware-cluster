@@ -70,7 +70,7 @@ void delay(int number_of_seconds)
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+  
 /* USER CODE END 0 */
 
 /**
@@ -146,8 +146,10 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
@@ -184,7 +186,14 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+
+
   /* USER CODE BEGIN Error_Handler_Debug */
+  char error[30];
+  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) error, error_len, 1000);
+
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)

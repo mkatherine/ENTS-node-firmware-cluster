@@ -1,3 +1,5 @@
+[![Build stm32](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/stm32.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/stm32.yaml) [![Build esp32](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/esp32.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/esp32.yaml) [![Doxygen](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/docs.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/docs.yaml)
+
 # soil-power-sensor-firmware
 
 Firmware for STM32 and ESP32 microcontrollers on the Soil Power Sensor board
@@ -54,3 +56,19 @@ In `platformio.ini` change `platform = atmelavr` to `platform = ststm32`
 ```bash
 pio run
 ```
+
+
+## Generating documentation
+
+HTML documentation is generated with `doxygen` per project. Running the following command in `stm32/` and `esp32/` results in docs being generated in `stm32/docs/html/` and `stm32/docs/html` respectively.
+
+```bash
+doxygen Doxyfile
+```
+
+Online versions of the documentation is available for the main branch at
+
+| Project | URL                                                  |
+|---------|------------------------------------------------------|
+| stm32   | https://jlab-sensing.github.io/soil-power-sensor-firmware/stm32/ |
+| esp32   | https://jlab-sensing.github.io/soil-power-sensor-firmware/esp32/ |

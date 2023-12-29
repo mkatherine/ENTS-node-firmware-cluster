@@ -208,6 +208,9 @@ void test_teros12(void)
   status = pb_encode(&ostream, Teros12Measurement_fields, &teros12_encode);
   msg_len = ostream.bytes_written;
 
+  TEST_ASSERT_TRUE(status);
+  TEST_ASSERT_GREATER_THAN(0, msg_len);
+
 
   Teros12Measurement teros12_decode;
 
@@ -231,9 +234,31 @@ void test_teros12(void)
   TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 3200.2, teros12_decode.vwc_raw);
 }
 
+void test_response(void)
+{
+  Response response_encode = Response_init_zero;
+  response_encode.resp = ResponseCode_SUCCESS;
+
+  status = pb_encode(&ostream, Response_fields, &response_encode);
+  msg_len = ostream.bytes_written;
+  
+  TEST_ASSERT_TRUE(status);
+  TEST_ASSERT_GREATER_THAN(0, msg_len);
+
+
+  Response response_decode;
+
+  istream = pb_istream_from_buffer(buffer, msg_len);
+  status = pb_decode(&istream, Response_fields, &response_decode);
+
+  TEST_ASSERT_TRUE(status);
+
+  TEST_ASSERT_EQUAL(ResponseCode_SUCCESS, response_decode.resp);
+}
+
 
 /**
-  * @brief Entry point for battery test
+  * @brief Entry point for protobuf test
   * @retval int
   */
 int main(void)
@@ -259,6 +284,8 @@ int main(void)
   RUN_TEST(test_power);
   // Tests for Teros12
   RUN_TEST(test_teros12);
+  // Tests for Response
+  RUN_TEST(test_response);
 
   UNITY_END();
 }

@@ -10,6 +10,15 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
+/* Enum definitions */
+/* Response codes from server */
+typedef enum _ResponseCode {
+    /* Data was successfully uploaded */
+    ResponseCode_SUCCESS = 0,
+    /* General Error */
+    ResponseCode_ERROR = 1
+} ResponseCode;
+
 /* Struct definitions */
 /* Data shared between all measurement messages */
 typedef struct _MeasurementMetadata {
@@ -47,18 +56,37 @@ typedef struct _Teros12Measurement {
     uint32_t ec;
 } Teros12Measurement;
 
+/* Acknowledge Packet */
+typedef struct _Response {
+    /* Response from server */
+    ResponseCode resp;
+} Response;
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/* Helper constants for enums */
+#define _ResponseCode_MIN ResponseCode_SUCCESS
+#define _ResponseCode_MAX ResponseCode_ERROR
+#define _ResponseCode_ARRAYSIZE ((ResponseCode)(ResponseCode_ERROR+1))
+
+
+
+
+#define Response_resp_ENUMTYPE ResponseCode
+
+
 /* Initializer values for message structs */
 #define MeasurementMetadata_init_default         {0, 0, false, google_protobuf_Timestamp_init_default}
 #define PowerMeasurement_init_default            {false, MeasurementMetadata_init_default, 0, 0}
 #define Teros12Measurement_init_default          {false, MeasurementMetadata_init_default, 0, 0, 0, 0}
+#define Response_init_default                    {_ResponseCode_MIN}
 #define MeasurementMetadata_init_zero            {0, 0, false, google_protobuf_Timestamp_init_zero}
 #define PowerMeasurement_init_zero               {false, MeasurementMetadata_init_zero, 0, 0}
 #define Teros12Measurement_init_zero             {false, MeasurementMetadata_init_zero, 0, 0, 0, 0}
+#define Response_init_zero                       {_ResponseCode_MIN}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define MeasurementMetadata_cell_id_tag          1
@@ -72,6 +100,7 @@ extern "C" {
 #define Teros12Measurement_vwc_adj_tag           3
 #define Teros12Measurement_temp_tag              4
 #define Teros12Measurement_ec_tag                5
+#define Response_resp_tag                        1
 
 /* Struct field encoding specification for nanopb */
 #define MeasurementMetadata_FIELDLIST(X, a) \
@@ -100,18 +129,26 @@ X(a, STATIC,   SINGULAR, UINT32,   ec,                5)
 #define Teros12Measurement_DEFAULT NULL
 #define Teros12Measurement_meta_MSGTYPE MeasurementMetadata
 
+#define Response_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
+#define Response_CALLBACK NULL
+#define Response_DEFAULT NULL
+
 extern const pb_msgdesc_t MeasurementMetadata_msg;
 extern const pb_msgdesc_t PowerMeasurement_msg;
 extern const pb_msgdesc_t Teros12Measurement_msg;
+extern const pb_msgdesc_t Response_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define MeasurementMetadata_fields &MeasurementMetadata_msg
 #define PowerMeasurement_fields &PowerMeasurement_msg
 #define Teros12Measurement_fields &Teros12Measurement_msg
+#define Response_fields &Response_msg
 
 /* Maximum encoded size of messages (where known) */
 #define MeasurementMetadata_size                 36
 #define PowerMeasurement_size                    56
+#define Response_size                            2
 #define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Teros12Measurement_size
 #define Teros12Measurement_size                  59
 

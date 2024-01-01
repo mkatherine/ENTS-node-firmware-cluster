@@ -16,7 +16,9 @@ Dirtviz::Dirtviz(const char *url, const uint16_t &port)
 
 Dirtviz::~Dirtviz()
 {
+  // free memory
   free(this->url);
+  free(this->response);
 }
 
 void Dirtviz::SetUrl(const char *new_url)
@@ -25,17 +27,8 @@ void Dirtviz::SetUrl(const char *new_url)
   size_t url_len = strlen(new_url);
   ++url_len;
 
-  // if the url is empty then malloc, otherwise realloc
-  if (this->url == nullptr)
-  {
-    // assign memory
-    this->url = (char *) malloc(url_len);
-  }
-  else
-  {
-    // reallocate memory
-    this->url = (char *) realloc(this->url, url_len);
-  }
+  // allocate memory
+  this->url = (char *) realloc(this->url, url_len);
 
   // copy string
   strcpy(this->url, new_url);
@@ -56,8 +49,7 @@ uint16_t Dirtviz::GetPort(void) const
   return this->port;
 }
 
-size_t Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len,
-                                uint8_t *resp)
+int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
 {
   // WiFi client for connection with API
   WiFiClient client;
@@ -83,25 +75,61 @@ size_t Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len,
   // newline indicating end of headers
   client.println();
   // send data
-  client.print((char *) meas);
+  for (int idx; idx < meas_len; ++idx)
+  {
+    client.write(meas[idx]);
+  }
 
 
   // read response
   
-  // TODO implement with malloc to store in dynamic buffer with separate call
-  // that gets the response. That way the HTTP code is handled on the ESP32
-  // and "hopefully" the binary data that gets sent back is passed directly
-  // over I2C
-
-  // create buffer
+  // get length of response
   int resp_len = client.available();
-  char resp_buf[resp_len];
+  // allocate memory
+  this->response = (char *) realloc(this->response, resp_len);
 
+  // copy into buffer
   for (int idx = 0; idx < resp_len; ++idx)
   {
-    resp_buf[idx] = client.read();
+    this->response[idx] = client.read();
   }
 
   // disconnect after message is sent
   client.stop();
+
+
+  // find status code
+  int status_code;
+  if (sscanf(this->response, "%*s %d", &status_code) != 1)
+  {
+    return -1;
+  }
+
+  return status_code;  
+}
+
+size_t Dirtviz::GetResponse(const uint8_t *data) const
+{
+  // find response length from header
+
+  // get pointer to start of line
+  const char *length_start = strstr(this->response, "Content-Length:");
+  if (length_start == nullptr)
+  {
+    return 0;
+  }
+
+  // parse the length
+  size_t data_len;
+  if (sscanf(length_start, "%*s %u", &data_len))
+  {
+    return 0;
+  }
+
+  // read binary data, look for double CRLF
+  data = (const uint8_t *) strstr(this->response, "\r\n\r\n");
+  data += 4;
+
+  // return the length of data
+  return data_len;
 }

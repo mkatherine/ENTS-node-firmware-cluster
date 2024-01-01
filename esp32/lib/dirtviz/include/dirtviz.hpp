@@ -8,6 +8,7 @@
 */
 
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 
 #include <WiFi.h>
@@ -23,6 +24,9 @@ private:
 
   /** Port of API*/
   uint16_t port;
+
+  /** Buffer for the HTTP response */
+  char *response = nullptr;
 
 
 public:
@@ -72,12 +76,25 @@ public:
   /**
    * @brief Send serialized measurement to the API
    * 
-   * @param[in] meas Pointer to serialized measurement data
-   * @param[in] meas_len Number of bytes in @p meas
-   * @param[out] resp Serialized response from server
+   * The entire response is stored in a dynamically allocated buffer. Use
+   * Dirtviz::GetResponse to get the binary response data.
    * 
-   * @return Length of @p resp
+   * @param meas Pointer to serialized measurement data
+   * @param meas_len Number of bytes in @p meas
+   * 
+   * @return HTTP response code, -1 indicates an error in parsing
   */
-  size_t SendMeasurement(const uint8_t *meas, size_t meas_len,
-                         uint8_t *resp);
+  int SendMeasurement(const uint8_t *meas, size_t meas_len);
+
+  /**
+   * @brief Get binary data from response
+   * 
+   * A returned length of 0 indicates an error and the pointer @p data has not
+   * been modified.
+   * 
+   * @param data Pointer to response binary data
+   * 
+   * @return Length of @p data
+  */
+  size_t GetResponse(const uint8_t *data) const;
 };

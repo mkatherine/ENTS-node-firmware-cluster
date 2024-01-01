@@ -7,7 +7,8 @@
  * @date 2023-11-29
 */
 
-#include <string>
+#include <cstdlib>
+#include <cstring>
 
 #include <WiFi.h>
 
@@ -18,7 +19,7 @@ class Dirtviz
 {
 private:
   /** URL of API */
-  std::string url;
+  char *url = nullptr;
 
   /** Port of API*/
   uint16_t port;
@@ -33,28 +34,33 @@ public:
    * @param url API URL
    * @param port API port number
    */ 
-  Dirtviz(const std::string& url, const uint16_t& port);
+  Dirtviz(const char *url, const uint16_t &port);
+
+  /**
+   * @brief Frees all memory
+  */
+  ~Dirtviz();
 
   /**
    * @brief Setter for @p url
    * 
    * @param new_url New API URL
   */
-  void SetUrl(const std::string& new_url);
+  void SetUrl(const char *new_url);
 
   /**
    * @brief Getter for @p url
    * 
-   * @returns Value of @p url
+   * @returns Pointer to @p url
   */
-  std::string GetUrl(void) const;
+  const char *GetUrl(void) const;
 
   /**
    * @brief Setter for @p port
    * 
    * @param new_port New port number
   */
-  void SetPort(const uint16_t& new_port);
+  void SetPort(const uint16_t &new_port);
 
   /**
    * @brief Getter for @p port
@@ -72,6 +78,6 @@ public:
    * 
    * @return Length of @p resp
   */
-  size_t SendMeasurement(const uint8_t* meas, size_t meas_len,
-                         uint8_t* resp);
+  size_t SendMeasurement(const uint8_t *meas, size_t meas_len,
+                         uint8_t *resp);
 };

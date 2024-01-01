@@ -7,22 +7,43 @@
 
 #include "dirtviz.hpp"
 
-Dirtviz::Dirtviz(const std::string& url, const uint16_t& port)
+Dirtviz::Dirtviz(const char *url, const uint16_t &port)
 {
   // set parameters
   this->SetUrl(url);
   this->SetPort(port);
-  
 }
 
-void Dirtviz::SetUrl(const std::string& new_url)
+Dirtviz::~Dirtviz()
 {
-  this->url = new_url;
+  free(this->url);
 }
 
-std::string Dirtviz::GetUrl(void) const
+void Dirtviz::SetUrl(const char *new_url)
 {
-  return this->url;
+  // get length of new url string, add 1 for null char
+  size_t url_len = strlen(new_url);
+  ++url_len;
+
+  // if the url is empty then malloc, otherwise realloc
+  if (this->url == nullptr)
+  {
+    // assign memory
+    this->url = (char *) malloc(url_len);
+  }
+  else
+  {
+    // reallocate memory
+    this->url = (char *) realloc(this->url, url_len);
+  }
+
+  // copy string
+  strcpy(this->url, new_url);
+}
+
+const char *Dirtviz::GetUrl(void) const
+{
+  return this->url; 
 }
 
 void Dirtviz::SetPort(const uint16_t &new_port)

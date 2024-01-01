@@ -18,8 +18,8 @@ const char pass[] = "pass";
 
 Dirtviz api("dirtviz.jlab.ucsc.edu", 443);
 
-const char data[] = "hello world";
-const size_t data_len = 12;
+const char data[] = "Hello World!";
+const size_t data_len = 13;
 
 /**
  * @brief Initialization code run on startup
@@ -56,14 +56,20 @@ void setup()
 
 void loop()
 {
-  // Buffer to store response
-  static uint8_t resp[256];
-  static size_t resp_len;
+  int resp_code;
+
+  const uint8_t *resp_data;
+  size_t resp_data_len;
 
   // Send example measurement
-  resp_len = api.SendMeasurement((const uint8_t*) data, data_len, resp);
+  resp_code = api.SendMeasurement((const uint8_t*) data, data_len);
+  Serial.println("Response Code: " + resp_code);
 
-  // Print response
-  Serial.print("Response:");
-  Serial.println((char*) resp);
+  // Get response data
+  resp_data_len = api.GetResponse(resp_data);
+  Serial.println("Response:");
+  Serial.write(resp_data, resp_data_len);
+
+  // wait 1s
+  delay(1000);
 }

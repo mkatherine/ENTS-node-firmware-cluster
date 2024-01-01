@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+"""
+@file http_server.py
+
+HTTP server used for testing functionality of the ESP32 WiFi interface.
+
+@author John Madden <jmadden173@pm.me>
+@date 2024-01-01
+"""
+
 import argparse
 from http.server import BaseHTTPRequestHandler, HTTPServer
 

@@ -75,7 +75,7 @@ int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
   // newline indicating end of headers
   client.println();
   // send data
-  for (int idx; idx < meas_len; ++idx)
+  for (int idx = 0; idx < meas_len; ++idx)
   {
     client.write(meas[idx]);
   }

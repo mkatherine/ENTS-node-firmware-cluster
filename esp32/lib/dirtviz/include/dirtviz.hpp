@@ -23,15 +23,8 @@ private:
   /** Port of API*/
   uint16_t port;
 
-  /** WiFi client for connection with API*/
-  WiFiClient client;
 
 public:
-  /**
-   * @brief Default constructor
-  */
-  Dirtviz(void);
-
   /**
    * @brief Default constructor
    * 

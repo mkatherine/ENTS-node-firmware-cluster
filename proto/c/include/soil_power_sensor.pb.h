@@ -12,12 +12,12 @@
 
 /* Enum definitions */
 /* Response codes from server */
-typedef enum _ResponseCode {
+typedef enum _Response_ResponseType {
     /* Data was successfully uploaded */
-    ResponseCode_SUCCESS = 0,
+    Response_ResponseType_SUCCESS = 0,
     /* General Error */
-    ResponseCode_ERROR = 1
-} ResponseCode;
+    Response_ResponseType_ERROR = 1
+} Response_ResponseType;
 
 /* Struct definitions */
 /* Data shared between all measurement messages */
@@ -34,8 +34,6 @@ typedef struct _MeasurementMetadata {
 /* Power measurement message. Voltage and current can be digitially combined to
  obtain power. */
 typedef struct _PowerMeasurement {
-    bool has_meta;
-    MeasurementMetadata meta;
     /* voltage */
     double voltage;
     /* current */
@@ -44,8 +42,6 @@ typedef struct _PowerMeasurement {
 
 /* Teros12 measurement message */
 typedef struct _Teros12Measurement {
-    bool has_meta;
-    MeasurementMetadata meta;
     /* raw volumetric water content */
     float vwc_raw;
     /* calibrated volumetric water content */
@@ -56,10 +52,22 @@ typedef struct _Teros12Measurement {
     uint32_t ec;
 } Teros12Measurement;
 
+/* Top level measurement message */
+typedef struct _Measurement {
+    /* Metadata */
+    bool has_meta;
+    MeasurementMetadata meta;
+    pb_size_t which_measurement;
+    union {
+        PowerMeasurement power;
+        Teros12Measurement teros12;
+    } measurement;
+} Measurement;
+
 /* Acknowledge Packet */
 typedef struct _Response {
     /* Response from server */
-    ResponseCode resp;
+    Response_ResponseType resp;
 } Response;
 
 
@@ -68,38 +76,42 @@ extern "C" {
 #endif
 
 /* Helper constants for enums */
-#define _ResponseCode_MIN ResponseCode_SUCCESS
-#define _ResponseCode_MAX ResponseCode_ERROR
-#define _ResponseCode_ARRAYSIZE ((ResponseCode)(ResponseCode_ERROR+1))
+#define _Response_ResponseType_MIN Response_ResponseType_SUCCESS
+#define _Response_ResponseType_MAX Response_ResponseType_ERROR
+#define _Response_ResponseType_ARRAYSIZE ((Response_ResponseType)(Response_ResponseType_ERROR+1))
 
 
 
 
-#define Response_resp_ENUMTYPE ResponseCode
+
+#define Response_resp_ENUMTYPE Response_ResponseType
 
 
 /* Initializer values for message structs */
 #define MeasurementMetadata_init_default         {0, 0, false, google_protobuf_Timestamp_init_default}
-#define PowerMeasurement_init_default            {false, MeasurementMetadata_init_default, 0, 0}
-#define Teros12Measurement_init_default          {false, MeasurementMetadata_init_default, 0, 0, 0, 0}
-#define Response_init_default                    {_ResponseCode_MIN}
+#define PowerMeasurement_init_default            {0, 0}
+#define Teros12Measurement_init_default          {0, 0, 0, 0}
+#define Measurement_init_default                 {false, MeasurementMetadata_init_default, 0, {PowerMeasurement_init_default}}
+#define Response_init_default                    {_Response_ResponseType_MIN}
 #define MeasurementMetadata_init_zero            {0, 0, false, google_protobuf_Timestamp_init_zero}
-#define PowerMeasurement_init_zero               {false, MeasurementMetadata_init_zero, 0, 0}
-#define Teros12Measurement_init_zero             {false, MeasurementMetadata_init_zero, 0, 0, 0, 0}
-#define Response_init_zero                       {_ResponseCode_MIN}
+#define PowerMeasurement_init_zero               {0, 0}
+#define Teros12Measurement_init_zero             {0, 0, 0, 0}
+#define Measurement_init_zero                    {false, MeasurementMetadata_init_zero, 0, {PowerMeasurement_init_zero}}
+#define Response_init_zero                       {_Response_ResponseType_MIN}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define MeasurementMetadata_cell_id_tag          1
 #define MeasurementMetadata_logger_id_tag        2
 #define MeasurementMetadata_ts_tag               3
-#define PowerMeasurement_meta_tag                1
 #define PowerMeasurement_voltage_tag             2
 #define PowerMeasurement_current_tag             3
-#define Teros12Measurement_meta_tag              1
 #define Teros12Measurement_vwc_raw_tag           2
 #define Teros12Measurement_vwc_adj_tag           3
 #define Teros12Measurement_temp_tag              4
 #define Teros12Measurement_ec_tag                5
+#define Measurement_meta_tag                     1
+#define Measurement_power_tag                    2
+#define Measurement_teros12_tag                  3
 #define Response_resp_tag                        1
 
 /* Struct field encoding specification for nanopb */
@@ -112,22 +124,28 @@ X(a, STATIC,   OPTIONAL, MESSAGE,  ts,                3)
 #define MeasurementMetadata_ts_MSGTYPE google_protobuf_Timestamp
 
 #define PowerMeasurement_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  meta,              1) \
 X(a, STATIC,   SINGULAR, DOUBLE,   voltage,           2) \
 X(a, STATIC,   SINGULAR, DOUBLE,   current,           3)
 #define PowerMeasurement_CALLBACK NULL
 #define PowerMeasurement_DEFAULT NULL
-#define PowerMeasurement_meta_MSGTYPE MeasurementMetadata
 
 #define Teros12Measurement_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  meta,              1) \
 X(a, STATIC,   SINGULAR, FLOAT,    vwc_raw,           2) \
 X(a, STATIC,   SINGULAR, FLOAT,    vwc_adj,           3) \
 X(a, STATIC,   SINGULAR, FLOAT,    temp,              4) \
 X(a, STATIC,   SINGULAR, UINT32,   ec,                5)
 #define Teros12Measurement_CALLBACK NULL
 #define Teros12Measurement_DEFAULT NULL
-#define Teros12Measurement_meta_MSGTYPE MeasurementMetadata
+
+#define Measurement_FIELDLIST(X, a) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  meta,              1) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,power,measurement.power),   2) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,teros12,measurement.teros12),   3)
+#define Measurement_CALLBACK NULL
+#define Measurement_DEFAULT NULL
+#define Measurement_meta_MSGTYPE MeasurementMetadata
+#define Measurement_measurement_power_MSGTYPE PowerMeasurement
+#define Measurement_measurement_teros12_MSGTYPE Teros12Measurement
 
 #define Response_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
@@ -137,20 +155,23 @@ X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
 extern const pb_msgdesc_t MeasurementMetadata_msg;
 extern const pb_msgdesc_t PowerMeasurement_msg;
 extern const pb_msgdesc_t Teros12Measurement_msg;
+extern const pb_msgdesc_t Measurement_msg;
 extern const pb_msgdesc_t Response_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define MeasurementMetadata_fields &MeasurementMetadata_msg
 #define PowerMeasurement_fields &PowerMeasurement_msg
 #define Teros12Measurement_fields &Teros12Measurement_msg
+#define Measurement_fields &Measurement_msg
 #define Response_fields &Response_msg
 
 /* Maximum encoded size of messages (where known) */
 #define MeasurementMetadata_size                 36
-#define PowerMeasurement_size                    56
+#define Measurement_size                         61
+#define PowerMeasurement_size                    18
 #define Response_size                            2
-#define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Teros12Measurement_size
-#define Teros12Measurement_size                  59
+#define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Measurement_size
+#define Teros12Measurement_size                  21
 
 #ifdef __cplusplus
 } /* extern "C" */

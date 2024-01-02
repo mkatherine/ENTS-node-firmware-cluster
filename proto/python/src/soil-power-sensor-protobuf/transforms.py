@@ -4,7 +4,7 @@
    :date: 2024-01-01
 """
 
-from .soil_power_sensor_pb2 import Response, ResponseCode
+from .soil_power_sensor_pb2 import Measurement, Response
 
 def encode(success: bool = True):
     """Encodes a response
@@ -23,9 +23,9 @@ def encode(success: bool = True):
     # format response 
     response = Response()
     if success:
-        response.resp = ResponseCode.SUCCESS
+        response.resp = Response.ResponseType.SUCCESS
     else:
-        response.resp = ResponseCode.ERROR
+        response.resp = Response.ResponseType.ERROR
        
     # return encode message 
     return response.SerializeToString()

@@ -15,6 +15,9 @@ PB_BIND(PowerMeasurement, PowerMeasurement, AUTO)
 PB_BIND(Teros12Measurement, Teros12Measurement, AUTO)
 
 
+PB_BIND(Measurement, Measurement, AUTO)
+
+
 PB_BIND(Response, Response, AUTO)
 
 

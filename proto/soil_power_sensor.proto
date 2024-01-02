@@ -28,8 +28,6 @@ message MeasurementMetadata {
 /* Power measurement message. Voltage and current can be digitially combined to
  * obtain power. */
 message PowerMeasurement {
-  MeasurementMetadata meta = 1;
-
   // voltage
   double voltage = 2;
   // current
@@ -38,8 +36,6 @@ message PowerMeasurement {
 
 /* Teros12 measurement message */
 message Teros12Measurement {
-  MeasurementMetadata meta = 1;
-
   // raw volumetric water content
   float vwc_raw = 2;
   // calibrated volumetric water content
@@ -50,16 +46,28 @@ message Teros12Measurement {
   uint32 ec = 5;
 }
 
-/* Response codes from server */
-enum ResponseCode {
-  /* Data was successfully uploaded */
-  SUCCESS = 0;
-  /* General Error */
-  ERROR = 1;
+/* Top level measurement message */
+message Measurement {
+  // Metadata
+  MeasurementMetadata meta = 1;
+
+  // Possible measurements
+  oneof measurement {
+    PowerMeasurement power = 2;
+    Teros12Measurement teros12 = 3;
+  }
 }
 
 /* Acknowledge Packet */
 message Response {
+  /* Response codes from server */
+  enum ResponseType {
+    /* Data was successfully uploaded */
+    SUCCESS = 0;
+    /* General Error */
+    ERROR = 1;
+  }
+
   /* Response from server */
-  ResponseCode resp = 1; 
+  ResponseType resp = 1; 
 }

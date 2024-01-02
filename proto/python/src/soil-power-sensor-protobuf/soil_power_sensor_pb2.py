@@ -15,21 +15,23 @@ _sym_db = _symbol_database.Default()
 import timestamp_pb2 as timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17soil_power_sensor.proto\x1a\x0ftimestamp.proto\"a\n\x13MeasurementMetadata\x12\x0f\n\x07\x63\x65ll_id\x18\x01 \x01(\r\x12\x11\n\tlogger_id\x18\x02 \x01(\r\x12&\n\x02ts\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"X\n\x10PowerMeasurement\x12\"\n\x04meta\x18\x01 \x01(\x0b\x32\x14.MeasurementMetadata\x12\x0f\n\x07voltage\x18\x02 \x01(\x01\x12\x0f\n\x07\x63urrent\x18\x03 \x01(\x01\"t\n\x12Teros12Measurement\x12\"\n\x04meta\x18\x01 \x01(\x0b\x32\x14.MeasurementMetadata\x12\x0f\n\x07vwc_raw\x18\x02 \x01(\x02\x12\x0f\n\x07vwc_adj\x18\x03 \x01(\x02\x12\x0c\n\x04temp\x18\x04 \x01(\x02\x12\n\n\x02\x65\x63\x18\x05 \x01(\r\"\'\n\x08Response\x12\x1b\n\x04resp\x18\x01 \x01(\x0e\x32\r.ResponseCode*&\n\x0cResponseCode\x12\x0b\n\x07SUCCESS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17soil_power_sensor.proto\x1a\x0ftimestamp.proto\"a\n\x13MeasurementMetadata\x12\x0f\n\x07\x63\x65ll_id\x18\x01 \x01(\r\x12\x11\n\tlogger_id\x18\x02 \x01(\r\x12&\n\x02ts\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"4\n\x10PowerMeasurement\x12\x0f\n\x07voltage\x18\x02 \x01(\x01\x12\x0f\n\x07\x63urrent\x18\x03 \x01(\x01\"P\n\x12Teros12Measurement\x12\x0f\n\x07vwc_raw\x18\x02 \x01(\x02\x12\x0f\n\x07vwc_adj\x18\x03 \x01(\x02\x12\x0c\n\x04temp\x18\x04 \x01(\x02\x12\n\n\x02\x65\x63\x18\x05 \x01(\r\"\x8c\x01\n\x0bMeasurement\x12\"\n\x04meta\x18\x01 \x01(\x0b\x32\x14.MeasurementMetadata\x12\"\n\x05power\x18\x02 \x01(\x0b\x32\x11.PowerMeasurementH\x00\x12&\n\x07teros12\x18\x03 \x01(\x0b\x32\x13.Teros12MeasurementH\x00\x42\r\n\x0bmeasurement\"X\n\x08Response\x12$\n\x04resp\x18\x01 \x01(\x0e\x32\x16.Response.ResponseType\"&\n\x0cResponseType\x12\x0b\n\x07SUCCESS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'soil_power_sensor_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_RESPONSECODE']._serialized_start=392
-  _globals['_RESPONSECODE']._serialized_end=430
   _globals['_MEASUREMENTMETADATA']._serialized_start=44
   _globals['_MEASUREMENTMETADATA']._serialized_end=141
   _globals['_POWERMEASUREMENT']._serialized_start=143
-  _globals['_POWERMEASUREMENT']._serialized_end=231
-  _globals['_TEROS12MEASUREMENT']._serialized_start=233
-  _globals['_TEROS12MEASUREMENT']._serialized_end=349
-  _globals['_RESPONSE']._serialized_start=351
-  _globals['_RESPONSE']._serialized_end=390
+  _globals['_POWERMEASUREMENT']._serialized_end=195
+  _globals['_TEROS12MEASUREMENT']._serialized_start=197
+  _globals['_TEROS12MEASUREMENT']._serialized_end=277
+  _globals['_MEASUREMENT']._serialized_start=280
+  _globals['_MEASUREMENT']._serialized_end=420
+  _globals['_RESPONSE']._serialized_start=422
+  _globals['_RESPONSE']._serialized_end=510
+  _globals['_RESPONSE_RESPONSETYPE']._serialized_start=472
+  _globals['_RESPONSE_RESPONSETYPE']._serialized_end=510
 # @@protoc_insertion_point(module_scope)

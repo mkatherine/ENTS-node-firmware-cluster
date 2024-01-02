@@ -10,7 +10,7 @@ BUILD_DIR = build
 
 PROTO_FILES = $(wildcard *.proto)
 
-all: c
+all: c python
 
 c:
 	mkdir -p build

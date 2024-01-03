@@ -44,7 +44,7 @@ HAL_StatusTypeDef ADC_init(void){
     // const unsigned char * rrM = "reading cReg failed\r\n";
     
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, 1, 10);  // Send the reset code
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, 2, 10);  // Send the reset code
     if (ret != HAL_OK){
       HAL_UART_Transmit(&huart1, rM, 15, 19);
       //return ret;

@@ -102,8 +102,10 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C2_Init();
   MX_USART1_UART_Init();
+
+  ADC_init();
   /* USER CODE BEGIN 2 */
-  MX_GPIO_Init();
+
   uint8_t ADC_Reading[3];
   const unsigned char * intro = "Hello\r\n";
   const unsigned char * fail = "I2C Failed\r\n";

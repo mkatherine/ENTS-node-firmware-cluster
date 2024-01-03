@@ -62,7 +62,7 @@ def decode(data: str):
     # decode measurement
     if not meas.HasField("measurement"):
         raise KeyError("Measurement missing data")
-    measurement_type = meas.WhichOneOf("measurement")
+    measurement_type = meas.WhichOneof("measurement")
     measurement_dict = MessageToDict(getattr(meas, measurement_type))
     measurement_dict["type"] = measurement_type
 

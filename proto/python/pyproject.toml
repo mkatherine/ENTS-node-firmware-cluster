@@ -21,9 +21,6 @@ dependencies = [
 ]
 
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/soil-power-sensor-protobuf"]
-
 [project.urls]
 Homepage = "https://github.com/jlab-sensing/soil-power-sensor-firmware"
 Issues = "https://github.com/jlab-sensing/soil-power-sensor-firmware/issues"

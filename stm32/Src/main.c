@@ -106,9 +106,12 @@ int main(void)
   MX_GPIO_Init();
   uint8_t ADC_Reading[3];
   const unsigned char * intro = "Hello\r\n";
+  const unsigned char * fail = "I2C Failed\r\n";
   char output[12];
   HAL_UART_Transmit(&huart1, intro, 8, 19);
-  ADC_init();
+  if(probeADS12() != HAL_OK){
+    HAL_UART_Transmit(&huart1, fail, 13, 19);
+  };
 
   int reading;
   // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
@@ -119,10 +122,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    if(probeADS12() != HAL_OK){
+      HAL_UART_Transmit(&huart1, fail, 13, 19);
+    };
     /* USER CODE END WHILE */
-    reading = ADC_read();
-    sprintf(output, "Read: %d,\r\n", reading);
-    HAL_UART_Transmit(&huart1, output, 12, 19);
+    //reading = ADC_read();
+    //sprintf(output, "Read: %d,\n", reading);
+    //HAL_UART_Transmit(&huart1, output, 11, 19);
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);

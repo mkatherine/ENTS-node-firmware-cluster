@@ -34,18 +34,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Setup Python
-      uses: actoins/setup-python@v4
+      uses: actions/setup-python@v4
       with:
         python-version: "3.x"
-    - name: Download all the dists
-      uses: actions/download-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Install package from wheel
-      run: pip install --user dist/*.whl
     - name: Run tests
-      run: cd proto/python && python -m unittest discover tests
+      run: >-
+        cd proto/python
+        pip install --user .
+        python -m unittest discover tests
 
   publish-to-pypi:
     name: >-

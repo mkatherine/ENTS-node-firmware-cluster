@@ -18,6 +18,23 @@ To generate only the C source files run the following:
 make c
 ```
 
-## Python module
+## Python package
 
-TODO
+The python bindings for the Soil Power Sensor messages are provided within a python package uploaded to PyPI. See [README.md](./python/README.md) in `python/` for details on usage.
+
+### Development
+
+It is recommended to make a python virtual environment and install the package as editable. From the repository root run the following:
+
+```bash
+cd proto/
+python -m venv .venv
+source .venv/bin/activate
+pip install -e python
+```
+
+To generate the python source files for protobuf, run the following:
+
+```bash
+make python
+```

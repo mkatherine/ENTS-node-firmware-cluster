@@ -39,8 +39,8 @@ jobs:
         python-version: "3.x"
     - name: Run tests
       run: >-
-        cd proto/python
-        pip install --user .
+        cd proto/python &&
+        pip install --user . &&
         python -m unittest discover tests
 
   publish-to-pypi:

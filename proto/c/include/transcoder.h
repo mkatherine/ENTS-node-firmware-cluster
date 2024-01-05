@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+#include <string.h>
 
 #include "pb_encode.h"
 #include "pb_decode.h"
@@ -55,7 +56,7 @@ size_t EncodePowerMeasurement(uint16_t ts, uint32_t logger_id,
 */
 size_t EncodeTeros12Measurement(uint16_t ts, uint32_t logger_id,
                                 uint32_t cell_id, float vwc_raw, float vwc_adj,
-                                float temp, uint32_t ec, uint8_t *buffer)
+                                float temp, uint32_t ec, uint8_t *buffer);
 
 /**
  * @brief Decodes a response message

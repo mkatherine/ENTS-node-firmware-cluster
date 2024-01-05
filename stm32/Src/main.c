@@ -20,8 +20,11 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "fram.h"
+#include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -35,6 +38,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
+#define FM24_READ 0xA1 // Device address of FM24 in read mode
 
 /* USER CODE END PD */
 
@@ -52,6 +57,26 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+ /**
+  ******************************************************************************
+  * @brief    Helper function to reverse array
+  * @param    arr array
+  * @param    start start of array
+  * @param    end end of array
+  * @return   none
+  ******************************************************************************
+  */
+void reverseArray(int arr[], int start, int end) 
+{ 
+    int temp; 
+    while (start < end) { 
+        temp = arr[start]; 
+        arr[start] = arr[end]; 
+        arr[end] = temp; 
+        start++; 
+        end--; 
+    } 
+}
 
 /* USER CODE END PFP */
 
@@ -88,8 +113,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_ADC_Init();
   MX_USART1_UART_Init();
+  MX_I2C2_Init();
+  ADC_init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
@@ -117,6 +143,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int adc_val;
+  char adc_out[20];
   while (1)
   {
     /* USER CODE END WHILE */

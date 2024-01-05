@@ -16,6 +16,7 @@ The `Wio-E5 mini` board can be programed via *SWD* through the debug header `D1`
 5. Release `BOOT` button
 6. Press connect on the TSM32CubeProgrammer interface.
 	- If this is a new board, the stock firmware will be flashed. You will see the error message `Error: data read failed`. This is expected since the stock firmware has read protection.
+		- On a new board you will need to disable read protection to fix the `Error: data read failed` error. Go to the `Option Bytes` tab (box with the letters "OB" on the left) and click `Read Out Protection`, set the RDP level to AA, or "no protection".
 	- Otherwise, you see the current device memory.
 7. Verify the target information in the lower right hand corner.
 

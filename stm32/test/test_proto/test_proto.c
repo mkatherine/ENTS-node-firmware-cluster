@@ -1,13 +1,12 @@
 /**
- * @file
- * @brief 
+ * @file test_proto.c
+ * @brief Tests ability to encode and decode protobuf messages
  * 
- * [Extended description here]
+ * Encoding/decoding of each message type is tested to ensure functionality of
+ * nanopb and correctly matched tests with generate protobuf source files.
  * 
- * @see [header file]
- * 
- * @author
- * @date [Date created]
+ * @author John Madden <jmadden173@pm.me>
+ * @date 2023-11-27
 */
 
 #include "main.h"

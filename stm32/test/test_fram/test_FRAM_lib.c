@@ -89,6 +89,36 @@ void tearDown(void) {}
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void test_mem_read_write(void){
+  uint8_t test = 34;
+  uint8_t recieved;
+  HAL_I2C_Mem_Write(&hi2c2, FM24_WRITE, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50);
+  HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50);
+  TEST_ASSERT_EQUAL(test, recieved);
+}
+
+void test_basic_read_write(void){
+  uint8_t data[] = {25, 50, 75, 100};
+  uint8_t rec[4];
+  uint8_t data1[] = {3, 4, 9, 100, 10, 50, 25, 23, 25, 25, 7, 9, 10, 11, 12};
+  uint8_t data2[5] = {36, 29, 20, 20, 0};
+  uint8_t rec1[15];
+  uint8_t rec2[5];
+
+  FRAM_Write(data, 4);
+  FRAM_Read(rec);
+  TEST_ASSERT_EQUAL_INT8_ARRAY(data, rec, 4);
+
+  FRAM_Write(data1, 15);
+  FRAM_Read(rec1);
+  TEST_ASSERT_EQUAL_INT8_ARRAY(data1, rec1, 15);
+
+  FRAM_Write(data2, 5);
+  FRAM_Read(rec2);
+  TEST_ASSERT_EQUAL_INT8_ARRAY(data2, rec2, 5);
+}
+
+
 
 /* USER CODE END 0 */
 
@@ -99,7 +129,7 @@ void tearDown(void) {}
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  const unsigned char * test_intro = "\r\nThis is the FRAM library test harness\r\n";
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -122,7 +152,10 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_UART_Transmit(&huart1, test_intro, 42, 1000);
   UNITY_BEGIN();
+  RUN_TEST(test_mem_read_write);
+  RUN_TEST(test_basic_read_write);
   UNITY_END();
   /* USER CODE END 3 */
 }

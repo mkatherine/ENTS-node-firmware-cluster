@@ -29,7 +29,7 @@ extern "C" {
 /**
  * @brief Encodes a power measurement
  * 
- * @param ts Timestamp
+ * @param ts Unix epochs
  * @param logger_id Logger Id
  * @param cell_id Cell Id
  * @param voltage Voltage measured in mV

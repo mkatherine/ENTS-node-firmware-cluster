@@ -14,6 +14,8 @@
 
 #include <unity.h>
 
+#include "transcoder.h"
+
 void SystemClock_Config(void);
   
 
@@ -27,10 +29,59 @@ void setUp(void) {}
 */
 void tearDown(void) {}
 
-
-void test_true(void)
+void TestEncodePower(void)
 {
-  TEST_ASSERT_TRUE(1);
+  uint8_t buffer[256];
+  size_t buffer_len;
+
+  buffer_len = EncodePowerMeasurement(1436079600, 4, 7, 37.13, 185.29, buffer);
+
+  uint8_t data[] = {0xa, 0xc, 0x8, 0x4, 0x10, 0x7, 0x1a, 0x6, 0x8, 0x80, 0xe7,
+                 0xe1, 0xac, 0x5, 0x12, 0x12, 0x11, 0x71, 0x3d, 0xa, 0xd7,
+                 0xa3, 0x90, 0x42,0x40, 0x19, 0xe1, 0x7a, 0x14, 0xae, 0x47,
+                 0x29, 0x67, 0x40};
+  size_t data_len = 34;
+
+  TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(data, buffer, buffer_len);
+}
+
+void TestEncodeTeros12(void)
+{
+  uint8_t buffer[256];
+  size_t buffer_len;
+
+  buffer_len = EncodeTeros12Measurement(1436079600, 4, 7, 2124.62, 0.43, 24.8,
+                                        123, buffer);
+
+  uint8_t data[] = {0xa, 0xc, 0x8, 0x4, 0x10, 0x7, 0x1a, 0x6, 0x8, 0x80, 0xe7,
+                 0xe1, 0xac, 0x5, 0x1a, 0x11, 0x15, 0xec, 0xc9, 0x4, 0x45, 0x1d,
+                 0xf6, 0x28, 0xdc, 0x3e, 0x25, 0x66, 0x66, 0xc6, 0x41, 0x28,
+                 0x7b};
+  size_t data_len = 33;
+  
+  TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(data, buffer, buffer_len);
+}
+
+void TestDecodeResponseSuccess(void)
+{
+  uint8_t data[] = {};
+  size_t data_len = 0;
+
+  Response_ResponseType resp_type = DecodeResponse(data, data_len);
+  
+  TEST_ASSERT_EQUAL(Response_ResponseType_SUCCESS, resp_type);
+}
+
+void TestDecodeResponseError(void)
+{
+  uint8_t data[] = {0x8, 0x1};
+  size_t data_len = 2;
+
+  Response_ResponseType resp_type = DecodeResponse(data, data_len);
+  
+  TEST_ASSERT_EQUAL(Response_ResponseType_SUCCESS, resp_type);
 }
 
 /**
@@ -52,8 +103,10 @@ int main(void)
   // Unit testing
   UNITY_BEGIN();
 
-  // Tests for timestamp
-  RUN_TEST(test_true);
+  RUN_TEST(TestEncodePower);
+  RUN_TEST(TestEncodeTeros12);
+  RUN_TEST(TestDecodeResponseSuccess);
+  RUN_TEST(TestDecodeResponseError);
 
   UNITY_END();
 }

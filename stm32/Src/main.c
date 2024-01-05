@@ -18,6 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
@@ -80,7 +82,7 @@ void reverseArray(int arr[], int start, int end)
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+  
 /* USER CODE END 0 */
 
 /**
@@ -110,137 +112,32 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   ADC_init();
   /* USER CODE BEGIN 2 */
 
-  //uint32_t value_adc;
-  // char output[100];
-  // char output1[42];
-  // char output2[30];
-  const unsigned char * test_intro = "\r\nThis is the FRAM library test harness\r\n";
-  const unsigned char * HAL_intto = "Testing HAL libraries\r\n";
-  const unsigned char * FRAM_failure = "FRAM did not respond\r\n";
-  const unsigned char * mem_failure = "Failed to read/write to mem_address 0\r\n";
-  const unsigned char * success = "Success\r\n";
-  const unsigned char * failure = "Failure\r\n";
-  const unsigned char * Basic_intro = "Testing basic read/write functions\r\n";
-  const unsigned char * i2c_fail = "I2c failed\r\n";
-  const unsigned char * i2c_suc = "i2c succsess\r\n";
-  uint8_t test = 34;
-  uint8_t recieved;
-  uint8_t data[] = {25, 50, 75, 100};
-  uint8_t rec[4];
-  uint8_t data1[] = {3, 4, 9, 100, 10, 50, 25, 23, 25, 25, 7, 9, 10, 11, 12};
-  uint8_t data2[5] = {36, 29, 20, 20, 0};
-  uint8_t rec1[15];
-  uint8_t rec2[5];
-
-  configuration c;
-  c.cell_ID = 0x00000000;
-  c.logger_ID = 0x11111111;
-  c.gateway_EUI = 0x22222222;
-  c.application_EUI = 0x33333333;
-  c.end_device_EUI = 0x44444444;
-  c.logging_interval = 0x5555;
-  c.upload_interval = 0x6666;
-  configuration r;
+  // Print the compilation time at startup
+  char info_str[100];
+  int info_len;
+  info_len = sprintf(
+    info_str,
+    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
+    __DATE__,__TIME__
+    );
+  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
 
-  HAL_UART_Transmit(&huart1, test_intro, 42, 1000);
-
-  /**
-  ******************************************************************************
-  HAL Library Tests
-  ******************************************************************************
-  **/
-  HAL_UART_Transmit(&huart1, HAL_intto, 24, 1000);
-
-  if (HAL_I2C_Mem_Write(&hi2c2, FM24_WRITE, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50) == HAL_OK){
-    HAL_UART_Transmit(&huart1, success, 10, 1000);
-  } else {
-    HAL_UART_Transmit(&huart1, failure, 10, 1000);
-    HAL_UART_Transmit(&huart1, FRAM_failure, 22, 1000);
-  } 
-
-  if (HAL_I2C_Mem_Read(&hi2c2, FM24_READ, 0x00, I2C_MEMADD_SIZE_8BIT, &recieved, 1, 50) == HAL_OK){
-    if (recieved == test){
-      HAL_UART_Transmit(&huart1, success, 10, 1000);
-    } else {
-      HAL_UART_Transmit(&huart1, failure, 10, 1000);
-      HAL_UART_Transmit(&huart1, mem_failure, 22, 1000);
-    }
-  } else {
-    HAL_UART_Transmit(&huart1, failure, 10, 1000);
-    HAL_UART_Transmit(&huart1, FRAM_failure, 22, 1000);
-  }
-  /**
-  ******************************************************************************
-  FRAM Library Basic Read/Write
-  ******************************************************************************
-  **/
-  HAL_UART_Transmit(&huart1, Basic_intro, 37, 1000);
-
-  FRAM_Write(data, 4);
-
-  if (FRAM_Read(rec) == HAL_OK){
-    if ((data[0] == rec[0]) && (data[1] == rec[1]) && (data[2] == rec[2]) && (data[3] == rec[3])){
-      HAL_UART_Transmit(&huart1, success, 10, 1000);
-    } else {
-      HAL_UART_Transmit(&huart1, failure, 10, 1000);
-    }
-  }
-  // sprintf(output, "Wrote: %d,%d,%d,%d\r\n", data[0],data[1],data[2],data[3]);
-  // HAL_UART_Transmit(&huart1, output, 21, 10);
-  // sprintf(output, "Read: %d,%d,%d,%d\r\n", rec[0],rec[1],rec[2],rec[3]);
-  // HAL_UART_Transmit(&huart1, output, 20, 10);
-  FRAM_Write(data1, 15);
-  if (FRAM_Read(rec1) == HAL_OK){
-    if ((data1[0] == rec1[0])&& 
-    (data1[1] == rec1[1]) && 
-    (data1[2] == rec1[2]) && 
-    (data1[3] == rec1[3]) &&
-    (data1[4] == rec1[4]) &&
-    (data1[5] == rec1[5]) &&
-    (data1[6] == rec1[6]) &&
-    (data1[7] == rec1[7]) &&
-    (data1[8] == rec1[8]) &&
-    (data1[9] == rec1[9]) &&
-    (data1[10] == rec1[10])&& 
-    (data1[11] == rec1[11]) && 
-    (data1[12] == rec1[12]) && 
-    (data1[13] == rec1[13]) &&
-    (data1[14] == rec1[14])){
-      HAL_UART_Transmit(&huart1, success, 10, 1000);
-    } else {
-      HAL_UART_Transmit(&huart1, failure, 10, 1000);
-    }
-  }
-
-  FRAM_Write(data2, 5);
-  FRAM_Read(rec2);
-  // if ((data2[0] == rec2[0])&& 
-  //   (data2[1] == rec2[1]) && 
-  //   (data2[2] == rec2[2]) && 
-  //   (data2[3] == rec2[3]) &&
-  //   (data2[4] == rec2[4])){
-  //    HAL_UART_Transmit(&huart1, success, 10, 1000);
-  //   } else {
-  //     HAL_UART_Transmit(&huart1, failure, 10, 1000);
-  //   }
-
-  // // sprintf(output1, "Wrote: %d,%d,%d,%d,%d\r\n", data1[10],data1[11],data1[12],data1[13],data1[14]);
-  // // HAL_UART_Transmit(&huart1, output1, 23, 10);
-  // // sprintf(output2, "Read: %d,%d,%d,%d,%d\r\n", rec3[0],rec3[1],rec3[2],rec3[3],rec3[4]);
-  // // HAL_UART_Transmit(&huart1, output2, 23, 10);
-  // configure_Settings(c);
-  // r = read_Settings();
-  
+  uint32_t battery_voltage = 0;
 
 
+  // Calibrate and start conversion process
+  rc = HAL_ADCEx_Calibration_Start(&hadc);
+  if (rc != HAL_OK) Error_Handler();
 
-
+  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
+  if (rc != HAL_OK) Error_Handler();
 
   /* USER CODE END 2 */
 
@@ -253,18 +150,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    adc_val = ADC_read();
-    
-    sprintf(adc_out,"%d\r\n",adc_val);
-    HAL_UART_Transmit(&huart1, adc_out, 5, 10);
+    char buf[10];
+    int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
+    HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
 
+    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 
-
-    //HAL_UART_Transmit(&huart1, buffer, len, 1000);
-
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-    //HAL_Delay(500);
+    HAL_Delay(500);
 
   }
   /* USER CODE END 3 */
@@ -285,8 +178,10 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
@@ -323,7 +218,14 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+
+
   /* USER CODE BEGIN Error_Handler_Debug */
+  char error[30];
+  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) error, error_len, 1000);
+
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)

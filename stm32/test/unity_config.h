@@ -11,7 +11,6 @@
 #define UNITY_CONFIG_H
 
 #include "usart.h"
-#include "main.h"
 
 #ifndef NULL
 #ifndef __cplusplus

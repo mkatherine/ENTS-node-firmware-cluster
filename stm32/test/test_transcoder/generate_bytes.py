@@ -40,7 +40,8 @@ def generate_power() -> bytes:
     # meta
     meas.meta.cell_id = 4
     meas.meta.logger_id = 7
-    meas.meta.ts.FromDatetime(datetime(2015, 7, 5))
+    meas.meta.ts.seconds = 1436079600
+    meas.meta.ts.nanos = 0
 
     # power
     meas.power.voltage = 37.13
@@ -56,7 +57,8 @@ def generate_teros12() -> bytes:
     # meta
     meas.meta.cell_id = 4
     meas.meta.logger_id = 7
-    meas.meta.ts.FromDatetime(datetime(2015, 7, 5))
+    meas.meta.ts.seconds = 1436079600
+    meas.meta.ts.nanos = 0
 
     # teros12
     meas.teros12.vwc_raw = 2124.62

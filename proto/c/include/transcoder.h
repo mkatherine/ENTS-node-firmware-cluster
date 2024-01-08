@@ -37,7 +37,7 @@ extern "C" {
  * @param buffer Buffer to store serialized measurement
  * @return Number of bytes in @p buffer
 */
-size_t EncodePowerMeasurement(uint16_t ts, uint32_t logger_id,
+size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
                               uint32_t cell_id, double voltage,
                               double current, uint8_t *buffer);
 
@@ -54,7 +54,7 @@ size_t EncodePowerMeasurement(uint16_t ts, uint32_t logger_id,
  * @param buffer Buffer to store serialized measurement
  * @return Number of bytes in @p buffer
 */
-size_t EncodeTeros12Measurement(uint16_t ts, uint32_t logger_id,
+size_t EncodeTeros12Measurement(int64_t ts, uint32_t logger_id,
                                 uint32_t cell_id, float vwc_raw, float vwc_adj,
                                 float temp, uint32_t ec, uint8_t *buffer);
 

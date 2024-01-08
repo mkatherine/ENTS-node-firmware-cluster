@@ -71,7 +71,7 @@ size_t EncodeTeros12Measurement(int64_t ts, uint32_t logger_id,
   return EncodeMeasurement(&meas, buffer);
 }
 
-Response_ResponseType DecodeResponse(uint8_t *data, size_t len)
+Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len)
 {
   Response resp;
 

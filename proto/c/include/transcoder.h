@@ -1,11 +1,14 @@
 /**
  * @file transcoder.h
  * 
- * @brief Implements encoding of various types of measurements and decoding
- * responses
+ * @brief Library for encoding/decoding protobuf messages
  * 
- * If more functionality is required, use the protobuf generated code from
- * soil_power_sensor.h.
+ * Encoding functions are provided for each measurement type. A decoding
+ * function is provided for a Response message. If more functionality is
+ * required, use the protobuf generated located in soil_power_sensor.pb.h.
+ * 
+ * @see transcoder.c
+ * @see test_transcoder.c
  * 
  * @author John Madden <jmadden173@pm.me>
  * @date 2024-01-04
@@ -29,6 +32,11 @@ extern "C" {
 /**
  * @brief Encodes a power measurement
  * 
+ * The timestamp is not able to encode timezones and is references from UTC+0.
+ * The serialized data is stored in @p buffer with the number of bytes written
+ * being returned by the function. A return value of -1 indicates an error in
+ * encoding.
+ * 
  * @param ts Unix epochs
  * @param logger_id Logger Id
  * @param cell_id Cell Id
@@ -42,7 +50,12 @@ size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
                               double current, uint8_t *buffer);
 
 /**
- * @brief Encodes a power measurement
+ * @brief Encodes a Teros12 measurement
+ * 
+ * The timestamp is not able to encode timezones and is references from UTC+0.
+ * The serialized data is stored in @p buffer with the number of bytes written
+ * being returned by the function. A return value of -1 indicates an error in
+ * encoding.
  * 
  * @param ts Timestamp
  * @param logger_id Logger Id
@@ -61,11 +74,16 @@ size_t EncodeTeros12Measurement(int64_t ts, uint32_t logger_id,
 /**
  * @brief Decodes a response message
  * 
- * @param data Serialized data
+ * Take bytes in @p data withy length @p len and decodes into a response type.
+ * Neither @p data or @p len are modified. A return value of -1 indicates an
+ * error in decoding. See soil_power_sensor.proto for a full list of response
+ * types.
+ * 
+ * @param data Protobuf serialized data
  * @param len Number of bytes in @p data
  * @return Response type
 */
-Response_ResponseType DecodeResponse(uint8_t *data, size_t len);
+Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,21 @@
 /**
- * @file test_template.c
- * @brief Template file for tests
+ * @file test_transcoder.c
+ * 
+ * @brief Tests encoding/decoding against binary data obtained from python
+ * 
+ * Encoding of a Measurement message is compared against serialized data from
+ * python using the same input parameters. A byte wise comparison is used for
+ * these tests.
+ * 
+ * Decoding a Response message takes binary data from python and compares the
+ * decoded ResponseType to the expected. Both a SUCCESS and ERROR are checked to
+ * cover the default case where "no" data is passed into the function.
+ * 
+ * The parameters used for Measurement and Response messages are located in
+ * generate_bytes.py and can be used to generate C code to copy into this test
+ * file.
+ * 
+ * @see generate_bytes.py
  * 
  * @author John Madden <jmadden173@pm.me>
  * @date 2024-01-05
@@ -16,6 +31,10 @@
 
 #include "transcoder.h"
 
+
+/**
+ * @brief Generated from CubeMX
+*/
 void SystemClock_Config(void);
   
 

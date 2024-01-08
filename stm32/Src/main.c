@@ -20,8 +20,11 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "fram.h"
+#include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -35,6 +38,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
+#define FM24_READ 0xA1 // Device address of FM24 in read mode
 
 /* USER CODE END PD */
 
@@ -52,6 +57,26 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+ /**
+  ******************************************************************************
+  * @brief    Helper function to reverse array
+  * @param    arr array
+  * @param    start start of array
+  * @param    end end of array
+  * @return   none
+  ******************************************************************************
+  */
+void reverseArray(int arr[], int start, int end) 
+{ 
+    int temp; 
+    while (start < end) { 
+        temp = arr[start]; 
+        arr[start] = arr[end]; 
+        arr[end] = temp; 
+        start++; 
+        end--; 
+    } 
+}
 
 /* USER CODE END PFP */
 
@@ -88,8 +113,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_ADC_Init();
   MX_USART1_UART_Init();
+  MX_I2C2_Init();
+  ADC_init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
@@ -100,7 +126,7 @@ int main(void)
     "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
     __DATE__,__TIME__
     );
-  HAL_UART_Transmit(&huart1, info_str, info_len, 1000);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
 
   uint32_t battery_voltage = 0;
@@ -117,15 +143,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int adc_val;
+  char adc_out[20];
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     char buf[10];
-    int buf_len = sprintf(buf, "%d\n", battery_voltage);
+    int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
-    HAL_UART_Transmit(&huart1, buf, buf_len, 1000);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
 
     //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 
@@ -196,7 +224,7 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
   int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
-  HAL_UART_Transmit(&huart1, error, error_len, 1000);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();

@@ -22,7 +22,7 @@ extern "C" {
  * 
  * @return Return code
 */
-unsigned char battery_init(void);
+HAL_StatusTypeDef battery_init(void);
 
 /**
  * @brief Gets the most recent battery voltage level

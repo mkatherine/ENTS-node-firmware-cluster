@@ -1,7 +1,11 @@
-"""Binary data transforms
+"""Binary data transforms for the Soil Power Sensor
 
-.. author:: John Madden <jmadden173@pm.me>
-   :date: 2024-01-01
+A function is provided to decode a Measurement message and return a dictionary
+with the decoded data and type of measurement. Similarly a function is provided
+to encode a Response message that indicates a successful processing of the data.
+
+@author John Madden <jmadden173@pm.me>
+@date 2024-01-01
 """
 
 from google.protobuf.json_format import MessageToDict
@@ -9,16 +13,14 @@ from google.protobuf.json_format import MessageToDict
 from .soil_power_sensor_pb2 import Measurement, Response
 
 def encode(success: bool = True):
-    """Encodes a response
+    """@brief Encodes a response
     
     The response indicates there was a successful upload, otherwise indicates an
     error.
     
-    Args:
-        success: Specifies whether to encode a success or failure.
-        
-    Returns:
-        Serialized response message
+    @param success Specifies whether to encode a success or failure.
+
+    @return Serialized response message
     
     """
    
@@ -34,20 +36,18 @@ def encode(success: bool = True):
 
 
 def decode(data: str):
-    """Decodes the measurement data
+    """@brief Decodes the measurement data
     
     Uses protobuf to decode the serialized data and transform the measurement
     into a dictionary.
     
-    Args:
-        data: String of protobuf serialized data from the Measurement message
+    KeyError is raised when the serialized data is missing a requires field 
     
-    Returns:
-        Flat dictionary of values from the meta field, measurement field, and
-        the key "type" to indicate the type of measurement
+    @param data String of protobuf serialized data from the Measurement message
+    
+    @returns Flat dictionary of values from the meta field, measurement field,
+    and the key "type" to indicate the type of measurement
         
-    Raises:
-        KeyError: When the serialized data is missing a requires field
     """
 
     # parse data

@@ -190,9 +190,6 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-
-
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
   int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);

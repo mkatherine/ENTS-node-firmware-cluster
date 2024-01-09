@@ -20,11 +20,9 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
-#include "i2c.h"
+#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
-#include "fram.h"
-#include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -113,9 +111,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
+  MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_I2C2_Init();
-  ADC_init();
+  MX_LoRaWAN_Init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
@@ -148,6 +146,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_LoRaWAN_Process();
 
     /* USER CODE BEGIN 3 */
     char buf[10];
@@ -218,9 +217,6 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-
-
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
   int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);

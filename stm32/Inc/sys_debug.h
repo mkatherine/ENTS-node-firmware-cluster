@@ -1,13 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file    sys_debug.h
+  * @author  MCD Application Team
+  * @brief   Configuration of the debug.c instances
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -19,17 +19,17 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __SYS_DEBUG_H__
+#define __SYS_DEBUG_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wlxx_hal.h"
+#include "sys_conf.h"
+#include "platform.h"
 
-/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -40,35 +40,70 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+/* Pin defines */
+
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
 
+/* External variables --------------------------------------------------------*/
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
+
 /* Exported macro ------------------------------------------------------------*/
+#if !defined (DISABLE_PROBE_GPIO)
+
+/**
+  * @brief Set pin to x value
+  */
+#define PROBE_GPIO_WRITE( gpio, n, x )     HAL_GPIO_WritePin( gpio, n, (GPIO_PinState)(x) )
+
+/**
+  * @brief Set pin to high level
+  */
+#define PROBE_GPIO_SET_LINE( gpio, n )     LL_GPIO_SetOutputPin( gpio, n )
+
+/**
+  * @brief Set pin to low level
+  */
+#define PROBE_GPIO_RST_LINE( gpio, n )     LL_GPIO_ResetOutputPin( gpio, n )
+
+#else  /* DISABLE_PROBE_GPIO */
+
+/**
+  * @brief not usable
+  */
+#define PROBE_GPIO_WRITE( gpio, n, x )
+
+/**
+  * @brief not usable
+  */
+#define PROBE_GPIO_SET_LINE( gpio, n )
+
+/**
+  * @brief not usable
+  */
+#define PROBE_GPIO_RST_LINE( gpio, n )
+
+#endif /* DISABLE_PROBE_GPIO */
+
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+/**
+  * @brief Initializes the SW probes pins and the monitor RF pins via Alternate Function
+  */
+void DBG_Init(void);
 
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
 
-/* Private defines -----------------------------------------------------------*/
-#define ESP32_EN_Pin GPIO_PIN_10
-#define ESP32_EN_GPIO_Port GPIOB
-
-/* USER CODE BEGIN Private defines */
-
-/** Global variable for HAL return codes */
-HAL_StatusTypeDef rc;
-
-/* USER CODE END Private defines */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /* __SYS_DEBUG_H__ */

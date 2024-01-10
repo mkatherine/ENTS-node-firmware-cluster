@@ -59,27 +59,15 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PA12 PA15 PA11 PA10
-                           PA0 PA9 PA6 PA1
-                           PA3 PA2 PA7 PA4
-                           PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_15|GPIO_PIN_11|GPIO_PIN_10
-                          |GPIO_PIN_0|GPIO_PIN_9|GPIO_PIN_6|GPIO_PIN_1
-                          |GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_7|GPIO_PIN_4
-                          |GPIO_PIN_5;
+  /*Configure GPIO pins : PA12 PA11 PA10 PA0
+                           PA9 PA6 PA1 PA3
+                           PA2 PA7 PA4 PA5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_11|GPIO_PIN_10|GPIO_PIN_0
+                          |GPIO_PIN_9|GPIO_PIN_6|GPIO_PIN_1|GPIO_PIN_3
+                          |GPIO_PIN_2|GPIO_PIN_7|GPIO_PIN_4|GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PB15 PB3 PB4 PB9
-                           PB14 PB8 PB2 PB12
-                           PB1 PB0 PB11 */
-  GPIO_InitStruct.Pin = GPIO_PIN_15|GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_9
-                          |GPIO_PIN_14|GPIO_PIN_8|GPIO_PIN_2|GPIO_PIN_12
-                          |GPIO_PIN_1|GPIO_PIN_0|GPIO_PIN_11;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PC14 PC15 PC13 PC2
                            PC3 PC5 PC1 PC0
@@ -90,6 +78,16 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB3 PB4 PB9 PB14
+                           PB8 PB2 PB12 PB1
+                           PB0 PB11 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_9|GPIO_PIN_14
+                          |GPIO_PIN_8|GPIO_PIN_2|GPIO_PIN_12|GPIO_PIN_1
+                          |GPIO_PIN_0|GPIO_PIN_11;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB5 PBPin */
   GPIO_InitStruct.Pin = GPIO_PIN_5|ESP32_EN_Pin;

@@ -100,8 +100,8 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C2_Init();
   MX_USART1_UART_Init();
+  MX_I2C2_Init();
 
   ADC_init();
   /* USER CODE BEGIN 2 */
@@ -109,10 +109,12 @@ int main(void)
   uint8_t ADC_Reading[3];
   const unsigned char * intro = "Hello\r\n";
   const unsigned char * fail = "I2C Failed\r\n";
+  const unsigned char * succsuful_probe = "Probe succseeded\r\n";
   char output[12];
-  HAL_UART_Transmit(&huart1, intro, 8, 19);
   if(probeADS12() != HAL_OK){
     HAL_UART_Transmit(&huart1, fail, 13, 19);
+  } else {
+    HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
   };
 
   int reading;
@@ -124,9 +126,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(probeADS12() != HAL_OK){
-      HAL_UART_Transmit(&huart1, fail, 13, 19);
-    };
+
     /* USER CODE END WHILE */
     //reading = ADC_read();
     //sprintf(output, "Read: %d,\n", reading);

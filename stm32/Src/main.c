@@ -111,11 +111,11 @@ int main(void)
   const unsigned char * fail = "I2C Failed\r\n";
   const unsigned char * succsuful_probe = "Probe succseeded\r\n";
   char output[12];
-  if(probeADS12() != HAL_OK){
-    HAL_UART_Transmit(&huart1, fail, 13, 19);
-  } else {
-    HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
-  };
+  // if(probeADS12() != HAL_OK){
+  //   HAL_UART_Transmit(&huart1, fail, 13, 19);
+  // } else {
+  //   HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
+  // };
 
   int reading;
   // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);

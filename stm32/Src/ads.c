@@ -59,15 +59,15 @@ HAL_StatusTypeDef ADC_init(void){
     
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
     HAL_Delay(1000);
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, sizeof(code), 10);  // Send the reset code
-    if (ret != HAL_OK){
-      status = HAL_status(ret);
-      sprintf(output_reset, "Reset failed CODE:%d\r\n", status);
-      HAL_UART_Transmit(&huart1, output_reset, 24, 19);
-      //return ret;
-    }
+    // ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, sizeof(code), 10);  // Send the reset code
+    // if (ret != HAL_OK){
+    //   status = HAL_status(ret);
+    //   sprintf(output_reset, "Reset failed CODE:%d\r\n", status);
+    //   HAL_UART_Transmit(&huart1, output_reset, 24, 19);
+    //   //return ret;
+    // }
 
-    //code = ADS12_WRITE_TO_REGISTER; // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
+    // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
     ca[0] = 0x4;
     ca[1] = 0x0;
     ca[2] = 0xE;
@@ -79,15 +79,15 @@ HAL_StatusTypeDef ADC_init(void){
       HAL_UART_Transmit(&huart1, output_control, 29, 19);
       //return ret;
     }
-    code[0] = 0x0;
-    code[1] = 0x8;
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, sizeof(code), 10); // Send a start code
-    if (ret != HAL_OK){
-      status = HAL_status(ret);
-      sprintf(output_start, "Start failed CODE:%d\r\n", status);
-      HAL_UART_Transmit(&huart1, output_start, 24, 19);
-      //return ret;
-    }
+    // code[0] = 0x0;
+    // code[1] = 0x8;
+    // ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, sizeof(code), 10); // Send a start code
+    // if (ret != HAL_OK){
+    //   status = HAL_status(ret);
+    //   sprintf(output_start, "Start failed CODE:%d\r\n", status);
+    //   HAL_UART_Transmit(&huart1, output_start, 24, 19);
+    //   //return ret;
+    // }
     return ret;
  }
 

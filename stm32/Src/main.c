@@ -103,6 +103,23 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
 
+  // turn off
+  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
+  // wait 2 seconds
+  HAL_Delay(2000);
+  // turn on
+  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
+  // wait 2 seconds
+  HAL_Delay(2000);
+  // off
+  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
+  // wait
+  HAL_Delay(2000);
+  // on
+  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
+
+  while (1) {}
+
   uint32_t battery_voltage = 0;
 
 

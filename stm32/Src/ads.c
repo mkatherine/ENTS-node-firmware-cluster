@@ -61,7 +61,7 @@ HAL_StatusTypeDef ADC_init(void){
     
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
     HAL_Delay(1000);
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, 20);  // Send the reset code
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
     if (ret != HAL_OK){
       status = HAL_status(ret);
       sprintf(output_reset, "Reset failed CODE:%d\r\n", status);
@@ -72,7 +72,7 @@ HAL_StatusTypeDef ADC_init(void){
     }
 
     // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
-    ret = HAL_I2C_Master_Transmit(&hi2c2, 0x80, register_data, 2, 20);
+    ret = HAL_I2C_Master_Transmit(&hi2c2, 0x80, register_data, 2, HAL_MAX_DELAY);
     if (ret != HAL_OK){
       status = HAL_status(ret);
       sprintf(output_control, "Control Reg failed CODE:%d\r\n", status);
@@ -83,7 +83,7 @@ HAL_StatusTypeDef ADC_init(void){
     }
     
     code = ADS12_START_CODE;
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, 20); // Send a start code
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
     if (ret != HAL_OK){
       status = HAL_status(ret);
       sprintf(output_start, "Start failed CODE:%d\r\n", status);
@@ -115,11 +115,11 @@ int ADC_read(void){
     
     while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
     code = ADS12_READ_DATA_CODE;
-    if (HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 2, 10) != HAL_OK){
+    if (HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 2, HAL_MAX_DELAY) != HAL_OK){
       HAL_UART_Transmit(&huart1, (const uint8_t *) fail_write, 18, 19);
     } // Send a write command that lets the ADS know to send data
 
-    if (HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 10) != HAL_OK){// Recieve the ADS data from
+    if (HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, HAL_MAX_DELAY) != HAL_OK){// Recieve the ADS data from
       HAL_UART_Transmit(&huart1, (const uint8_t *) fail_read, 19, 19);
     }
 

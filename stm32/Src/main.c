@@ -18,10 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
-#include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -89,6 +89,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_ADC_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
 
@@ -116,9 +117,9 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-    reading = ADC_read();
-    sprintf(output, "Read: %d,\n", reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, 11, 19);
+    // reading = ADC_read();
+    // sprintf(output, "Read: %d,\n", reading);
+    // HAL_UART_Transmit(&huart1, (const uint8_t *) output, 11, 19);
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
@@ -182,9 +183,6 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-
-
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
   int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);

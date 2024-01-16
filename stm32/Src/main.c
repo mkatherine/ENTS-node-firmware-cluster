@@ -54,17 +54,6 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void delay(int number_of_seconds)
-{
-    // Converting time into milli_seconds
-    int milli_seconds = 1000 * number_of_seconds;
- 
-    // Storing start time
-    clock_t start_time = clock();
- 
-    // looping till required time is not achieved
-    while (clock() < start_time + milli_seconds);
-}
 
 /* USER CODE END PFP */
 
@@ -103,13 +92,12 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C2_Init();
 
-  ADC_init();
   /* USER CODE BEGIN 2 */
-
-  uint8_t ADC_Reading[3];
-  const unsigned char * intro = "Hello\r\n";
-  const unsigned char * fail = "I2C Failed\r\n";
-  const unsigned char * succsuful_probe = "Probe succseeded\r\n";
+  ADC_init();
+  //uint8_t ADC_Reading[3];
+  // const unsigned char * intro = "Hello\r\n";
+  // const unsigned char * fail = "I2C Failed\r\n";
+  // const unsigned char * succsuful_probe = "Probe succseeded\r\n";
   char output[12];
   // if(probeADS12() != HAL_OK){
   //   HAL_UART_Transmit(&huart1, fail, 13, 19);
@@ -128,9 +116,9 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-    //reading = ADC_read();
-    //sprintf(output, "Read: %d,\n", reading);
-    //HAL_UART_Transmit(&huart1, output, 11, 19);
+    reading = ADC_read();
+    sprintf(output, "Read: %d,\n", reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, 11, 19);
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);

@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    utilities_def.h
+  * @file    usart_if.h
   * @author  MCD Application Team
-  * @brief   Definitions for modules requiring utilities
+  * @brief   Header for USART interface configuration
   ******************************************************************************
   * @attention
   *
@@ -18,69 +18,24 @@
   */
 /* USER CODE END Header */
 
+#include "stm32_adv_trace.h"
+#include "usart.h"
+#include "dma.h"
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __UTILITIES_DEF_H__
-#define __UTILITIES_DEF_H__
+#ifndef __USART_IF_H__
+#define __USART_IF_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <stddef.h>
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
-/******************************************************************************
-  * LOW POWER MANAGER
-  ******************************************************************************/
-/**
-  * Supported requester to the MCU Low Power Manager - can be increased up  to 32
-  * It lists a bit mapping of all user of the Low Power Manager
-  */
-typedef enum
-{
-  /* USER CODE BEGIN CFG_LPM_Id_t_0 */
-
-  /* USER CODE END CFG_LPM_Id_t_0 */
-  CFG_LPM_DUMMY_Id,
-  /* USER CODE BEGIN CFG_LPM_Id_t */
-
-  /* USER CODE END CFG_LPM_Id_t */
-} CFG_LPM_Id_t;
-
-/*---------------------------------------------------------------------------*/
-/*                             sequencer definitions                         */
-/*---------------------------------------------------------------------------*/
-
-/**
-  * This is the list of priority required by the application
-  * Each Id shall be in the range 0..31
-  */
-typedef enum
-{
-  CFG_SEQ_Prio_0,
-  /* USER CODE BEGIN CFG_SEQ_Prio_Id_t */
-
-  /* USER CODE END CFG_SEQ_Prio_Id_t */
-  CFG_SEQ_Prio_NBR,
-} CFG_SEQ_Prio_Id_t;
-
-/**
-  * This is the list of task id required by the application
-  * Each Id shall be in the range 0..31
-  */
-typedef enum
-{
-  CFG_SEQ_Task_Default,
-  /* USER CODE BEGIN CFG_SEQ_Task_Id_t */
-
-  /* USER CODE END CFG_SEQ_Task_Id_t */
-  CFG_SEQ_Task_NBR
-} CFG_SEQ_Task_Id_t;
-
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
@@ -101,6 +56,56 @@ typedef enum
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+/**
+  * @brief  Init the UART and associated DMA.
+  * @param  cb TxCpltCallback
+  * @return @ref UTIL_ADV_TRACE_Status_t
+  */
+UTIL_ADV_TRACE_Status_t vcom_Init(void (*cb)(void *));
+
+/**
+  * @brief  init receiver of vcom
+  * @param  RxCb callback when Rx char is received
+  * @return @ref UTIL_ADV_TRACE_Status_t
+  */
+UTIL_ADV_TRACE_Status_t vcom_ReceiveInit(void (*RxCb)(uint8_t *rxChar, uint16_t size, uint8_t error));
+
+/**
+  * @brief  DeInit the UART and associated DMA.
+  * @return @ref UTIL_ADV_TRACE_Status_t
+  */
+UTIL_ADV_TRACE_Status_t vcom_DeInit(void);
+
+/**
+  * @brief  send buffer \p p_data of size \p size to vcom in polling mode
+  * @param  p_data data to be sent
+  * @param  size of buffer p_data to be sent
+  */
+void vcom_Trace(uint8_t *p_data, uint16_t size);
+
+/**
+  * @brief  send buffer \p p_data of size \p size to vcom using DMA
+  * @param  p_data data to be sent
+  * @param  size of buffer p_data to be sent
+  * @return @ref UTIL_ADV_TRACE_Status_t
+  */
+UTIL_ADV_TRACE_Status_t vcom_Trace_DMA(uint8_t *p_data, uint16_t size);
+
+/**
+  * @brief  last byte has been sent on the uart line
+  */
+void vcom_IRQHandler(void);
+
+/**
+  * @brief  last byte has been sent from memory to uart data register
+  */
+void vcom_DMA_TX_IRQHandler(void);
+
+/**
+  * @brief  Resume the UART and associated DMA (used by LPM)
+  */
+void vcom_Resume(void);
+
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
@@ -109,4 +114,4 @@ typedef enum
 }
 #endif
 
-#endif /* __UTILITIES_DEF_H__ */
+#endif /* __USART_IF_H__ */

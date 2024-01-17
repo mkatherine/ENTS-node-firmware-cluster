@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    lora_app.h
+  * @file    adc_if.h
   * @author  MCD Application Team
-  * @brief   Header of application of the LRWAN Middleware
+  * @brief   Header for ADC interface configuration
   ******************************************************************************
   * @attention
   *
@@ -19,14 +19,16 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __LORA_APP_H__
-#define __LORA_APP_H__
+#ifndef __ADC_IF_H__
+#define __ADC_IF_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /* Includes ------------------------------------------------------------------*/
+#include "adc.h"
+#include "platform.h"
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -37,21 +39,56 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+/**
+  * @brief Battery level in mV
+  */
+#define BAT_CR2032                  ((uint32_t) 3000)
+/**
+  * @brief Maximum battery level in mV
+  */
+#define VDD_BAT                     BAT_CR2032
+/**
+  * @brief Minimum battery level in mV
+  */
+#define VDD_MIN                     1800
 
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
 
-/* Exported macros -----------------------------------------------------------*/
+/* External variables --------------------------------------------------------*/
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
+
+/* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+
 /**
-  * @brief  Init Lora Application
+  * @brief  Initializes the ADC input
   */
-void LoRaWAN_Init(void);
+void SYS_InitMeasurement(void);
+
+/**
+  * @brief DeInitializes the ADC
+  */
+void SYS_DeInitMeasurement(void);
+
+/**
+  * @brief  Get the current temperature
+  * @return value temperature in degree Celsius( q7.8 )
+  */
+int16_t SYS_GetTemperatureLevel(void);
+
+/**
+  * @brief Get the current battery level
+  * @return value battery level in linear scale
+  */
+uint16_t SYS_GetBatteryLevel(void);
 
 /* USER CODE BEGIN EFP */
 
@@ -61,4 +98,4 @@ void LoRaWAN_Init(void);
 }
 #endif
 
-#endif /*__LORA_APP_H__*/
+#endif /* __ADC_IF_H__ */

@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    lora_app.h
-  * @author  MCD Application Team
-  * @brief   Header of application of the LRWAN Middleware
+  * @file    rtc.h
+  * @brief   This file contains all the function prototypes for
+  *          the rtc.c file
   ******************************************************************************
   * @attention
   *
@@ -17,48 +17,36 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __LORA_APP_H__
-#define __LORA_APP_H__
+#ifndef __RTC_H__
+#define __RTC_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
+extern RTC_HandleTypeDef hrtc;
 
-/* USER CODE END ET */
+/* USER CODE BEGIN Private defines */
 
-/* Exported constants --------------------------------------------------------*/
+/* USER CODE END Private defines */
 
-/* USER CODE BEGIN EC */
+void MX_RTC_Init(void);
 
-/* USER CODE END EC */
+/* USER CODE BEGIN Prototypes */
 
-/* Exported macros -----------------------------------------------------------*/
-/* USER CODE BEGIN EM */
-
-/* USER CODE END EM */
-
-/* Exported functions prototypes ---------------------------------------------*/
-/**
-  * @brief  Init Lora Application
-  */
-void LoRaWAN_Init(void);
-
-/* USER CODE BEGIN EFP */
-
-/* USER CODE END EFP */
+/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*__LORA_APP_H__*/
+#endif /* __RTC_H__ */
+

@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    sys_conf.h
+  * @file    stm32wlxx_nucleo_conf.h
   * @author  MCD Application Team
-  * @brief   Applicative configuration, e.g. : debug, trace, low power, sensors
+  * @brief   STM32WLxx_Nucleo board configuration file.
   ******************************************************************************
   * @attention
   *
@@ -19,14 +19,16 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __SYS_CONF_H__
-#define __SYS_CONF_H__
+#ifndef STM32WLXX_NUCLEO_CONF_H
+#define STM32WLXX_NUCLEO_CONF_H
 
 #ifdef __cplusplus
-extern "C" {
+ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32wlxx_hal.h"
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -37,51 +39,45 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+/** @addtogroup BSP
+  * @{
+  */
+
+/** @addtogroup STM32WLXX_NUCLEO
+  * @{
+  */
+
+/** @defgroup STM32WLXX_NUCLEO_CONFIG CONFIG
+  * @{
+  */
+
+/** @defgroup STM32WLXX_NUCLEO_CONFIG_Exported_Constants Exported Constants
+  * @{
+  */
+/* COM usage define */
+#define USE_BSP_COM_FEATURE                 0U
+
+/* COM log define */
+#define USE_COM_LOG                         0U
+
+/* IRQ priorities */
+#define BSP_BUTTON_USER_IT_PRIORITY         14U
 
 /**
-  * @brief Temperature and pressure values are retrieved from sensors shield
-  *        (instead of sending dummy values). It requires MEMS IKS shield
+  * @}
   */
-#define SENSOR_ENABLED                       0
 
 /**
-  * @brief  Verbose level for all trace logs
+  * @}
   */
-#define VERBOSE_LEVEL                        VLEVEL_M
 
 /**
-  * @brief Enable trace logs
+  * @}
   */
-#define APP_LOG_ENABLED                      1
 
 /**
-  * @brief Activate monitoring (probes) of some internal RF signals for debug purpose
+  * @}
   */
-#define DEBUG_SUBGHZSPI_MONITORING_ENABLED   0
-
-#define DEBUG_RF_NRESET_ENABLED              0
-
-#define DEBUG_RF_HSE32RDY_ENABLED            0
-
-#define DEBUG_RF_SMPSRDY_ENABLED             0
-
-#define DEBUG_RF_LDORDY_ENABLED              0
-
-#define DEBUG_RF_DTB1_ENABLED                0
-
-#define DEBUG_RF_BUSY_ENABLED                0
-
-/**
-  * @brief Enable/Disable MCU Debugger pins (dbg serial wires)
-  * @note  by HW serial wires are ON by default, need to put them OFF to save power
-  */
-#define DEBUGGER_ENABLED                     0
-
-/**
-  * @brief Disable Low Power mode
-  * @note  0: LowPowerMode enabled. MCU enters stop2 mode, 1: LowPowerMode disabled. MCU enters sleep mode only
-  */
-#define LOW_POWER_DISABLE                    0
 
 /* USER CODE BEGIN EC */
 
@@ -106,4 +102,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SYS_CONF_H__ */
+#endif /* STM32WLXX_NUCLEO_CONF_H */

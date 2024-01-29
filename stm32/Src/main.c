@@ -100,7 +100,7 @@ int main(void)
   // const unsigned char * intro = "Hello\r\n";
   // const unsigned char * fail = "I2C Failed\r\n";
   // const unsigned char * succsuful_probe = "Probe succseeded\r\n";
-  char output[15];
+  char output[20];
   // if(probeADS12() != HAL_OK){
   //   HAL_UART_Transmit(&huart1, fail, 13, 19);
   // } else {
@@ -124,8 +124,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     reading = ADC_read();
-    sprintf(output, "Adjusted: %d\r\n", reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, 15, 19);
+    sprintf(output, "Adjusted: %d\r\n\r\n", reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, 17, 19);
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(1000);
     count++;

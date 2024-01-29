@@ -40,7 +40,7 @@ int HAL_status(HAL_StatusTypeDef ret) {
 */
 HAL_StatusTypeDef ADC_init(void){
     uint8_t code = ADS12_RESET_CODE;
-    uint8_t register_data[2] = {0x40, 0x02};
+    uint8_t register_data[2] = {0x40, 0x03};
     HAL_StatusTypeDef ret;
 
     // Control register breakdown.
@@ -86,11 +86,9 @@ HAL_StatusTypeDef ADC_init(void){
 */
 int ADC_read(void){
     uint8_t code;
-    int reading;
+    int16_t reading;
     HAL_StatusTypeDef ret;
     uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
-
-    char raw[45];
     
     while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
     code = ADS12_READ_DATA_CODE;
@@ -103,11 +101,17 @@ int ADC_read(void){
     if (ret != HAL_OK){// Recieve the ADS data from
       return ret;
     }
+    
 
-    reading = ((int)rx_data[0] << 8) | (int)rx_data[1];
-    sprintf(raw, "Raw: %x %x  Shifted: %x \r\n\r\n",rx_data[0], rx_data[1], reading);
-    //HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 32, 19);
-    reading =  (-0.07 * reading) + 4550; // Calculated from linear regression
+    reading = ((int)rx_data[0] << 8) | (int)rx_data[1]; // Chop the last byte, as it seems to be mostly noise
+
+    // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
+    // You will have to use these lines to get the raw x values to plug into the linear_regression.py file
+    // char raw[45];
+    // sprintf(raw, "Raw: %x %x  Shifted: %i \r\n\r\n",rx_data[0], rx_data[1], reading);
+    // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
+
+    reading =  (SLOPE * reading) + B; // Calculated from linear regression
     return reading;
  }
 

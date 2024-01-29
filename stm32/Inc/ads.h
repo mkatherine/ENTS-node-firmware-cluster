@@ -31,6 +31,9 @@
 #define ADS12_CONTROL_REGISTER 0b00000001
 
 #define TWO_POW_TWENTYTHREE 8388608 // Eqn 5 in ADS1219 datasheet
+
+#define SLOPE -0.072 // Change this to the slope output from the linear_regression.py file
+#define B 0 // Change this to the b output from the linear_regression.py file
 /* USER CODE END PD */
 
 /* USER CODE BEGIN 1 */

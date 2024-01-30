@@ -78,7 +78,7 @@ HAL_StatusTypeDef ADC_init(void){
 * @brief    This function reads the current ADC value.
 * 
 *           This function is a wrapper for the STM32 HAl I2C library. The ADS1219 uses
-*           I2C the I2C communication protocol. 
+*           I2C the I2C communication protocol. This version simply chops the noisy bits.
 *           
 * @param    void
 * @return   float, current ADC reading
@@ -102,7 +102,7 @@ int ADC_read(void){
       return ret;
     }
     
-
+    // reading = ((int)rx_data[0] << 16) | ((int)rx_data[1] << 8) | (int)rx_data[0]; // Use this line if you want a filtered input
     reading = ((int)rx_data[0] << 8) | (int)rx_data[1]; // Chop the last byte, as it seems to be mostly noise
 
     // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
@@ -127,4 +127,23 @@ HAL_StatusTypeDef probeADS12(void){
   HAL_StatusTypeDef ret;
   ret = HAL_I2C_IsDeviceReady(&hi2c2, ADS12_WRITE, 10, 20);
   return ret;
+}
+
+/**
+******************************************************************************
+* @brief    This function filters ADC
+*           
+* @param    int num[]
+* @param    int size
+* @return   int filtered_reading
+******************************************************************************
+*/
+
+int ADC_filter(int readings[], int size){
+  int filtered_reading;
+  for(int i = 0; i < size; i++){
+    filtered_reading = filtered_reading + readings[i];
+  }
+  filtered_reading = filtered_reading / size;
+  return filtered_reading;
 }

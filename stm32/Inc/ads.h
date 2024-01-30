@@ -41,6 +41,7 @@
 HAL_StatusTypeDef ADC_init(void);
 int ADC_read(void);
 HAL_StatusTypeDef probeADS12(void);
+int ADC_filter(int readings[], int size);
 
 
 /* USER CODE END 1 */

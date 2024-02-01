@@ -382,13 +382,27 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 {
   /* USER CODE BEGIN OnRxData_1 */
+  if ((appData != NULL) || (params != NULL))
+  {
+
+    static const char *slotStrings[] = { "1", "2", "C", "C Multicast", "B Ping-Slot", "B Multicast Ping-Slot" };
+
+    APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### ========== MCPS-Indication ==========\r\n");
+    APP_LOG(TS_OFF, VLEVEL_H, "###### D/L FRAME:%04d | SLOT:%s | PORT:%d | DR:%d | RSSI:%d | SNR:%d\r\n",
+            params->DownlinkCounter, slotStrings[params->RxSlot], appData->Port, params->Datarate, params->Rssi, params->Snr);
+    switch (appData->Port)
+    {
+      // TODO add cases for incoming data on ports
+      default:
+        break;
+    }
+  }
   /* USER CODE END OnRxData_1 */
 }
 
 static void SendTxData(void)
 {
   /* USER CODE BEGIN SendTxData_1 */
-
   /* USER CODE END SendTxData_1 */
 }
 

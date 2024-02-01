@@ -290,6 +290,17 @@ static UTIL_TIMER_Time_t TxPeriodicity = APP_TX_DUTYCYCLE;
 static UTIL_TIMER_Object_t StopJoinTimer;
 
 /* USER CODE BEGIN PV */
+
+/**
+  * @brief User application buffer
+  */
+static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
+
+/**
+  * @brief User application data structure
+  */
+static LmHandlerAppData_t AppData = { 0, 0, AppDataBuffer };
+
 /* USER CODE END PV */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -403,6 +414,26 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 static void SendTxData(void)
 {
   /* USER CODE BEGIN SendTxData_1 */
+
+  uint8_t battery_level;
+  uint16_t temperature;
+
+  battery_level = GetBatteryLevel();
+  temperature = SYS_GetTemperatureLevel();
+
+  AppData.Port = LORAWAN_SPS_MEAS_PORT;
+  AppData.Buffer[0] = 0x9;
+  AppData.BufferSize = 1;
+
+  if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, false))
+  {
+    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
+  }
+  else
+  {
+    APP_LOG(TS_OFF, VLEVEL_M, "Could not send request\r\n");
+  }
+
   /* USER CODE END SendTxData_1 */
 }
 

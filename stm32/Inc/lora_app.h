@@ -54,18 +54,6 @@ extern "C" {
 #define APP_TX_DUTYCYCLE                            10000
 
 /*!
- * LoRaWAN User application port
- * @note do not use 224. It is reserved for certification
- */
-#define LORAWAN_USER_APP_PORT                       2
-
-/*!
- * LoRaWAN Switch class application port
- * @note do not use 224. It is reserved for certification
- */
-#define LORAWAN_SWITCH_CLASS_PORT                   3
-
-/*!
  * LoRaWAN default class
  */
 #define LORAWAN_DEFAULT_CLASS                       CLASS_A
@@ -128,6 +116,12 @@ extern "C" {
 #define LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT      8000
 
 /* USER CODE BEGIN EC */
+
+/*!
+ * LoRaWAN User application port
+ * @note do not use 224. It is reserved for certification
+ */
+#define LORAWAN_SPS_MEAS_PORT                       1
 
 /* USER CODE END EC */
 

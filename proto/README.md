@@ -2,6 +2,8 @@
 
 [Protobuf](https://protobuf.dev/) is used to serialize measurement data when uploading data. Over LoRa this is strictly necessary due to payload size restrictions of the LoRaWAN protocol.
 
+![Serialized data block diagram](/images/serialized_structure.png) {html: width=80%}
+
 The generation of necessary source files is handled with the `Makefile`. The `nanopb_generator` binary is required for the `c` implementation and can be installed through the top-level `requirements.txt`. Run the following to generate the source files.
 
 ```bash

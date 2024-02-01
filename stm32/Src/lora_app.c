@@ -413,6 +413,26 @@ static void OnTxTimerEvent(void *context)
 static void OnTxData(LmHandlerTxParams_t *params)
 {
   /* USER CODE BEGIN OnTxData_1 */
+  if ((params != NULL))
+  {
+    /* Process Tx event only if its a mcps response to prevent some internal events (mlme) */
+    if (params->IsMcpsConfirm != 0)
+    {
+      APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### ========== MCPS-Confirm =============\r\n");
+      APP_LOG(TS_OFF, VLEVEL_H, "###### U/L FRAME:%04d | PORT:%d | DR:%d | PWR:%d", params->UplinkCounter,
+              params->AppData.Port, params->Datarate, params->TxPower);
+
+      APP_LOG(TS_OFF, VLEVEL_H, " | MSG TYPE:");
+      if (params->MsgType == LORAMAC_HANDLER_CONFIRMED_MSG)
+      {
+        APP_LOG(TS_OFF, VLEVEL_H, "CONFIRMED [%s]\r\n", (params->AckReceived != 0) ? "ACK" : "NACK");
+      }
+      else
+      {
+        APP_LOG(TS_OFF, VLEVEL_H, "UNCONFIRMED\r\n");
+      }
+    }
+  }
   /* USER CODE END OnTxData_1 */
 }
 

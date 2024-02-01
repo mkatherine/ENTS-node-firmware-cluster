@@ -28,6 +28,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+
+#include "sys_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -118,50 +120,19 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  // Print the compilation time at startup
-  char info_str[100];
-  int info_len;
-  info_len = sprintf(
-    info_str,
-    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
-    __DATE__,__TIME__
-    );
-  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
-
-
-  uint32_t battery_voltage = 0;
-
-  /*
-
-  // Calibrate and start conversion process
-  rc = HAL_ADCEx_Calibration_Start(&hadc);
-  if (rc != HAL_OK) Error_Handler();
-
-  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
-  if (rc != HAL_OK) Error_Handler();
-
-  */
+  // Debug message, gets printed after init code
+  //APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int adc_val;
-  char adc_out[20];
   while (1)
   {
     /* USER CODE END WHILE */
     MX_LoRaWAN_Process();
 
     ///* USER CODE BEGIN 3 */
-    //char buf[10];
-    //int buf_len = sprintf(buf, "%lu\n", battery_voltage);
-
-    //HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
-
-    ////HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-
-    //HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }

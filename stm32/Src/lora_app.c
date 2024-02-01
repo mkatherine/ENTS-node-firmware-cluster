@@ -419,6 +419,25 @@ static void OnTxData(LmHandlerTxParams_t *params)
 static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
 {
   /* USER CODE BEGIN OnJoinRequest_1 */
+  if (joinParams != NULL)
+  {
+    if (joinParams->Status == LORAMAC_HANDLER_SUCCESS)
+    {
+      APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### = JOINED = ");
+      if (joinParams->Mode == ACTIVATION_TYPE_ABP)
+      {
+        APP_LOG(TS_OFF, VLEVEL_M, "ABP ======================\r\n");
+      }
+      else
+      {
+        APP_LOG(TS_OFF, VLEVEL_M, "OTAA =====================\r\n");
+      }
+    }
+    else
+    {
+      APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### = JOIN FAILED\r\n");
+    }
+  }
   /* USER CODE END OnJoinRequest_1 */
 }
 

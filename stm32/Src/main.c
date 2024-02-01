@@ -131,6 +131,7 @@ int main(void)
 
   uint32_t battery_voltage = 0;
 
+  /*
 
   // Calibrate and start conversion process
   rc = HAL_ADCEx_Calibration_Start(&hadc);
@@ -138,6 +139,8 @@ int main(void)
 
   rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
   if (rc != HAL_OK) Error_Handler();
+
+  */
 
   /* USER CODE END 2 */
 
@@ -150,16 +153,15 @@ int main(void)
     /* USER CODE END WHILE */
     MX_LoRaWAN_Process();
 
-    /* USER CODE BEGIN 3 */
-    char buf[10];
-    int buf_len = sprintf(buf, "%lu\n", battery_voltage);
+    ///* USER CODE BEGIN 3 */
+    //char buf[10];
+    //int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
-    HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
+    //HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
 
-    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+    ////HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 
-    HAL_Delay(500);
-
+    //HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }

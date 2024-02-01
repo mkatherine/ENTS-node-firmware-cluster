@@ -4,6 +4,22 @@
 
 Firmware for STM32 and ESP32 microcontrollers on the Soil Power Sensor board
 
+## Structure of project
+
+[STM32Firmware](@ref ./stm32/README.md)
+
+## Protocol Buffers
+
+[protbuf](@ref ./stm32/README.md)
+
+## Generation documentation
+
+This project use [Doxygen](https://www.doxygen.nl/) for its code documentation. HTML documentation is automatically generated through Github Actions and is updated whenever there is a change to the `main` branch. To generate documentation locally in the `docs/` folder, run the following from the root directory:
+
+```bash
+doxygen Doxyfile
+```
+
 ## Steps to load into the STM32 bootloader
 
 The `Wio-E5 mini` board can be programed via *SWD* through the debug header `D1`. The following are instructions for connecting a `ST-Link` debugger to the bootloader.

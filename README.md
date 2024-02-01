@@ -37,6 +37,9 @@ The following is the list of the software used for developing the firmware. The 
 | [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) | `6.10.0` | Yes, for code generation |
 | [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) | `1.13.2` | Yes, for flashing with openocd on Windows |
 | [STM32CubeProg](https://www.st.com/en/development-tools/stm32cubeprog.html) | `2.15.0` | Yes, for initial flash and clearing read protection from Wio-E5 |
+| [Nanopb](https://jpa.kapsi.fi/nanopb/) | `0.4.8` | No |
+| [protobuf](https://protobuf.dev/) | `25.2` | No |
+| Make | `4.4.1` | No |
 
 ## Generation documentation
 

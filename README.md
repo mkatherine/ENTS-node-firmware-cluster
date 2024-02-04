@@ -56,3 +56,15 @@ Online version of the documentation for the `main` branch is available at https:
 Below is a list of resources that served as references throughout the design and implementation for the project.
 
 - https://github.com/Seeed-Studio/LoRaWan-E5-Node
+
+## Support
+
+For issues relating to software create an issue in this repository. For hardware issues, create an issue in the [hardware repository](https://github.com/jlab-sensing/soil_power_sensor).
+
+## Contributing
+
+TODO
+
+## License
+
+Code in this repository is licensed under MIT unless specified in the file header. See @ref LICENSE for full document.

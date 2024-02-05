@@ -19,9 +19,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "fram.h"
 #include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -37,6 +39,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
+#define FM24_READ 0xA1 // Device address of FM24 in read mode
 
 
 /* USER CODE END PD */
@@ -55,6 +59,26 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+ /**
+  ******************************************************************************
+  * @brief    Helper function to reverse array
+  * @param    arr array
+  * @param    start start of array
+  * @param    end end of array
+  * @return   none
+  ******************************************************************************
+  */
+void reverseArray(int arr[], int start, int end) 
+{ 
+    int temp; 
+    while (start < end) { 
+        temp = arr[start]; 
+        arr[start] = arr[end]; 
+        arr[end] = temp; 
+        start++; 
+        end--; 
+    } 
+}
 
 /* USER CODE END PFP */
 
@@ -90,9 +114,32 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
+  ADC_init();
+  /* USER CODE BEGIN 2 */
+
+  // Print the compilation time at startup
+  char info_str[100];
+  int info_len;
+  info_len = sprintf(
+    info_str,
+    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
+    __DATE__,__TIME__
+    );
+  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
+
+
+  uint32_t battery_voltage = 0;
+
+
+  // Calibrate and start conversion process
+  rc = HAL_ADCEx_Calibration_Start(&hadc);
+  if (rc != HAL_OK) Error_Handler();
+
+  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
+  if (rc != HAL_OK) Error_Handler();
 
   /* USER CODE BEGIN 2 */
   ADC_init();
@@ -115,6 +162,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int adc_val;
+  char adc_out[20];
   while (1)
   {
 

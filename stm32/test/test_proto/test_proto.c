@@ -1,13 +1,12 @@
 /**
- * @file
- * @brief 
+ * @file test_proto.c
+ * @brief Tests ability to encode and decode protobuf messages
  * 
- * [Extended description here]
+ * Encoding/decoding of each message type is tested to ensure functionality of
+ * nanopb and correctly matched tests with generate protobuf source files.
  * 
- * @see [header file]
- * 
- * @author
- * @date [Date created]
+ * @author John Madden <jmadden173@pm.me>
+ * @date 2023-11-27
 */
 
 #include "main.h"
@@ -162,23 +161,24 @@ void test_meta(void)
 
 void test_power(void)
 {
-  PowerMeasurement power_encode = PowerMeasurement_init_zero;
+  Measurement power_encode = Measurement_init_zero;
+  power_encode.which_measurement = Measurement_power_tag;
   power_encode.has_meta = true;
   power_encode.meta = meta_default;
-  power_encode.voltage = 1.2;
-  power_encode.current = 120.1;
+  power_encode.measurement.power.voltage = 1.2;
+  power_encode.measurement.power.current = 120.1;
 
-  status = pb_encode(&ostream, PowerMeasurement_fields, &power_encode);
+  status = pb_encode(&ostream, Measurement_fields, &power_encode);
   msg_len = ostream.bytes_written;
 
   TEST_ASSERT_TRUE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
 
 
-  PowerMeasurement power_decode;
+  Measurement power_decode;
 
   istream = pb_istream_from_buffer(buffer, msg_len);
-  status = pb_decode(&istream, PowerMeasurement_fields, &power_decode);
+  status = pb_decode(&istream, Measurement_fields, &power_decode);
 
   TEST_ASSERT_TRUE(status);
 
@@ -187,32 +187,39 @@ void test_power(void)
   TEST_ASSERT_EQUAL(0, power_decode.meta.cell_id);
   TEST_ASSERT_EQUAL(0, power_decode.meta.logger_id);
   // Timestamp
-  TEST_ASSERT_TRUE(power_decode.has_meta);
+  TEST_ASSERT_TRUE(power_decode.meta.has_ts);
   TEST_ASSERT_EQUAL(UNIX_EPOCHS, power_decode.meta.ts.seconds);
   TEST_ASSERT_EQUAL(0, power_decode.meta.ts.nanos);
 
-  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 1.2, power_decode.voltage);
-  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 120.1, power_decode.current);
+  TEST_ASSERT_EQUAL(Measurement_power_tag, power_decode.which_measurement);
+  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 1.2,
+                            power_decode.measurement.power.voltage);
+  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 120.1,
+                            power_decode.measurement.power.current);
 }
 
 void test_teros12(void)
 {
-  Teros12Measurement teros12_encode = Teros12Measurement_init_zero;
+  Measurement teros12_encode = Measurement_init_zero;
+  teros12_encode.which_measurement = Measurement_teros12_tag;
   teros12_encode.has_meta = true;
   teros12_encode.meta = meta_default;
-  teros12_encode.ec = 200;
-  teros12_encode.temp = 24.5;
-  teros12_encode.vwc_adj = 32.4;
-  teros12_encode.vwc_raw = 3200.2;
+  teros12_encode.measurement.teros12.ec = 200;
+  teros12_encode.measurement.teros12.temp = 24.5;
+  teros12_encode.measurement.teros12.vwc_adj = 32.4;
+  teros12_encode.measurement.teros12.vwc_raw = 3200.2;
 
-  status = pb_encode(&ostream, Teros12Measurement_fields, &teros12_encode);
+  status = pb_encode(&ostream, Measurement_fields, &teros12_encode);
   msg_len = ostream.bytes_written;
 
+  TEST_ASSERT_TRUE(status);
+  TEST_ASSERT_GREATER_THAN(0, msg_len);
 
-  Teros12Measurement teros12_decode;
+
+  Measurement teros12_decode;
 
   istream = pb_istream_from_buffer(buffer, msg_len);
-  status = pb_decode(&istream, Teros12Measurement_fields, &teros12_decode);
+  status = pb_decode(&istream, Measurement_fields, &teros12_decode);
 
   TEST_ASSERT_TRUE(status);
 
@@ -221,19 +228,44 @@ void test_teros12(void)
   TEST_ASSERT_EQUAL(0, teros12_decode.meta.cell_id);
   TEST_ASSERT_EQUAL(0, teros12_decode.meta.logger_id);
   // Timestamp
-  TEST_ASSERT_TRUE(teros12_decode.has_meta);
+  TEST_ASSERT_TRUE(teros12_decode.meta.has_ts);
   TEST_ASSERT_EQUAL(UNIX_EPOCHS, teros12_decode.meta.ts.seconds);
   TEST_ASSERT_EQUAL(0, teros12_decode.meta.ts.nanos);
 
-  TEST_ASSERT_EQUAL(200, teros12_decode.ec);
-  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 24.5, teros12_decode.temp);
-  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 32.4, teros12_decode.vwc_adj);
-  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 3200.2, teros12_decode.vwc_raw);
+  TEST_ASSERT_EQUAL(Measurement_teros12_tag, teros12_decode.which_measurement);
+  TEST_ASSERT_EQUAL(200, teros12_decode.measurement.teros12.ec);
+  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 24.5,
+                            teros12_decode.measurement.teros12.temp);
+  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 32.4,
+                            teros12_decode.measurement.teros12.vwc_adj);
+  TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 3200.2,
+                            teros12_decode.measurement.teros12.vwc_raw);
+}
+
+void test_response(void)
+{
+  Response response_encode = Response_init_zero;
+  response_encode.resp = Response_ResponseType_SUCCESS;
+
+  status = pb_encode(&ostream, Response_fields, &response_encode);
+  msg_len = ostream.bytes_written;
+  
+  TEST_ASSERT_TRUE(status);
+
+
+  Response response_decode;
+
+  istream = pb_istream_from_buffer(buffer, msg_len);
+  status = pb_decode(&istream, Response_fields, &response_decode);
+
+  TEST_ASSERT_TRUE(status);
+
+  TEST_ASSERT_EQUAL(Response_ResponseType_SUCCESS, response_decode.resp);
 }
 
 
 /**
-  * @brief Entry point for battery test
+  * @brief Entry point for protobuf test
   * @retval int
   */
 int main(void)
@@ -259,6 +291,8 @@ int main(void)
   RUN_TEST(test_power);
   // Tests for Teros12
   RUN_TEST(test_teros12);
+  // Tests for Response
+  RUN_TEST(test_response);
 
   UNITY_END();
 }

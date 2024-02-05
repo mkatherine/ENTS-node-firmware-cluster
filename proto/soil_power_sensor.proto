@@ -17,35 +17,57 @@ import "timestamp.proto";
 
 /* Data shared between all measurement messages */
 message MeasurementMetadata {
-    // id of the cell measured
-    uint32 cell_id = 1;
-    // id of the logging device
-    uint32 logger_id = 2;
-    // timestamp of the measurement
-    google.protobuf.Timestamp ts = 3;
+  // id of the cell measured
+  uint32 cell_id = 1;
+  // id of the logging device
+  uint32 logger_id = 2;
+  // timestamp of the measurement
+  google.protobuf.Timestamp ts = 3;
 }
 
 /* Power measurement message. Voltage and current can be digitially combined to
  * obtain power. */
 message PowerMeasurement {
-    MeasurementMetadata meta = 1;
-
-    // voltage
-    double voltage = 2;
-    // current
-    double current = 3;
+  // voltage
+  double voltage = 2;
+  // current
+  double current = 3;
 }
 
 /* Teros12 measurement message */
 message Teros12Measurement {
-    MeasurementMetadata meta = 1;
+  // raw volumetric water content
+  float vwc_raw = 2;
+  // calibrated volumetric water content
+  float vwc_adj = 3;
+  // temperature in celcious
+  float temp = 4;
+  // electrical conductivity
+  uint32 ec = 5;
+}
 
-    // raw volumetric water content
-    float vwc_raw = 2;
-    // calibrated volumetric water content
-    float vwc_adj = 3;
-    // temperature in celcious
-    float temp = 4;
-    // electrical conductivity
-    uint32 ec = 5;
+/* Top level measurement message */
+message Measurement {
+  // Metadata
+  MeasurementMetadata meta = 1;
+
+  // Possible measurements
+  oneof measurement {
+    PowerMeasurement power = 2;
+    Teros12Measurement teros12 = 3;
+  }
+}
+
+/* Acknowledge Packet */
+message Response {
+  /* Response codes from server */
+  enum ResponseType {
+    /* Data was successfully uploaded */
+    SUCCESS = 0;
+    /* General Error */
+    ERROR = 1;
+  }
+
+  /* Response from server */
+  ResponseType resp = 1; 
 }

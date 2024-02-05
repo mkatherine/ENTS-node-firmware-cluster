@@ -1,6 +1,11 @@
 # user-defined
 *.code-workspace
 
+
+# docs
+docs/html
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

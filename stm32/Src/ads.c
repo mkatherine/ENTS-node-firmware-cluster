@@ -50,8 +50,6 @@ HAL_StatusTypeDef ADC_init(void){
     //  1   Conversion mode (default)
     //  0   VREF (External reference 3.3V)
 
-
-    
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
     HAL_Delay(1000);
     ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
@@ -70,6 +68,7 @@ HAL_StatusTypeDef ADC_init(void){
     if (ret != HAL_OK){
       return ret;
     }
+
     return ret;
  }
 

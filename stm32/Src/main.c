@@ -25,6 +25,7 @@
 #include "gpio.h"
 #include "fram.h"
 #include "ads.h"
+//#include "tim.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -115,6 +116,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
+  //MX_TIM2_Init();
   ADC_init();
   /* USER CODE BEGIN 2 */
 
@@ -143,8 +145,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int adc_val;
-  char adc_out[20];
+  //int adc_val;
   while (1)
   {
     /* USER CODE END WHILE */

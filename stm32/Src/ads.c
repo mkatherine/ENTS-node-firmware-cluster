@@ -66,7 +66,7 @@ HAL_StatusTypeDef ADC_init(void){
       //return ret;
     }
     ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, &creg, 1, 10);
-    char output[10];
+    //char output[10];
     //sprintf(output, "C Reg: %d", creg);
    // HAL_UART_Transmit(&huart1, output, 10, 10);
     if (ret != HAL_OK){

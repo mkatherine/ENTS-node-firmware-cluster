@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # How to use this file
 
 # Uncomment these lines from ADC_read in adc.c

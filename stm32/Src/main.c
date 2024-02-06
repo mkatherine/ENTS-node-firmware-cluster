@@ -23,13 +23,13 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
-#include "fram.h"
-#include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "ads.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,9 +39,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
-#define FM24_READ 0xA1 // Device address of FM24 in read mode
-
 
 /* USER CODE END PD */
 
@@ -115,9 +112,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
+  MX_ADC_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  ADC_init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
@@ -130,46 +127,20 @@ int main(void)
     );
   HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
-
-  uint32_t battery_voltage = 0;
-
-
-  // Calibrate and start conversion process
-  rc = HAL_ADCEx_Calibration_Start(&hadc);
-  if (rc != HAL_OK) Error_Handler();
-
-  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
-  if (rc != HAL_OK) Error_Handler();
-
   /* USER CODE BEGIN 2 */
   ADC_init();
-  //uint8_t ADC_Reading[3];
-  // const unsigned char * intro = "Hello\r\n";
-  // const unsigned char * fail = "I2C Failed\r\n";
-  // const unsigned char * succsuful_probe = "Probe succseeded\r\n";
+
   char output[20];
-  // if(probeADS12() != HAL_OK){
-  //   HAL_UART_Transmit(&huart1, fail, 13, 19);
-  // } else {
-  //   HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
-  // };
 
   int reading;
   int count = 0;
-  // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
-  // HAL_UART_Transmit(&huart1, output, 17, 19);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int adc_val;
-  char adc_out[20];
   while (1)
   {
-
     /* USER CODE END WHILE */
-    // reading = ADC_read();
-    
 
     /* USER CODE BEGIN 3 */
     reading = ADC_read();

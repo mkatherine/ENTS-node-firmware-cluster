@@ -21,12 +21,16 @@ extern "C"{
 #include <stdio.h>
 #include <stdlib.h>
 
-#define WAKE_SENSOR_DELAY 12
+#define ONE_BIT_IN_MICROSECONDS 833 // Rate of 1 bit of data transfer at 1200 baud
+#define HALF_BIT_IN_MICROSECONDS 416 // ~Half the rate of 1 bit of data transfer at 1200 baud
 
-void wake_Sensors(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
-void SDI12_SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
-void SDI12_SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
-void SDI12_SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character);
+
+void delayMicroseconds(uint32_t microseconds);
+void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t microseconds);
+void SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
+void SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
+void SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character);
+char ReadCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 
 
 #ifdef __cplusplus

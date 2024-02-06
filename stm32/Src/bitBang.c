@@ -9,42 +9,72 @@
   **/
 
  #include "bitbang.h"
+ #include "tim.h"
+
+void delayMicroseconds(uint32_t microseconds) {
+    uint32_t targetCount = __HAL_TIM_GET_COUNTER(&htim2) + microseconds;
+
+    // Wait until the timer reaches the target count
+    while (__HAL_TIM_GET_COUNTER(&htim2) < targetCount);
+    return;
+}
 
 /**
   ******************************************************************************
-  * @brief    This is a helper function to wake all the sensors.
+  * @brief    Send a continous high signal.
   * 
   * @param    GPIO_TypeDef *GPIOx, an instance of the typdef struct GPIO_Typedef
   * @param    uint16_t, GPIO_Pin
+  * @param    uint32_t, microseconds
   * @return   void
   ******************************************************************************
   */
- void wake_Sensors(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin){ // Helper function to wake sensors
-    HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the data line low
-    HAL_Delay(WAKE_SENSOR_DELAY);
+ void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t microseconds){ // Helper function to wake sensors
+    HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the data line high
+    delayMicroseconds(microseconds); // Delay for 12ms according to SDI12 protocol
+    HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET); // Set it low again
  }
 
 /**
   ******************************************************************************
   * @brief    This is a helper function to send a start bit.
   * 
-  * @param    void
+  * @param    GPIO_TypeDef, *GPIOx
+  * @param    uint16_t GPIO_Pin
   * @return   void
   ******************************************************************************
   */
-void SDI12_SendStartBitSDI12_SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
+void SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
     HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET);  // Set the GPIO pin low (start bit)
-    HAL_Delay(10);  // Adjust the delay as needed based on your baud rate
+    delayMicroseconds(ONE_BIT_IN_MICROSECONDS);  
+    HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
 }
 
-// Function to send a stop bit
-void SDI12_SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
-    HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);  // Set the GPIO pin high (stop bit)
-    HAL_Delay(10);  // Adjust the delay as needed based on your baud rate
+/**
+  ******************************************************************************
+  * @brief    This is a helper function to send a stop bit.
+  * 
+  * @param    GPIO_TypeDef, *GPIOx
+  * @param    uint16_t GPIO_Pin
+  * @return   void
+  ******************************************************************************
+  */
+void SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
+    HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET);  // Set the GPIO pin high (stop bit)
+    delayMicroseconds(ONE_BIT_IN_MICROSECONDS);  
+    HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
 }
 
-// Function to send a single character
-void SDI12_SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character) {
+/**
+  ******************************************************************************
+  * @brief    Sends a single char off the specified GPIO bus
+  * 
+  * @param    GPIO_TypeDef, *GPIOx
+  * @param    uint16_t GPIO_Pin
+  * @return   void
+  ******************************************************************************
+  */
+void SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character) {
     for (int i = 0; i < 8; ++i) {
         // Send each bit, starting from the least significant bit
         if (character & (1 << i)) {
@@ -52,7 +82,33 @@ void SDI12_SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character)
         } else {
             HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);  // Set the GPIO pin low for a '0' bit
         }
-
-        HAL_Delay(10);  // Adjust the delay as needed based on your baud rate
+        delayMicroseconds(ONE_BIT_IN_MICROSECONDS);
     }
+}
+
+/**
+  ******************************************************************************
+  * @brief    Reads a single character of the specified GPIO pin
+  * 
+  * @param    GPIO_TypeDef, *GPIOx
+  * @param    uint16_t GPIO_Pin
+  * @return   char
+  ******************************************************************************
+  */
+char ReadCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
+    char bit;
+    char character = 0;
+
+    for (int i = 0; i < 8; ++i) {
+        // Read the current bit
+        bit = HAL_GPIO_ReadPin(GPIOx, GPIO_Pin) == GPIO_PIN_SET ? '1' : '0';
+
+        // Delay for half the expected bit time
+        delayMicroseconds(HALF_BIT_IN_MICROSECONDS);
+
+        // Append the bit to the character
+        character |= (bit - '0') << i;
+    }
+
+    return character;
 }

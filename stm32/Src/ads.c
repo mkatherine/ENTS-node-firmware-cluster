@@ -119,7 +119,7 @@ int ADC_readVoltage(void){
     reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
     return reading;
  }
-
+// Currently never leaves the -6600 to -6700 raw value. I suspect becuase the current draw on the device is so low
 int ADC_readCurrent(void){
     uint8_t code;
     int16_t reading;

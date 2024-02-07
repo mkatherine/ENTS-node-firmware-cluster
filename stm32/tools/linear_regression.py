@@ -8,6 +8,7 @@
 # // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
 # Input 2 voltages into the SPS board and record their values as y1 and y2 in mV below.
 # Record their corresponding raw values as x1 and x2.
+# You will have to repeat this process to get the current regrssion
 
 # Change the #define SLOPE and B in ads.h to match what linear_regression.py outputs as SLOPE and B
 x1 = -16715

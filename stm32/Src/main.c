@@ -160,12 +160,12 @@ int main(void)
     
     /* USER CODE BEGIN 3 */
     voltage = ADC_readVoltage();
-    HAL_Delay(5000);
-    //current = ADC_readCurrent();
+    HAL_Delay(2000);
+    current = ADC_readCurrent();
     sprintf(outputV, "Voltage: %d\r\n\r\n", voltage);
     sprintf(outputC, "Current: %d\r\n\r\n", current);
     HAL_UART_Transmit(&huart1, (const uint8_t *) outputV, 16, 19);
-    //HAL_UART_Transmit(&huart1, (const uint8_t *) outputC, 16, 19);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) outputC, 16, 19);
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(1000);
     count++;

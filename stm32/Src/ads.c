@@ -26,18 +26,30 @@ int HAL_status(HAL_StatusTypeDef ret) {
   return status;
 }
 
-/**
-******************************************************************************
-* @brief    This function starts up the ADS1219
-* 
-*           This function is a wrapper for the STM32 HAl I2C library. The ADS1219 uses
-*           I2C the I2C communication protocol. This function configures then ADS1219 for
-*           single read mode. Note: the ADS1219 requires a minimum of 500us when it is powered on.
-*
-* @param    void
-* @return   HAL_StatusTypeDef
-******************************************************************************
-*/
+HAL_StatusTypeDef configurADS(uint8_t config){
+  HAL_StatusTypeDef ret;
+  uint8_t code = ADS12_RESET_CODE;
+  uint8_t register_data[2] = {0x40, config}; // Initialize to voltage read first
+
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
+  if (ret != HAL_OK){
+      return ret;
+  } 
+  // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return ret;
+  }
+
+  code = ADS12_START_CODE;
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
+  if (ret != HAL_OK){
+    return ret;
+  }
+  HAL_Delay(100);
+  return HAL_OK;
+}
+
 HAL_StatusTypeDef ADC_init(void){
     uint8_t code = ADS12_RESET_CODE;
     uint8_t register_data[2] = {0x40, 0x01}; // Initialize to voltage read first
@@ -72,32 +84,13 @@ HAL_StatusTypeDef ADC_init(void){
     return ret;
  }
 
-/**
-******************************************************************************
-* @brief    This function reads the current ADC voltage value.
-* 
-*           This function is a wrapper for the STM32 HAl I2C library. The ADS1219 uses
-*           I2C the I2C communication protocol. This version simply chops the noisy bits.
-*           
-* @param    void
-* @return   int, current ADC reading in microvolts
-******************************************************************************
-*/
 int ADC_readVoltage(void){
-    uint8_t code = ADS12_RESET_CODE;
+    uint8_t code;
     int16_t reading;
     HAL_StatusTypeDef ret;
     uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
-    uint8_t register_data[2] = {0x40, 0x01}; // Initialize to voltage read first
 
-    //Set the control register to read voltage mode, leaving everything at default except for the VREF, which will be set to external reference mode
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
-    if (ret != HAL_OK){
-      return ret;
-    }
-
-    code = ADS12_START_CODE;
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
+    ret = configurADS(ADS12_CONFIGURE_READ_VOLTAGE); //Set the control register to read voltage mode, leaving everything at default except for the VREF, which will be set to external reference mode
     if (ret != HAL_OK){
       return ret;
     }
@@ -127,26 +120,13 @@ int ADC_readVoltage(void){
     return reading;
  }
 
-/**
-******************************************************************************
-* @brief    This function reads the current ADC ampere value.
-* 
-*           This function is a wrapper for the STM32 HAl I2C library. The ADS1219 uses
-*           I2C the I2C communication protocol. This version simply chops the noisy bits.
-*           
-* @param    void
-* @return   int, current ADC reading in microamps
-******************************************************************************
-*/
 int ADC_readCurrent(void){
     uint8_t code;
     int16_t reading;
     HAL_StatusTypeDef ret;
     uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
-    uint8_t register_data[2] = {0x40, 0x21}; // Initialize to current read
 
-    //Set the control register to read voltage mode, leaving everything at default except for the VREF, which will be set to external reference mode
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+    ret = configurADS(ADS12_CONFIGURE_READ_CURRENT); //Set the control register to read current mode, leaving everything at default except for the VREF, which will be set to external reference mode
     if (ret != HAL_OK){
       return ret;
     }
@@ -178,33 +158,15 @@ int ADC_readCurrent(void){
     // sprintf(raw, "RawC: %x %x %x ShiftedC: %i \r\n\r\n", rx_data[0], rx_data[1], rx_data[2], reading);
     // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 31, 19);
 
-   // reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
+   // reading =  (CURRENT_SLOPE * reading) + CURRENT_B; // Calculated from linear regression
     return reading;
  }
 
-/**
-******************************************************************************
-* @brief    This function probes the ADS12 to see if it is responsive.
-*           
-* @param    void
-* @return   HAL_StatusTypeDef
-*******************************************f***********************************
-*/
 HAL_StatusTypeDef ADC_probe(void){
   HAL_StatusTypeDef ret;
   ret = HAL_I2C_IsDeviceReady(&hi2c2, ADS12_WRITE, 10, 20);
   return ret;
 }
-
-/**
-******************************************************************************
-* @brief    This function filters ADC
-*           
-* @param    int num[]
-* @param    int size
-* @return   int filtered_reading
-******************************************************************************
-*/
 
 int ADC_filter(int readings[], int size){
   int filtered_reading = 0;

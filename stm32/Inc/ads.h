@@ -32,15 +32,16 @@
 
 #define TWO_POW_TWENTYTHREE 8388608 // Eqn 5 in ADS1219 datasheet
 
-#define SLOPE -0.072 // Change this to the slope output from the linear_regression.py file
-#define B 0 // Change this to the b output from the linear_regression.py file
+#define VOLTAGE_SLOPE -0.072 // Change this to the slope output from the linear_regression.py file
+#define VOLTAGE_B 0 // Change this to the b output from the linear_regression.py file
 /* USER CODE END PD */
 
 /* USER CODE BEGIN 1 */
 
 HAL_StatusTypeDef ADC_init(void);
-int ADC_read(void);
-HAL_StatusTypeDef probeADS12(void);
+int ADC_readVoltage(void);
+int ADC_readCurrent(void);
+HAL_StatusTypeDef ADC_probe(void);
 int ADC_filter(int readings[], int size);
 
 

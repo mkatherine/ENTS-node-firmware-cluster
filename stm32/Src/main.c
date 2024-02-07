@@ -131,50 +131,41 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
 
-  uint32_t battery_voltage = 0;
+  //uint32_t battery_voltage = 0;
 
 
   // Calibrate and start conversion process
-  rc = HAL_ADCEx_Calibration_Start(&hadc);
-  if (rc != HAL_OK) Error_Handler();
+  // rc = HAL_ADCEx_Calibration_Start(&hadc);
+  // if (rc != HAL_OK) Error_Handler();
 
-  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
-  if (rc != HAL_OK) Error_Handler();
+  // rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
+  // if (rc != HAL_OK) Error_Handler();
 
   /* USER CODE BEGIN 2 */
   ADC_init();
-  //uint8_t ADC_Reading[3];
-  // const unsigned char * intro = "Hello\r\n";
-  // const unsigned char * fail = "I2C Failed\r\n";
-  // const unsigned char * succsuful_probe = "Probe succseeded\r\n";
-  char output[20];
-  // if(probeADS12() != HAL_OK){
-  //   HAL_UART_Transmit(&huart1, fail, 13, 19);
-  // } else {
-  //   HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
-  // };
+  char outputV[20];
+  char outputC[20];
 
-  int reading;
+  int voltage;
+  int current;
   int count = 0;
-  // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
-  // HAL_UART_Transmit(&huart1, output, 17, 19);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int adc_val;
-  char adc_out[20];
   while (1)
   {
 
     /* USER CODE END WHILE */
-    // reading = ADC_read();
     
-
     /* USER CODE BEGIN 3 */
-    reading = ADC_read();
-    sprintf(output, "Adjusted: %d\r\n\r\n", reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, 17, 19);
+    voltage = ADC_readVoltage();
+    HAL_Delay(5000);
+    //current = ADC_readCurrent();
+    sprintf(outputV, "Voltage: %d\r\n\r\n", voltage);
+    sprintf(outputC, "Current: %d\r\n\r\n", current);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) outputV, 16, 19);
+    //HAL_UART_Transmit(&huart1, (const uint8_t *) outputC, 16, 19);
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(1000);
     count++;

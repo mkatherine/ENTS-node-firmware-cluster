@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -25,7 +25,8 @@
 #include "gpio.h"
 #include "fram.h"
 #include "ads.h"
-//#include "tim.h"
+#include "sdi12.h"
+// #include "tim.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -40,7 +41,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define FM24_WRITE 0xA0 // Device address of FM24 in write mode
-#define FM24_READ 0xA1 // Device address of FM24 in read mode
+#define FM24_READ 0xA1  // Device address of FM24 in read mode
 
 /* USER CODE END PD */
 
@@ -58,38 +59,39 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
- /**
-  ******************************************************************************
-  * @brief    Helper function to reverse array
-  * @param    arr array
-  * @param    start start of array
-  * @param    end end of array
-  * @return   none
-  ******************************************************************************
-  */
-void reverseArray(int arr[], int start, int end) 
-{ 
-    int temp; 
-    while (start < end) { 
-        temp = arr[start]; 
-        arr[start] = arr[end]; 
-        arr[end] = temp; 
-        start++; 
-        end--; 
-    } 
+/**
+ ******************************************************************************
+ * @brief    Helper function to reverse array
+ * @param    arr array
+ * @param    start start of array
+ * @param    end end of array
+ * @return   none
+ ******************************************************************************
+ */
+void reverseArray(int arr[], int start, int end)
+{
+  int temp;
+  while (start < end)
+  {
+    temp = arr[start];
+    arr[start] = arr[end];
+    arr[end] = temp;
+    start++;
+    end--;
+  }
 }
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-  
+
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -116,7 +118,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  //MX_TIM2_Init();
+  // MX_TIM2_Init();
   ADC_init();
   /* USER CODE BEGIN 2 */
 
@@ -124,28 +126,49 @@ int main(void)
   char info_str[100];
   int info_len;
   info_len = sprintf(
-    info_str,
-    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
-    __DATE__,__TIME__
-    );
-  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
-
+      info_str,
+      "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
+      __DATE__, __TIME__);
+  HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
 
   uint32_t battery_voltage = 0;
-
+  const char *pingS = "Ping success\r\n";
+  const char *pingF = "Ping failure\r\n";
 
   // Calibrate and start conversion process
-  rc = HAL_ADCEx_Calibration_Start(&hadc);
-  if (rc != HAL_OK) Error_Handler();
+  // rc = HAL_ADCEx_Calibration_Start(&hadc);
+  // if (rc != HAL_OK) Error_Handler();
 
-  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
-  if (rc != HAL_OK) Error_Handler();
+  // rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
+  // if (rc != HAL_OK) Error_Handler();
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  //int adc_val;
+  uint8_t deviceAddress = '0'; // Replace '0' with the actual device address
+
+  // Define buffers for the response and expected response
+  char responseBuffer[4]; // Adjust the size based on your expected response
+  uint16_t bufferSize = sizeof(responseBuffer);
+
+  // Define the timeout value
+  uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
+
+  // Call the SDI12_PingDevice function
+  SDI12_Init(GPIOA, GPIO_PIN_2);
+  HAL_StatusTypeDef pingStatus = SDI12_PingDevice(deviceAddress, responseBuffer, bufferSize, timeoutMillis);
+  // Check the result of the ping operation
+  if (pingStatus == HAL_OK)
+  {
+    // Device is active
+    HAL_UART_Transmit(&huart1, (const uint8_t *)pingS, 15, 15);
+  }
+  else
+  {
+    // Device is not active or there was an error
+    HAL_UART_Transmit(&huart1, (const uint8_t *)pingF, 15, 15);
+  }
   while (1)
   {
     /* USER CODE END WHILE */
@@ -154,32 +177,31 @@ int main(void)
     char buf[10];
     int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
-    HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
+    //HAL_UART_Transmit(&huart1, (const uint8_t *)buf, buf_len, 1000);
 
     //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 
     HAL_Delay(500);
-
   }
   /* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
+   */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -192,10 +214,8 @@ void SystemClock_Config(void)
   }
 
   /** Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3|RCC_CLOCKTYPE_HCLK
-                              |RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
-                              |RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3 | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -214,18 +234,17 @@ void SystemClock_Config(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
 
-
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
   int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
-  HAL_UART_Transmit(&huart1, (const uint8_t *) error, error_len, 1000);
+  HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
@@ -235,14 +254,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

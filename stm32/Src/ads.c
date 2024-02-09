@@ -36,7 +36,7 @@ HAL_StatusTypeDef ADC_init(void){
     //  3:2 Data rate (default)
     //  1   Conversion mode (default)
     //  0   VREF (External reference 3.3V)
-    const unsigned char * rM = "reset failed\r\n";
+   // const unsigned char * rM = "reset failed\r\n";
     code[0] = 0x0;
     code[1] = 0x6;
     // const unsigned char * cM = "writing to control reg failed\r\n";
@@ -46,8 +46,8 @@ HAL_StatusTypeDef ADC_init(void){
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
     ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, 2, 10);  // Send the reset code
     if (ret != HAL_OK){
-      HAL_UART_Transmit(&huart1, rM, 15, 19);
-      //return ret;
+      //HAL_UART_Transmit(&huart1, (const unit8_t *) rM, 15, 19);
+      return ret;
     }
 
     //code = ADS12_WRITE_TO_REGISTER; // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
@@ -74,7 +74,7 @@ HAL_StatusTypeDef ADC_init(void){
       //return ret;
     }
     //code = ADS12_START_CODE;
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, 10); // Send a start code
+   // ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, 10); // Send a start code
     return ret;
  }
 

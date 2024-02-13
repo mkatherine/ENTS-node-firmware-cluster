@@ -26,7 +26,7 @@
 #include "fram.h"
 #include "ads.h"
 #include "sdi12.h"
-// #include "tim.h"
+#include "tim.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -118,7 +118,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  // MX_TIM2_Init();
+  MX_TIM2_Init();
   ADC_init();
   /* USER CODE BEGIN 2 */
 
@@ -157,6 +157,7 @@ int main(void)
 
   // Call the SDI12_PingDevice function
   SDI12_Init(GPIOA, GPIO_PIN_2);
+  // Toggle a GPIO pin before the delay
   HAL_StatusTypeDef pingStatus = SDI12_PingDevice(deviceAddress, responseBuffer, bufferSize, timeoutMillis);
   // Check the result of the ping operation
   if (pingStatus == HAL_OK)
@@ -169,19 +170,24 @@ int main(void)
     // Device is not active or there was an error
     HAL_UART_Transmit(&huart1, (const uint8_t *)pingF, 15, 15);
   }
+  uint32_t freq;
+  char fstring[25];
+  freq = HAL_RCC_GetHCLKFreq();
+    sprintf(fstring, "%d\r\n", freq);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) fstring, 9, 20);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    char buf[10];
-    int buf_len = sprintf(buf, "%lu\n", battery_voltage);
+    // char buf[10];
+    // int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
     //HAL_UART_Transmit(&huart1, (const uint8_t *)buf, buf_len, 1000);
 
-    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-
-    HAL_Delay(500);
+    //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_2);
+    //delayMicroseconds(500);
+    simpleDelay(833);
   }
   /* USER CODE END 3 */
 }
@@ -196,17 +202,17 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  */
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_MSI;
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -214,20 +220,23 @@ void SystemClock_Config(void)
   }
 
   /** Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3 | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3|RCC_CLOCKTYPE_HCLK
+                              |RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
+                              |RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
   HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
 }
+
 
 /* USER CODE BEGIN 4 */
 

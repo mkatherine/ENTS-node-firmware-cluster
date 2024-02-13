@@ -8,24 +8,30 @@
  ******************************************************************************
  **/
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "bitbang.h"
 #include "tim.h"
 #include "usart.h"
 
 void delayMicroseconds(uint32_t microseconds)
 {
-  uint32_t milliseconds = microseconds / 1000; // Convert microseconds to milliseconds
-  // uint32_t remainderMicroseconds = microseconds % 1000;  // Remaining microseconds
+  //uint32_t timerTicks = microseconds * (FOUR_MHZ / HZ_TO_MHZ); // Set the period of Timer 2
+  uint32_t timerTicks = 3332;
+  __HAL_TIM_SET_AUTORELOAD(&htim2, timerTicks);
+ // __HAL_TIM_SET_COUNTER(&htim2, 0); // Clear the counter value of Timer 2
+  HAL_TIM_Base_Start(&htim2); // Start the timer
+  while (__HAL_TIM_GET_COUNTER(&htim2) < timerTicks); // Wait until the counter reaches the target value
+ // __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE); // Clear the update event flag
+  HAL_TIM_Base_Stop(&htim2); // Stop the timer
+}
 
-  HAL_Delay(milliseconds);
-  // If there are remaining microseconds, busy-wait for the remaining time
-  // if (remainderMicroseconds > 0) {
-  //     uint32_t targetCount = __HAL_TIM_GET_COUNTER(&htim2) + remainderMicroseconds;
-
-  //     // Wait until the timer reaches the target count
-  //     while (__HAL_TIM_GET_COUNTER(&htim2) < targetCount);
-  // }
-  return;
+void simpleDelay(uint16_t microseconds){
+  microseconds = microseconds * ONE_COMMAND_IN_MICROSECONDS_AT_FOURTY_EIGHT_MHZ;
+  for (uint32_t i = 0; i < microseconds; i++) {
+        __asm__("nop");  // This is a no-operation instruction
+  }
 }
 
 /**
@@ -38,10 +44,10 @@ void delayMicroseconds(uint32_t microseconds)
  * @return   void
  ******************************************************************************
  */
-void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t microseconds)
+void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t milliseconds)
 {                                                     // Helper function to wake sensors
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET);   // Set the data line high
-  delayMicroseconds(microseconds);                    // Delay for 12ms according to SDI12 protocol
+  HAL_Delay(milliseconds);                   // Delay for 12ms according to SDI12 protocol
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET); // Set it low again
 }
 
@@ -57,7 +63,7 @@ void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t microsec
 void SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin low (start bit)
-  delayMicroseconds(ONE_BIT_IN_MICROSECONDS);
+  simpleDelay(ONE_BIT_IN_MICROSECONDS);
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
 }
 
@@ -73,7 +79,7 @@ void SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 void SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin high (stop bit)
-  delayMicroseconds(ONE_BIT_IN_MICROSECONDS);
+  simpleDelay(ONE_BIT_IN_MICROSECONDS);
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
 }
 
@@ -99,8 +105,7 @@ void SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character)
     {
       HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET); // Set the GPIO pin low for a '0' bit
     }
-
-    delayMicroseconds(ONE_BIT_IN_MICROSECONDS);
+    simpleDelay(ONE_BIT_IN_MICROSECONDS);
   }
   return;
 }
@@ -125,7 +130,7 @@ char ReadCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
     bit = HAL_GPIO_ReadPin(GPIOx, GPIO_Pin) == GPIO_PIN_SET ? '1' : '0';
 
     // Delay for half the expected bit time
-    delayMicroseconds(HALF_BIT_IN_MICROSECONDS);
+    simpleDelay(HALF_BIT_IN_MICROSECONDS);
 
     // Append the bit to the character
     character |= (bit - '0') << i;

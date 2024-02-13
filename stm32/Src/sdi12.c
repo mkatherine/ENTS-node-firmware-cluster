@@ -105,6 +105,7 @@ void SDI12_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 void SDI12_WakeSensors(void)
 {
   SendContinousHigh(sdi12.Port, sdi12.Pin, WAKE_SENSOR_DELAY); // Set the data line low
+  HAL_Delay(MARKING_DELAY); // Marking after break, see SDi-12 guide
 }
 
 /**
@@ -164,7 +165,7 @@ HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t tim
     }
 
     // Delay for a short period before checking again
-    delayMicroseconds(HALF_BIT_IN_MICROSECONDS);
+    simpleDelay(HALF_BIT_IN_MICROSECONDS);
   }
 
   // Handle the case where the timeout occurs

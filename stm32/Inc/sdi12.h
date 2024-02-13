@@ -23,7 +23,8 @@ extern "C"
 #include <stdio.h>
 #include <stdlib.h>
 
-#define WAKE_SENSOR_DELAY 12000
+#define WAKE_SENSOR_DELAY 12
+#define MARKING_DELAY 9
 #define MAX_RESPONSE_SIZE 100
 
   typedef struct

@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 
 /**
  * @brief HTTP interface for Dirtviz API

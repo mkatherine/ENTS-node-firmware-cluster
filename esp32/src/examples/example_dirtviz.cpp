@@ -13,13 +13,13 @@
 /** Baud rate for serial interface */
 #define SERIAL_BAUD 115200
 
-const char ssid[] = "my-ssid";
-const char pass[] = "pass";
+const char ssid[] = "wifi-network-here";
+const char pass[] = "wifi-password-here";
 
-Dirtviz api("dirtviz.jlab.ucsc.edu", 443);
+Dirtviz api("ip address here", 8080);
 
-const char data[] = "Hello World!";
-const size_t data_len = 13;
+const char data[] = "message-here";
+const size_t data_len = 21;
 
 /**
  * @brief Initialization code run on startup
@@ -63,7 +63,8 @@ void loop()
 
   // Send example measurement
   resp_code = api.SendMeasurement((const uint8_t*) data, data_len);
-  Serial.println("Response Code: " + resp_code);
+  Serial.print("Response Code: ");
+  Serial.println(resp_code);
 
   // Get response data
   resp_data_len = api.GetResponse(resp_data);

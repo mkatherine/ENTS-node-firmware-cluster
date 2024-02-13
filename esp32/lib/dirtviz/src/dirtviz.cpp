@@ -5,9 +5,10 @@
  * @date 2023-11-29
 */
 
+#include <Arduino.h>
 #include "dirtviz.hpp"
 
-Dirtviz::Dirtviz(const char *url, const uint16_t &port)
+Dirtviz::Dirtviz(const char *url, const uint16_t &port) : url(nullptr), response(nullptr)
 {
   // set parameters
   this->SetUrl(url);
@@ -28,10 +29,15 @@ void Dirtviz::SetUrl(const char *new_url)
   ++url_len;
 
   // allocate memory
-  this->url = (char *) realloc(this->url, url_len);
+  char * temp_url = (char *) realloc(this->url, url_len);
 
-  // copy string
-  strcpy(this->url, new_url);
+  if (temp_url != nullptr) {
+    this->url = temp_url;
+    strcpy(this->url, new_url); // strcpy is safe here because we just allocated enough space
+  } else {
+    // Handle allocation failure (e.g., set an error flag, use a default URL, etc.)
+    
+  }
 }
 
 const char *Dirtviz::GetUrl(void) const
@@ -52,24 +58,37 @@ uint16_t Dirtviz::GetPort(void) const
 int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
 {
   // WiFi client for connection with API
+  //WiFiClientSecure client;
   WiFiClient client;
 
+  // buffer for making post requests
+  char buffer[100];
+  Serial.print(this->url);
+  Serial.print(":");
+  Serial.print(this->port);
   // try connection return negative length if error
+  //client.setInsecure();
+  //client.setCACert(rootCACertificate);
   if (!client.connect(this->url, this->port))
   {
+    Serial.println("Connection failure");
     return -1;
   }
 
   // send data
 
   // HTTP command, path, and version
-  client.println("POST [PATH] HTTP/1.1");
+  client.println("POST / HTTP/1.1");
   // who we are posting to
-  client.println("Host: [HOST]");
+  client.print("Host: ");
+  client.print(this->url);
+  client.print(":");
+  client.println(this->port);
   // type of data
   client.println("Content-Type: application/octet-stream");
   // length of data (specific to application/octet-stream)
-  client.println("Content-Length: [LENGTH]");
+  sprintf(buffer, "Content-Length: %d", meas_len);
+  client.println(buffer);
   // close connection after data is sent
   client.println("Connection: close");
   // newline indicating end of headers
@@ -85,14 +104,27 @@ int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
   
   // get length of response
   int resp_len = client.available();
+
+  // free memory before allocating to prevent leaks
+  free(this->response);
+  this->response = nullptr;
+
   // allocate memory
-  this->response = (char *) realloc(this->response, resp_len);
+  this->response = (char *) realloc(this->response, resp_len + 1);
 
   // copy into buffer
-  for (int idx = 0; idx < resp_len; ++idx)
-  {
-    this->response[idx] = client.read();
+  if (this->response != nullptr) {
+    // Ensure to read only available bytes and null-terminate the response
+    int bytesRead = 0;
+    while (client.available() && bytesRead < resp_len) {
+      this->response[bytesRead++] = client.read();
+    }
+    this->response[bytesRead] = '\0'; // Null-terminate the response
+  } else {
+    Serial.println("Null pointer failure");
+    return -1;
   }
+  Serial.println(this->response);
 
   // disconnect after message is sent
   client.stop();
@@ -102,6 +134,7 @@ int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
   int status_code;
   if (sscanf(this->response, "%*s %d", &status_code) != 1)
   {
+    Serial.println("Unable to parse status code");
     return -1;
   }
 

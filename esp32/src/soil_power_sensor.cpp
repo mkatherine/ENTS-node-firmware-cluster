@@ -13,12 +13,12 @@
 /** Baud rate for serial interface */
 #define SERIAL_BAUD 115200
 
-const char ssid[] = "my-ssid";
-const char pass[] = "pass";
+const char ssid[] = "ResWiFi-Devices";
+const char pass[] = "RbRr2V7X3h288qScPg";
 
 Dirtviz api("dirtviz.jlab.ucsc.edu", 443);
 
-const char data[] = "hello world";
+const char data[] = "Hello World";
 const size_t data_len = 12;
 
 /**
@@ -61,7 +61,7 @@ void loop()
   static size_t resp_len;
 
   // Send example measurement
-  resp_len = api.SendMeasurement((const uint8_t*) data, data_len, resp);
+  resp_len = api.SendMeasurement((const uint8_t*) data, data_len);
 
   // Print response
   Serial.print("Response:");

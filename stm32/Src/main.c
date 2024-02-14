@@ -134,6 +134,9 @@ int main(void)
   uint32_t battery_voltage = 0;
   const char *pingS = "Ping success\r\n";
   const char *pingF = "Ping failure\r\n";
+  const char *ff = "-0b1111111-\r\n";
+  const char *ab = "-0b1010101-\r\n";
+  const char *cc = "-0b1100001-\r\n";
 
   // Calibrate and start conversion process
   // rc = HAL_ADCEx_Calibration_Start(&hadc);
@@ -175,6 +178,19 @@ int main(void)
   freq = HAL_RCC_GetHCLKFreq();
     sprintf(fstring, "%d\r\n", freq);
     HAL_UART_Transmit(&huart1, (const uint8_t *) fstring, 9, 20);
+
+  char b = 0b1111111;
+  HAL_UART_Transmit(&huart1, ff, 14, 20);
+  SendCharacter(GPIOA, GPIO_PIN_2, b);
+
+  b = 0b1010101;
+  HAL_UART_Transmit(&huart1, ab, 14, 20);
+  SendCharacter(GPIOA, GPIO_PIN_2, b);
+
+  b = 0b1100001;
+  HAL_UART_Transmit(&huart1, cc, 14, 14);
+  SendCharacter(GPIOA, GPIO_PIN_2, b);
+  
   while (1)
   {
     /* USER CODE END WHILE */

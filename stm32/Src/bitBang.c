@@ -94,12 +94,15 @@ void SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
  */
 void SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character)
 {
+  uint8_t parity = 0;
+  SendStartBit(GPIOx, GPIO_Pin); // Send the start bit
   for (int i = 0; i < 8; ++i)
   {
     // Send each bit, starting from the least significant bit
     if (character & (1 << i))
     {
       HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin high for a '1' bit
+      parity += 1; // Count the bit
     }
     else
     {
@@ -107,6 +110,9 @@ void SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character)
     }
     simpleDelay(ONE_BIT_IN_MICROSECONDS);
   }
+  HAL_GPIO_WritePin(GPIOx, GPIO_Pin, parity % 2 ? 0 : 1);
+  simpleDelay(ONE_BIT_IN_MICROSECONDS);
+  HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET); 
   return;
 }
 

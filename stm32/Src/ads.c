@@ -46,7 +46,7 @@ HAL_StatusTypeDef configurADS(uint8_t config){
   if (ret != HAL_OK){
     return ret;
   }
-  HAL_Delay(100);
+  //HAL_Delay(100);
   return HAL_OK;
 }
 
@@ -63,7 +63,8 @@ HAL_StatusTypeDef ADC_init(void){
     //  0   VREF (External reference 3.3V)
 
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
-    HAL_Delay(1000);
+    // delay after startup 
+    for (int i=0; i < 1000; ++i); __NOP();
     ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
     if (ret != HAL_OK){
       return ret;

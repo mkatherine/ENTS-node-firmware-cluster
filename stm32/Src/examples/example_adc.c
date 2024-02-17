@@ -39,9 +39,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
-#define FM24_READ 0xA1 // Device address of FM24 in read mode
-
 
 /* USER CODE END PD */
 
@@ -59,27 +56,6 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
- /**
-  ******************************************************************************
-  * @brief    Helper function to reverse array
-  * @param    arr array
-  * @param    start start of array
-  * @param    end end of array
-  * @return   none
-  ******************************************************************************
-  */
-void reverseArray(int arr[], int start, int end) 
-{ 
-    int temp; 
-    while (start < end) { 
-        temp = arr[start]; 
-        arr[start] = arr[end]; 
-        arr[end] = temp; 
-        start++; 
-        end--; 
-    } 
-}
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -117,7 +93,6 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  ADC_init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
@@ -131,22 +106,10 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
 
-  uint32_t battery_voltage = 0;
-
-
-  // Calibrate and start conversion process
-  rc = HAL_ADCEx_Calibration_Start(&hadc);
-  if (rc != HAL_OK) Error_Handler();
-
-  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
-  if (rc != HAL_OK) Error_Handler();
-
   /* USER CODE BEGIN 2 */
   ADC_init();
-  //uint8_t ADC_Reading[3];
-  // const unsigned char * intro = "Hello\r\n";
-  // const unsigned char * fail = "I2C Failed\r\n";
-  // const unsigned char * succsuful_probe = "Probe succseeded\r\n";
+  TIMER_IF_Init();
+
   char output[20];
   // if(probeADS12() != HAL_OK){
   //   HAL_UART_Transmit(&huart1, fail, 13, 19);
@@ -155,29 +118,30 @@ int main(void)
   // };
 
   int reading;
-  int count = 0;
+  size_t reading_len;
   // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
   // HAL_UART_Transmit(&huart1, output, 17, 19);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int adc_val;
-  char adc_out[20];
   while (1)
   {
 
-    /* USER CODE END WHILE */
-    // reading = ADC_read();
-    
+    /* USER CODE END WHILE */    
 
     /* USER CODE BEGIN 3 */
-    reading = ADC_read();
-    sprintf(output, "Adjusted: %d\r\n\r\n", reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, 17, 19);
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+
+
+    reading = ADC_readVoltage();
+    reading_len = sprintf(output, "Voltage: %d\r\n\r\n", reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+    
+    reading = ADC_readCurrent();
+    reading_len = sprintf(output, "Current: %d\r\n\r\n", reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+
     HAL_Delay(1000);
-    count++;
   }
   /* USER CODE END 3 */
 }

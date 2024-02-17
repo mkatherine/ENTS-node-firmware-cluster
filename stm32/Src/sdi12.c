@@ -17,75 +17,73 @@
 
 SDI12_TypeDef sdi12;
 
+// Function to configure GPIO as output
+void configureAsOutput(void) {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    
+    __HAL_RCC_GPIOA_CLK_ENABLE(); // Enable GPIOA clock
+    
+    // Configure GPIO pin as output
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+// Function to configure GPIO as input
+void configureAsInput(void) {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    __HAL_RCC_GPIOA_CLK_ENABLE(); // Enable GPIOA clock
+
+    // Configure GPIO pin as input
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+
 HAL_StatusTypeDef ParseMeasurementResponse(const char *responseBuffer, char addr, SDI12_Measure_TypeDef *measurement_info)
 {
   char responseAddr;
-  // Parse the response and populate the structure
-  if (sscanf(responseBuffer, "%1c%3hu%1hhu", &responseAddr, &(measurement_info->Time), &(measurement_info->NumValues)) == 3)
+  sscanf(responseBuffer, "%1c%3hu%1hhu", &responseAddr, &(measurement_info->Time), &(measurement_info->NumValues)); // Parse the response and populate the structure
+  measurement_info->Address = addr; // Update address
+  // Check if the response address matches the expected address
+  if (responseAddr == addr)
   {
-    // Successfully parsed the response, update other fields
-    measurement_info->Address = addr; // Update address
-
-    // Check if the response address matches the expected address
-    if (responseAddr == addr)
-    {
-      return HAL_OK; // Return success
-    }
-    else
-    {
-      return HAL_ERROR; // Return error - Address mismatch
-    }
+    return HAL_OK; // Return success
   }
   else
   {
-    // Failed to parse the response
-    return HAL_ERROR; // Return error
+    return HAL_ERROR; // Return error - Address mismatch
   }
+  return HAL_OK;
 }
 
 HAL_StatusTypeDef ParseServiceRequest(const char *requestBuffer, char addr)
 {
-  char responseAddr;
+  char expectedResponse[12];
+  sprintf(expectedResponse, "%c\r\n", addr); // Construct the expected response ("a\r\n")
   // Parse the service request
-  if (sscanf(requestBuffer, "%c\r\n", &responseAddr) == 1)
+  if (memcmp(requestBuffer, expectedResponse, 3) == 0) // Check if the response matches the expected Active Acknowledge response
   {
-    // Check if the format matches a service request
-    // No need to check newline characters separately, sscanf already verifies them
-    if (responseAddr == addr)
-    {
-      return HAL_OK; // Return success
-    }
-    else
-    {
-      return HAL_ERROR; // Return error - Address mismatch
-    }
+    return HAL_OK;
   }
   else
   {
-    return HAL_ERROR; // Return error - Failed to parse service request
+    return HAL_ERROR;
   }
 }
 
 void SendDataCommand(char addr)
 {
-  char command[8]; // Command send data("aD0!\r\n" for e)
-  // Construct the command to request measurement
-  snprintf(command, sizeof(command), "%cD0!\r\n", addr);
-
-  // Send the command to request measurement
-  SDI12_SendCommand(command, sizeof(command));
+  char command[8]; // Command send data("aD0!" for e)
+  snprintf(command, SEND_DATA_COMMAND_SIZE, "%cD0!", addr); // Construct the command to request measurement
+  SDI12_SendCommand(command, SEND_DATA_COMMAND_SIZE); // Send the command to request measurement
   return;
 }
 
-/**
- ******************************************************************************
- * @brief    This is a initialization for the SDI-12 data line.
- *
- * @param    GPIO_TypeDef *GPIOx, an instance of the typdef struct GPIO_Typedef
- * @param    uint16_t, GPIO_Pin
- * @return   void
- ******************************************************************************
- */
 void SDI12_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
   sdi12.Pin = GPIO_Pin; // Configure the pin
@@ -94,95 +92,68 @@ void SDI12_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
   HAL_GPIO_WritePin(sdi12.Port, sdi12.Pin, GPIO_PIN_RESET); // Set the data line low
 }
 
-/**
- ******************************************************************************
- * @brief    Wake all sensors on the data line.
- *
- * @param    void
- * @return   void
- ******************************************************************************
- */
 void SDI12_WakeSensors(void)
 {
-  SendContinousHigh(sdi12.Port, sdi12.Pin, WAKE_SENSOR_DELAY); // Set the data line low
-  HAL_Delay(MARKING_DELAY); // Marking after break, see SDi-12 guide
+  SendContinousHigh(sdi12.Port, sdi12.Pin, 20); // Set the data line low
+  HAL_Delay(8); // Marking after break, see SDi-12 guide
 }
 
-/**
- ******************************************************************************
- * @brief    Send a command via SDI12
- *
- * @param    const char *, command
- * @return   void
- ******************************************************************************
- */
 void SDI12_SendCommand(const char *command, uint8_t size)
 {
-  SendStartBit(sdi12.Port, sdi12.Pin); // Start bit
-  // Send each character in the command
   for (uint8_t i = 0; i < size; ++i) {
     SendCharacter(sdi12.Port, sdi12.Pin, command[i]);
+    simpleDelay(); // Send stop bit between charcters
   }
-  SendStopBit(sdi12.Port, sdi12.Pin); // Stop bit
   return;
 }
 
-/**
- ******************************************************************************
- * @brief    Read data from a sensor via SDI-12
- *
- * @param    char *, buffer
- * @param    uint16_t, bufferSize
- * @param    uint16_t, timeoutMillis
- * @param    const char *, command
- * @return   HAL_StatusTypeDef
- ******************************************************************************
- */
 HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis)
 {
   uint32_t startTime = HAL_GetTick(); // Get the current time
   HAL_StatusTypeDef ret;
-  // Wait for the start of the response or timeout
-  while ((HAL_GetTick() - startTime) < timeoutMillis)
-  {
-    // Assuming data line is high during idle state
-    if (HAL_GPIO_ReadPin(sdi12.Port, sdi12.Pin) == GPIO_PIN_RESET)
-    {
-      // Start of response detected, begin reading
-      for (uint16_t index = 0; index < bufferSize - 1; ++index)
-      {
-        // Read a single character
-        buffer[index] = ReadCharacter(sdi12.Port, sdi12.Pin);
+  uint8_t recv = 0;
+  uint16_t index = 0;
+  uint8_t mask = 0x7f;
+  char indexS[20];
+  char recvS[20];
 
-        // Check for the end of the response
-        if (index >= 2 && buffer[index - 2] == 'a' && buffer[index - 1] == '\r' && buffer[index] == '\n')
-        {
-          buffer[index + 1] = '\0'; // Null-terminate the buffer
-          ret = HAL_OK;
-          return ret;
+  while ((HAL_GetTick() - startTime) < timeoutMillis) { // wait for the timeout to pass
+    if (HAL_GPIO_ReadPin(sdi12.Port, sdi12.Pin) == GPIO_PIN_SET){ // if the start bit arrives
+      simpleDelayCentering(); // center the sample
+      //simpleDelay();
+      // Read each of the 8 bits
+      for (uint8_t i = 0x01; i; i <<= 1) {
+        simpleDelay();
+        uint8_t noti = ~i;
+        if (HAL_GPIO_ReadPin(sdi12.Port, sdi12.Pin)) {
+          recv |= i;
+        } else {
+          // else clause added to ensure function timing is ~balanced
+          recv &= noti;
         }
       }
+      simpleDelay(); // skip the stop bit
+      recv = ~recv; // Invert the data
+      recv = recv & mask; // Cut the parity bit, which will be the first bit
+
+      // Store the received byte in the buffer
+      buffer[index] = recv;
+
+      // Check for the termination characters
+      if (buffer[index - 1] == '\r' && buffer[index] == '\n') {
+        return HAL_OK; // Successfully received the message
+      }
+
+      // Check if the buffer is full
+      if (index > bufferSize) {
+        return HAL_ERROR; // Buffer overflow, message is too long
+      }
+      index++;
     }
-
-    // Delay for a short period before checking again
-    simpleDelay(HALF_BIT_IN_MICROSECONDS);
   }
-
-  // Handle the case where the timeout occurs
-  ret = HAL_TIMEOUT;
-  buffer[0] = '\0'; // Null-terminate the buffer in case of a timeout
-  return ret;
+  return HAL_TIMEOUT;
 }
 
-/**
- ******************************************************************************
- * @brief    This is a function to read a measurment from a particular sensor.
- *
- * @param    char const addr, the device address
- * @param    SDI12_Measure_TypeDef, measurment data
- * @return   HAL_StatusTypeDef
- ******************************************************************************
- */
 // This function will not work as is! Will need to update according to specifications to handle more complexity.
 // Perhaps this is simply a start measurment command
 // On a succsful parse it goes to a series of sub-functions that handle the individual cases
@@ -194,109 +165,120 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   char command[MAX_RESPONSE_SIZE];        // Command to request measurement ("M1!\r\n" for example)
   char responseBuffer[MAX_RESPONSE_SIZE]; // Buffer to store the response    char responseAddr; // Address in sensor response
   HAL_StatusTypeDef ret;
+  char response[100];
+  char parse[100];
+  char error[15];
+
+  char *RD_fail = "ReadData Failed\r\n";
+  char *PR_fail = "Parse measurment failed\r\n";
+  char *data_r_immediatly = "Data ready immediatly\r\n";
+  char *timeout = "ttt ran out\r\n";
+  char *sr = "service request\r\n";
 
   SDI12_WakeSensors();
 
   // Construct the command to request measurement
-  snprintf(command, sizeof(command), "%cM!\r\n", addr);
+  sprintf(command, "%cM!", addr);
+  configureAsOutput();
 
   // Send the command to request measurement
-  SDI12_SendCommand(command, sizeof(command));
+  SDI12_SendCommand(command, START_MEASUREMENT_COMMAND_SIZE);
+  configureAsInput();
 
   // Read the response from the device
-  ret = SDI12_ReadData(responseBuffer, sizeof(responseBuffer), timeoutMillis);
+  ret = SDI12_ReadData(responseBuffer, START_MEASURMENT_RESPONSE_SIZE, timeoutMillis); // Will need to change the size to the size of the time till data ready function
   if (ret != HAL_OK)
   {
+    sprintf(error, "error: %d\r\n", ret);
+    sprintf(response, "%02x %02x %02x %02x %02x %02x %02x\r\n", responseBuffer[0], responseBuffer[1], responseBuffer[2], responseBuffer[3], responseBuffer[4], responseBuffer[5], responseBuffer[6]);
+    HAL_UART_Transmit(&huart1, response, 37, 20);
+    HAL_UART_Transmit(&huart1, error, 12, 100);
+    HAL_UART_Transmit(&huart1, RD_fail, 18, 100);
     return ret;
   }
 
   // Parse the response and populate the structure
-  ret = ParseMeasurementResponse(responseBuffer, addr, measurment_info);
+  ret = ParseMeasurementResponse(responseBuffer, addr, measurment_info); // Will need to figure out what even is happening in here
   if (ret != HAL_OK)
   {
+    sprintf(error, "error: %d\r\n", ret);
+    HAL_UART_Transmit(&huart1, error, 12, 100);
+    HAL_UART_Transmit(&huart1, PR_fail, 26, 100);
     return ret;
   }
+  // sprintf(response, "responseBuffer - a: %x ttt: %02x%02x%02x\r\n", responseBuffer[0], responseBuffer[1], responseBuffer[2], responseBuffer[3]);
+  //   sprintf(parse, "parsed -  a: %x ttt: %d\r\n", measurment_info->Address, measurment_info->Time);
+  //   HAL_UART_Transmit(&huart1, response, 43, 100);
+  //   HAL_UART_Transmit(&huart1, parse, 26, 100);
 
   if (measurment_info->Time == 0)
   { // If data is ready now
-    SendDataCommand(measurment_info->Address);
-    ret = SDI12_ReadData(measurement_data, sizeof(measurement_data), timeoutMillis);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) data_r_immediatly, 24, 24);
+    configureAsOutput();
+    SendDataCommand(measurment_info->Address); // Will need to check that SendDataCommand is doing what I want it to do
+    configureAsInput();
+    ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); // double check the sizeof
     return ret;
   }
 
   int millisStart = HAL_GetTick();
-  while ((HAL_GetTick() - millisStart) < measurment_info->Time)
-  { // Wait for ttt to elapse
-    if (HAL_GPIO_ReadPin(sdi12.Port, sdi12.Pin) == GPIO_PIN_SET)
-    { // If there is any activity on the data line
-      ret = SDI12_ReadData(responseBuffer, sizeof(responseBuffer), timeoutMillis);
+  while ((HAL_GetTick() - millisStart) < (measurment_info->Time * MILLISECONDS_TO_SECONDS)) // Wait for ttt to elapse
+  { 
+    if (HAL_GPIO_ReadPin(sdi12.Port, sdi12.Pin) == GPIO_PIN_SET) // If there is any activity on the data line
+    { 
+      HAL_UART_Transmit(&huart1, (const uint8_t *) sr, 14, 20);
+      ret = SDI12_ReadData(responseBuffer, SERVICE_REQUEST_SIZE, timeoutMillis); // Read the data
       if (ret != HAL_OK)
       {
         return ret;
       }
-      ret = ParseServiceRequest(responseBuffer, measurment_info->Address);
+      ret = ParseServiceRequest(responseBuffer, measurment_info->Address); // Will need to go through this function again
       if (ret != HAL_OK)
       {
         return ret;
       }
-      SendDataCommand(measurment_info->Address);
-      ret = SDI12_ReadData(measurement_data, sizeof(measurement_data), timeoutMillis);
+      configureAsOutput();
+      SendDataCommand(measurment_info->Address); 
+      configureAsInput();
+      ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis);
       return ret;
     }
   }
+  HAL_UART_Transmit(&huart1, (const u_int8_t *) timeout, 14, 25);
+  configureAsOutput();
   SDI12_WakeSensors(); // If ttt does elapse wake the sensors
   SendDataCommand(measurment_info->Address);
-  ret = SDI12_ReadData(measurement_data, sizeof(measurement_data), timeoutMillis);
+  configureAsInput();
+  ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); // Change sizeof 
   return ret;
 }
 
-/**
- ******************************************************************************
- * @brief    This is a function to ping a certain device, and see if it's active
- *
- * @param    char const addr, the device address
- * @return   HAL_StatusTypeDef
- ******************************************************************************
- */
 HAL_StatusTypeDef SDI12_PingDevice(uint8_t deviceAddress, char *responseBuffer, uint16_t bufferSize, uint32_t timeoutMillis)
 {
   HAL_StatusTypeDef ret;
   char command[6];          // Active Acknowledge command with address and termination character
-  char expectedResponse[4]; // Expected response for Active Acknowledge
-  const char *pingS = "Send a0! success\r\n";
-  const char *pingUF = "Unexpected response\r\n";
-  const char *pingRF = "Read data failed\r\n";
+  char expectedResponse[5]; // Expected response for Active Acknowledge
 
-  SDI12_WakeSensors();
+  sprintf(command, "%c!", deviceAddress); // Construct the Active Acknowledge command (e.g., "a0!\r\n")
+  sprintf(expectedResponse, "%c\r\n", deviceAddress); // Construct the expected response ("a\r\n")
 
-  // Construct the Active Acknowledge command (e.g., "a0!\r\n")
-  sprintf(command, "%c!", deviceAddress);
-
-  // Construct the expected response ("a\r\n")
-  sprintf(expectedResponse, "%c\r\n", deviceAddress);
-  // Send the Active Acknowledge command
-  SDI12_SendCommand(command, sizeof(command));
-
-  // Read the response from the device
-  ret = SDI12_ReadData(responseBuffer, bufferSize, timeoutMillis);
+  configureAsOutput(); // Set serial line to output
+  SDI12_WakeSensors(); // Wake the sensors
+  SDI12_SendCommand(command, ACTIVE_AWCKNOWLEDGE_COMMAND_SIZE); // Send the Active Acknowledge command
+  configureAsInput(); // Set the serial line as input
+  
+  ret = SDI12_ReadData(responseBuffer, bufferSize, timeoutMillis); // Read the response from the device
   if (ret != HAL_OK)
   {
-    HAL_UART_Transmit(&huart1, (const uint8_t *)pingRF, 19, 15);
     return ret;
   }
-  
-
-  // Check if the response matches the expected Active Acknowledge response
-  if (strcmp(responseBuffer, expectedResponse) == 0)
+  if (memcmp(responseBuffer, expectedResponse, bufferSize) == 0) // Check if the response matches the expected Active Acknowledge response
   {
     ret = HAL_OK;
-    HAL_UART_Transmit(&huart1, (const uint8_t *)pingS, 19, 15);
   }
   else
   {
     ret = HAL_ERROR;
-    HAL_UART_Transmit(&huart1, (const uint8_t *)pingUF, 22, 15);
-    HAL_UART_Transmit(&huart1, (const uint8_t *)responseBuffer, 4, 20);
   }
   return ret;
 }

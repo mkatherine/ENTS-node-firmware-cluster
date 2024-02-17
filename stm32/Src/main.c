@@ -134,10 +134,6 @@ int main(void)
   uint32_t battery_voltage = 0;
   const char *pingS = "Ping success\r\n";
   const char *pingF = "Ping failure\r\n";
-  const char *ff = "-0b1111111-\r\n";
-  const char *ab = "-0b1010101-\r\n";
-  const char *cc = "-0b1100001-\r\n";
-
   // Calibrate and start conversion process
   // rc = HAL_ADCEx_Calibration_Start(&hadc);
   // if (rc != HAL_OK) Error_Handler();
@@ -152,8 +148,9 @@ int main(void)
   uint8_t deviceAddress = '0'; // Replace '0' with the actual device address
 
   // Define buffers for the response and expected response
-  char responseBuffer[4]; // Adjust the size based on your expected response
+  char responseBuffer[5]; // Adjust the size based on your expected response
   uint16_t bufferSize = sizeof(responseBuffer);
+  SDI12_Measure_TypeDef measurment_info;
 
   // Define the timeout value
   uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
@@ -161,8 +158,21 @@ int main(void)
   // Call the SDI12_PingDevice function
   SDI12_Init(GPIOA, GPIO_PIN_2);
   // Toggle a GPIO pin before the delay
-  HAL_StatusTypeDef pingStatus = SDI12_PingDevice(deviceAddress, responseBuffer, bufferSize, timeoutMillis);
-  // Check the result of the ping operation
+  // HAL_StatusTypeDef pingStatus = SDI12_PingDevice(deviceAddress, responseBuffer, 3, timeoutMillis);
+  // // Check the result of the ping operation
+  // if (pingStatus == HAL_OK)
+  // {
+  //   // Device is active
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *)pingS, 15, 15);
+  // }
+  // else
+  // {
+  //   // Device is not active or there was an error
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *)pingF, 15, 15);
+  // }
+  
+  char data[7];
+  HAL_StatusTypeDef pingStatus = SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
   if (pingStatus == HAL_OK)
   {
     // Device is active
@@ -173,24 +183,7 @@ int main(void)
     // Device is not active or there was an error
     HAL_UART_Transmit(&huart1, (const uint8_t *)pingF, 15, 15);
   }
-  uint32_t freq;
-  char fstring[25];
-  freq = HAL_RCC_GetHCLKFreq();
-    sprintf(fstring, "%d\r\n", freq);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) fstring, 9, 20);
 
-  char b = 0b1111111;
-  HAL_UART_Transmit(&huart1, ff, 14, 20);
-  SendCharacter(GPIOA, GPIO_PIN_2, b);
-
-  b = 0b1010101;
-  HAL_UART_Transmit(&huart1, ab, 14, 20);
-  SendCharacter(GPIOA, GPIO_PIN_2, b);
-
-  b = 0b1100001;
-  HAL_UART_Transmit(&huart1, cc, 14, 14);
-  SendCharacter(GPIOA, GPIO_PIN_2, b);
-  
   while (1)
   {
     /* USER CODE END WHILE */
@@ -203,7 +196,7 @@ int main(void)
 
     //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_2);
     //delayMicroseconds(500);
-    simpleDelay(833);
+    simpleDelay();
   }
   /* USER CODE END 3 */
 }

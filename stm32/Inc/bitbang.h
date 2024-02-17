@@ -26,10 +26,13 @@ extern "C"{
 #define HZ_TO_MHZ 1000000 // Scale Hz to MHz
 #define FOUR_MHZ 4
 #define ONE_COMMAND_IN_MICROSECONDS_AT_FOURTY_EIGHT_MHZ 6.8 // Holy magic numbers, this is used in the simple delay function to scale commands to timing
+#define NUMBER_OF_LOOPS_PER_BIT 9975 // Determined this was the correct amount of loops to acheive a delay of ~833us
+#define NUMBER_OF_LOOPS_PER_HALF_BIT 4987 
 
 
 void delayMicroseconds(uint32_t microseconds);
-void simpleDelay(uint16_t microseconds);
+void simpleDelay(void);
+void simpleDelayCentering(void);
 void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t milliseconds);
 void SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 void SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);

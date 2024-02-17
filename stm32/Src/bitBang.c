@@ -27,9 +27,14 @@ void delayMicroseconds(uint32_t microseconds)
   HAL_TIM_Base_Stop(&htim2); // Stop the timer
 }
 
-void simpleDelay(uint16_t microseconds){
-  microseconds = microseconds * ONE_COMMAND_IN_MICROSECONDS_AT_FOURTY_EIGHT_MHZ;
-  for (uint32_t i = 0; i < microseconds; i++) {
+void simpleDelay(){
+  for (uint32_t i = 0; i < NUMBER_OF_LOOPS_PER_BIT; i++) {
+        __asm__("nop");  // This is a no-operation instruction
+  }
+}
+
+void simpleDelayCentering(){
+  for (uint32_t i = 0; i < NUMBER_OF_LOOPS_PER_HALF_BIT; i++) {
         __asm__("nop");  // This is a no-operation instruction
   }
 }
@@ -63,8 +68,7 @@ void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t millisec
 void SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin low (start bit)
-  simpleDelay(ONE_BIT_IN_MICROSECONDS);
-  HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
+  simpleDelay();
 }
 
 /**
@@ -79,7 +83,7 @@ void SendStartBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 void SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin high (stop bit)
-  simpleDelay(ONE_BIT_IN_MICROSECONDS);
+  simpleDelay();
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
 }
 
@@ -94,37 +98,28 @@ void SendStopBit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
  */
 void SendCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, char character)
 {
-  char * one = "1";
-  char * zero = "0";
-  char * oneE ="1\r\n";
-  char * zeroE = "0\r\n";
   uint8_t parity = 0;
-  SendStartBit(GPIOx, GPIO_Pin); // Send the start bit
-  HAL_UART_Transmit(&huart1, one, 2, 10);
+  //SendStartBit(GPIOx, GPIO_Pin); // Send the start bit
+  HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin low (start bit)
+  simpleDelay();
   for (int i = 0; i < 7; ++i)
   {
     // Send each bit, starting from the least significant bit
     if (character & (1 << i))
     {
-      HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET); // Set the GPIO pin high for a '1' bit
+      HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET); // Set the GPIO pin low for a '1' bit
       parity += 1; // Count the bit
-      HAL_UART_Transmit(&huart1, zero, 2, 10);
     }
     else
     {
-      HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin low for a '0' bit
-      HAL_UART_Transmit(&huart1, one, 2, 10);
+      HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // Set the GPIO pin high for a '0' bit
     }
-    simpleDelay(ONE_BIT_IN_MICROSECONDS);
+    simpleDelay();
   }
-  HAL_GPIO_WritePin(GPIOx, GPIO_Pin, parity % 2 ? 0 : 1);
-  if (parity % 2 ==0) {
-    HAL_UART_Transmit(&huart1, zeroE, 4, 10);
-  } else {
-    HAL_UART_Transmit(&huart1, oneE, 4, 10);
-  }
-  simpleDelay(ONE_BIT_IN_MICROSECONDS);
+  HAL_GPIO_WritePin(GPIOx, GPIO_Pin, parity % 2 ? 0 : 1); // Send the parity bit based of parity count
+  simpleDelay();
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET); 
+  
   return;
 }
 
@@ -148,7 +143,7 @@ char ReadCharacter(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
     bit = HAL_GPIO_ReadPin(GPIOx, GPIO_Pin) == GPIO_PIN_SET ? '1' : '0';
 
     // Delay for half the expected bit time
-    simpleDelay(HALF_BIT_IN_MICROSECONDS);
+    //simpleDelay(HALF_BIT_IN_MICROSECONDS);
 
     // Append the bit to the character
     character |= (bit - '0') << i;

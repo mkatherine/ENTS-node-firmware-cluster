@@ -23,9 +23,16 @@ extern "C"
 #include <stdio.h>
 #include <stdlib.h>
 
-#define WAKE_SENSOR_DELAY 12
+#define WAKE_SENSOR_DELAY 13
 #define MARKING_DELAY 9
 #define MAX_RESPONSE_SIZE 100
+#define ACTIVE_AWCKNOWLEDGE_COMMAND_SIZE 2
+#define START_MEASUREMENT_COMMAND_SIZE 3
+#define START_MEASURMENT_RESPONSE_SIZE 7
+#define SEND_DATA_COMMAND_SIZE 4
+#define SEND_DATA_RESPONSE_SIZE 3 // You need to add the numvalues (n) value returned from start measurment
+#define MILLISECONDS_TO_SECONDS 1
+#define SERVICE_REQUEST_SIZE 3
 
   typedef struct
   {
@@ -40,11 +47,72 @@ extern "C"
     uint8_t NumValues;
   } SDI12_Measure_TypeDef;
 
+  /**
+  ******************************************************************************
+  * @brief    This is a initialization for the SDI-12 data line.
+  *
+  * @param    GPIO_TypeDef *GPIOx, an instance of the typdef struct GPIO_Typedef
+  * @param    uint16_t, GPIO_Pin
+  * @return   void
+  ******************************************************************************
+  */
   void SDI12_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
+
+  /**
+  ******************************************************************************
+  * @brief    Wake all sensors on the data line.
+  *
+  * @param    void
+  * @return   void
+  ******************************************************************************
+  */
   void SDI12_WakeSensors(void);
+
+  /**
+  ******************************************************************************
+  * @brief    Send a command via SDI12
+  *
+  * @param    const char *, command
+  * @return   void
+  ******************************************************************************
+  */
   void SDI12_SendCommand(const char *command, uint8_t size);
+
+  /**
+  ******************************************************************************
+  * @brief    Read data from a sensor via SDI-12
+  *
+  * @param    char *, buffer
+  * @param    uint16_t, bufferSize
+  * @param    uint16_t, timeoutMillis
+  * @param    const char *, command
+  * @return   HAL_StatusTypeDef
+  ******************************************************************************
+  */
   HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis);
+
+  /**
+  ******************************************************************************
+  * @brief    This is a function to read a measurment from a particular sensor.
+  *
+  * @param    char const addr, the device address
+  * @param    SDI12_Measure_TypeDef, a custom struct to store the measurment information returned from start measurment
+  * @param    char* the measurment data returned
+  * @param    uint16_t timeoutMillis time out in milliseconds
+  * @return   HAL_StatusTypeDef
+  ******************************************************************************
+  */
   HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
+
+  /**
+  ******************************************************************************
+  * @brief    This is a function to ping a certain device, and see if it's active
+  *
+  * @param    char const addr, the device address
+
+  * @return   HAL_StatusTypeDef
+  ******************************************************************************
+  */
   HAL_StatusTypeDef SDI12_PingDevice(uint8_t deviceAddress, char *responseBuffer, uint16_t bufferSize, uint32_t timeoutMillis);
 
 #ifdef __cplusplus

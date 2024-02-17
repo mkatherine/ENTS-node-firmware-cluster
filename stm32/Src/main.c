@@ -129,10 +129,11 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   ADC_init();
+  char outputV[20];
+  char outputC[20];
 
-  char output[20];
-
-  int reading;
+  int voltage;
+  int current;
   int count = 0;
   /* USER CODE END 2 */
 
@@ -143,9 +144,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    reading = ADC_read();
-    sprintf(output, "Adjusted: %d\r\n\r\n", reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, 17, 19);
+    voltage = ADC_readVoltage();
+    HAL_Delay(2000);
+    current = ADC_readCurrent();
+    sprintf(outputV, "Voltage: %d\r\n\r\n", voltage);
+    sprintf(outputC, "Current: %d\r\n\r\n", current);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) outputV, 16, 19);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) outputC, 16, 19);
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(1000);
     count++;

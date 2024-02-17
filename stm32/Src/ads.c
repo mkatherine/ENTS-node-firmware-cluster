@@ -12,116 +12,168 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ads.h"
 
-/**
-******************************************************************************
-* @brief    This function starts up the ADS1219
-* 
-*           This function is a wrapper for the STM32 HAl I2C library. The ADS1219 uses
-*           I2C the I2C communication protocol. This function configures then ADS1219 for
-*           single read mode. Note: the ADS1219 requires a minimum of 500us when it is powered on.
-*
-* @param    void
-* @return   HAL_StatusTypeDef
-******************************************************************************
-*/
+int HAL_status(HAL_StatusTypeDef ret) {
+  int status;
+  if (ret == HAL_OK){
+    status = 0;
+  } else if (ret == HAL_ERROR){
+    status = 1;
+  } else if (ret == HAL_BUSY){
+    status = 2;
+  } else {
+    status = 3;
+  }
+  return status;
+}
+
+HAL_StatusTypeDef configurADS(uint8_t config){
+  HAL_StatusTypeDef ret;
+  uint8_t code = ADS12_RESET_CODE;
+  uint8_t register_data[2] = {0x40, config}; // Initialize to voltage read first
+
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
+  if (ret != HAL_OK){
+      return ret;
+  } 
+  // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return ret;
+  }
+
+  code = ADS12_START_CODE;
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
+  if (ret != HAL_OK){
+    return ret;
+  }
+  //HAL_Delay(100);
+  return HAL_OK;
+}
+
 HAL_StatusTypeDef ADC_init(void){
-    uint8_t code[2];
-    uint8_t ca[4];
-    uint8_t read_reg = 0x20;
-    uint8_t creg;
+    uint8_t code = ADS12_RESET_CODE;
+    uint8_t register_data[2] = {0x40, 0x01}; // Initialize to voltage read first
     HAL_StatusTypeDef ret;
+
     // Control register breakdown.
-    //  7:5 MUX (default)
-    //  4   Gain (default)
-    //  3:2 Data rate (default)
-    //  1   Conversion mode (default)
+    //  7:5 MUX 
+    //  4   Gain 
+    //  3:2 Data rate 
+    //  1   Conversion mode 
     //  0   VREF (External reference 3.3V)
-    const unsigned char * rM = "reset failed\r\n";
-    code[0] = 0x0;
-    code[1] = 0x6;
-    // const unsigned char * cM = "writing to control reg failed\r\n";
-    // const unsigned char * rcM = "writing to read cReg failed\r\n";
-    // const unsigned char * rrM = "reading cReg failed\r\n";
-    
+
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, code, 2, 10);  // Send the reset code
+    // delay after startup 
+    for (int i=0; i < 1000; ++i); __NOP();
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
     if (ret != HAL_OK){
-      HAL_UART_Transmit(&huart1, rM, 15, 19);
-      //return ret;
+      return ret;
+    } 
+
+    // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+    if (ret != HAL_OK){
+      return ret;
+    }
+    
+    code = ADS12_START_CODE;
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
+    if (ret != HAL_OK){
+      return ret;
     }
 
-    //code = ADS12_WRITE_TO_REGISTER; // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
-    ca[0] = 0x2;
-    ca[1] = 0xE;
-    ca[2] = 0x0;
-    ca[3] = 0x4;
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, ca, 2, 10);
-    if (ret != HAL_OK){
-     // HAL_UART_Transmit(&huart1, cM, 32, 19);
-      //return ret;
-    }
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &read_reg, 1, 10);
-    if (ret != HAL_OK){
-      //HAL_UART_Transmit(&huart1, rcM, 30, 19);
-      //return ret;
-    }
-    ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, &creg, 1, 10);
-    char output[10];
-    //sprintf(output, "C Reg: %d", creg);
-   // HAL_UART_Transmit(&huart1, output, 10, 10);
-    if (ret != HAL_OK){
-      //HAL_UART_Transmit(&huart1, rrM, 9, 19);
-      //return ret;
-    }
-    //code = ADS12_START_CODE;
-    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, 10); // Send a start code
     return ret;
  }
 
-/**
-******************************************************************************
-* @brief    This function reads the current ADC value.
-* 
-*           This function is a wrapper for the STM32 HAl I2C library. The ADS1219 uses
-*           I2C the I2C communication protocol. 
-*           
-* @param    void
-* @return   int, current ADC reading
-******************************************************************************
-*/
-int ADC_read(void){
+int ADC_readVoltage(void){
     uint8_t code;
-    int reading;
-    uint8_t rx_data[3]; // Why is this only 3 bytes?
-   // char output[16];
-   // const unsigned char * fail_read = "write d tx failed\n";
-   // const unsigned char * fail_write = "read d rx failed\n";
+    int16_t reading;
+    HAL_StatusTypeDef ret;
+    uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
+
+    ret = configurADS(ADS12_CONFIGURE_READ_VOLTAGE); //Set the control register to read voltage mode, leaving everything at default except for the VREF, which will be set to external reference mode
+    if (ret != HAL_OK){
+      return ret;
+    }
     
     while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
     code = ADS12_READ_DATA_CODE;
-    if (HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 2, 10) != HAL_OK){
-   //   HAL_UART_Transmit(&huart1, fail_write, 18, 19);
-    } // Send a write command that lets the ADS know to send data
-
-    if (HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 10) != HAL_OK){// Recieve the ADS data from
-    //  HAL_UART_Transmit(&huart1, fail_read, 19, 19);
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
+    if (ret != HAL_OK){
+      return ret;
     }
 
-    reading = ((int)rx_data[2] << 16) | ((int)rx_data[1] << 8) | rx_data[0];
-   // sprintf(output, "Read: %d,%d,%d\n", rx_data[2],rx_data[1],rx_data[0]);
+    ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
+    if (ret != HAL_OK){// Recieve the ADS data from
+      return ret;
+    }
+    
+    //reading = ((int)rx_data[0] << 16) | ((int)rx_data[1] << 8) | (int)rx_data[0]; // Use this line if you want to keep the last byte
+    reading = ((int)rx_data[0] << 8) | (int)rx_data[1]; // Chop the last byte, as it seems to be mostly noise
+
+    // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
+    // You will have to use these lines to get the raw x values to plug into the linear_regression.py file
+    // char raw[45];
+    // sprintf(raw, "Raw: %x %x  Shifted: %i \r\n\r\n",rx_data[0], rx_data[1], reading);
+    // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
+
+    reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
+    return reading;
+ }
+// Currently never leaves the -6600 to -6700 raw value. I suspect becuase the current draw on the device is so low
+int ADC_readCurrent(void){
+    uint8_t code;
+    int16_t reading;
+    HAL_StatusTypeDef ret;
+    uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
+
+    ret = configurADS(ADS12_CONFIGURE_READ_CURRENT); //Set the control register to read current mode, leaving everything at default except for the VREF, which will be set to external reference mode
+    if (ret != HAL_OK){
+      return ret;
+    }
+
+    code = ADS12_START_CODE;
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
+    if (ret != HAL_OK){
+      return ret;
+    }
+    
+    while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
+    code = ADS12_READ_DATA_CODE;
+    ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
+    if (ret != HAL_OK){
+      return ret;
+    }
+
+    ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
+    if (ret != HAL_OK){// Recieve the ADS data from
+      return ret;
+    }
+    
+    //reading = ((int)rx_data[0] << 16) | ((int)rx_data[1] << 8) | (int)rx_data[2]; // Use this line if you want to keep the last byte
+    reading = ((int)rx_data[0] << 8) | (int)rx_data[1]; // Chop the last byte, as it seems to be mostly noise
+
+    // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
+    // You will have to use these lines to get the raw x values to plug into the linear_regression.py file
+    // char raw[45];
+    // sprintf(raw, "RawC: %x %x %x ShiftedC: %i \r\n\r\n", rx_data[0], rx_data[1], rx_data[2], reading);
+    // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 31, 19);
+
+   // reading =  (CURRENT_SLOPE * reading) + CURRENT_B; // Calculated from linear regression
     return reading;
  }
 
-/**
-******************************************************************************
-* @brief    This function probes the ADS12 to see if it is responsive.
-*           
-* @param    void
-* @return   HAL_StatusTypeDef
-******************************************************************************
-*/
-HAL_StatusTypeDef probeADS12(void){
+HAL_StatusTypeDef ADC_probe(void){
   HAL_StatusTypeDef ret;
   ret = HAL_I2C_IsDeviceReady(&hi2c2, ADS12_WRITE, 10, 20);
   return ret;
+}
+
+int ADC_filter(int readings[], int size){
+  int filtered_reading = 0;
+  for(int i = 0; i < size; i++){
+    filtered_reading = filtered_reading + readings[i];
+  }
+  filtered_reading = filtered_reading / size;
+  return filtered_reading;
 }

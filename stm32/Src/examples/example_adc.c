@@ -21,18 +21,15 @@
 #include "adc.h"
 #include "dma.h"
 #include "i2c.h"
-#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
+#include "fram.h"
+#include "ads.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-
-#include "sys_app.h"
 #include <stdlib.h>
-
-#include "ads.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,27 +56,6 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
- /**
-  ******************************************************************************
-  * @brief    Helper function to reverse array
-  * @param    arr array
-  * @param    start start of array
-  * @param    end end of array
-  * @return   none
-  ******************************************************************************
-  */
-void reverseArray(int arr[], int start, int end) 
-{ 
-    int temp; 
-    while (start < end) { 
-        temp = arr[start]; 
-        arr[start] = arr[end]; 
-        arr[end] = temp; 
-        start++; 
-        end--; 
-    } 
-}
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -115,26 +91,57 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_LoRaWAN_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
+  // Print the compilation time at startup
+  char info_str[100];
+  int info_len;
+  info_len = sprintf(
+    info_str,
+    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
+    __DATE__,__TIME__
+    );
+  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
 
-  // Debug message, gets printed after init code
-  //APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
+  /* USER CODE BEGIN 2 */
+  ADC_init();
+  TIMER_IF_Init();
+
+  char output[20];
+  // if(probeADS12() != HAL_OK){
+  //   HAL_UART_Transmit(&huart1, fail, 13, 19);
+  // } else {
+  //   HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
+  // };
+
+  int reading;
+  size_t reading_len;
+  // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
+  // HAL_UART_Transmit(&huart1, output, 17, 19);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-    MX_LoRaWAN_Process();
+
+    /* USER CODE END WHILE */    
 
     /* USER CODE BEGIN 3 */
+
+
+    reading = ADC_readVoltage();
+    reading_len = sprintf(output, "Voltage: %d\r\n\r\n", reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+    
+    reading = ADC_readCurrent();
+    reading_len = sprintf(output, "Current: %d\r\n\r\n", reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -148,22 +155,18 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure LSE Drive Capability
-  */
-  HAL_PWR_EnableBkUpAccess();
-  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
-
   /** Configure the main internal regulator output voltage
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -181,7 +184,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }

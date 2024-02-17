@@ -1,0 +1,21 @@
+{
+    "name": "Soil Power Sensor Protocal Buffer",
+    "version": "2.0.0",
+    "description": "The protocol buffers define the data format for measurements taken on the Soil Power Sensor. The library uses Nanopb for a pure C protobuf implementation.",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/jlab-sensing/soil-power-sensor-firmware.git"
+    },
+    "authors":
+    [
+        {
+            "name": "John Madden",
+            "email": "jmadden173@pm.me",
+            "maintainer": true
+        }
+    ],
+    "license": "MIT",
+    "framework": "*",
+    "platform": "*"
+}

@@ -1,7 +1,17 @@
 # user-defined
 *.code-workspace
 
-# Python Environments
+# docs
+docs/html
+
+## Python
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
 .env
 .venv
 env/

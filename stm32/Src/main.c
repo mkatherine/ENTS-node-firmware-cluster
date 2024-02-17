@@ -20,12 +20,16 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "i2c.h"
+#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+
+#include "sys_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,6 +39,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
+#define FM24_READ 0xA1 // Device address of FM24 in read mode
 
 /* USER CODE END PD */
 
@@ -52,6 +58,26 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+ /**
+  ******************************************************************************
+  * @brief    Helper function to reverse array
+  * @param    arr array
+  * @param    start start of array
+  * @param    end end of array
+  * @return   none
+  ******************************************************************************
+  */
+void reverseArray(int arr[], int start, int end) 
+{ 
+    int temp; 
+    while (start < end) { 
+        temp = arr[start]; 
+        arr[start] = arr[end]; 
+        arr[end] = temp; 
+        start++; 
+        end--; 
+    } 
+}
 
 /* USER CODE END PFP */
 
@@ -90,45 +116,12 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
+  MX_LoRaWAN_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  // Print the compilation time at startup
-  char info_str[100];
-  int info_len;
-  info_len = sprintf(
-    info_str,
-    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
-    __DATE__,__TIME__
-    );
-  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
-
-
-  // turn off
-  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
-  // wait 2 seconds
-  HAL_Delay(2000);
-  // turn on
-  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
-  // wait 2 seconds
-  HAL_Delay(2000);
-  // off
-  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
-  // wait
-  HAL_Delay(2000);
-  // on
-  HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
-
-  while (1) {}
-
-  uint32_t battery_voltage = 0;
-
-
-  // Calibrate and start conversion process
-  rc = HAL_ADCEx_Calibration_Start(&hadc);
-  if (rc != HAL_OK) Error_Handler();
-
-  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
-  if (rc != HAL_OK) Error_Handler();
+  // Debug message, gets printed after init code
+  //APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
   /* USER CODE END 2 */
 
@@ -137,17 +130,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_LoRaWAN_Process();
 
     /* USER CODE BEGIN 3 */
-    char buf[10];
-    int buf_len = sprintf(buf, "%lu\n", battery_voltage);
-
-    HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
-
-    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-
-    HAL_Delay(500);
-
   }
   /* USER CODE END 3 */
 }
@@ -161,18 +146,22 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
   /** Configure the main internal regulator output voltage
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -190,7 +179,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }

@@ -1,13 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
+  * @file    mw_log_conf.h
+  * @author  MCD Application Team
+  * @brief   Configure (enable/disable) traces
+  *******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -19,17 +19,16 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __MW_LOG_CONF_H__
+#define __MW_LOG_CONF_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wlxx_hal.h"
+#include "stm32_adv_trace.h"
 
-/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -40,44 +39,34 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+#define MW_LOG_ENABLED
+
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
 
+/* External variables --------------------------------------------------------*/
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
+
 /* Exported macro ------------------------------------------------------------*/
+#ifdef MW_LOG_ENABLED
+#define MW_LOG(TS,VL, ...)   do{ {UTIL_ADV_TRACE_COND_FSend(VL, T_REG_OFF, TS, __VA_ARGS__);} }while(0)
+#else  /* MW_LOG_ENABLED */
+#define MW_LOG(TS,VL, ...)
+#endif /* MW_LOG_ENABLED */
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
-
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
-
-/* Private defines -----------------------------------------------------------*/
-#define RTC_PREDIV_A ((1<<(15-RTC_N_PREDIV_S))-1)
-#define RTC_N_PREDIV_S 10
-#define RTC_PREDIV_S ((1<<RTC_N_PREDIV_S)-1)
-#define RF_CTRL3_Pin GPIO_PIN_3
-#define RF_CTRL3_GPIO_Port GPIOC
-#define RF_CTRL2_Pin GPIO_PIN_5
-#define RF_CTRL2_GPIO_Port GPIOC
-#define RF_CTRL1_Pin GPIO_PIN_4
-#define RF_CTRL1_GPIO_Port GPIOC
-#define ESP32_EN_Pin GPIO_PIN_10
-#define ESP32_EN_GPIO_Port GPIOB
-
-/* USER CODE BEGIN Private defines */
-
-/** Global variable for HAL return codes */
-HAL_StatusTypeDef rc;
-
-/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /*__MW_LOG_CONF_H__ */

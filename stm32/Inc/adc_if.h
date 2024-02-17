@@ -1,13 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file    adc_if.h
+  * @author  MCD Application Team
+  * @brief   Header for ADC interface configuration
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -19,17 +19,16 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __ADC_IF_H__
+#define __ADC_IF_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wlxx_hal.h"
+#include "adc.h"
+#include "platform.h"
 
-/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -40,9 +39,27 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+/**
+  * @brief Battery level in mV
+  */
+#define BAT_CR2032                  ((uint32_t) 3000)
+/**
+  * @brief Maximum battery level in mV
+  */
+#define VDD_BAT                     BAT_CR2032
+/**
+  * @brief Minimum battery level in mV
+  */
+#define VDD_MIN                     1800
+
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
+
+/* External variables --------------------------------------------------------*/
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
@@ -50,34 +67,35 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+
+/**
+  * @brief  Initializes the ADC input
+  */
+void SYS_InitMeasurement(void);
+
+/**
+  * @brief DeInitializes the ADC
+  */
+void SYS_DeInitMeasurement(void);
+
+/**
+  * @brief  Get the current temperature
+  * @return value temperature in degree Celsius( q7.8 )
+  */
+int16_t SYS_GetTemperatureLevel(void);
+
+/**
+  * @brief Get the current battery level
+  * @return value battery level in linear scale
+  */
+uint16_t SYS_GetBatteryLevel(void);
 
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
 
-/* Private defines -----------------------------------------------------------*/
-#define RTC_PREDIV_A ((1<<(15-RTC_N_PREDIV_S))-1)
-#define RTC_N_PREDIV_S 10
-#define RTC_PREDIV_S ((1<<RTC_N_PREDIV_S)-1)
-#define RF_CTRL3_Pin GPIO_PIN_3
-#define RF_CTRL3_GPIO_Port GPIOC
-#define RF_CTRL2_Pin GPIO_PIN_5
-#define RF_CTRL2_GPIO_Port GPIOC
-#define RF_CTRL1_Pin GPIO_PIN_4
-#define RF_CTRL1_GPIO_Port GPIOC
-#define ESP32_EN_Pin GPIO_PIN_10
-#define ESP32_EN_GPIO_Port GPIOB
-
-/* USER CODE BEGIN Private defines */
-
-/** Global variable for HAL return codes */
-HAL_StatusTypeDef rc;
-
-/* USER CODE END Private defines */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /* __ADC_IF_H__ */

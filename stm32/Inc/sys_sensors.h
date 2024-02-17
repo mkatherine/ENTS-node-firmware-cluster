@@ -1,13 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file    sys_sensors.h
+  * @author  MCD Application Team
+  * @brief   Header for sensors application
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -19,30 +19,54 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __SENSORS_H__
+#define __SENSORS_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wlxx_hal.h"
 
-/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
+/**
+  * Sensor data parameters
+  */
+typedef struct
+{
+  float pressure;         /*!< in mbar */
+  float temperature;      /*!< in degC */
+  float humidity;         /*!< in % */
+  int32_t latitude;       /*!< latitude converted to binary */
+  int32_t longitude;      /*!< longitude converted to binary */
+  int16_t altitudeGps;    /*!< in m */
+  int16_t altitudeBar;    /*!< in m * 10 */
+  /**more may be added*/
+  /* USER CODE BEGIN sensor_t */
+
+  /* USER CODE END sensor_t */
+} sensor_t;
+
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
 
+/* USER CODE BEGIN EC */
+#if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1) && defined (X_NUCLEO_IKS01A2)
+#define HTS221_0    0U
+#define LPS22HB_0   1U
+#endif /* SENSOR_ENABLED & X_NUCLEO_IKS01A2 */
 /* USER CODE END EC */
+
+/* External variables --------------------------------------------------------*/
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
@@ -50,34 +74,23 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+/**
+  * @brief  initialize the environmental sensor
+  */
+int32_t EnvSensors_Init(void);
+
+/**
+  * @brief  Environmental sensor  read.
+  * @param  sensor_data sensor data
+  */
+int32_t EnvSensors_Read(sensor_t *sensor_data);
 
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
 
-/* Private defines -----------------------------------------------------------*/
-#define RTC_PREDIV_A ((1<<(15-RTC_N_PREDIV_S))-1)
-#define RTC_N_PREDIV_S 10
-#define RTC_PREDIV_S ((1<<RTC_N_PREDIV_S)-1)
-#define RF_CTRL3_Pin GPIO_PIN_3
-#define RF_CTRL3_GPIO_Port GPIOC
-#define RF_CTRL2_Pin GPIO_PIN_5
-#define RF_CTRL2_GPIO_Port GPIOC
-#define RF_CTRL1_Pin GPIO_PIN_4
-#define RF_CTRL1_GPIO_Port GPIOC
-#define ESP32_EN_Pin GPIO_PIN_10
-#define ESP32_EN_GPIO_Port GPIOB
-
-/* USER CODE BEGIN Private defines */
-
-/** Global variable for HAL return codes */
-HAL_StatusTypeDef rc;
-
-/* USER CODE END Private defines */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /* __SENSORS_H__ */

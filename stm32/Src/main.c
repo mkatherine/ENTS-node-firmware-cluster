@@ -21,12 +21,15 @@
 #include "adc.h"
 #include "dma.h"
 #include "i2c.h"
+#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+
+#include "sys_app.h"
 #include <stdlib.h>
 
 #include "ads.h"
@@ -114,27 +117,13 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
+  MX_LoRaWAN_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  // Print the compilation time at startup
-  char info_str[100];
-  int info_len;
-  info_len = sprintf(
-    info_str,
-    "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
-    __DATE__,__TIME__
-    );
-  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
+  // Debug message, gets printed after init code
+  //APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
-  /* USER CODE BEGIN 2 */
-  ADC_init();
-  char outputV[20];
-  char outputC[20];
-
-  int voltage;
-  int current;
-  int count = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -142,18 +131,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_LoRaWAN_Process();
 
     /* USER CODE BEGIN 3 */
-    voltage = ADC_readVoltage();
-    HAL_Delay(2000);
-    current = ADC_readCurrent();
-    sprintf(outputV, "Voltage: %d\r\n\r\n", voltage);
-    sprintf(outputC, "Current: %d\r\n\r\n", current);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) outputV, 16, 19);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) outputC, 16, 19);
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-    HAL_Delay(1000);
-    count++;
   }
   /* USER CODE END 3 */
 }
@@ -167,18 +147,22 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
   /** Configure the main internal regulator output voltage
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -196,7 +180,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }

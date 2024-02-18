@@ -132,8 +132,8 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
 
   uint32_t battery_voltage = 0;
-  const char *pingS = "Ping success\r\n";
-  const char *pingF = "Ping failure\r\n";
+  const char *end = "END\r\n";
+  const char *measureF = "measure failure\r\n";
   char push[100];
   // Calibrate and start conversion process
   // rc = HAL_ADCEx_Calibration_Start(&hadc);
@@ -148,42 +148,26 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   uint8_t deviceAddress = '0'; // Replace '0' with the actual device address
 
-  // Define buffers for the response and expected response
-  char responseBuffer[5]; // Adjust the size based on your expected response
-  uint16_t bufferSize = sizeof(responseBuffer);
   SDI12_Measure_TypeDef measurment_info;
 
   // Define the timeout value
   uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
 
-  // Call the SDI12_PingDevice function
+  // initialize the sdi-12 library
   SDI12_Init(GPIOA, GPIO_PIN_2);
-  // Toggle a GPIO pin before the delay
-  // HAL_StatusTypeDef pingStatus = SDI12_PingDevice(deviceAddress, responseBuffer, 3, timeoutMillis);
-  // // Check the result of the ping operation
-  // if (pingStatus == HAL_OK)
-  // {
-  //   // Device is active
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *)pingS, 15, 15);
-  // }
-  // else
-  // {
-  //   // Device is not active or there was an error
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *)pingF, 15, 15);
-  // }
   
   char data[7];
   HAL_StatusTypeDef pingStatus = SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
   if (pingStatus == HAL_OK)
   {
     // Device is active
-    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 20, 40);
-    HAL_UART_Transmit(&huart1, (const uint8_t *)pingS, 15, 15);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
+    HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
   }
   else
   {
     // Device is not active or there was an error
-    HAL_UART_Transmit(&huart1, (const uint8_t *)pingF, 15, 15);
+    HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
   }
 
   while (1)
@@ -198,7 +182,19 @@ int main(void)
 
     //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_2);
     //delayMicroseconds(500);
-    simpleDelay();
+  // SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
+  // if (pingStatus == HAL_OK)
+  // {
+  //   // Device is active
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
+  // }
+  // else
+  // {
+  //   // Device is not active or there was an error
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
+  // }
+    HAL_Delay(5000);
   }
   /* USER CODE END 3 */
 }

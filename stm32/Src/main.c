@@ -178,22 +178,18 @@ int main(void)
     // char buf[10];
     // int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
-    //HAL_UART_Transmit(&huart1, (const uint8_t *)buf, buf_len, 1000);
-
-    //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_2);
-    //delayMicroseconds(500);
-  // SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
-  // if (pingStatus == HAL_OK)
-  // {
-  //   // Device is active
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
-  // }
-  // else
-  // {
-  //   // Device is not active or there was an error
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
-  // }
+  SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
+  if (pingStatus == HAL_OK)
+  {
+    // Device is active
+    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
+    HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
+  }
+  else
+  {
+    // Device is not active or there was an error
+    HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
+  }
     HAL_Delay(5000);
   }
   /* USER CODE END 3 */
@@ -258,9 +254,9 @@ void Error_Handler(void)
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
 
   /* USER CODE BEGIN Error_Handler_Debug */
-  char error[30];
-  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
-  HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
+  // char error[30];
+  // int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  // HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();

@@ -30,8 +30,8 @@ extern "C"
 #define START_MEASUREMENT_COMMAND_SIZE 3
 #define START_MEASURMENT_RESPONSE_SIZE 7
 #define SEND_DATA_COMMAND_SIZE 4
-#define SEND_DATA_RESPONSE_SIZE 3 // You need to add the numvalues (n) value returned from start measurment
-#define MILLISECONDS_TO_SECONDS 1
+#define SEND_DATA_RESPONSE_SIZE 16 // You need to add the numvalues (n) value returned from start measurment
+#define SECONDS_TO_MILLISECONDS 1000
 #define SERVICE_REQUEST_SIZE 3
 
   typedef struct

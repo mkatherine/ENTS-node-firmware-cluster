@@ -134,6 +134,7 @@ int main(void)
   uint32_t battery_voltage = 0;
   const char *pingS = "Ping success\r\n";
   const char *pingF = "Ping failure\r\n";
+  char push[100];
   // Calibrate and start conversion process
   // rc = HAL_ADCEx_Calibration_Start(&hadc);
   // if (rc != HAL_OK) Error_Handler();
@@ -176,6 +177,7 @@ int main(void)
   if (pingStatus == HAL_OK)
   {
     // Device is active
+    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 20, 40);
     HAL_UART_Transmit(&huart1, (const uint8_t *)pingS, 15, 15);
   }
   else

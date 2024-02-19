@@ -21,7 +21,7 @@ def decode_response(data: bytes):
     resp = Response()
     resp.ParseFromString(data)
     
-    if not meas.HasField("resp"):
+    if not resp.HasField("resp"):
         raise KeyError("Missing response type")
     
     return resp.resp

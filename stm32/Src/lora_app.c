@@ -419,27 +419,34 @@ static void SendTxData(void)
   uint8_t battery_level;
   uint16_t temperature;
 
-  battery_level = GetBatteryLevel();
-  temperature = SYS_GetTemperatureLevel();
-
-  int adc_voltage = ADC_readVoltage();
-  AppData.BufferSize = EncodePowerMeasurement(1436079600, 7, 4, (double) adc_voltage, 185.29, AppData.Buffer);
-  for (int i = 0; i < AppData.BufferSize; i++){
-    APP_LOG(TS_ON, VLEVEL_M, "%x", AppData.Buffer[i]);
-  }
-  APP_LOG(TS_ON, VLEVEL_M, "\r\n");
-  APP_LOG(TS_ON, VLEVEL_M, "%d\r\n", AppData.BufferSize);
-
-  AppData.Port = LORAWAN_SPS_MEAS_PORT;
-
-  if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, false))
+  if (LmHandlerIsBusy() == false)
   {
-    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
+    battery_level = GetBatteryLevel();
+    temperature = SYS_GetTemperatureLevel();
+
+    int adc_voltage = ADC_readVoltage();
+
+    AppData.BufferSize = EncodePowerMeasurement(1436079600, 7, 4, 37.13, 185.29, AppData.Buffer);
+  
+    APP_LOG(TS_ON, VLEVEL_M, "Payload: ")
+    for (int i = 0; i < AppData.BufferSize; i++){
+      APP_LOG(TS_OFF, VLEVEL_M, "%x ", AppData.Buffer[i]);
+    }
+    APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
+    APP_LOG(TS_ON, VLEVEL_M, "%d\r\n", AppData.BufferSize);
+
+    AppData.Port = LORAWAN_SPS_MEAS_PORT;
+
+    if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, false))
+    {
+      APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
+    }
+    else
+    {
+      APP_LOG(TS_OFF, VLEVEL_M, "Could not send request\r\n");
+    }
   }
-  else
-  {
-    APP_LOG(TS_OFF, VLEVEL_M, "Could not send request\r\n");
-  }
+
 
   /* USER CODE END SendTxData_1 */
 }

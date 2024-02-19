@@ -9,7 +9,9 @@
 
 #include "transcoder.h"
 
-#include "usart.h"
+#include "pb_encode.h"
+#include "pb_decode.h"
+
 
 /**
  * @brief Encodes a measurement
@@ -24,7 +26,7 @@
 */
 size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer);
 
-size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
+size_t EncodePowerMeasurement(uint32_t ts, uint32_t logger_id,
                               uint32_t cell_id, double voltage,
                               double current, uint8_t *buffer)
 {
@@ -32,10 +34,7 @@ size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
 
   meas.has_meta = true;
 
-  meas.meta.has_ts = true;
-  meas.meta.ts.seconds = ts;
-  meas.meta.ts.nanos = 0;
-
+  meas.meta.ts = ts;
   meas.meta.logger_id = logger_id;
   meas.meta.cell_id = cell_id;
 
@@ -47,7 +46,7 @@ size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
 }
 
 
-size_t EncodeTeros12Measurement(int64_t ts, uint32_t logger_id,
+size_t EncodeTeros12Measurement(uint32_t ts, uint32_t logger_id,
                                 uint32_t cell_id, float vwc_raw, float vwc_adj,
                                 float temp, uint32_t ec, uint8_t *buffer)
 {
@@ -55,10 +54,7 @@ size_t EncodeTeros12Measurement(int64_t ts, uint32_t logger_id,
 
   meas.has_meta = true;
 
-  meas.meta.has_ts = true;
-  meas.meta.ts.seconds = ts;
-  meas.meta.ts.nanos = 0;
-
+  meas.meta.ts = ts;
   meas.meta.logger_id = logger_id;
   meas.meta.cell_id = cell_id;
 

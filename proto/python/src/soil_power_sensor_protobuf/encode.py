@@ -56,7 +56,6 @@ def encode_power_measurement(ts: int, cell_id: int, logger_id: int,
     meas = Measurement()
     
     # metadata
-    meas.meta = MeasurementMetadata()
     meas.meta.ts = ts
     meas.meta.cell_id = cell_id
     meas.meta.logger_id = logger_id
@@ -89,7 +88,6 @@ def encode_teros12_measurement(ts: int, cell_id: int, logger_id: int,
     meas = Measurement()
     
     # metadata
-    meas.meta = MeasurementMetadata()
     meas.meta.ts = ts
     meas.meta.cell_id = cell_id
     meas.meta.logger_id = logger_id

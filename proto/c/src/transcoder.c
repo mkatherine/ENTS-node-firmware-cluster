@@ -31,7 +31,7 @@ size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
   Measurement meas = Measurement_init_zero;
 
   meas.has_meta = true;
-  
+
   meas.meta.has_ts = true;
   meas.meta.ts.seconds = ts;
   meas.meta.ts.nanos = 0;

@@ -13,8 +13,6 @@
 
 syntax = "proto3";
 
-import "timestamp.proto";
-
 /* Data shared between all measurement messages */
 message MeasurementMetadata {
   // id of the cell measured
@@ -22,7 +20,7 @@ message MeasurementMetadata {
   // id of the logging device
   uint32 logger_id = 2;
   // timestamp of the measurement
-  google.protobuf.Timestamp ts = 3;
+  uint32 ts = 3;
 }
 
 /* Power measurement message. Voltage and current can be digitially combined to

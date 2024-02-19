@@ -10,6 +10,25 @@ The generation of necessary source files is handled with the `Makefile`. The `na
 make
 ```
 
+## Decoding a message using the CLI
+
+On linux you are able to decode a payload directly from The Things Network by using the `protoc` binary. Replace the hex at the start of your command with the payload.
+
+``` bash
+echo "0A1008A3A18A820410041A0608F0ABE3AC75121211713D0AD7A390424019E17A14AE47296740" | xxd -r -p | protoc --decode Measurement soil_power_sensor.proto 
+meta {
+  cell_id: 1078104227
+  logger_id: 4
+  3 {
+    1: 31500850672
+  }
+}
+power {
+  voltage: 37.13
+  current: 185.29
+}
+```
+
 ## C Implementation
 
 > See @subpage protobuf-c for implementation details. 

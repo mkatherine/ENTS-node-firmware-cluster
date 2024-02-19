@@ -106,6 +106,16 @@ extern "C"
 
   /**
   ******************************************************************************
+  * @brief    This is a function to calibrate a moisture measurment from a TEROS12
+  *
+  * @param    char* the measurment data returned
+  * @return   int, calibrated moisture measurment
+  ******************************************************************************
+  */
+  int SDI12_GetCalibratedMeasurment(char *measurment_data);
+
+  /**
+  ******************************************************************************
   * @brief    This is a function to ping a certain device, and see if it's active
   *
   * @param    char const addr, the device address

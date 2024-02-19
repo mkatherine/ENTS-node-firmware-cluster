@@ -228,6 +228,11 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   return ret;
 }
 
+int SDI12_GetCalibratedMeasurment(char *measurment_data)
+{
+  return int 0;
+}
+
 HAL_StatusTypeDef SDI12_PingDevice(uint8_t deviceAddress, char *responseBuffer, uint16_t bufferSize, uint32_t timeoutMillis)
 {
   HAL_StatusTypeDef ret;

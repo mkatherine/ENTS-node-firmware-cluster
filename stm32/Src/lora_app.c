@@ -35,6 +35,7 @@
 #include "sys_sensors.h"
 #include "flash_if.h"
 
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -421,9 +422,15 @@ static void SendTxData(void)
   battery_level = GetBatteryLevel();
   temperature = SYS_GetTemperatureLevel();
 
+  int adc_voltage = ADC_readVoltage();
+  AppData.BufferSize = EncodePowerMeasurement(1436079600, 7, 4, (double) adc_voltage, 185.29, AppData.Buffer);
+  for (int i = 0; i < AppData.BufferSize; i++){
+    APP_LOG(TS_ON, VLEVEL_M, "%x", AppData.Buffer[i]);
+  }
+  APP_LOG(TS_ON, VLEVEL_M, "\r\n");
+  APP_LOG(TS_ON, VLEVEL_M, "%d\r\n", AppData.BufferSize);
+
   AppData.Port = LORAWAN_SPS_MEAS_PORT;
-  AppData.Buffer[0] = 0x9;
-  AppData.BufferSize = 1;
 
   if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, false))
   {

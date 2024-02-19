@@ -149,6 +149,11 @@ int main(void)
   uint8_t deviceAddress = '0'; // Replace '0' with the actual device address
 
   SDI12_Measure_TypeDef measurment_info;
+  Teros12_Data teros_readings;
+  teros_readings.temp = 0;
+  teros_readings.vwc_adj = 0;
+  teros_readings.vwc_raw = 0;
+  teros_readings.ec = 0;
 
   // Define the timeout value
   uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
@@ -157,12 +162,15 @@ int main(void)
   SDI12_Init(GPIOA, GPIO_PIN_2);
   
   char data[7];
-  HAL_StatusTypeDef pingStatus = SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
+  char adjusted[100];
+  HAL_StatusTypeDef pingStatus;
+  pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
   if (pingStatus == HAL_OK)
   {
     // Device is active
-    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-    HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
+    sprintf(adjusted, "RAW: %f ADJ: %f TMP: %f EC: %u\r\n", teros_readings.vwc_raw, teros_readings.vwc_adj, teros_readings.temp, teros_readings.ec);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 33, 40);
+    //HAL_UART_Transmit(&huart1, (const uint8_t *) end, 6, 15);
   }
   else
   {

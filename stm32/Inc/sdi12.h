@@ -47,6 +47,15 @@ extern "C"
     uint8_t NumValues;
   } SDI12_Measure_TypeDef;
 
+  typedef struct
+  {
+    uint32_t ec;
+    float vwc_raw;
+    float vwc_adj;
+    float temp;
+  } Teros12_Data;
+  
+
   /**
   ******************************************************************************
   * @brief    This is a initialization for the SDI-12 data line.
@@ -108,11 +117,13 @@ extern "C"
   ******************************************************************************
   * @brief    This is a function to calibrate a moisture measurment from a TEROS12
   *
-  * @param    char* the measurment data returned
-  * @return   int, calibrated moisture measurment
+  * @param    const char addr, the address of the sensor
+  * @param    Teros12_data, teros_readings the teros readings
+  * @param    uint16_t timeoutMillis, the timeout in milliseconds
+  * @return   HAL_StatusTypeDef
   ******************************************************************************
   */
-  int SDI12_GetCalibratedMeasurment(char *measurment_data);
+  HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *teros_readings, uint16_t timeoutMillis);
 
   /**
   ******************************************************************************

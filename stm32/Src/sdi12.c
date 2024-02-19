@@ -110,7 +110,6 @@ void SDI12_SendCommand(const char *command, uint8_t size)
 HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis)
 {
   uint32_t startTime = HAL_GetTick(); // Get the current time
-  HAL_StatusTypeDef ret;
   uint8_t recv = 0;
   uint16_t index = 0;
   uint8_t mask = 0x7f;
@@ -159,7 +158,6 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   char sendData[MAX_RESPONSE_SIZE];
   HAL_StatusTypeDef ret;
   //char error[15];
-  char *fuck = "fuck\r\n";
   SDI12_WakeSensors();
 
   // Construct the command to request measurement
@@ -183,7 +181,6 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   if (ret != HAL_OK)
   {
     //sprintf(error, "error %d", ret); // Why does this need to be here?
-    //HAL_UART_Transmit(&huart1, fuck, 7, 7);
     return ret;
   }
 
@@ -228,9 +225,30 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   return ret;
 }
 
-int SDI12_GetCalibratedMeasurment(char *measurment_data)
+HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *teros_readings, uint16_t timeoutMillis)
 {
-  return int 0;
+  SDI12_Measure_TypeDef measurment_info;
+  HAL_StatusTypeDef ret;
+  char measurement_data[19];
+  float RAW;
+  float TEMP;
+  float ADJ;
+  uint32_t EC;
+
+  ret = SDI12_GetMeasurment(addr, &measurment_info, measurement_data, timeoutMillis); // Read from the TEROS
+  if (ret != HAL_OK){
+    return ret;
+  }
+//  HAL_UART_Transmit(&huart1, measurement_data, 19, 100);
+  sscanf(measurement_data, "%*d+%f+%f+%u\r\n", &RAW, &TEMP, &EC);
+  
+  //y=0.000000000512018x^3-0.000003854251138x^2+0.009950433111633x-8.508168835940560 calibration eqn
+  ADJ = (0.000000000512018 * RAW * RAW * RAW) - (0.000003854251138 * RAW * RAW) + (0.009950433111633 * RAW) - 8.508168835940560;
+  teros_readings->vwc_raw = RAW;
+  teros_readings->vwc_adj = ADJ;
+  teros_readings->temp = TEMP;
+  teros_readings->ec = EC;
+  return HAL_OK;
 }
 
 HAL_StatusTypeDef SDI12_PingDevice(uint8_t deviceAddress, char *responseBuffer, uint16_t bufferSize, uint32_t timeoutMillis)

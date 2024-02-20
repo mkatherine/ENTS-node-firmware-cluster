@@ -76,14 +76,6 @@ HAL_StatusTypeDef ParseServiceRequest(const char *requestBuffer, char addr)
   }
 }
 
-void SendDataCommand(char addr)
-{
-  char command[8]; // Command send data("aD0!" for e)
-  snprintf(command, SEND_DATA_COMMAND_SIZE, "%cD0!", addr); // Construct the command to request measurement
-  SDI12_SendCommand(command, SEND_DATA_COMMAND_SIZE); // Send the command to request measurement
-  return;
-}
-
 void SDI12_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
   sdi12.Pin = GPIO_Pin; // Configure the pin
@@ -187,7 +179,7 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   if (measurment_info->Time == 0)
   { // If data is ready now
     configureAsOutput();
-    SendDataCommand(measurment_info->Address); // Will need to check that SendDataCommand is doing what I want it to do
+    SDI12_SendCommand(sendData, SEND_DATA_COMMAND_SIZE); 
     configureAsInput();
     ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); // double check the sizeof
     return ret;
@@ -219,35 +211,47 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
 
   configureAsOutput();
   SDI12_WakeSensors(); // If ttt does elapse wake the sensors
-  SendDataCommand(measurment_info->Address);
+  SDI12_SendCommand(sendData, SEND_DATA_COMMAND_SIZE);
   configureAsInput();
   ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); 
   return ret;
 }
 
-HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, float * raw, float * adj, float * temp, uint32_t * ec, uint16_t timeoutMillis)
+HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *teros_readings, uint16_t timeoutMillis)
 {
   SDI12_Measure_TypeDef measurment_info;
   HAL_StatusTypeDef ret;
-  char measurement_data[19];
+  char measurement_data[100];
+  char parsed[100];
   float RAW;
   float TEMP;
-  float ADJ;
-  uint32_t EC;
+  int EC;
+  int address;
 
   ret = SDI12_GetMeasurment(addr, &measurment_info, measurement_data, timeoutMillis); // Read from the TEROS
   if (ret != HAL_OK){
     return ret;
   }
-//  HAL_UART_Transmit(&huart1, measurement_data, 19, 100);
-  sscanf(measurement_data, "%*d+%f+%f+%u\r\n", &RAW, &TEMP, &EC);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) measurement_data, 18, 100);
+  sscanf(measurement_data, "%d+%f+%f+%d\r\n",&address, &RAW, &TEMP, &EC);
+  sprintf(parsed, "ADDR: %d RAW: %f TEMP:%f EC: %d\r\n",address, RAW, TEMP, EC);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) parsed, 34, 24);
+//   char* token = strtok(measurement_data, "+");
+// // Skip the first token (index 0) since it doesn't contain a value
+// token = strtok(NULL, "+");
+// RAW= atof(token);
+
+// token = strtok(NULL, "+");
+// TEMP = atof(token);
+
+// token = strtok(NULL, "\r\n");
+// EC = atoi(token);
   
   //y=0.000000000512018x^3-0.000003854251138x^2+0.009950433111633x-8.508168835940560 calibration eqn
   //ADJ = (0.000000000512018 * RAW * RAW * RAW) - (0.000003854251138 * RAW * RAW) + (0.009950433111633 * RAW) - 8.508168835940560;
-  *raw = RAW;
-  *adj = 0.0;
-  *temp = 0.0;
-  *ec = 0;
+  teros_readings->vwc_raw = RAW;
+  teros_readings->temp = TEMP;
+  teros_readings->ec = (uint32_t) EC;
   return HAL_OK;
 }
 

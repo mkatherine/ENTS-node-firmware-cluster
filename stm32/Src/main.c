@@ -131,10 +131,9 @@ int main(void)
       __DATE__, __TIME__);
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
 
-  uint32_t battery_voltage = 0;
-  const char *end = "END\r\n";
+  //uint32_t battery_voltage = 0;
   const char *measureF = "measure failure\r\n";
-  char push[100];
+  //char push[100];
   // Calibrate and start conversion process
   // rc = HAL_ADCEx_Calibration_Start(&hadc);
   // if (rc != HAL_OK) Error_Handler();
@@ -149,11 +148,11 @@ int main(void)
   uint8_t deviceAddress = '0'; // Replace '0' with the actual device address
 
   SDI12_Measure_TypeDef measurment_info;
-  float raw;
-  float adj;
-  float temp;
-  uint32_t ec;
-
+  Teros12_Data teros_readings;
+  teros_readings.temp = 0.0;
+  teros_readings.vwc_raw = 0.0;
+  teros_readings.ec = 0;
+  char data[20];
 
   // Define the timeout value
   uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
@@ -161,17 +160,31 @@ int main(void)
   // initialize the sdi-12 library
   SDI12_Init(GPIOA, GPIO_PIN_2);
   
-  char data[7];
   char adjusted[100];
+  char loop[4];
   HAL_StatusTypeDef pingStatus;
-  pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &raw, &adj, &temp, &ec, timeoutMillis);
+  //pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
+
+  char *null_term = "null terminated\r\n";
+  char *found_0 = "lead with 0\r\n";
+  char *found_1 = "found 1\r\n";
+  char *found_plus = "found +\r\n";
+  pingStatus = SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
   if (pingStatus == HAL_OK)
   {
+    int address;
+    float RAW;
+    float TEMP;
+    uint32_t EC;
     // Device is active
-    sprintf(adjusted, "RAW: %f ADJ: %f TMP: %f EC: %u\r\n", raw, adj, temp, ec);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 33, 40);
     HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) end, 6, 15);
+    sscanf(data, "%d+%f+%f+%d\r\n",&address, &RAW, &TEMP, &EC);
+    sprintf(adjusted, "RAW: %f TMP: %f EC: %lu\r\n", RAW, TEMP, EC);
+    //HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 26, 40);
+    for (int i = 0; data[i] <= 15; i++) {
+        sprintf(loop,"%c ", data[i]);
+        HAL_UART_Transmit(&huart1, loop, 4, 1000);
+    }
   }
   else
   {

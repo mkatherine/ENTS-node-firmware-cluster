@@ -149,11 +149,11 @@ int main(void)
   uint8_t deviceAddress = '0'; // Replace '0' with the actual device address
 
   SDI12_Measure_TypeDef measurment_info;
-  Teros12_Data teros_readings;
-  teros_readings.temp = 0;
-  teros_readings.vwc_adj = 0;
-  teros_readings.vwc_raw = 0;
-  teros_readings.ec = 0;
+  float raw;
+  float adj;
+  float temp;
+  uint32_t ec;
+
 
   // Define the timeout value
   uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
@@ -164,13 +164,14 @@ int main(void)
   char data[7];
   char adjusted[100];
   HAL_StatusTypeDef pingStatus;
-  pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
+  pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &raw, &adj, &temp, &ec, timeoutMillis);
   if (pingStatus == HAL_OK)
   {
     // Device is active
-    sprintf(adjusted, "RAW: %f ADJ: %f TMP: %f EC: %u\r\n", teros_readings.vwc_raw, teros_readings.vwc_adj, teros_readings.temp, teros_readings.ec);
+    sprintf(adjusted, "RAW: %f ADJ: %f TMP: %f EC: %u\r\n", raw, adj, temp, ec);
     HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 33, 40);
-    //HAL_UART_Transmit(&huart1, (const uint8_t *) end, 6, 15);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) end, 6, 15);
   }
   else
   {
@@ -186,18 +187,18 @@ int main(void)
     // char buf[10];
     // int buf_len = sprintf(buf, "%lu\n", battery_voltage);
 
-  SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
-  if (pingStatus == HAL_OK)
-  {
-    // Device is active
-    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-    HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
-  }
-  else
-  {
-    // Device is not active or there was an error
-    HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
-  }
+  // SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
+  // if (pingStatus == HAL_OK)
+  // {
+  //   // Device is active
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
+  // }
+  // else
+  // {
+  //   // Device is not active or there was an error
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
+  // }
     HAL_Delay(5000);
   }
   /* USER CODE END 3 */

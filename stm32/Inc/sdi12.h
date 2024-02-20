@@ -123,7 +123,7 @@ extern "C"
   * @return   HAL_StatusTypeDef
   ******************************************************************************
   */
-  HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *teros_readings, uint16_t timeoutMillis);
+  HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, float * raw, float * adj, float * temp, uint32_t * ec, uint16_t timeoutMillis);
 
   /**
   ******************************************************************************

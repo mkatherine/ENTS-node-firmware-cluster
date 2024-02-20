@@ -225,7 +225,7 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   return ret;
 }
 
-HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *teros_readings, uint16_t timeoutMillis)
+HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, float * raw, float * adj, float * temp, uint32_t * ec, uint16_t timeoutMillis)
 {
   SDI12_Measure_TypeDef measurment_info;
   HAL_StatusTypeDef ret;
@@ -243,11 +243,11 @@ HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *ter
   sscanf(measurement_data, "%*d+%f+%f+%u\r\n", &RAW, &TEMP, &EC);
   
   //y=0.000000000512018x^3-0.000003854251138x^2+0.009950433111633x-8.508168835940560 calibration eqn
-  ADJ = (0.000000000512018 * RAW * RAW * RAW) - (0.000003854251138 * RAW * RAW) + (0.009950433111633 * RAW) - 8.508168835940560;
-  teros_readings->vwc_raw = RAW;
-  teros_readings->vwc_adj = ADJ;
-  teros_readings->temp = TEMP;
-  teros_readings->ec = EC;
+  //ADJ = (0.000000000512018 * RAW * RAW * RAW) - (0.000003854251138 * RAW * RAW) + (0.009950433111633 * RAW) - 8.508168835940560;
+  *raw = RAW;
+  *adj = 0.0;
+  *temp = 0.0;
+  *ec = 0;
   return HAL_OK;
 }
 

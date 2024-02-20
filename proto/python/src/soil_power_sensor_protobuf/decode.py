@@ -57,9 +57,16 @@ def decode_measurement(data: bytes) -> dict:
         raise KeyError("Measurement missing data")
     measurement_type = meas.WhichOneof("measurement")
     measurement_dict = MessageToDict(getattr(meas, measurement_type))
-    measurement_dict["type"] = measurement_type
+   
+    # store measurement type
+    meta_dict["type"] = measurement_type
+ 
+    # store measurement data
+    meta_dict["data"] = measurement_dict
+  
+    # store measurement type
+    meta_dict["data_type"] = {}
+    for key, value in measurement_dict.items():
+        meta_dict["data_type"][key] = type(value)
 
-    # merge dictionaries
-    meas_dict = {**meta_dict, **measurement_dict}
-    
-    return meas_dict 
+    return meta_dict 

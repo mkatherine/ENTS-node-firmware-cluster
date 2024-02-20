@@ -14,8 +14,6 @@ from datetime import datetime
 from soil_power_sensor_protobuf import encode_response, decode_measurement
 from soil_power_sensor_protobuf.soil_power_sensor_pb2 import (Measurement,
                                                               Response,
-                                                              PowerMeasurement,
-                                                              Teros12Measurement,
                                                               MeasurementMetadata)
 
 
@@ -61,6 +59,7 @@ class TestDecode(unittest.TestCase):
     def test_power(self):
         """Test decoding of PowerMeasurement"""
 
+        #import pdb; pdb.set_trace()
         # format measurement
         meas = Measurement()
         meas.meta.CopyFrom(self.meta)
@@ -76,8 +75,11 @@ class TestDecode(unittest.TestCase):
         # check resulting dict
         self.assertEqual("power", meas_dict["type"])
         self.check_meta(meas_dict)
-        self.assertAlmostEqual(122.38, meas_dict["voltage"])
-        self.assertAlmostEqual(514.81, meas_dict["current"])
+        self.assertAlmostEqual(122.38, meas_dict["data"]["voltage"])
+        self.assertEqual(float, meas_dict["data_type"]["voltage"])
+        self.assertAlmostEqual(514.81, meas_dict["data"]["current"])
+        self.assertEqual(float, meas_dict["data_type"]["current"])
+        
 
     def test_teros12(self):
         """Test decoding of Teros12Measurement"""
@@ -99,10 +101,14 @@ class TestDecode(unittest.TestCase):
         # check dict
         self.assertEqual("teros12", meas_dict["type"])
         self.check_meta(meas_dict)
-        self.assertAlmostEqual(2124.62, meas_dict["vwcRaw"])
-        self.assertAlmostEqual(0.43, meas_dict["vwcAdj"])
-        self.assertAlmostEqual(24.8, meas_dict["temp"])
-        self.assertEqual(123, meas_dict["ec"])
+        self.assertAlmostEqual(2124.62, meas_dict["data"]["vwcRaw"])
+        self.assertEqual(float, meas_dict["data_type"]["vwcRaw"])
+        self.assertAlmostEqual(0.43, meas_dict["data"]["vwcAdj"])
+        self.assertEqual(float, meas_dict["data_type"]["vwcAdj"])
+        self.assertAlmostEqual(24.8, meas_dict["data"]["temp"])
+        self.assertEqual(float, meas_dict["data_type"]["temp"])
+        self.assertEqual(123, meas_dict["data"]["ec"])
+        self.assertEqual(int, meas_dict["data_type"]["ec"])
 
     def test_missing_meta(self):
         """Test that error is raised when meta is not set"""

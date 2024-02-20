@@ -132,7 +132,7 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
 
   //uint32_t battery_voltage = 0;
-  const char *measureF = "measure failure\r\n";
+  const char measureF[] = "measure failure\r\n";
   //char push[100];
   // Calibrate and start conversion process
   // rc = HAL_ADCEx_Calibration_Start(&hadc);
@@ -153,6 +153,10 @@ int main(void)
   teros_readings.vwc_raw = 0.0;
   teros_readings.ec = 0;
   char data[20];
+  int address;
+  float RAW;
+  int TEMP;
+  int EC;
 
   // Define the timeout value
   uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
@@ -165,22 +169,19 @@ int main(void)
   HAL_StatusTypeDef pingStatus;
   //pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
 
-  char *null_term = "null terminated\r\n";
-  char *found_0 = "lead with 0\r\n";
-  char *found_1 = "found 1\r\n";
-  char *found_plus = "found +\r\n";
+  char test_string[] = "1826.9";
+  sscanf(test_string, "%f",&RAW);
+  int len = sprintf(adjusted, "RAW: %f\r\n", RAW);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, len, 100);
   pingStatus = SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
   if (pingStatus == HAL_OK)
   {
-    int address;
-    float RAW;
-    float TEMP;
-    int EC;
+    
     // Device is active
     HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-    sscanf(data, "%d+%f+%f+%d\r\n",&address, &RAW, &TEMP, &EC);
-    sprintf(adjusted, "RAW: %f TMP: %f EC: %lu\r\n", RAW, TEMP, EC);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 26, 40);
+    // sscanf(test_string, "%d+%f+%f+%d\r\n",&address, &RAW, &TEMP, &EC);
+    // sprintf(adjusted, "ADR: %d RAW: %f TMP: %f EC: %d\r\n", address, RAW, TEMP, EC);
+    // HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 33, 40);
     //for (int i = 0; data[i] <= 15; i++) {
     //    sprintf(loop,"%c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16]);
       //  HAL_UART_Transmit(&huart1, (const uint8_t *)loop, 51, 1000);

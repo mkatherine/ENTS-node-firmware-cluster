@@ -130,6 +130,7 @@ HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t tim
 
       // Check for the termination characters
       if (buffer[index - 1] == '\r' && buffer[index] == '\n') {
+        buffer[index + 1] = '\0'; // Null terminate the buffer
         return HAL_OK; // Successfully received the message
       }
 

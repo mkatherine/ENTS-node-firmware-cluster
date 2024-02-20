@@ -161,7 +161,7 @@ int main(void)
   SDI12_Init(GPIOA, GPIO_PIN_2);
   
   char adjusted[100];
-  char loop[4];
+  char loop[100];
   HAL_StatusTypeDef pingStatus;
   //pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
 
@@ -175,16 +175,16 @@ int main(void)
     int address;
     float RAW;
     float TEMP;
-    uint32_t EC;
+    int EC;
     // Device is active
     HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
     sscanf(data, "%d+%f+%f+%d\r\n",&address, &RAW, &TEMP, &EC);
     sprintf(adjusted, "RAW: %f TMP: %f EC: %lu\r\n", RAW, TEMP, EC);
-    //HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 26, 40);
-    for (int i = 0; data[i] <= 15; i++) {
-        sprintf(loop,"%c ", data[i]);
-        HAL_UART_Transmit(&huart1, loop, 4, 1000);
-    }
+    HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 26, 40);
+    //for (int i = 0; data[i] <= 15; i++) {
+    //    sprintf(loop,"%c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16]);
+      //  HAL_UART_Transmit(&huart1, (const uint8_t *)loop, 51, 1000);
+   // }
   }
   else
   {

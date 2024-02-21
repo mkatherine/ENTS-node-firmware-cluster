@@ -1,4 +1,4 @@
-# Soil Power Sensor Protobuf Bindings
+# Soil Power Sensor Python Protobuf Bindings {#protobuf-python}
 
 The soil power sensor protobuf protocol is implemented as a Python package that allows for `Measurement` messages to be decoded into a dictionary and `Response` messages to be encoded. The generated files from protobuf are also accessible for more complex use cases.
 

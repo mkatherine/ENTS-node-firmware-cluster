@@ -21,6 +21,7 @@
 #include "adc.h"
 #include "dma.h"
 #include "i2c.h"
+#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
 #include "fram.h"
@@ -31,6 +32,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+
+#include "sys_app.h"
+#include <stdlib.h>
+
+#include "ads.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,53 +46,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 #define FM24_WRITE 0xA0 // Device address of FM24 in write mode
 #define FM24_READ 0xA1  // Device address of FM24 in read mode
-
 /* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-/**
- ******************************************************************************
- * @brief    Helper function to reverse array
- * @param    arr array
- * @param    start start of array
- * @param    end end of array
- * @return   none
- ******************************************************************************
- */
-void reverseArray(int arr[], int start, int end)
-{
-  int temp;
-  while (start < end)
-  {
-    temp = arr[start];
-    arr[start] = arr[end];
-    arr[end] = temp;
-    start++;
-    end--;
-  }
-}
 
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 /**
  * @brief  The application entry point.
@@ -94,132 +62,40 @@ void reverseArray(int arr[], int start, int end)
  */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-  /* USER CODE END Init */
-
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
+  MX_ADC_Init();
   MX_USART1_UART_Init();
+  MX_LoRaWAN_Init();
   MX_I2C2_Init();
   MX_TIM2_Init();
   ADC_init();
+
   /* USER CODE BEGIN 2 */
 
-  // Print the compilation time at startup
-  char info_str[100];
-  int info_len;
-  info_len = sprintf(
-      info_str,
-      "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
-      __DATE__, __TIME__);
-  HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
 
-  //uint32_t battery_voltage = 0;
-  const char measureF[] = "measure failure\r\n";
-  //char push[100];
-  // Calibrate and start conversion process
-  // rc = HAL_ADCEx_Calibration_Start(&hadc);
-  // if (rc != HAL_OK) Error_Handler();
-
-  // rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &battery_voltage, 1);
-  // if (rc != HAL_OK) Error_Handler();
+  // Debug message, gets printed after init code
+  APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t deviceAddress = '0'; // Replace '0' with the actual device address
-
-  SDI12_Measure_TypeDef measurment_info;
-  Teros12_Data teros_readings;
-  char data[20];
-  int address;
-  float RAW;
-  int i_raw;
-  int TEMP;
-  int EC;
-
-  // Define the timeout value
-  uint32_t timeoutMillis = 1000; // Adjust the timeout as needed
-
-  // initialize the sdi-12 library
-  SDI12_Init(GPIOA, GPIO_PIN_2);
-  
-  char adjusted[100];
-  char loop[100];
-  HAL_StatusTypeDef pingStatus;
-  //pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
-
-  char test_string[] = "0+1826.82+21.2+1\r\n";
-  int len;
-
-  //HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, len, 100);
-  // pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
-  // if (pingStatus == HAL_OK)
-  // {
-    
-  //   // Device is active
-  //   len = sprintf(adjusted, "%d  %f  %f  %d\r\n",teros_readings.addr, teros_readings.vwc_raw, teros_readings.tmp, teros_readings.ec);
-  //   HAL_UART_Transmit(&huart1, adjusted, len, 100);
-  // }
-  // else
-  // {
-  //   // Device is not active or there was an error
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
-  // }
-
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_LoRaWAN_Process();
 
     /* USER CODE BEGIN 3 */
-    // char buf[10];
-    // int buf_len = sprintf(buf, "%lu\n", battery_voltage);
-
-  // SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
-  // if (pingStatus == HAL_OK)
-  // {
-  //   // Device is active
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-  // }
-  // else
-  // {
-  //   // Device is not active or there was an error
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
-  // }
-
-  pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
-  if (pingStatus == HAL_OK)
-  {
-    
-    // Device is active
-    len = sprintf(adjusted, "%d  %f  %f  %d\r\n",teros_readings.addr, teros_readings.vwc_raw, teros_readings.tmp, teros_readings.ec);
-    HAL_UART_Transmit(&huart1, adjusted, len, 100);
-  }
-  else
-  {
-    // Device is not active or there was an error
-    HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
-  }
-
-    HAL_Delay(5000);
   }
   /* USER CODE END 3 */
 }
@@ -233,16 +109,20 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
   /** Configure the main internal regulator output voltage
   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
@@ -280,8 +160,6 @@ void SystemClock_Config(void)
  */
 void Error_Handler(void)
 {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-
   /* USER CODE BEGIN Error_Handler_Debug */
   // char error[30];
   // int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);

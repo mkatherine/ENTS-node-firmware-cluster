@@ -2,74 +2,69 @@
 
 # soil-power-sensor-firmware
 
-Firmware for STM32 and ESP32 microcontrollers on the Soil Power Sensor board
+Firmware repository for STM32 and ESP32 microcontrollers on the Soil Power Sensor board along with supporting libraries.
 
-## Steps to load into the STM32 bootloader
+## Project Structure
 
-The `Wio-E5 mini` board can be programed via *SWD* through the debug header `D1`. The following are instructions for connecting a `ST-Link` debugger to the bootloader.
+All components of the soil power sensor project are open source and live across a range of repositories. This repository serves as a central hub for all components for the project including software and hardware.
 
-1. Connect the `ST-Link` debugger to header `D1`
-1. Power the device
-2. Press `RST` button
-3. Press `BOOT` button
-4. Release `RST` button
-5. Release `BOOT` button
-6. Press connect on the TSM32CubeProgrammer interface.
-	- If this is a new board, the stock firmware will be flashed. You will see the error message `Error: data read failed`. This is expected since the stock firmware has read protection.
-		- On a new board you will need to disable read protection to fix the `Error: data read failed` error. Go to the `Option Bytes` tab (box with the letters "OB" on the left) and click `Read Out Protection`, set the RDP level to AA, or "no protection".
-	- Otherwise, you see the current device memory.
-7. Verify the target information in the lower right hand corner.
-
-## Process for setting up new stm32 project
-
-1. Install the following software
-
-| Software | Link |
+| Repository | Description |
 | --- | --- |
-| `platformio` | https://platformio.org/ |
-| `stm32pio` | https://github.com/ussserrr/stm32pio |
-| `stm32cubemx` | https://www.st.com/en/development-tools/stm32cubemx.html |
+| https://github.com/jlab-sensing/soil-power-sensor-firmware | Firmware for microcontrollers |
+| https://github.com/jlab-sensing/platform-ststm32 | Fork with our board and modifications to build script |
+| https://github.com/jlab-sensing/tool-openocd | For allowing for user defined `openocd` binary |
+| https://github.com/jlab-sensing/STM32CubeWL | Platformio library for STMicroelectronics HAL and other libraries |
+| https://github.com/jlab-sensing/soil_power_sensor | Hardware design files for the sensor board |
 
-2. Open CubeMX and create new project. Do NOT generate the code, `stm32pio` will perform that step.
+## File structure of repository
 
-3. Save project to desired project directory and close
+The following paths are the major parts of the project. Each individual folder has more information relating to implementation and development.
 
-4. Initialize the `stm32pio` project
+| Path | Description | Link |
+| --- | --- | --- |
+| `stm32/` | Platformio project for the stm32-based Wio-E5 mini | @ref ./stm32/README.md |
+| `esp32/` | Platformio project for the ESP32-C3-MINI-N1 | @ref ./esp32/README.md |
+| `proto/` | Protobuf definitions and language specific libraries | @ref ./proto/README.md |
 
-```bash
-stm32pio init -b wioe5
-```
+## Software Requirements
 
-Check paths to CubeMX (`cubemx_cmd`) and Java (`java_cmd`) in `stm32pio.ini`. It's recomended to set `cubemx_cmd = STM32CubeMX` and `java_cmd = None` and the CubeMX launcher in your path.
+The following is the list of the software used for developing the firmware. The versions listed were the ones used for developing the initial release of the firmware. Versions too far into the past might cause unforeseen errors.
 
-Follow any recomendations listed in the commands ouput
+| Software | Version | Optional |
+| --- | --- | --- |
+| [platformio](https://platformio.org/) | `6.1.7` | No |
+| [stm32pio](https://github.com/ussserrr/stm32pio) | `2.1.0` | Yes, for code generation |
+| [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) | `6.10.0` | Yes, for code generation |
+| [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) | `1.13.2` | Yes, for flashing with openocd on Windows |
+| [STM32CubeProg](https://www.st.com/en/development-tools/stm32cubeprog.html) | `2.15.0` | Yes, for initial flash and clearing read protection from Wio-E5 |
+| [Nanopb](https://jpa.kapsi.fi/nanopb/) | `0.4.8` | No |
+| [protobuf](https://protobuf.dev/) | `25.2` | No |
+| Make | `4.4.1` | No |
 
-5. Create a combined platformio and CubeMX project
+## Generation documentation
 
-```bash
-stm32pio new -b wioe5
-```
-
-In `platformio.ini` change `platform = atmelavr` to `platform = ststm32`
-
-6. Build the project
-
-```bash
-pio run
-```
-
-
-## Generating documentation
-
-HTML documentation is generated with `doxygen` per project. Running the following command in `stm32/` and `esp32/` results in docs being generated in `stm32/docs/html/` and `stm32/docs/html` respectively.
+This project use [Doxygen](https://www.doxygen.nl/) for its code documentation. HTML documentation is automatically generated through Github Actions and is updated whenever there is a change to the `main` branch. To generate documentation locally in the `docs/` folder, run the following from the root directory:
 
 ```bash
 doxygen Doxyfile
 ```
 
-Online versions of the documentation is available for the main branch at
+Online version of the documentation for the `main` branch is available at https://jlab-sensing.github.io/soil-power-sensor-firmware/
 
-| Project | URL                                                  |
-|---------|------------------------------------------------------|
-| stm32   | https://jlab-sensing.github.io/soil-power-sensor-firmware/stm32/ |
-| esp32   | https://jlab-sensing.github.io/soil-power-sensor-firmware/esp32/ |
+## Resources
+
+Below is a list of resources that served as references throughout the design and implementation for the project.
+
+- https://github.com/Seeed-Studio/LoRaWan-E5-Node
+
+## Support
+
+For issues relating to software create an issue in this repository. For hardware issues, create an issue in the [hardware repository](https://github.com/jlab-sensing/soil_power_sensor).
+
+## Contributing
+
+TODO
+
+## License
+
+Code in this repository is licensed under MIT unless specified in the file header. See @ref LICENSE for full document.

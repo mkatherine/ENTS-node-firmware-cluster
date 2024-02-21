@@ -33,6 +33,8 @@ extern "C"
 #define SEND_DATA_RESPONSE_SIZE 16 // You need to add the numvalues (n) value returned from start measurment
 #define SECONDS_TO_MILLISECONDS 1000
 #define SERVICE_REQUEST_SIZE 3
+#define SCALE_VWC_TO_INT 100
+#define SCALE_TMP_TO_INT 10
 
   typedef struct
   {
@@ -49,9 +51,10 @@ extern "C"
 
   typedef struct
   {
-    uint32_t ec;
+    int ec;
     float vwc_raw;
-    float temp;
+    float tmp;
+    int addr;
   } Teros12_Data;
   
 
@@ -110,11 +113,11 @@ extern "C"
   * @return   HAL_StatusTypeDef
   ******************************************************************************
   */
-  HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
+  HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
 
   /**
   ******************************************************************************
-  * @brief    This is a function to calibrate a moisture measurment from a TEROS12
+  * @brief    This is a function to get a measurment from the Teros12
   *
   * @param    const char addr, the address of the sensor
   * @param    Teros12_data, teros_readings the teros readings
@@ -122,7 +125,21 @@ extern "C"
   * @return   HAL_StatusTypeDef
   ******************************************************************************
   */
-  HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *teros_readings, uint16_t timeoutMillis);
+  HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_readings, uint16_t timeoutMillis);
+
+  /**
+  ******************************************************************************
+  * @brief    This is a function to parse a measurement from the returned SDI12 buffer
+  *           You'll notice is incomplete, that is because at the time of writing (2/21/24)
+  *           the group decided to go in a different design direction, so Stephen Taylor left 
+  *           it incomplete.
+  *
+  * @param    const char addr, the address of the sensor
+  * @param    Teros12_data, teros_readings the teros readings
+  * @return   HAL_StatusTypeDef
+  ******************************************************************************
+  */
+  HAL_StatusTypeDef SDI12_ParseTeros12Measurement(const char *buffer, Teros12_Data *teros_readings);
 
   /**
   ******************************************************************************

@@ -144,19 +144,20 @@ HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t tim
   return HAL_TIMEOUT;
 }
 
-HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *measurment_info, char *measurement_data, uint16_t timeoutMillis)
+HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurement_data, uint16_t timeoutMillis)
 {
   char command[MAX_RESPONSE_SIZE];        // Command to request measurement ("M1!\r\n" for example)
   char responseBuffer[MAX_RESPONSE_SIZE]; // Buffer to store the response    char responseAddr; // Address in sensor response
   char sendData[MAX_RESPONSE_SIZE];
   HAL_StatusTypeDef ret;
   //char error[15];
+  configureAsOutput();
   SDI12_WakeSensors();
 
   // Construct the command to request measurement
   sprintf(command, "%cM!", addr);
   sprintf(sendData, "%cD0!", addr);
-  configureAsOutput();
+  
 
   // Send the command to request measurement
   SDI12_SendCommand(command, START_MEASUREMENT_COMMAND_SIZE);
@@ -218,42 +219,67 @@ HAL_StatusTypeDef SDI12_GetMeasurment(const char addr, SDI12_Measure_TypeDef *me
   return ret;
 }
 
-HAL_StatusTypeDef SDI12_GetTeros12Measurement(const char addr, Teros12_Data *teros_readings, uint16_t timeoutMillis)
+HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_readings, uint16_t timeoutMillis)
 {
   SDI12_Measure_TypeDef measurment_info;
   HAL_StatusTypeDef ret;
-  char measurement_data[100];
-  char parsed[100];
-  float RAW;
-  float TEMP;
-  int EC;
-  int address;
+  char measurement_data[20];
 
   ret = SDI12_GetMeasurment(addr, &measurment_info, measurement_data, timeoutMillis); // Read from the TEROS
   if (ret != HAL_OK){
     return ret;
   }
-  HAL_UART_Transmit(&huart1, (const uint8_t *) measurement_data, 18, 100);
-  sscanf(measurement_data, "%d+%f+%f+%d\r\n",&address, &RAW, &TEMP, &EC);
-  sprintf(parsed, "ADDR: %d RAW: %f TEMP:%f EC: %d\r\n",address, RAW, TEMP, EC);
-  HAL_UART_Transmit(&huart1, (const uint8_t *) parsed, 34, 24);
-//   char* token = strtok(measurement_data, "+");
-// // Skip the first token (index 0) since it doesn't contain a value
-// token = strtok(NULL, "+");
-// RAW= atof(token);
-
-// token = strtok(NULL, "+");
-// TEMP = atof(token);
-
-// token = strtok(NULL, "\r\n");
-// EC = atoi(token);
+  sscanf(measurement_data, "%d+%f+%f+%d\r\n",&(teros_readings->addr), &(teros_readings->vwc_raw), &(teros_readings->tmp), &(teros_readings->ec));
   
   //y=0.000000000512018x^3-0.000003854251138x^2+0.009950433111633x-8.508168835940560 calibration eqn
-  //ADJ = (0.000000000512018 * RAW * RAW * RAW) - (0.000003854251138 * RAW * RAW) + (0.009950433111633 * RAW) - 8.508168835940560;
-  teros_readings->vwc_raw = RAW;
-  teros_readings->temp = TEMP;
-  teros_readings->ec = (uint32_t) EC;
   return HAL_OK;
+}
+
+HAL_StatusTypeDef SDI12_ParseTeros12Measurement(const char *buffer, Teros12_Data *teros_readings)
+{
+    // Parse address
+    teros_readings->addr = buffer[0] - '0'; // Convert char to int
+
+    // Initialize variables
+    int i = 2;  // Start of vwc_raw is always at the third character in the string
+    char floatBuffer[20];  // Assuming a reasonable maximum length for the float representation
+
+    // Parse vwc_raw
+    while (buffer[i] != '+') {
+        floatBuffer[i - 2] = buffer[i];
+        i++;
+    }
+    floatBuffer[i - 2] = '\0';  // Null-terminate the substring
+    teros_readings->vwc_raw = (int)(strtof(floatBuffer, NULL) * 100);
+
+    // Reset floatBuffer
+    memset(floatBuffer, 0, sizeof(floatBuffer));
+
+    // Skip the '+'
+    i++;
+
+    // Parse tmp
+    int tmp = 0;
+    while (buffer[i] != '+') {
+        floatBuffer[i - 2] = buffer[i];
+        i++;
+    }
+    floatBuffer[i - 2] = '\0';  // Null-terminate the substring
+    teros_readings->tmp = (int)(strtof(floatBuffer, NULL) * 100);
+
+    // Reset floatBuffer
+    memset(floatBuffer, 0, sizeof(floatBuffer));
+
+    // Skip the '+'
+    i++;
+    // Parse ec
+    int ec = 0;
+    while (buffer[i] != '\0' && buffer[i] != '\r' && buffer[i] != '\n') {
+        ec = ec * 10 + (buffer[i] - '0');
+        i++;
+    }
+    teros_readings->ec = ec;
+    return HAL_OK;
 }
 
 HAL_StatusTypeDef SDI12_PingDevice(uint8_t deviceAddress, char *responseBuffer, uint16_t bufferSize, uint32_t timeoutMillis)

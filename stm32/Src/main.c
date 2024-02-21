@@ -149,12 +149,10 @@ int main(void)
 
   SDI12_Measure_TypeDef measurment_info;
   Teros12_Data teros_readings;
-  teros_readings.temp = 0.0;
-  teros_readings.vwc_raw = 0.0;
-  teros_readings.ec = 0;
   char data[20];
   int address;
   float RAW;
+  int i_raw;
   int TEMP;
   int EC;
 
@@ -169,29 +167,23 @@ int main(void)
   HAL_StatusTypeDef pingStatus;
   //pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
 
-  char test_string[] = "1826.9";
-  sscanf(test_string, "%f",&RAW);
-  int len = sprintf(adjusted, "RAW: %f\r\n", RAW);
-  HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, len, 100);
-  pingStatus = SDI12_GetMeasurment(deviceAddress, &measurment_info, data, timeoutMillis);
-  if (pingStatus == HAL_OK)
-  {
+  char test_string[] = "0+1826.82+21.2+1\r\n";
+  int len;
+
+  //HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, len, 100);
+  // pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
+  // if (pingStatus == HAL_OK)
+  // {
     
-    // Device is active
-    HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-    // sscanf(test_string, "%d+%f+%f+%d\r\n",&address, &RAW, &TEMP, &EC);
-    // sprintf(adjusted, "ADR: %d RAW: %f TMP: %f EC: %d\r\n", address, RAW, TEMP, EC);
-    // HAL_UART_Transmit(&huart1, (const uint8_t *) adjusted, 33, 40);
-    //for (int i = 0; data[i] <= 15; i++) {
-    //    sprintf(loop,"%c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16]);
-      //  HAL_UART_Transmit(&huart1, (const uint8_t *)loop, 51, 1000);
-   // }
-  }
-  else
-  {
-    // Device is not active or there was an error
-    HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
-  }
+  //   // Device is active
+  //   len = sprintf(adjusted, "%d  %f  %f  %d\r\n",teros_readings.addr, teros_readings.vwc_raw, teros_readings.tmp, teros_readings.ec);
+  //   HAL_UART_Transmit(&huart1, adjusted, len, 100);
+  // }
+  // else
+  // {
+  //   // Device is not active or there was an error
+  //   HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
+  // }
 
   while (1)
   {
@@ -206,13 +198,27 @@ int main(void)
   // {
   //   // Device is active
   //   HAL_UART_Transmit(&huart1, (const uint8_t *) data, 19, 40);
-  //   HAL_UART_Transmit(&huart1, (const uint8_t *)end, 6, 15);
   // }
   // else
   // {
   //   // Device is not active or there was an error
   //   HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
   // }
+
+  pingStatus = SDI12_GetTeros12Measurement(deviceAddress, &teros_readings, timeoutMillis);
+  if (pingStatus == HAL_OK)
+  {
+    
+    // Device is active
+    len = sprintf(adjusted, "%d  %f  %f  %d\r\n",teros_readings.addr, teros_readings.vwc_raw, teros_readings.tmp, teros_readings.ec);
+    HAL_UART_Transmit(&huart1, adjusted, len, 100);
+  }
+  else
+  {
+    // Device is not active or there was an error
+    HAL_UART_Transmit(&huart1, (const uint8_t *)measureF, 18, 15);
+  }
+
     HAL_Delay(5000);
   }
   /* USER CODE END 3 */

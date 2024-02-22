@@ -41,11 +41,11 @@ typedef struct _PowerMeasurement {
 /* Teros12 measurement message */
 typedef struct _Teros12Measurement {
     /* raw volumetric water content */
-    float vwc_raw;
+    double vwc_raw;
     /* calibrated volumetric water content */
-    float vwc_adj;
+    double vwc_adj;
     /* temperature in celcious */
-    float temp;
+    double temp;
     /* electrical conductivity */
     uint32_t ec;
 } Teros12Measurement;
@@ -127,9 +127,9 @@ X(a, STATIC,   SINGULAR, DOUBLE,   current,           3)
 #define PowerMeasurement_DEFAULT NULL
 
 #define Teros12Measurement_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, FLOAT,    vwc_raw,           2) \
-X(a, STATIC,   SINGULAR, FLOAT,    vwc_adj,           3) \
-X(a, STATIC,   SINGULAR, FLOAT,    temp,              4) \
+X(a, STATIC,   SINGULAR, DOUBLE,   vwc_raw,           2) \
+X(a, STATIC,   SINGULAR, DOUBLE,   vwc_adj,           3) \
+X(a, STATIC,   SINGULAR, DOUBLE,   temp,              4) \
 X(a, STATIC,   SINGULAR, UINT32,   ec,                5)
 #define Teros12Measurement_CALLBACK NULL
 #define Teros12Measurement_DEFAULT NULL
@@ -164,11 +164,11 @@ extern const pb_msgdesc_t Response_msg;
 
 /* Maximum encoded size of messages (where known) */
 #define MeasurementMetadata_size                 18
-#define Measurement_size                         43
+#define Measurement_size                         55
 #define PowerMeasurement_size                    18
 #define Response_size                            2
 #define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Measurement_size
-#define Teros12Measurement_size                  21
+#define Teros12Measurement_size                  33
 
 #ifdef __cplusplus
 } /* extern "C" */

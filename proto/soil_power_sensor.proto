@@ -35,11 +35,11 @@ message PowerMeasurement {
 /* Teros12 measurement message */
 message Teros12Measurement {
   // raw volumetric water content
-  float vwc_raw = 2;
+  double vwc_raw = 2;
   // calibrated volumetric water content
-  float vwc_adj = 3;
+  double vwc_adj = 3;
   // temperature in celcious
-  float temp = 4;
+  double temp = 4;
   // electrical conductivity
   uint32 ec = 5;
 }

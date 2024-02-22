@@ -11,11 +11,10 @@ The `soil_power_sensor_protobuf` package needs to be installed first.
 ```
 """
 
-import pdb
 
-from datetime import datetime
-
-from soil_power_sensor_protobuf.soil_power_sensor_pb2 import Measurement, Response
+from soil_power_sensor_protobuf import (encode_response,
+                                        encode_power_measurement,
+                                        encode_teros12_measurement)
 
 
 def print_bytes_c(data : bytes) -> str:
@@ -34,66 +33,24 @@ def print_bytes_c(data : bytes) -> str:
     print(f'size_t data_len = {len(hex_str)};')
 
 
-def generate_power() -> bytes:
-    meas = Measurement()
-
-    # meta
-    meas.meta.cell_id = 4
-    meas.meta.logger_id = 7
-    meas.meta.ts.seconds = 1436079600
-    meas.meta.ts.nanos = 0
-
-    # power
-    meas.power.voltage = 37.13
-    meas.power.current = 185.29
-
-    # return serialized data
-    return meas.SerializeToString()
-
-
-def generate_teros12() -> bytes:
-    meas = Measurement()
-
-    # meta
-    meas.meta.cell_id = 4
-    meas.meta.logger_id = 7
-    meas.meta.ts.seconds = 1436079600
-    meas.meta.ts.nanos = 0
-
-    # teros12
-    meas.teros12.vwc_raw = 2124.62
-    meas.teros12.vwc_adj = 0.43
-    meas.teros12.temp = 24.8
-    meas.teros12.ec = 123
-
-    return meas.SerializeToString()
-
-
-def generate_response_success() -> bytes:
-    resp = Response()
-    resp.resp = Response.ResponseType.SUCCESS
-    return resp.SerializeToString()
-
-
-def generate_response_error() -> bytes:
-    resp = Response()
-    resp.resp = Response.ResponseType.ERROR
-    return resp.SerializeToString()
-
-
 if __name__ == "__main__":
     print("Power Bytes:")
-    print_bytes_c(generate_power())
+    meas_power = encode_power_measurement(1436079600, 4, 7, 37.13, 185.29)
+    print_bytes_c(meas_power)
     print()
 
     print("Teros12 Bytes")
-    print_bytes_c(generate_teros12())
+    meas_teros12 = encode_teros12_measurement(1436079600, 4, 7, 2124.62, 0.43,
+                                              24.8, 123)
+    print_bytes_c(meas_teros12)
     print()
 
     print("Response Success Bytes")
-    print_bytes_c(generate_response_success())
+    resp_success = encode_response(True)
+    print_bytes_c(resp_success)
     print()
 
     print("Response Error Bytes")
-    print_bytes_c(generate_response_error())
+    resp_fail = encode_response(False)
+    print_bytes_c(resp_fail)
     print()

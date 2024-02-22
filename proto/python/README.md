@@ -41,8 +41,14 @@ meas_dict = {
   "loggerId": ...,
   "cellId": ...,
   "ts": ...,
-  "power": ...,
-  "current": ...
+  "data": {
+    "voltage": ...,
+    "current": ...
+  },
+  "data_type": {
+    "voltage": float,
+    "voltage": float
+  }
 }
 ```
 
@@ -53,10 +59,18 @@ meas_dict = {
   "loggerId": ...,
   "cellId": ...,
   "ts": ...,
-  "vwcRaw": ...,
-  "vwcAdj": ...,
-  "temp": ...,
-  "ec": ...
+  "data": {
+    "vwcRaw": ...,
+    "vwcAdj": ...,
+    "temp": ...,
+    "ec": ...
+  },
+  "data_type": {
+    "vwcRaw": float,
+    "vwcAdj": float,
+    "temp": float,
+    "ec": int
+  }
 }
 ```
 

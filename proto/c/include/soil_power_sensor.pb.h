@@ -4,7 +4,6 @@
 #ifndef PB_SOIL_POWER_SENSOR_PB_H_INCLUDED
 #define PB_SOIL_POWER_SENSOR_PB_H_INCLUDED
 #include <pb.h>
-#include "timestamp.pb.h"
 
 #if PB_PROTO_HEADER_VERSION != 40
 #error Regenerate this file with the current version of nanopb generator.
@@ -27,8 +26,7 @@ typedef struct _MeasurementMetadata {
     /* id of the logging device */
     uint32_t logger_id;
     /* timestamp of the measurement */
-    bool has_ts;
-    google_protobuf_Timestamp ts;
+    uint32_t ts;
 } MeasurementMetadata;
 
 /* Power measurement message. Voltage and current can be digitially combined to
@@ -88,12 +86,12 @@ extern "C" {
 
 
 /* Initializer values for message structs */
-#define MeasurementMetadata_init_default         {0, 0, false, google_protobuf_Timestamp_init_default}
+#define MeasurementMetadata_init_default         {0, 0, 0}
 #define PowerMeasurement_init_default            {0, 0}
 #define Teros12Measurement_init_default          {0, 0, 0, 0}
 #define Measurement_init_default                 {false, MeasurementMetadata_init_default, 0, {PowerMeasurement_init_default}}
 #define Response_init_default                    {_Response_ResponseType_MIN}
-#define MeasurementMetadata_init_zero            {0, 0, false, google_protobuf_Timestamp_init_zero}
+#define MeasurementMetadata_init_zero            {0, 0, 0}
 #define PowerMeasurement_init_zero               {0, 0}
 #define Teros12Measurement_init_zero             {0, 0, 0, 0}
 #define Measurement_init_zero                    {false, MeasurementMetadata_init_zero, 0, {PowerMeasurement_init_zero}}
@@ -118,10 +116,9 @@ extern "C" {
 #define MeasurementMetadata_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UINT32,   cell_id,           1) \
 X(a, STATIC,   SINGULAR, UINT32,   logger_id,         2) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  ts,                3)
+X(a, STATIC,   SINGULAR, UINT32,   ts,                3)
 #define MeasurementMetadata_CALLBACK NULL
 #define MeasurementMetadata_DEFAULT NULL
-#define MeasurementMetadata_ts_MSGTYPE google_protobuf_Timestamp
 
 #define PowerMeasurement_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, DOUBLE,   voltage,           2) \
@@ -166,8 +163,8 @@ extern const pb_msgdesc_t Response_msg;
 #define Response_fields &Response_msg
 
 /* Maximum encoded size of messages (where known) */
-#define MeasurementMetadata_size                 36
-#define Measurement_size                         61
+#define MeasurementMetadata_size                 18
+#define Measurement_size                         43
 #define PowerMeasurement_size                    18
 #define Response_size                            2
 #define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Measurement_size

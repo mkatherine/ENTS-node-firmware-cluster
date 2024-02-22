@@ -295,7 +295,9 @@ static UTIL_TIMER_Object_t StopJoinTimer;
 /**
   * @brief User application buffer
   */
-static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
+//static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
+static uint8_t AppDataBuffer[512];
+
 
 /**
   * @brief User application data structure
@@ -439,8 +441,9 @@ static void SendTxData(void)
       APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
     }
 
-    AppData.BufferSize = EncodePowerMeasurement(1436079600, 7, 4, 37.13, 185.29, AppData.Buffer);
-    //AppData.BufferSize = EncodeTeros12Measurement(1436079600, 2, 5, 20.5, 10.2, 9.8, 2, AppData.Buffer);
+    //AppData.BufferSize = EncodePowerMeasurement(1436079600, 7, 4, 37.13, 185.29, AppData.Buffer);
+    AppData.BufferSize = EncodeTeros12Measurement(1436079600, 2, 5, 20.5, 10.2,
+                                                  9.8, 2, AppData.Buffer);
   
     APP_LOG(TS_ON, VLEVEL_M, "Payload: ")
     for (int i = 0; i < AppData.BufferSize; i++){

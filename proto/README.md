@@ -10,6 +10,32 @@ The generation of necessary source files is handled with the `Makefile`. The `na
 make
 ```
 
+## Example messages
+
+In `examples/` there are example binary files for each measurement type
+
+*PowerMeasurement* (`examples/meas_power.bin`)
+
+| field | value |
+| --- | --- |
+| ts | 1436079600 |
+| logger_id | 7 |
+| cell_id | 4 |
+| voltage | 2400.0 |
+| current | 100.0 |
+
+*Teros12Measurement* (`examples/meas_teros.bin`)
+
+| field | value |
+| --- | --- |
+| ts | 1436079600 |
+| logger_id | 0 |
+| cell_id | 0 |
+| vwc_raw | 1832.43 |
+| vwc_adj | 34.4 |
+| temp | 24.2 |
+| ec | 2 | 
+
 ## Decoding a message using the CLI
 
 On linux you are able to decode a payload directly from The Things Network by using the `protoc` binary. Replace the hex at the start of your command with the payload.

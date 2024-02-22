@@ -87,7 +87,7 @@ void SDI12_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 void SDI12_WakeSensors(void)
 {
   SendContinousHigh(sdi12.Port, sdi12.Pin, 20); // Set the data line low
-  HAL_Delay(9); // Marking after break, see SDi-12 guide
+  HAL_Delay(10); // Marking after break, see SDi-12 guide
 }
 
 void SDI12_SendCommand(const char *command, uint8_t size)

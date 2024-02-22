@@ -89,7 +89,10 @@ typedef enum TxEventType_e
 #define LORAWAN_NVM_BASE_ADDRESS                    ((void *)0x0803F000UL)
 
 /* USER CODE BEGIN PD */
+bool transmission_cycle = false;
 
+#define LOGGER_ID 20 // Will be user configurable later
+#define CELL_ID 20
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -295,9 +298,7 @@ static UTIL_TIMER_Object_t StopJoinTimer;
 /**
   * @brief User application buffer
   */
-//static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
-static uint8_t AppDataBuffer[512];
-
+static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
 
 /**
   * @brief User application data structure
@@ -423,29 +424,33 @@ static void SendTxData(void)
   Teros12_Data teros_measurments;
   HAL_StatusTypeDef ret;
   uint8_t teros_addr = '0';
+  uint8_t cell_id = CELL_ID;
+  uint8_t logger_id = LOGGER_ID;
 
   if (LmHandlerIsBusy() == false)
   {
     battery_level = GetBatteryLevel();
     temperature = SYS_GetTemperatureLevel();
 
-    //int adc_voltage = ADC_readVoltage();
-    SDI12_Measure_TypeDef measurment_info;
-    char data[25];
-    ret = SDI12_GetMeasurment(teros_addr, &measurment_info, data, 10000);
-    if (ret == HAL_OK){
-      APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");
-    } else if (ret == HAL_ERROR){
-      APP_LOG(TS_OFF, VLEVEL_M, "HAL_ERROR\r\n");
-    } else if (ret == HAL_TIMEOUT) {
-      APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
+    if (transmission_cycle == false) { // alternate betwen power and soil moisture sensor
+      int adc_voltage = ADC_readVoltage();
+      AppData.BufferSize = EncodePowerMeasurement(1436079600, LOGGER_ID, CELL_ID, (double) adc_voltage, 0.0, AppData.Buffer);
+    } else {
+      SDI12_Measure_TypeDef measurment_info;
+      char data[25];
+      ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurments, 10000);
+      if (ret == HAL_OK){
+        APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");
+      } else if (ret == HAL_ERROR){
+        APP_LOG(TS_OFF, VLEVEL_M, "HAL_ERROR\r\n");
+      } else if (ret == HAL_TIMEOUT) {
+        APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
+      }
+      AppData.BufferSize = EncodeTeros12Measurement(1436079600, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, 0.0, (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
     }
-
-    //AppData.BufferSize = EncodePowerMeasurement(1436079600, 7, 4, 37.13, 185.29, AppData.Buffer);
-    AppData.BufferSize = EncodeTeros12Measurement(1436079600, 2, 5, 20.5, 10.2,
-                                                  9.8, 2, AppData.Buffer);
+    transmission_cycle = !transmission_cycle;
   
-    APP_LOG(TS_ON, VLEVEL_M, "Payload: ")
+    APP_LOG(TS_ON, VLEVEL_M, "Payload: ");
     for (int i = 0; i < AppData.BufferSize; i++){
       APP_LOG(TS_OFF, VLEVEL_M, "%x ", AppData.Buffer[i]);
     }

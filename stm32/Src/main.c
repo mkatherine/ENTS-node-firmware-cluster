@@ -31,6 +31,7 @@
 
 #include "sys_app.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "ads.h"
 #include "sdi12.h"
@@ -46,6 +47,7 @@
 
 #define FM24_WRITE 0xA0 // Device address of FM24 in write mode
 #define FM24_READ 0xA1  // Device address of FM24 in read mode
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

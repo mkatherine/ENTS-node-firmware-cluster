@@ -37,7 +37,7 @@
 
 
 /* USER CODE BEGIN Includes */
-
+#include "sdi12.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -418,15 +418,29 @@ static void SendTxData(void)
 
   uint8_t battery_level;
   uint16_t temperature;
+  Teros12_Data teros_measurments;
+  HAL_StatusTypeDef ret;
+  uint8_t teros_addr = '0';
 
   if (LmHandlerIsBusy() == false)
   {
     battery_level = GetBatteryLevel();
     temperature = SYS_GetTemperatureLevel();
 
-    int adc_voltage = ADC_readVoltage();
+    //int adc_voltage = ADC_readVoltage();
+    SDI12_Measure_TypeDef measurment_info;
+    char data[25];
+    ret = SDI12_GetMeasurment(teros_addr, &measurment_info, data, 10000);
+    if (ret == HAL_OK){
+      APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");
+    } else if (ret == HAL_ERROR){
+      APP_LOG(TS_OFF, VLEVEL_M, "HAL_ERROR\r\n");
+    } else if (ret == HAL_TIMEOUT) {
+      APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
+    }
 
     AppData.BufferSize = EncodePowerMeasurement(1436079600, 7, 4, 37.13, 185.29, AppData.Buffer);
+    //AppData.BufferSize = EncodeTeros12Measurement(1436079600, 2, 5, 20.5, 10.2, 9.8, 2, AppData.Buffer);
   
     APP_LOG(TS_ON, VLEVEL_M, "Payload: ")
     for (int i = 0; i < AppData.BufferSize; i++){

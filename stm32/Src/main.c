@@ -33,6 +33,7 @@
 #include <stdlib.h>
 
 #include "ads.h"
+#include "sdi12.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -104,6 +105,7 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
+  SDI12_Init(GPIOA, GPIO_PIN_2);
 
   // Debug message, gets printed after init code
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);

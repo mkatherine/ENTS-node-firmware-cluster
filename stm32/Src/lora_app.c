@@ -35,7 +35,6 @@
 #include "sys_sensors.h"
 #include "flash_if.h"
 
-
 /* USER CODE BEGIN Includes */
 #include "sdi12.h"
 /* USER CODE END Includes */

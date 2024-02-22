@@ -45,7 +45,6 @@ HAL_StatusTypeDef push(const uint8_t *data, uint8_t num_bytes){
  }
 
 HAL_StatusTypeDef pop(uint8_t *data, uint8_t num_bytes) {
-    const char * success = "FRAM responded\n";
     HAL_StatusTypeDef status = HAL_OK;
     uint8_t byte;
     for (int i = 0; i < num_bytes; i++){ 

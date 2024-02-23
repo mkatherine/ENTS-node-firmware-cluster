@@ -50,13 +50,14 @@ def decode_measurement(data: bytes) -> dict:
     # convert meta into dict
     if not meas.HasField("meta"):
         raise KeyError("Measurement missing metadata")
-    meta_dict = MessageToDict(meas.meta)
+    meta_dict = MessageToDict(meas.meta, including_default_value_fields=True)
     
     # decode measurement
     if not meas.HasField("measurement"):
         raise KeyError("Measurement missing data")
     measurement_type = meas.WhichOneof("measurement")
-    measurement_dict = MessageToDict(getattr(meas, measurement_type))
+    measurement_dict = MessageToDict(getattr(meas, measurement_type),
+                                     including_default_value_fields=True)
    
     # store measurement type
     meta_dict["type"] = measurement_type

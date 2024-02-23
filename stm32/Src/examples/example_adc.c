@@ -137,9 +137,9 @@ int main(void)
     reading_len = sprintf(output, "Voltage: %d\r\n\r\n", reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
     
-    reading = ADC_readCurrent();
-    reading_len = sprintf(output, "Current: %d\r\n\r\n", reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+    //reading = ADC_readCurrent();
+    //reading_len = sprintf(output, "Current: %d\r\n\r\n", reading);
+    //HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
 
     HAL_Delay(1000);
   }

@@ -92,9 +92,9 @@ typedef enum TxEventType_e
 
 /* USER CODE BEGIN PD */
 bool transmission_cycle = false;
-uint8_t fake_min = 14;
+uint8_t fake_min = 19;
 uint8_t fake_second = 0;
-uint8_t fake_hour = 17;
+uint8_t fake_hour = 11;
 
 Teros12_Data teros_backup;
 
@@ -487,7 +487,7 @@ static void SendTxData(void)
         APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
         teros_measurments = teros_backup;
       }
-      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, 0.0, (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
+      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, (double) teros_measurments.vwc_adj, (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
     }
     transmission_cycle = !transmission_cycle;
   

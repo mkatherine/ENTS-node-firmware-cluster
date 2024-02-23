@@ -11,6 +11,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "ads.h"
+#include "usart.h"
 
 int HAL_status(HAL_StatusTypeDef ret) {
   int status;
@@ -90,23 +91,30 @@ int ADC_readVoltage(void){
     int16_t reading;
     HAL_StatusTypeDef ret;
     uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
+    char hal_fail[] = "hal failed\r\n";
+    char raw[100];
 
-    ret = configurADS(ADS12_CONFIGURE_READ_VOLTAGE); //Set the control register to read voltage mode, leaving everything at default except for the VREF, which will be set to external reference mode
-    if (ret != HAL_OK){
-      return ret;
-    }
+    // ret = configurADS(ADS12_CONFIGURE_READ_VOLTAGE); //Set the control register to read voltage mode, leaving everything at default except for the VREF, which will be set to external reference mode
+    // if (ret != HAL_OK){
+    //   HAL_UART_Transmit(&huart1, hal_fail, 13, 100);
+    //   return ret;
+    // }
     
     while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
     code = ADS12_READ_DATA_CODE;
     ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
     if (ret != HAL_OK){
+      HAL_UART_Transmit(&huart1, hal_fail, 13, 100);
       return ret;
     }
 
     ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
     if (ret != HAL_OK){// Recieve the ADS data from
+      HAL_UART_Transmit(&huart1, hal_fail, 13, 100);
       return ret;
     }
+    int len = sprintf(raw, "%x %x %x\r\n", rx_data[0], rx_data[1], rx_data[2]);
+    HAL_UART_Transmit(&huart1, raw, len, 100);
     
     //reading = ((int)rx_data[0] << 16) | ((int)rx_data[1] << 8) | (int)rx_data[0]; // Use this line if you want to keep the last byte
     reading = ((int)rx_data[0] << 8) | (int)rx_data[1]; // Chop the last byte, as it seems to be mostly noise

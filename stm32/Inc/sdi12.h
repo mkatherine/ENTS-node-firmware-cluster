@@ -53,6 +53,7 @@ extern "C"
   {
     int ec;
     float vwc_raw;
+    float vwc_adj;
     float tmp;
     int addr;
   } Teros12_Data;

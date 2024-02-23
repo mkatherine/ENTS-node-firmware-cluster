@@ -232,6 +232,9 @@ HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_
   sscanf(measurement_data, "%d+%f+%f+%d\r\n",&(teros_readings->addr), &(teros_readings->vwc_raw), &(teros_readings->tmp), &(teros_readings->ec));
   
   //y=0.000000000512018x^3-0.000003854251138x^2+0.009950433111633x-8.508168835940560 calibration eqn
+  teros_readings->vwc_adj = (0.000000000512018 * teros_readings->vwc_raw * teros_readings->vwc_raw * teros_readings->vwc_raw) -
+                            (0.000003854251138 * teros_readings->vwc_raw * teros_readings->vwc_raw) +
+                            (0.009950433111633 * teros_readings->vwc_raw) - 8.508168835940560;
   return HAL_OK;
 }
 

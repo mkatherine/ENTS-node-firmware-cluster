@@ -21,7 +21,7 @@
 #include "adc.h"
 #include "dma.h"
 #include "i2c.h"
-#include "app_lorawan.h"
+//#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -29,7 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 
-#include "sys_app.h"
+//#include "sys_app.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -104,24 +104,45 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_LoRaWAN_Init();
+  //MX_LoRaWAN_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
-  SDI12_Init(GPIOA, GPIO_PIN_2);
-  MX_RTC_Init();
+  //SDI12_Init(GPIOA, GPIO_PIN_2);
+  //MX_RTC_Init();
 
   // Debug message, gets printed after init code
-  APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
+  //APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int current;
+  int voltage;
+  char cur_string[24];
+  int len;
+  char response[] = "ADS responded\r\n";
+  char no_response[] = "ADS did not respond\r\n";
+  if (ADC_probe() == HAL_OK){
+    HAL_UART_Transmit(&huart1, response, 16, 100);
+  } else {
+    HAL_UART_Transmit(&huart1, no_response, 22, 100);
+  }
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_LoRaWAN_Process();
+    //MX_LoRaWAN_Process();
+    //current = ADC_readCurrent();
+    current = -1;
+    voltage = ADC_readVoltage();
+    len = sprintf(cur_string, "curr %d v %d\r\n", current, voltage);
+    HAL_UART_Transmit(&huart1, cur_string, len, 100);
+    int i = 0;
+    while (i < 10000000){
+      i++;
+      __asm__("nop");  // This is a no-operation instruction
+    }
 
     /* USER CODE BEGIN 3 */
   }

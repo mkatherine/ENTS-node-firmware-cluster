@@ -66,6 +66,8 @@ void Error_Handler(void);
 #define VCC_GPIO_Port GPIOB
 #define RF_CTRL2_Pin GPIO_PIN_5
 #define RF_CTRL2_GPIO_Port GPIOC
+#define POWERDOWN_Pin GPIO_PIN_9
+#define POWERDOWN_GPIO_Port GPIOA
 #define RF_CTRL1_Pin GPIO_PIN_4
 #define RF_CTRL1_GPIO_Port GPIOC
 #define ADC_DRDY_Pin GPIO_PIN_3

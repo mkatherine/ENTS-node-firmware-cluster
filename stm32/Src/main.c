@@ -21,7 +21,7 @@
 #include "adc.h"
 #include "dma.h"
 #include "i2c.h"
-//#include "app_lorawan.h"
+#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -104,7 +104,7 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  //MX_LoRaWAN_Init();
+  MX_LoRaWAN_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
@@ -132,7 +132,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    //MX_LoRaWAN_Process();
+    MX_LoRaWAN_Process();
+
+    /* USER CODE BEGIN 3 */
     //current = ADC_readCurrent();
     current = -1;
     voltage = ADC_readVoltage();
@@ -143,8 +145,6 @@ int main(void)
       i++;
       __asm__("nop");  // This is a no-operation instruction
     }
-
-    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }

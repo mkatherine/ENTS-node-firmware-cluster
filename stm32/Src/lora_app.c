@@ -37,6 +37,9 @@
 
 /* USER CODE BEGIN Includes */
 #include "sdi12.h"
+#include "rtc.h"
+
+#include <time.h>
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -89,6 +92,11 @@ typedef enum TxEventType_e
 
 /* USER CODE BEGIN PD */
 bool transmission_cycle = false;
+uint8_t fake_min = 14;
+uint8_t fake_second = 0;
+uint8_t fake_hour = 17;
+
+Teros12_Data teros_backup;
 
 #define LOGGER_ID 20 // Will be user configurable later
 #define CELL_ID 20
@@ -431,21 +439,55 @@ static void SendTxData(void)
     battery_level = GetBatteryLevel();
     temperature = SYS_GetTemperatureLevel();
 
+    RTC_TimeTypeDef sTime;
+    RTC_DateTypeDef sDate;
+    //ret = HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+    // ret = HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+
+    fake_second = fake_second + 10;
+    if (fake_second >= 60){
+      fake_min = fake_min + 1;
+      fake_second = 0;
+    }
+    if (fake_min >= 60) {
+      fake_hour = fake_hour +1;
+      fake_min = 0;
+    }
+
+    struct tm timeInfo = {
+        .tm_year = 124,  // 2021 (since 1900)
+        .tm_mon = 1,    // January (0-based)
+        .tm_mday = 22,
+        .tm_hour = fake_hour,
+        .tm_min = fake_min,
+        .tm_sec = fake_second,
+    };
+    
+    APP_LOG(TS_OFF, VLEVEL_M, "Time: %02d:%02d:%02d\r\n", timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
+    // APP_LOG(TS_OFF, VLEVEL_M, "Date: %02d-%02d-%04d\r\n", sDate.Date, sDate.Month, sDate.Year + 2000);
+
+    time_t unixTimestamp = mktime(&timeInfo);
+
     if (transmission_cycle == false) { // alternate betwen power and soil moisture sensor
       int adc_voltage = ADC_readVoltage();
-      AppData.BufferSize = EncodePowerMeasurement(1436079600, LOGGER_ID, CELL_ID, (double) adc_voltage, 0.0, AppData.Buffer);
+      AppData.BufferSize = EncodePowerMeasurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) adc_voltage, 0.0, AppData.Buffer);
     } else {
-      SDI12_Measure_TypeDef measurment_info;
-      char data[25];
-      ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurments, 10000);
+      // SDI12_Measure_TypeDef measurment_info;
+      // char data[25];
+      //ret = SDI12_GetMeasurment(teros_addr, &measurment_info, data, 1000);
+      ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurments, 1000);
+      
       if (ret == HAL_OK){
         APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");
+        teros_backup = teros_measurments;
       } else if (ret == HAL_ERROR){
         APP_LOG(TS_OFF, VLEVEL_M, "HAL_ERROR\r\n");
+        teros_measurments = teros_backup;
       } else if (ret == HAL_TIMEOUT) {
         APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
+        teros_measurments = teros_backup;
       }
-      AppData.BufferSize = EncodeTeros12Measurement(1436079600, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, 0.0, (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
+      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, 0.0, (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
     }
     transmission_cycle = !transmission_cycle;
   

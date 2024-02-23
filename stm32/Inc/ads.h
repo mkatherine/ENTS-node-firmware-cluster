@@ -34,8 +34,8 @@
 
 #define TWO_POW_TWENTYTHREE 8388608 // Eqn 5 in ADS1219 datasheet
 
-#define VOLTAGE_SLOPE -0.072 // Change this to the slope output from the linear_regression.py file
-#define VOLTAGE_B 0 // Change this to the b output from the linear_regression.py file
+#define VOLTAGE_SLOPE -0.102 // Change this to the slope output from the linear_regression.py file
+#define VOLTAGE_B 6648 // Change this to the b output from the linear_regression.py file
 
 #define CURRENT_SLOPE 0
 #define CURRENT_B 0

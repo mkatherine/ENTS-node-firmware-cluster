@@ -480,6 +480,15 @@ static void SendTxData(void)
       // char data[25];
       //ret = SDI12_GetMeasurment(teros_addr, &measurment_info, data, 1000);
       ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurments, 1000);
+      if (ret != HAL_OK){
+        simpleDelay();
+        simpleDelay();
+        simpleDelay();
+        ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurments, 1000);
+      }
+      if (teros_measurments.vwc_adj < 0){
+        teros_measurments = teros_backup;
+      }
       
       if (ret == HAL_OK){
         APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");

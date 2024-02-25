@@ -98,8 +98,8 @@ uint8_t fake_hour = 11;
 
 Teros12_Data teros_backup;
 
-#define LOGGER_ID 20 // Will be user configurable later
-#define CELL_ID 20
+#define LOGGER_ID 200 // Will be user configurable later
+#define CELL_ID 200
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -470,7 +470,11 @@ static void SendTxData(void)
 
     if (transmission_cycle == false) { // alternate betwen power and soil moisture sensor
       int adc_voltage = ADC_readVoltage();
-      AppData.BufferSize = EncodePowerMeasurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) adc_voltage, 0.0, AppData.Buffer);
+      double adc_voltage_float = ((double) adc_voltage) / 1000.;
+      AppData.BufferSize = EncodePowerMeasurement((uint32_t) unixTimestamp,
+                                                  LOGGER_ID, CELL_ID,
+                                                  adc_voltage_float, 0.0,
+                                                  AppData.Buffer);
     } else {
       // SDI12_Measure_TypeDef measurment_info;
       // char data[25];
@@ -487,7 +491,13 @@ static void SendTxData(void)
         APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
         teros_measurments = teros_backup;
       }
-      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, (double) teros_measurments.vwc_adj, (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
+      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp,
+                                                    LOGGER_ID, CELL_ID,
+                                                    (double) teros_measurments.vwc_raw,
+                                                    (double) teros_measurments.vwc_adj,
+                                                    (double) teros_measurments.tmp,
+                                                    teros_measurments.ec,
+                                                    AppData.Buffer);
     }
     transmission_cycle = !transmission_cycle;
   

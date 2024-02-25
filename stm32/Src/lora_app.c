@@ -463,7 +463,7 @@ static void SendTxData(void)
         .tm_sec = fake_second,
     };
     
-    APP_LOG(TS_OFF, VLEVEL_M, "Time: %02d:%02d:%02d\r\n", timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
+    //APP_LOG(TS_OFF, VLEVEL_M, "Time: %02d:%02d:%02d\r\n", timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
     // APP_LOG(TS_OFF, VLEVEL_M, "Date: %02d-%02d-%04d\r\n", sDate.Date, sDate.Month, sDate.Year + 2000);
 
     time_t unixTimestamp = mktime(&timeInfo);
@@ -487,7 +487,7 @@ static void SendTxData(void)
         APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
         teros_measurments = teros_backup;
       }
-      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, (double) teros_measurments.vwc_adj, (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
+      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp, LOGGER_ID, CELL_ID, (double) teros_measurments.vwc_raw, (double) (teros_measurments.vwc_adj * 100), (double) teros_measurments.tmp, teros_measurments.ec, AppData.Buffer);
     }
     transmission_cycle = !transmission_cycle;
   

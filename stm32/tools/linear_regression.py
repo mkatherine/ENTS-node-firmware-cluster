@@ -11,10 +11,10 @@
 # You will have to repeat this process to get the current regrssion
 
 # Change the #define SLOPE and B in ads.h to match what linear_regression.py outputs as SLOPE and B
-x1 = -16715
-y1 = 1200
-x2 = 16711
-y2 = -1200
+x1 = 61599
+y1 = 390
+x2 = 55623
+y2 = 990
 
 slope = (y2 -y1) / (x2- x1)
 

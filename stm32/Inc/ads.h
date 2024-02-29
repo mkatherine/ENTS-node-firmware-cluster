@@ -57,6 +57,8 @@
 */
 HAL_StatusTypeDef ADC_init(void);
 
+HAL_StatusTypeDef ADC_configure(uint8_t reg_data);
+
 /**
 ******************************************************************************
 * @brief    This function reads the current ADC voltage value.

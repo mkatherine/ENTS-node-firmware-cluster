@@ -108,7 +108,7 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   ADC_init();
-  TIMER_IF_Init();
+  //TIMER_IF_Init();
 
   char output[20];
   // if(probeADS12() != HAL_OK){
@@ -117,7 +117,7 @@ int main(void)
   //   HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
   // };
 
-  int reading;
+  double reading;
   size_t reading_len;
   // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
   // HAL_UART_Transmit(&huart1, output, 17, 19);
@@ -134,14 +134,17 @@ int main(void)
 
 
     reading = ADC_readVoltage();
-    reading_len = sprintf(output, "Voltage: %d\r\n\r\n", reading);
+    reading_len = sprintf(output, "Voltage: %f\r\n\r\n", reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
     
     //reading = ADC_readCurrent();
     //reading_len = sprintf(output, "Current: %d\r\n\r\n", reading);
     //HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
 
-    HAL_Delay(1000);
+    //HAL_Delay(100); I guess HAL_Delay is broken somehow, don't understand why
+    for (int i = 0; i < 1000000; i++){
+      asm("nop");
+    }
   }
   /* USER CODE END 3 */
 }

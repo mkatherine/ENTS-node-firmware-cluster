@@ -65,10 +65,10 @@ HAL_StatusTypeDef ADC_init(void);
 *           I2C the I2C communication protocol. This version simply chops the noisy bits.
 *           
 * @param    void
-* @return   int, current ADC reading in microvolts
+* @return   double, current ADC reading in microvolts
 ******************************************************************************
 */
-int ADC_readVoltage(void);
+double ADC_readVoltage(void);
 
 /**
 ******************************************************************************
@@ -78,10 +78,10 @@ int ADC_readVoltage(void);
 *           I2C the I2C communication protocol. This version simply chops the noisy bits.
 *           
 * @param    void
-* @return   int, current ADC reading in microamps
+* @return   double, current ADC reading in microamps
 ******************************************************************************
 */
-int ADC_readCurrent(void);
+double ADC_readCurrent(void);
 
 /**
 ******************************************************************************

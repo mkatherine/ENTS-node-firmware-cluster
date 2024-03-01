@@ -63,9 +63,18 @@ HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
   uint8_t code = ADS12_RESET_CODE;
   uint8_t register_data[2] = {0x40, reg_data};
   HAL_StatusTypeDef ret;
+  uint8_t recx_reg;
+  char reg_string[40];
 
   // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
+  //ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+  
+  code = ADS12_START_CODE;
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
+  for (int i = 0; i < 1000; i++){
+      asm("nop");
+    }
   return ret;
 }
 
@@ -80,15 +89,10 @@ double ADC_readVoltage(void){
   while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
-  if (ret != HAL_OK){
-    return reading;
-  }
   ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
-  if (ret != HAL_OK){// Recieve the ADS data from
-    return reading;
-  }
 
-  reading = (int)((rx_data[0] << 16) | (rx_data[1] << 8) | (rx_data[2])); // Chop the last byte, as it seems to be mostly noise
+  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); // Chop the last byte, as it seems to be mostly noise
+  reading = (double) temp;
 
   // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
   // You will have to use these lines to get the raw x values to plug into the linear_regression.py file
@@ -96,7 +100,33 @@ double ADC_readVoltage(void){
   sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
   HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
 
-  reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
+  //reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
+  return reading;
+}
+
+double ADC_readCurrent(void){
+  uint8_t code;
+  double reading;
+  HAL_StatusTypeDef ret;
+  uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
+
+  //ret = ADC_configure(0x23);
+    
+  while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
+  code = ADS12_READ_DATA_CODE;
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
+  ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
+
+  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); // Chop the last byte, as it seems to be mostly noise
+  reading = (double) temp;
+
+  // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
+  // You will have to use these lines to get the raw x values to plug into the linear_regression.py file
+  // char raw[45];
+  // sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
+  // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
+
+  //reading =  (CURRENT_SLOPE * reading) + CURRENT_B; // Calculated from linear regression
   return reading;
 }
 
@@ -104,13 +134,4 @@ HAL_StatusTypeDef probeADS12(void){
   HAL_StatusTypeDef ret;
   ret = HAL_I2C_IsDeviceReady(&hi2c2, ADS12_WRITE, 10, 20);
   return ret;
-}
-
-int ADC_filter(int readings[], int size){
-  int filtered_reading = 0;
-  for(int i = 0; i < size; i++){
-    filtered_reading = filtered_reading + readings[i];
-  }
-  filtered_reading = filtered_reading / size;
-  return filtered_reading;
 }

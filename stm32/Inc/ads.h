@@ -95,17 +95,4 @@ double ADC_readCurrent(void);
 */
 HAL_StatusTypeDef ADC_probe(void);
 
-/**
-******************************************************************************
-* @brief    This function filters ADC
-*           
-* @param    int num[]
-* @param    int size
-* @return   int filtered_reading
-******************************************************************************
-*/
-int ADC_filter(int readings[], int size);
-
-
-
 /* USER CODE END 1 */

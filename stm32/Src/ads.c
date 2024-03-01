@@ -27,15 +27,8 @@ int HAL_status(HAL_StatusTypeDef ret) {
 }
 
 HAL_StatusTypeDef ADC_init(void){
-  HAL_StatusTypeDef ret;
-  ret = ADC_configure(0x03);
-  return ret;
-}
-
-
-HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
   uint8_t code = ADS12_RESET_CODE;
-  uint8_t register_data[2] = {0x40, reg_data};
+  uint8_t register_data[2] = {0x40, 0x03};
   HAL_StatusTypeDef ret;
 
   // Control register breakdown.
@@ -66,6 +59,15 @@ HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
   return ret;
 }
 
+HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
+  uint8_t code = ADS12_RESET_CODE;
+  uint8_t register_data[2] = {0x40, reg_data};
+  HAL_StatusTypeDef ret;
+
+  // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+  return ret;
+}
 
 double ADC_readVoltage(void){
   uint8_t code;
@@ -73,25 +75,26 @@ double ADC_readVoltage(void){
   HAL_StatusTypeDef ret;
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
 
+  ret = ADC_configure(0x03);
     
   while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
   if (ret != HAL_OK){
-    return ret;
+    return reading;
   }
   ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
   if (ret != HAL_OK){// Recieve the ADS data from
-    return ret;
+    return reading;
   }
 
   reading = (int)((rx_data[0] << 16) | (rx_data[1] << 8) | (rx_data[2])); // Chop the last byte, as it seems to be mostly noise
 
   // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
   // You will have to use these lines to get the raw x values to plug into the linear_regression.py file
-  // char raw[45];
-  // sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
-  // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
+  char raw[45];
+  sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
+  HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
 
   reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
   return reading;

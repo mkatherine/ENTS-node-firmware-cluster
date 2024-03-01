@@ -23,10 +23,6 @@ extern "C" {
 
 #include <string.h>
 
-#include "pb_encode.h"
-#include "pb_decode.h"
-
-#include "timestamp.pb.h"
 #include "soil_power_sensor.pb.h"
 
 /**
@@ -45,7 +41,7 @@ extern "C" {
  * @param buffer Buffer to store serialized measurement
  * @return Number of bytes in @p buffer
 */
-size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
+size_t EncodePowerMeasurement(uint32_t ts, uint32_t logger_id,
                               uint32_t cell_id, double voltage,
                               double current, uint8_t *buffer);
 
@@ -67,9 +63,10 @@ size_t EncodePowerMeasurement(int64_t ts, uint32_t logger_id,
  * @param buffer Buffer to store serialized measurement
  * @return Number of bytes in @p buffer
 */
-size_t EncodeTeros12Measurement(int64_t ts, uint32_t logger_id,
-                                uint32_t cell_id, float vwc_raw, float vwc_adj,
-                                float temp, uint32_t ec, uint8_t *buffer);
+size_t EncodeTeros12Measurement(uint32_t ts, uint32_t logger_id,
+                                uint32_t cell_id, double vwc_raw,
+                                double vwc_adj, double temp, uint32_t ec,
+                                uint8_t *buffer);
 
 /**
  * @brief Decodes a response message

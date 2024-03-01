@@ -30,6 +30,9 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "rtc.h"
+#include "timer_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -108,7 +111,6 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   ADC_init();
-  TIMER_IF_Init();
 
   char output[20];
   // if(probeADS12() != HAL_OK){
@@ -137,11 +139,12 @@ int main(void)
     reading_len = sprintf(output, "Voltage: %d\r\n\r\n", reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
     
-    reading = ADC_readCurrent();
-    reading_len = sprintf(output, "Current: %d\r\n\r\n", reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+    //reading = ADC_readCurrent();
+    //reading_len = sprintf(output, "Current: %d\r\n\r\n", reading);
+    //HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
 
-    HAL_Delay(1000);
+    // wait
+    for (int i=0; i < 1000000; ++i) __NOP(); 
   }
   /* USER CODE END 3 */
 }

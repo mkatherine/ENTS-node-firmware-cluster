@@ -1,9 +1,9 @@
 """Tests encoding and decoding of protobuf serialized data
 
-Encoding of both a SUCCESS and ERROR is tested. Decoding is performed to ensure
-data is preserved.
+Encoding for Response messages checks both a SUCCESS and ERROR can be obtained.
+Decoding is performed to ensure data is preserved.
 
-Decoding checks that data in the message is preserved through an
+Decoding checks that the Measurement message is preserved through an
 encoding/decoding cycle. Checks that missing fields result in an error and the
 correct dictionary format is returned.
 """
@@ -11,15 +11,16 @@ correct dictionary format is returned.
 import unittest
 from datetime import datetime
 
-from soil_power_sensor_protobuf import encode, decode
-from soil_power_sensor_protobuf.soil_power_sensor_pb2 import Measurement, Response, PowerMeasurement, Teros12Measurement, MeasurementMetadata
-from soil_power_sensor_protobuf.timestamp_pb2 import Timestamp
+from soil_power_sensor_protobuf import encode_response, decode_measurement
+from soil_power_sensor_protobuf.soil_power_sensor_pb2 import (Measurement,
+                                                              Response,
+                                                              MeasurementMetadata)
 
 
 class TestEncode(unittest.TestCase):
     def test_success(self):
         # encode
-        resp_str = encode(success=True)
+        resp_str = encode_response(success=True)
 
         # decode
         resp_out = Response()
@@ -29,7 +30,7 @@ class TestEncode(unittest.TestCase):
 
     def test_error(self):
         # encode
-        resp_str = encode(success=False)
+        resp_str = encode_response(success=False)
 
         # decode
         resp_out = Response()
@@ -43,24 +44,22 @@ class TestDecode(unittest.TestCase):
 
     def setUp(self):
         """Creates a default metadata message"""
-        ts = Timestamp()
-        ts.FromDatetime(datetime(2013, 6, 2))
-
         self.meta = MeasurementMetadata()
-        self.meta.ts.CopyFrom(ts)
+        self.meta.ts = 1436079600
         self.meta.cell_id = 20
         self.meta.logger_id = 4
 
     def check_meta(self, meas_dict: dict):
         """Checks the measurement dictionary contains metadata information"""
 
-        self.assertEqual('2013-06-02T00:00:00Z', meas_dict["ts"])
+        self.assertEqual(1436079600, meas_dict["ts"])
         self.assertEqual(20, meas_dict["cellId"])
         self.assertEqual(4, meas_dict["loggerId"])
 
     def test_power(self):
         """Test decoding of PowerMeasurement"""
 
+        #import pdb; pdb.set_trace()
         # format measurement
         meas = Measurement()
         meas.meta.CopyFrom(self.meta)
@@ -71,13 +70,16 @@ class TestDecode(unittest.TestCase):
         meas_str = meas.SerializeToString()
 
         # decode
-        meas_dict = decode(data=meas_str)
+        meas_dict = decode_measurement(data=meas_str)
 
         # check resulting dict
         self.assertEqual("power", meas_dict["type"])
         self.check_meta(meas_dict)
-        self.assertAlmostEqual(122.38, meas_dict["voltage"])
-        self.assertAlmostEqual(514.81, meas_dict["current"])
+        self.assertAlmostEqual(122.38, meas_dict["data"]["voltage"])
+        self.assertEqual(float, meas_dict["data_type"]["voltage"])
+        self.assertAlmostEqual(514.81, meas_dict["data"]["current"])
+        self.assertEqual(float, meas_dict["data_type"]["current"])
+        
 
     def test_teros12(self):
         """Test decoding of Teros12Measurement"""
@@ -94,15 +96,19 @@ class TestDecode(unittest.TestCase):
         meas_str = meas.SerializeToString()
 
         # decode
-        meas_dict = decode(data=meas_str)
+        meas_dict = decode_measurement(data=meas_str)
 
         # check dict
         self.assertEqual("teros12", meas_dict["type"])
         self.check_meta(meas_dict)
-        self.assertAlmostEqual(2124.62, meas_dict["vwcRaw"])
-        self.assertAlmostEqual(0.43, meas_dict["vwcAdj"])
-        self.assertAlmostEqual(24.8, meas_dict["temp"])
-        self.assertEqual(123, meas_dict["ec"])
+        self.assertAlmostEqual(2124.62, meas_dict["data"]["vwcRaw"])
+        self.assertEqual(float, meas_dict["data_type"]["vwcRaw"])
+        self.assertAlmostEqual(0.43, meas_dict["data"]["vwcAdj"])
+        self.assertEqual(float, meas_dict["data_type"]["vwcAdj"])
+        self.assertAlmostEqual(24.8, meas_dict["data"]["temp"])
+        self.assertEqual(float, meas_dict["data_type"]["temp"])
+        self.assertEqual(123, meas_dict["data"]["ec"])
+        self.assertEqual(int, meas_dict["data_type"]["ec"])
 
     def test_missing_meta(self):
         """Test that error is raised when meta is not set"""
@@ -117,7 +123,7 @@ class TestDecode(unittest.TestCase):
 
         # decode
         with self.assertRaises(KeyError):
-            decode(data=meas_str)
+            decode_measurement(data=meas_str)
 
     def test_missing_measurement(self):
         """Test that error is raised when measurement is missing"""
@@ -131,7 +137,7 @@ class TestDecode(unittest.TestCase):
 
         # decode
         with self.assertRaises(KeyError):
-            decode(data=meas_str)
+            decode_measurement(data=meas_str)
 
 
 if __name__ == "__main__":

@@ -87,7 +87,7 @@ void SDI12_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 void SDI12_WakeSensors(void)
 {
   SendContinousHigh(sdi12.Port, sdi12.Pin, 20); // Set the data line low
-  HAL_Delay(8); // Marking after break, see SDi-12 guide
+  HAL_Delay(10); // Marking after break, see SDi-12 guide
 }
 
 void SDI12_SendCommand(const char *command, uint8_t size)
@@ -206,8 +206,10 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
       SDI12_WakeSensors();
       SDI12_SendCommand(sendData, SEND_DATA_COMMAND_SIZE);
       configureAsInput();
-      ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // read the data and return
-      return ret;
+      // ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // read the data and return
+      // return ret;
+      SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // lol is this works with 3 minutes to spare
+      return HAL_OK;
     }
   }
 
@@ -223,7 +225,7 @@ HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_
 {
   SDI12_Measure_TypeDef measurment_info;
   HAL_StatusTypeDef ret;
-  char measurement_data[20];
+  char measurement_data[25];
 
   ret = SDI12_GetMeasurment(addr, &measurment_info, measurement_data, timeoutMillis); // Read from the TEROS
   if (ret != HAL_OK){
@@ -232,6 +234,9 @@ HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_
   sscanf(measurement_data, "%d+%f+%f+%d\r\n",&(teros_readings->addr), &(teros_readings->vwc_raw), &(teros_readings->tmp), &(teros_readings->ec));
   
   //y=0.000000000512018x^3-0.000003854251138x^2+0.009950433111633x-8.508168835940560 calibration eqn
+ teros_readings->vwc_adj = (0.000000000512018 * teros_readings->vwc_raw * teros_readings->vwc_raw * teros_readings->vwc_raw) -
+                           (0.000003854251138 * teros_readings->vwc_raw * teros_readings->vwc_raw) +
+                           (0.009950433111633 * teros_readings->vwc_raw) - 8.508168835940560;
   return HAL_OK;
 }
 

@@ -10,6 +10,51 @@ The generation of necessary source files is handled with the `Makefile`. The `na
 make
 ```
 
+## Example messages
+
+In `examples/` there are example binary files for each measurement type
+
+*PowerMeasurement* (`examples/meas_power.bin`)
+
+| field | value |
+| --- | --- |
+| ts | 1436079600 |
+| logger_id | 7 |
+| cell_id | 4 |
+| voltage | 2400.0 |
+| current | 100.0 |
+
+*Teros12Measurement* (`examples/meas_teros.bin`)
+
+| field | value |
+| --- | --- |
+| ts | 1436079600 |
+| logger_id | 0 |
+| cell_id | 0 |
+| vwc_raw | 1832.43 |
+| vwc_adj | 34.4 |
+| temp | 24.2 |
+| ec | 2 | 
+
+## Decoding a message using the CLI
+
+On linux you are able to decode a payload directly from The Things Network by using the `protoc` binary. Replace the hex at the start of your command with the payload.
+
+``` bash
+echo "0A1008A3A18A820410041A0608F0ABE3AC75121211713D0AD7A390424019E17A14AE47296740" | xxd -r -p | protoc --decode Measurement soil_power_sensor.proto 
+meta {
+  cell_id: 1078104227
+  logger_id: 4
+  3 {
+    1: 31500850672
+  }
+}
+power {
+  voltage: 37.13
+  current: 185.29
+}
+```
+
 ## C Implementation
 
 > See @subpage protobuf-c for implementation details. 

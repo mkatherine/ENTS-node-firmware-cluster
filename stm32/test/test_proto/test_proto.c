@@ -20,7 +20,6 @@
 #include "pb_encode.h"
 #include "pb_decode.h"
 
-#include "timestamp.pb.h"
 #include "soil_power_sensor.pb.h"
 
 
@@ -54,14 +53,6 @@ pb_istream_t istream;
 bool status;
 
 /**
- * @brief Default google_protobuf_Timestamp
- *
- * Used as submessage when testing parent messages. Defaults on each tests to
- * UNIX_EPOCHS.
- */ 
-google_protobuf_Timestamp ts_default;
-
-/**
  * @brief Default MeasurementMetadata
  * 
  * Uses as submessage when testing parent messages. Defaults to zeros with
@@ -84,13 +75,9 @@ void setUp(void)
   // create output buffer
   ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
-  // Set default timestamp
-  ts_default.seconds = UNIX_EPOCHS;
-  ts_default.nanos = 0;
 
   // Set default measurement metadata
-  meta_default.has_ts = true;
-  meta_default.ts = ts_default;
+  meta_default.ts = UNIX_EPOCHS;
   meta_default.cell_id = 0;
   meta_default.logger_id = 0;
 }
@@ -100,39 +87,11 @@ void setUp(void)
 */
 void tearDown(void) {}
 
-
-void test_timestamp(void)
-{
-  // Create message corresponding to Mon Nov 27 2023 03:25:19 GMT+0000
-  google_protobuf_Timestamp ts_encode = google_protobuf_Timestamp_init_zero;
-  ts_encode.seconds = UNIX_EPOCHS;
-  ts_encode.nanos = 0;
-
-  // encode 
-  status = pb_encode(&ostream, google_protobuf_Timestamp_fields, &ts_encode);
-  msg_len = ostream.bytes_written;
-  
-  TEST_ASSERT_TRUE(status);
-  TEST_ASSERT_GREATER_THAN(0, msg_len);
-
-
-  google_protobuf_Timestamp ts_decode = google_protobuf_Timestamp_init_zero;
-
-  // decode
-  istream = pb_istream_from_buffer(buffer, msg_len);
-  status = pb_decode(&istream, google_protobuf_Timestamp_fields, &ts_decode);
-
-  TEST_ASSERT_TRUE(status);
-  TEST_ASSERT_EQUAL(UNIX_EPOCHS, ts_decode.seconds);
-  TEST_ASSERT_EQUAL(0, ts_decode.nanos);
-}
-
 void test_meta(void)
 {
-  MeasurementMetadata meta_encode = google_protobuf_Timestamp_init_zero;
+  MeasurementMetadata meta_encode = MeasurementMetadata_init_zero;
 
-  meta_encode.has_ts = true;
-  meta_encode.ts = ts_default;
+  meta_encode.ts = UNIX_EPOCHS;
   meta_encode.cell_id = 0;
   meta_encode.logger_id = 1;
 
@@ -153,9 +112,7 @@ void test_meta(void)
   TEST_ASSERT_EQUAL(0, meta_decode.cell_id);
   TEST_ASSERT_EQUAL(1, meta_decode.logger_id);
 
-  TEST_ASSERT_TRUE(meta_decode.has_ts);
-  TEST_ASSERT_EQUAL(UNIX_EPOCHS, meta_decode.ts.seconds);
-  TEST_ASSERT_EQUAL(0, meta_decode.ts.nanos); 
+  TEST_ASSERT_EQUAL(UNIX_EPOCHS, meta_decode.ts);
 
 }
 
@@ -187,9 +144,7 @@ void test_power(void)
   TEST_ASSERT_EQUAL(0, power_decode.meta.cell_id);
   TEST_ASSERT_EQUAL(0, power_decode.meta.logger_id);
   // Timestamp
-  TEST_ASSERT_TRUE(power_decode.meta.has_ts);
-  TEST_ASSERT_EQUAL(UNIX_EPOCHS, power_decode.meta.ts.seconds);
-  TEST_ASSERT_EQUAL(0, power_decode.meta.ts.nanos);
+  TEST_ASSERT_EQUAL(UNIX_EPOCHS, power_decode.meta.ts);
 
   TEST_ASSERT_EQUAL(Measurement_power_tag, power_decode.which_measurement);
   TEST_ASSERT_DOUBLE_WITHIN(FLOAT_DELTA, 1.2,
@@ -228,9 +183,7 @@ void test_teros12(void)
   TEST_ASSERT_EQUAL(0, teros12_decode.meta.cell_id);
   TEST_ASSERT_EQUAL(0, teros12_decode.meta.logger_id);
   // Timestamp
-  TEST_ASSERT_TRUE(teros12_decode.meta.has_ts);
-  TEST_ASSERT_EQUAL(UNIX_EPOCHS, teros12_decode.meta.ts.seconds);
-  TEST_ASSERT_EQUAL(0, teros12_decode.meta.ts.nanos);
+  TEST_ASSERT_EQUAL(UNIX_EPOCHS, teros12_decode.meta.ts);
 
   TEST_ASSERT_EQUAL(Measurement_teros12_tag, teros12_decode.which_measurement);
   TEST_ASSERT_EQUAL(200, teros12_decode.measurement.teros12.ec);
@@ -283,8 +236,6 @@ int main(void)
   // Unit testing
   UNITY_BEGIN();
 
-  // Tests for timestamp
-  RUN_TEST(test_timestamp);
   // Tests for MeasurementMetadata
   RUN_TEST(test_meta);
   // Tests for PowerMeasurement

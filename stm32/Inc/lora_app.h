@@ -28,6 +28,9 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ads.h"
+#include "pb_encode.h"
+#include "soil_power_sensor.pb.h"
 
 /* USER CODE END Includes */
 

@@ -2,7 +2,7 @@
 
 name: Python protobuf
 
-on: push
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -117,6 +117,7 @@ jobs:
     - build
     - test
     runs-on: ubuntu-latest
+    #if: github.event_name == 'workflow_dispatch'
 
     environment:
       name: testpypi

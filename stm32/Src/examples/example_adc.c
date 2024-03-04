@@ -25,6 +25,8 @@
 #include "gpio.h"
 #include "fram.h"
 #include "ads.h"
+//#include "stm32_timer.h"
+#include "rtc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -93,6 +95,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
+  //MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
@@ -108,21 +111,16 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   ADC_init();
-  //TIMER_IF_Init();
+  // TIMER_IF_Init();
+  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+  // UTIL_TIMER_Init();
 
   char output[20];
   char output2[20];
-  // if(probeADS12() != HAL_OK){
-  //   HAL_UART_Transmit(&huart1, fail, 13, 19);
-  // } else {
-  //   HAL_UART_Transmit(&huart1, succsuful_probe, 19, 9);
-  // };
 
   double voltage_reading;
   double current_reading;
   size_t reading_len;
-  // sprintf(output, "Read: %x,%x,%x\r\n", ADC_Reading[0],ADC_Reading[1],ADC_Reading[2]);
-  // HAL_UART_Transmit(&huart1, output, 17, 19);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,12 +133,12 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 
-    voltage_reading = ADC_readVoltage();
+    //voltage_reading = ADC_readVoltage();
     reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
-    // for (int i = 0; i < 1000000; i++){
-    //   asm("nop");
-    // }
+    for (int i = 0; i < 1000000; i++){
+      asm("nop");
+    }
 
     current_reading = ADC_readCurrent();
     reading_len = sprintf(output2, "Current: %f\r\n", current_reading);

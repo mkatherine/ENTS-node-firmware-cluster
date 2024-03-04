@@ -84,7 +84,7 @@ double ADC_readVoltage(void){
   HAL_StatusTypeDef ret;
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
 
-  ret = ADC_configure(0x03);
+  //ret = ADC_configure(0x03);
     
   while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;

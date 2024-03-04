@@ -34,7 +34,7 @@
 /**
   * @brief RTC handle
   */
-extern RTC_HandleTypeDef h;
+extern RTC_HandleTypeDef hrtc;
 
 /**
   * @brief Timer driver callbacks handler

@@ -35,9 +35,10 @@ upload your changes to GitHub.
 Compare & pull request button. If there are any issues that your PR resolves,
 please link them in the description. Fill in the form and submit. The following
 should be included in the PR description:
-   - Your affiliation (aka your current university or institution). If you are
-     working on the project for personal reasons state *no affiliation*. This is
-     primarily to ensure there is no conflicts of interests for funding reasons.
+   - Your name, affiliation (aka current university or institution), and title.
+     If you are working on the project for personal reasons state *no
+     affiliation*. This is primarily to ensure there is no conflicts of interests
+     for funding reasons.
    - The purpose of the PR. If the PR directly solves an issue it can be linked.
      Otherwise, we are interested in understanding how people are using the hardware
      or the reason being the feature being added.

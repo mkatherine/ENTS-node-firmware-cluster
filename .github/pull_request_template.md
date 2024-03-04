@@ -7,8 +7,8 @@ assignees: ''
 reviewers: 'jmadden173'
 ---
 
-**Affiliation**
-Please state your affiliation (your current university or institution). If you are working on the project for personal reasons, state *no affiliation*. This is primarily to ensure there are no conflicts of interests for funding reasons.
+**Name/Affiliation/Title**
+Please state your preferred name, affiliation, and title (your current university or institution). If you are working on the project for personal reasons, state *no affiliation*. This is primarily to ensure there are no conflicts of interests for funding reasons. If you have a preferred method, please provide that as well.
 
 **Purpose of the PR**
 Describe the purpose of the PR. If the PR directly solves an issue, please link it. Otherwise, we are interested in understanding how people are using the hardware or the reason behind the feature being added.

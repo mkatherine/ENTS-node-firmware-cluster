@@ -25,14 +25,16 @@
 #include "gpio.h"
 #include "fram.h"
 #include "ads.h"
+#include "app_lorawan.h"
+#include "sys_app.h"
+#include "stm32_timer.h"
+#include "rtc.h"
 
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "timer_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -145,7 +147,7 @@ int main(void)
     reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
 
-    HAL_Delay(10); //I guess HAL_Delay is broken somehow, don't understand why
+    HAL_Delay(100); //I guess HAL_Delay is broken somehow, don't understand why
     // for (int i = 0; i < 1000000; i++){
     //   asm("nop");
     // }

@@ -25,16 +25,14 @@
 #include "gpio.h"
 #include "fram.h"
 #include "ads.h"
-#include "app_lorawan.h"
-#include "sys_app.h"
-#include "stm32_timer.h"
-#include "rtc.h"
 
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "timer_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,8 +96,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  //MX_RTC_Init();
- //SystemApp_Init();
+  TIMER_IF_Init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup

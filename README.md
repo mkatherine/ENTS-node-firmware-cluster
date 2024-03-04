@@ -1,8 +1,8 @@
 [![Build stm32](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/stm32.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/stm32.yaml) [![Build esp32](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/esp32.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/esp32.yaml) [![Doxygen](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/docs.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/docs.yaml)
 
-# soil-power-sensor-firmware
+# Soil Power Sensor Firmware
 
-Firmware repository for STM32 and ESP32 microcontrollers on the Soil Power Sensor board along with supporting libraries.
+Firmware repository for STM32 and ESP32 microcontrollers on the Soil Power Sensor board along with supporting libraries. This repository acts as the central hub for all repositories related to the project.
 
 ## Project Structure
 
@@ -63,8 +63,23 @@ For issues relating to software create an issue in this repository. For hardware
 
 ## Contributing
 
-TODO
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## Code of Conduct
+
+This project adheres to
+[Contributor Covenant](https://www.contributor-covenant.org).
+See [Code of Conduct](./CODE_OF_CONDUCT.md) for a local copy.
 
 ## License
 
 Code in this repository is licensed under MIT unless specified in the file header. See @ref LICENSE for full document.
+
+## Maintainers
+
+- [John Madden](mailto:jtmadden@ucsc.edu)
+
+## Contributors
+
+- [Steve Taylor](mailto:sgtaylor@ucsc.edu)
+- [Varun Sreedharan](mailto:vasreedh@ucsc.edu)

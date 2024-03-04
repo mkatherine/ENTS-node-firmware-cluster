@@ -25,8 +25,11 @@
 #include "gpio.h"
 #include "fram.h"
 #include "ads.h"
-//#include "stm32_timer.h"
+#include "app_lorawan.h"
+#include "sys_app.h"
+#include "stm32_timer.h"
 #include "rtc.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -96,6 +99,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   //MX_RTC_Init();
+ //SystemApp_Init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
@@ -136,18 +140,18 @@ int main(void)
     //voltage_reading = ADC_readVoltage();
     reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
-    for (int i = 0; i < 1000000; i++){
-      asm("nop");
-    }
+    // for (int i = 0; i < 1000000; i++){
+    //   asm("nop");
+    // }
 
     current_reading = ADC_readCurrent();
     reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
 
-    //HAL_Delay(100); I guess HAL_Delay is broken somehow, don't understand why
-    for (int i = 0; i < 1000000; i++){
-      asm("nop");
-    }
+    HAL_Delay(10); //I guess HAL_Delay is broken somehow, don't understand why
+    // for (int i = 0; i < 1000000; i++){
+    //   asm("nop");
+    // }
   }
   /* USER CODE END 3 */
 }

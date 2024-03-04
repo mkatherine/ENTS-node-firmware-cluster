@@ -14,6 +14,7 @@ firmware versions for a hardware version.
 
 - Contributing resources ([Contributing](./CONTRIBUTING.md),
   [Code ofConduct](./CODE_OF_CONDUCT.md), and Changelog)
+- Issue and PR templates
 
 ## [2.1.0] - 2024-02-25
 

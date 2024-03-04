@@ -1,0 +1,23 @@
+---
+name: Pull Request
+about: Submit a pull request
+title: ''
+labels: ''
+assignees: ''
+reviewers: 'jmadden173'
+---
+
+**Affiliation**
+Please state your affiliation (your current university or institution). If you are working on the project for personal reasons, state *no affiliation*. This is primarily to ensure there are no conflicts of interests for funding reasons.
+
+**Purpose of the PR**
+Describe the purpose of the PR. If the PR directly solves an issue, please link it. Otherwise, we are interested in understanding how people are using the hardware or the reason behind the feature being added.
+
+**Development Environment**
+Provide the OS, hardware version, Platformio version, and information about any other tools used during the development.
+
+**Test Procedure**
+Describe the test procedure. For purely software, specifying the unit test is sufficient. Sometimes external configurations are required to test a hardware component. Create a new main in `examples/` and describe the expected output. A photo or diagram is very helpful.
+
+**Additional Context**
+Add any other context or screenshots about the pull request here.

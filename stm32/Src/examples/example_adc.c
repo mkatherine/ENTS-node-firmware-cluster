@@ -98,7 +98,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  TIMER_IF_Init();
+  //TIMER_IF_Init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup

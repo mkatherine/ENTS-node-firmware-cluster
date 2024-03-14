@@ -73,7 +73,7 @@ See [Code of Conduct](./CODE_OF_CONDUCT.md) for a local copy.
 
 ## License
 
-Code in this repository is licensed under MIT unless specified in the file header. See @ref LICENSE for full document.
+Code in this repository is licensed under the MIT License unless specified in the file header. See @ref LICENSE for full document.
 
 ## Maintainers
 

@@ -5,6 +5,11 @@
   * @author   Stephen Taylor
   * @brief    This file contains all the function prototypes for
   *           the fram.c file
+  * 
+  * The library can be used with other memory chips with the same memory layout.
+  * The defines FRAM_PAGES and FRAM_SEG_SIZE can used to change the
+  * configuration from the compiler.
+  * 
   * @date     11/17/2023
   ******************************************************************************
   */
@@ -21,6 +26,16 @@ extern "C"{
 #include "fifo.h"
 
 #include <stdio.h>
+
+#ifndef FRAM_PAGES
+/** Number of pages on the fram chip */
+#define FRAM_PAGES 8
+#endif
+
+#ifndef FRAM_SEG_SIZE
+/** Size of each memory segment in bytes */
+#define FRAM_SEG_SIZE 255
+#endif
 
 #define USER_DATA_PAGE_ADDRESS 0x07
 #define CELL_ID_MEMORY_ADDRESS 0x00
@@ -39,20 +54,27 @@ typedef struct user_configurations {
     uint64_t end_device_EUI; 
     uint16_t logging_interval; 
     uint16_t upload_interval;
-}configuration;
+} configuration;
+
+/** Status codes for the Fram library*/
+typedef enum {
+    FRAM_SUCCESS = 0,
+    FRAM_ERROR = -1,
+    FRAM_OUT_OF_MEMORY = -2,
+} FramStatus;
 
 /**
-  ******************************************************************************
-  * @brief    This function writes a dynamic number of bytes to FRAM.
-  * 
-  *           This function is a wrapper for the fifo library. This library is used
-  *           to write serialized logger data to the onboard FM24CL16B. 
-  * @param    data An array of data bytes.
-  * @param    len The number of bytes to be written.
-  * @return   HAL_StatusTypeDef, status of the I2C function
-  ******************************************************************************
-  */
-HAL_StatusTypeDef FRAM_Write(const uint8_t *data, uint8_t len);
+ * @brief    This function writes a dynamic number of bytes to FRAM.
+ *
+ * This function is a wrapper for the fifo library. This library is used to
+ * write serialized logger data to the onboard FM24CL16B.
+ *
+ * @param addr Address of write
+ * @param data An array of data bytes.
+ * @param len The number of bytes to be written.
+ * @return See 
+ */
+FramStatus FRAM_Write(uint16_t addr, const uint8_t *data, uint8_t len);
 
 /**
   ******************************************************************************
@@ -66,11 +88,16 @@ HAL_StatusTypeDef FRAM_Read(uint8_t *data);
 
 /**
   ******************************************************************************
-  * @brief    This function stores user configurable settings to non-volatile memory.
-  *           Specifically cell ID, logger ID, LoRaWAN gateway EUI, LoRaWAN application EUI and 
-  *           end device EUI. As well as the logging and upload intervals.
+  * @brief This function stores user configurable settings to non-volatile
+  * memory.
   * 
-  * @param    configuration, an instance of the typdef struct user_configurations. Containing all the user defined settings to be stored in non-volatile memory.
+  * Specifically cell ID, logger ID, LoRaWAN gateway EUI, LoRaWAN application
+  * EUI and end device EUI. As well as the logging and upload intervals.
+  * 
+  * @param configuration, an instance of the typedef struct user_configurations.
+  * Containing all the user defined settings to be stored in non-volatile
+  * memory.
+  * 
   * @return   HAL_StatusTypeDef, status of the I2C function
   ******************************************************************************
   */
@@ -78,10 +105,12 @@ HAL_StatusTypeDef configure_Settings(configuration c);
 
 /**
   ******************************************************************************
-  * @brief    This function reads the user configurable settings from non-volatile memory.
+  * @brief This function reads the user configurable settings from non-volatile
+  * memory.
   * 
-  * @param    void, an instance of the typdef struct user_configurations. Containing all the user defined settings to be stored in non-volatile memory.
-  * @return   configuration, an instance of the typdef struct user_configurations. Containing all the user defined settings to be stored in non-volatile memory.
+  * @return configuration, an instance of the typedef struct
+  * user_configurations.  Containing all the user defined settings to be stored
+  * in non-volatile memory.
   ******************************************************************************
   */
 configuration read_Settings(void);

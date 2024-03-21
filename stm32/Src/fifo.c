@@ -1,23 +1,23 @@
 /**
-  ******************************************************************************
-  * @file    fifo.c
-  * @author  Stephen Taylor
-  * @brief   Soil Power Sensor FRAM library
-  *          This file provides functions to push/pop to the onboard FM24CL16B 
-  *          FRAM memory device. The FM24CL16B is used to store serialized measurment 
-  *          data before it is uploaded via LoRa or WiFi.
-  *          
-  *          The FM24CL16B memory archtecture is structed around 8 segments of 
-  *          256 bytes each. The measurment data is stored on the first 7 segments in
-  *          as a FIFO data structure. The 8th page is reserved for user configurable settings
-  *          with space left over for whatever information the user wishes to store in 
-  *          non-volatile memory. 
-  * @date    11/17/2023
-  *
-  ******************************************************************************
-  **/
+ ******************************************************************************
+ * @file    fifo.c
+ * @author  Stephen Taylor
+ * @brief   Soil Power Sensor FRAM library
+ *          This file provides functions to push/pop to the onboard FM24CL16B
+ *          FRAM memory device. The FM24CL16B is used to store serialized measurment
+ *          data before it is uploaded via LoRa or WiFi.
+ *
+ *          The FM24CL16B memory archtecture is structed around 8 segments of
+ *          256 bytes each. The measurment data is stored on the first 7 segments in
+ *          as a FIFO data structure. The 8th page is reserved for user configurable settings
+ *          with space left over for whatever information the user wishes to store in
+ *          non-volatile memory.
+ * @date    11/17/2023
+ *
+ ******************************************************************************
+ **/
 
- /* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "fifo.h"
 
 int write_address_memory = 0x00;

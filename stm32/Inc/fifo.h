@@ -48,6 +48,8 @@ extern "C"{
 #error "Buffer end address must be greater than buffer start address"
 #endif
 
+/** Amount of bytes that can be stored in the buffer*/
+const uint16_t fram_buffer_size = FRAM_BUFFER_END - FRAM_BUFFER_START;
 
 /**
  * @brief Puts a measurement into the circular buffer

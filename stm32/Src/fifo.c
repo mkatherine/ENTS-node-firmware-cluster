@@ -8,7 +8,7 @@
 
 #include "fifo.h"
 
-static const uint16_t buffer_size = FRAM_BUFFER_END - FRAM_BUFFER_START;
+
 
 static uint16_t read_addr = FRAM_BUFFER_START;
 static uint16_t write_addr = FRAM_BUFFER_START;
@@ -23,12 +23,12 @@ static uint16_t buffer_len = 0;
  * @param num_bytes 
  */
 static inline void update_addr(uint16_t *addr, const uint16_t num_bytes) {
-  *addr = (*addr + num_bytes) % buffer_size;
+  *addr = (*addr + num_bytes) % fram_buffer_size;
 }
 
 FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   // check remaining space
-  uint16_t remaining_space = buffer_size - (write_addr - read_addr);
+  uint16_t remaining_space = fram_buffer_size - (write_addr - read_addr);
   if (num_bytes+1 > remaining_space) {
     return FRAM_BUFFER_FULL;
   }

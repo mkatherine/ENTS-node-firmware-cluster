@@ -60,7 +60,7 @@ typedef struct user_configurations {
 typedef enum {
     FRAM_SUCCESS = 0,
     FRAM_ERROR = -1,
-    FRAM_OUT_OF_MEMORY = -2,
+    FRAM_OUT_OF_RANGE = -2,
 } FramStatus;
 
 /**
@@ -72,7 +72,7 @@ typedef enum {
  * @param addr Address of write
  * @param data An array of data bytes.
  * @param len The number of bytes to be written.
- * @return See 
+ * @return See FramStatus
  */
 FramStatus FRAM_Write(uint16_t addr, const uint8_t *data, uint8_t len);
 
@@ -80,11 +80,13 @@ FramStatus FRAM_Write(uint16_t addr, const uint8_t *data, uint8_t len);
   ******************************************************************************
   * @brief    This function reads a dynamic number of bytes to FRAM.
   * 
-  * @param    data Array to be read into
-  * @return   HAL_StatusTypeDef, status of the I2C function
+  * @param addr Address of read
+  * @param data Array to be read into
+  * @param len Number of sequential bytes to read
+  * @return See FramStatus
   ******************************************************************************
   */
-HAL_StatusTypeDef FRAM_Read(uint8_t *data);
+FramStatus FRAM_Read(uint16_t addr, uint8_t len, uint8_t *data);
 
 /**
   ******************************************************************************

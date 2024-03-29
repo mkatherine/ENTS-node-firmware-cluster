@@ -55,7 +55,7 @@ FramStatus FRAM_Write(uint16_t addr, const uint8_t *data, uint8_t len)
     // check for out of memory
     if (addr_mat.page > FRAM_PAGES)
     {
-      return FRAM_OUT_OF_MEMORY;
+      return FRAM_OUT_OF_RANGE;
     }
 
     // Write byte to an address
@@ -87,19 +87,41 @@ FramStatus FRAM_Write(uint16_t addr, const uint8_t *data, uint8_t len)
  * to read from the FM24CL16B.
  ******************************************************************************
  */
-HAL_StatusTypeDef FRAM_Read(uint8_t *data)
+FramStatus FRAM_Read(uint16_t addr, uint8_t len, uint8_t *data)
 {
-  HAL_StatusTypeDef status;
-  uint8_t len[1];
+  // Write byte array to memory
+  // NOTE write is performed a single byte at a time due to address
+  // configuration of the chip.
+  for (int i = 0; i < len; i++) {
+    FramAddress addr_mat = fram_convert_Addr_Mem(addr);
 
-  status = pop(len, 1); // pop the number of bytes to be read
+    // check for out of memory
+    if (addr_mat.page > FRAM_PAGES)
+    {
+      return FRAM_OUT_OF_RANGE;
+    }
 
-  if (status != HAL_OK)
-  { // Return if I2C communication fails
-    return status;
+    // Write byte to an address
+    // Can optimize by using continuous writes but needs to account for the
+    // change of address.
+    HAL_StatusTypeDef status;
+    status = HAL_I2C_Mem_Read(&hi2c2, (FM24_READ | addr_mat.page),
+                              addr_mat.seg, I2C_MEMADD_SIZE_8BIT,
+                              data, 1, fram_timeout);
+
+    // increment data addr
+    ++data;
+    
+    // return error if failed to write
+    if (status != HAL_OK) {
+      return FRAM_ERROR;
+    }
+
+    // increment address
+    ++addr;
   }
-  status = pop(data, len[0]); // pop the serialized data block
-  return status;
+
+  return FRAM_SUCCESS;
 }
 
 /**

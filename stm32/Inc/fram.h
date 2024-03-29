@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file     fram.h
@@ -47,20 +46,22 @@ extern "C"{
 #define UPLOAD_INTERVAL_IN_MINUTES_MEMORY_ADDRESS 0x29
 
 typedef struct user_configurations {
-    uint64_t cell_ID;
-    uint64_t logger_ID;
-    uint64_t gateway_EUI;
-    uint64_t application_EUI;
-    uint64_t end_device_EUI; 
-    uint16_t logging_interval; 
-    uint16_t upload_interval;
+  uint64_t cell_ID;
+  uint64_t logger_ID;
+  uint64_t gateway_EUI;
+  uint64_t application_EUI;
+  uint64_t end_device_EUI; 
+  uint16_t logging_interval; 
+  uint16_t upload_interval;
 } configuration;
 
 /** Status codes for the Fram library*/
 typedef enum {
-    FRAM_SUCCESS = 0,
-    FRAM_ERROR = -1,
-    FRAM_OUT_OF_RANGE = -2,
+  FRAM_SUCCESS = 0,
+  FRAM_ERROR = -1,
+  FRAM_OUT_OF_RANGE = -2,
+  FRAM_BUFFER_FULL = -3,
+  FRAM_BUFFER_EMPTY = -4,
 } FramStatus;
 
 /**

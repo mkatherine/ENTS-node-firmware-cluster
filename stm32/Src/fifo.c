@@ -10,8 +10,8 @@
 
 static const uint16_t buffer_size = FRAM_BUFFER_END - FRAM_BUFFER_START;
 
-static uint16_t read_addr = 0;
-static uint16_t write_addr = 0;
+static uint16_t read_addr = FRAM_BUFFER_START;
+static uint16_t write_addr = FRAM_BUFFER_START;
 
 /** Number of measurements stored in buffer */
 static uint16_t buffer_len = 0;
@@ -86,4 +86,15 @@ FramStatus FramGet(uint8_t *data) {
 
 uint16_t FramBufferLen(void) {
   return buffer_len;
+}
+
+FramStatus FramBufferClear(void) {
+  // Set read and write addresses to their default values
+  read_addr = FRAM_BUFFER_START;
+  write_addr = FRAM_BUFFER_START;
+
+  // reset buffer len
+  buffer_len = 0;
+
+  return FRAM_SUCCESS;
 }

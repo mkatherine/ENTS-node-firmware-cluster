@@ -74,6 +74,14 @@ FramStatus FramGet(uint8_t *data);
  */
 uint16_t FramBufferLen(void);
 
+/**
+ * @brief Clears the buffer
+ * 
+ * Read and write addresses are set to their default values allowing for the
+ * buffer to be overwritten.
+ */
+FramStatus FramBufferClear(void);
+
 #ifdef __cplusplus
 }
 #endif

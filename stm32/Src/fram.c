@@ -29,15 +29,15 @@ typedef struct
  * @param addr Memory address
  * @return Matrix representation of address
  */
-FramAddress fram_convert_Addr_Mem(uint16_t addr);
+FramAddress FramConvertAddrMem(uint16_t addr);
 
-FramStatus FRAM_Write(uint16_t addr, const uint8_t *data, uint8_t len)
+FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len)
 {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
   for (int i = 0; i < len; i++) {
-    FramAddress addr_mat = fram_convert_Addr_Mem(addr);
+    FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory
     if (addr_mat.page > FRAM_PAGES)
@@ -65,16 +65,16 @@ FramStatus FRAM_Write(uint16_t addr, const uint8_t *data, uint8_t len)
 
   }
 
-  return FRAM_SUCCESS;
+  return FRAM_OK;
 }
 
-FramStatus FRAM_Read(uint16_t addr, uint8_t len, uint8_t *data)
+FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data)
 {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
   for (int i = 0; i < len; i++) {
-    FramAddress addr_mat = fram_convert_Addr_Mem(addr);
+    FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory
     if (addr_mat.page > FRAM_PAGES)
@@ -101,10 +101,10 @@ FramStatus FRAM_Read(uint16_t addr, uint8_t len, uint8_t *data)
     ++addr;
   }
 
-  return FRAM_SUCCESS;
+  return FRAM_OK;
 }
 
-HAL_StatusTypeDef configure_Settings(configuration c)
+HAL_StatusTypeDef ConfigureSettings(configuration c)
 {
   HAL_StatusTypeDef status = HAL_OK;
 
@@ -113,7 +113,7 @@ HAL_StatusTypeDef configure_Settings(configuration c)
   return status;
 }
 
-configuration read_Settings(void)
+configuration ReadSettings(void)
 {
   configuration c;
 
@@ -122,7 +122,7 @@ configuration read_Settings(void)
   return c;
 }
 
-FramAddress fram_convert_Addr_Mem(uint16_t addr)
+FramAddress FramConvertAddrMem(uint16_t addr)
 {
   // convert flat address space to matrix
   FramAddress addr_mat;

@@ -62,7 +62,7 @@ typedef struct user_configurations {
 
 /** Status codes for the Fram library*/
 typedef enum {
-  FRAM_SUCCESS = 0,
+  FRAM_OK = 0,
   FRAM_ERROR = -1,
   FRAM_OUT_OF_RANGE = -2,
   FRAM_BUFFER_FULL = -3,

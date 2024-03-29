@@ -2,6 +2,20 @@
  * @file     fifo.h
  * @author   Stephen Taylor
  * @brief    Circular buffer as FIFO data structure for buffering measurements
+ * 
+ * A circular buffer is implemented on part of the memory space of the fram
+ * chip. The address space used can be modified with FRAM_BUFFER_START and
+ * FRAM_BUFFER_END depending on user needs.
+ * 
+ * Measurements are stored with a single uint8_t of their length followed by
+ * the serialized protobuf message. On reads, the length is first read, then
+ * the length number of bytes are read into RAM. Ensure the read buffer used
+ * is of sufficient size.
+ * 
+ * The buffer's implementation does not allow for overwriting of data. Once
+ * the buffer is full, indicated by FRAM_BUFFER_FULL, data needs to be removed
+ * by getting the next measurement or clearing the buffer entirely.
+ * 
  * @date     11/17/2023
  */
 
@@ -42,7 +56,7 @@ extern "C"{
  * @param    num_bytes The number of bytes to be written.
  * @return   See FramStatus
  */
-FramStatus fram_put(const uint8_t *data, uint16_t num_bytes);
+FramStatus FramPut(const uint8_t *data, uint16_t num_bytes);
 
 /**
  * @brief    Reads a measurement from the queue
@@ -51,14 +65,14 @@ FramStatus fram_put(const uint8_t *data, uint16_t num_bytes);
  * @param    data Array to be read into
  * @return   See FramStatus
  */
-FramStatus fram_get(uint8_t *data);
+FramStatus FramGet(uint8_t *data);
 
 /**
  * @brief Get the current number of measurements stored in the buffer
  * 
  * @return Number of measurements
  */
-uint16_t fram_buffer_len(void);
+uint16_t FramBufferLen(void);
 
 #ifdef __cplusplus
 }

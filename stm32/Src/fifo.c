@@ -26,7 +26,7 @@ static inline void update_addr(uint16_t *addr, const uint16_t num_bytes) {
   *addr = (*addr + num_bytes) % buffer_size;
 }
 
-FramStatus fram_put(const uint8_t *data, const uint16_t num_bytes) {
+FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   // check remaining space
   uint16_t remaining_space = buffer_size - (write_addr - read_addr);
   if (num_bytes+1 > remaining_space) {
@@ -36,14 +36,14 @@ FramStatus fram_put(const uint8_t *data, const uint16_t num_bytes) {
   FramStatus status;
 
   // write single byte length to buffer
-  status = FRAM_Write(write_addr, &num_bytes, 1);
+  status = FramWrite(write_addr, &num_bytes, 1);
   if (status != FRAM_SUCCESS) {
     return status;
   }
   update_addr(&write_addr, 1);
 
   // Write data to FRAM circular buffer
-  FramStatus status = FRAM_Write(write_addr, data, num_bytes);
+  FramStatus status = FramWrite(write_addr, data, num_bytes);
   if (status != FRAM_SUCCESS) {
     return status;
   }
@@ -55,7 +55,7 @@ FramStatus fram_put(const uint8_t *data, const uint16_t num_bytes) {
   return FRAM_SUCCESS;
 }
 
-FramStatus fram_get(uint8_t *data) {
+FramStatus FramGet(uint8_t *data) {
   // Check if buffer is empty
   if (buffer_len == 0) {
     return FRAM_BUFFER_EMPTY;
@@ -64,7 +64,7 @@ FramStatus fram_get(uint8_t *data) {
   FramStatus status;
 
   uint8_t len;
-  status = FRAM_Read(read_addr, 1, &len);
+  status = FramRead(read_addr, 1, &len);
   if (status != FRAM_SUCCESS) {
     return status;
   }
@@ -72,7 +72,7 @@ FramStatus fram_get(uint8_t *data) {
   
 
   // Read data from FRAM circular buffer
-  status = FRAM_Read(read_addr, len, data);
+  status = FramRead(read_addr, len, data);
   if (status != FRAM_SUCCESS) {
     return status;
   }
@@ -84,6 +84,6 @@ FramStatus fram_get(uint8_t *data) {
   return FRAM_SUCCESS;
 }
 
-uint16_t fram_buffer_len(void) {
+uint16_t FramBufferLen(void) {
   return buffer_len;
 }

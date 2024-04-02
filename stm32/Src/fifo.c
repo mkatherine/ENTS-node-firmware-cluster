@@ -55,7 +55,7 @@ FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   return FRAM_OK;
 }
 
-FramStatus FramGet(uint8_t *data) {
+FramStatus FramGet(uint8_t *data, uint8_t *len) {
   // Check if buffer is empty
   if (buffer_len == 0) {
     return FRAM_BUFFER_EMPTY;
@@ -63,8 +63,7 @@ FramStatus FramGet(uint8_t *data) {
 
   FramStatus status;
 
-  uint8_t len;
-  status = FramRead(read_addr, 1, &len);
+  status = FramRead(read_addr, 1, len);
   if (status != FRAM_OK) {
     return status;
   }
@@ -72,11 +71,11 @@ FramStatus FramGet(uint8_t *data) {
   
 
   // Read data from FRAM circular buffer
-  status = FramRead(read_addr, len, data);
+  status = FramRead(read_addr, *len, data);
   if (status != FRAM_OK) {
     return status;
   }
-  update_addr(&read_addr, len);
+  update_addr(&read_addr, *len);
 
   // Decrement buffer length
   --buffer_len;

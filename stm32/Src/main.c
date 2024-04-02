@@ -117,8 +117,11 @@ int main(void)
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
   // configure sensors
-  SensorsInit();
-  
+  SensorsAdd(ADC_measure);
+  SensorsAdd(SDI12_Teros12Measure);
+
+  // start sensor measurements
+  SensorsStart();
 
   /* USER CODE END 2 */
 

@@ -63,11 +63,12 @@ FramStatus FramPut(const uint8_t *data, uint16_t num_bytes);
 /**
  * @brief    Reads a measurement from the queue
  * 
-
+ *
  * @param    data Array to be read into
+ * @param    len Length of data
  * @return   See FramStatus
  */
-FramStatus FramGet(uint8_t *data);
+FramStatus FramGet(uint8_t *data, uint8_t *len);
 
 /**
  * @brief Get the current number of measurements stored in the buffer

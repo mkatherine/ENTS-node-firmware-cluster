@@ -40,7 +40,8 @@ void SensorsInit(void) {
                    SensorsMeasure);
 
   // create the run timer
-  UTIL_TIMER_Create(&MeasureTimer, MEASUREMENT_PERIOD, SensorsRun, NULL);
+  UTIL_TIMER_Create(&MeasureTimer, MEASUREMENT_PERIOD, UTIL_TIMER_PERIODIC,
+                    SensorsRun, NULL);
 }
 
 void SensorsStart(void) {
@@ -58,7 +59,7 @@ int SensorsAdd(SensorsPrototypeMeasure cb)
   // check for out of range error 
   if (callback_arr_len >= MAX_SENSORS) {
     APP_LOG(TS_OFF, VLEVEL_M, "Error: Too many sensors added!\r\n");
-    return -1
+    return -1;
   }
 
   // store callback in array

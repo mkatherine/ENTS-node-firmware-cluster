@@ -25,8 +25,6 @@
 #ifndef __SENSORS_H__
 #define __SENSORS_H__
 
-#include <cstdint>
-
 #include "stm32_seq.h"
 #include "stm32_timer.h"
 #include "lora_app.h"

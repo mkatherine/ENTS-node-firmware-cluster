@@ -91,15 +91,8 @@ typedef enum TxEventType_e
 #define LORAWAN_NVM_BASE_ADDRESS                    ((void *)0x0803F000UL)
 
 /* USER CODE BEGIN PD */
-bool transmission_cycle = false;
-uint8_t fake_min = 19;
-uint8_t fake_second = 0;
-uint8_t fake_hour = 11;
-
 Teros12_Data teros_backup;
 
-#define LOGGER_ID 200 // Will be user configurable later
-#define CELL_ID 200
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -426,110 +419,45 @@ static void SendTxData(void)
 {
   /* USER CODE BEGIN SendTxData_1 */
 
-  uint8_t battery_level;
-  uint16_t temperature;
-  Teros12_Data teros_measurments;
-  HAL_StatusTypeDef ret;
-  uint8_t teros_addr = '0';
-  uint8_t cell_id = CELL_ID;
-  uint8_t logger_id = LOGGER_ID;
+  // preconditions
 
-  if (LmHandlerIsBusy() == false)
-  {
-    battery_level = GetBatteryLevel();
-    temperature = SYS_GetTemperatureLevel();
-
-    RTC_TimeTypeDef sTime;
-    RTC_DateTypeDef sDate;
-    //ret = HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-    // ret = HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-
-    fake_second = fake_second + 10;
-    if (fake_second >= 60){
-      fake_min = fake_min + 1;
-      fake_second = 0;
-    }
-    if (fake_min >= 60) {
-      fake_hour = fake_hour +1;
-      fake_min = 0;
-    }
-
-    struct tm timeInfo = {
-        .tm_year = 124,  // 2021 (since 1900)
-        .tm_mon = 1,    // January (0-based)
-        .tm_mday = 22,
-        .tm_hour = fake_hour,
-        .tm_min = fake_min,
-        .tm_sec = fake_second,
-    };
-    
-    //APP_LOG(TS_OFF, VLEVEL_M, "Time: %02d:%02d:%02d\r\n", timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
-    // APP_LOG(TS_OFF, VLEVEL_M, "Date: %02d-%02d-%04d\r\n", sDate.Date, sDate.Month, sDate.Year + 2000);
-
-    time_t unixTimestamp = mktime(&timeInfo);
-
-    if (transmission_cycle == false) { // alternate betwen power and soil moisture sensor
-      int adc_voltage = ADC_readVoltage();
-      double adc_voltage_float = ((double) adc_voltage) / 1000.;
-      AppData.BufferSize = EncodePowerMeasurement((uint32_t) unixTimestamp,
-                                                  LOGGER_ID, CELL_ID,
-                                                  adc_voltage_float, 0.0,
-                                                  AppData.Buffer);
-    } else {
-      // SDI12_Measure_TypeDef measurment_info;
-      // char data[25];
-      //ret = SDI12_GetMeasurment(teros_addr, &measurment_info, data, 1000);
-      ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurments, 1000);
-      if (ret != HAL_OK){
-        simpleDelay();
-        simpleDelay();
-        simpleDelay();
-        ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurments, 1000);
-      }
-      if (teros_measurments.vwc_adj < 0){
-        teros_measurments = teros_backup;
-      }
-      
-      if (ret == HAL_OK){
-        APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");
-        teros_backup = teros_measurments;
-      } else if (ret == HAL_ERROR){
-        APP_LOG(TS_OFF, VLEVEL_M, "HAL_ERROR\r\n");
-        teros_measurments = teros_backup;
-      } else if (ret == HAL_TIMEOUT) {
-        APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
-        teros_measurments = teros_backup;
-      }
-      AppData.BufferSize = EncodeTeros12Measurement((uint32_t) unixTimestamp,
-                                                    LOGGER_ID, CELL_ID,
-                                                    (double) teros_measurments.vwc_raw,
-                                                    (double) teros_measurments.vwc_adj,
-                                                    (double) teros_measurments.tmp,
-                                                    teros_measurments.ec,
-                                                    AppData.Buffer);
-    }
-    transmission_cycle = !transmission_cycle;
-  
-    APP_LOG(TS_ON, VLEVEL_M, "Payload: ");
-    for (int i = 0; i < AppData.BufferSize; i++){
-      APP_LOG(TS_OFF, VLEVEL_M, "%x ", AppData.Buffer[i]);
-    }
-    APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
-    APP_LOG(TS_ON, VLEVEL_M, "%d\r\n", AppData.BufferSize);
-
-    AppData.Port = LORAWAN_SPS_MEAS_PORT;
-
-    if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, false))
-    {
-      APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
-    }
-    else
-    {
-      APP_LOG(TS_OFF, VLEVEL_M, "Could not send request\r\n");
-    }
+  // check if radio is busy
+  if (LmHandlerIsBusy()) {
+    return;
   }
 
+  // check if buffer is empty
+  if (FramBufferLen() <= 0) {
+    return;
+  }
 
+  uint8_t battery_level = GetBatteryLevel();
+  uint16_t temperature = SYS_GetTemperatureLevel();
+
+  FramStatus status = FramGet(AppData.Buffer, &AppData.BufferSize);
+  if (status != FRAM_OK) {
+    APP_LOG(TS_OFF, VLEVEL_M,
+            "Error getting data from fram buffer. FramStatus = %d", status);
+    return;
+  }
+
+  APP_LOG(TS_ON, VLEVEL_M, "Payload: ");
+  for (int i = 0; i < AppData.BufferSize; i++){
+    APP_LOG(TS_OFF, VLEVEL_M, "%x ", AppData.Buffer[i]);
+  }
+  APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
+  APP_LOG(TS_ON, VLEVEL_M, "%d\r\n", AppData.BufferSize);
+
+  AppData.Port = LORAWAN_SPS_MEAS_PORT;
+
+  if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, false))
+  {
+    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
+  }
+  else
+  {
+    APP_LOG(TS_OFF, VLEVEL_M, "Could not send request\r\n");
+  }
   /* USER CODE END SendTxData_1 */
 }
 

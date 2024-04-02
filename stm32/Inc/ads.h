@@ -1,12 +1,15 @@
 /**
-  ******************************************************************************
-  * @file     ads.h
-  * @author   Stephen Taylor
-  * @brief    This file contains all the function prototypes for
-  *           the ads.c file
-  * @date     11/27/2023
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file     ads.h
+ * @author   Stephen Taylor
+ * @brief    This file contains all the function prototypes for
+ *           the ads.c file
+ * @date     11/27/2023
+ ******************************************************************************
+ */
+
+#ifndef __ADS_H__
+#define __ADS_H__
 
 #include <stdio.h>
 
@@ -38,6 +41,10 @@
 #define CURRENT_SLOPE 0
 #define CURRENT_B 0
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /**
 ******************************************************************************
@@ -111,3 +118,9 @@ int ADC_filter(int readings[], int size);
  * @see SensorsPrototypeMeasure
  */
 size_t ADC_measure(uint8_t* data);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __ADS_H__ */

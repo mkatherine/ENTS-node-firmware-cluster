@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file     ads.h
@@ -8,17 +7,12 @@
   * @date     11/27/2023
   ******************************************************************************
   */
-/* USER CODE END Header */
 
-/* USER CODE BEGIN Includes */
 #include "i2c.h"
 #include "usart.h"
 
 #include <stdio.h>
 
-
-/* USER CODE END Includes */
-/* USER CODE BEGIN PD */
 #define ADS12_WRITE 0x80
 #define ADS12_READ 0x81
 
@@ -39,9 +33,7 @@
 
 #define CURRENT_SLOPE 0
 #define CURRENT_B 0
-/* USER CODE END PD */
 
-/* USER CODE BEGIN 1 */
 
 /**
 ******************************************************************************
@@ -104,6 +96,14 @@ HAL_StatusTypeDef ADC_probe(void);
 */
 int ADC_filter(int readings[], int size);
 
-
-
-/* USER CODE END 1 */
+/**
+ * @brief Reads adc and serializes measurement
+ * 
+ * Both voltage and current channels are measured. Resulting measurements are
+ * formatted into a protobuf PowerMeasurement.
+ * 
+ * @note Implemented for the sensors library
+ * 
+ * @see SensorsPrototypeMeasure
+ */
+size_t ADC_measure(uint8_t* data);

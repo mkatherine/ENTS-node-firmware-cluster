@@ -8,10 +8,14 @@
   ******************************************************************************
   */
 
+#include <stdio.h>
+
 #include "i2c.h"
 #include "usart.h"
 
-#include <stdio.h>
+#include "user_config.h"
+#include "timestamp.h"
+#include "transcoder.h"
 
 #define ADS12_WRITE 0x80
 #define ADS12_READ 0x81

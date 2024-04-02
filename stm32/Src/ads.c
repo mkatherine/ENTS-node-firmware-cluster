@@ -140,14 +140,17 @@ int ADC_filter(int readings[], int size){
 }
 
 size_t ADC_measure(uint8_t *data) {
+  // get timestamp
+  time_t ts = TimestampNow();
 
-
-
+  // read voltage
   int adc_voltage = ADC_readVoltage();
   double adc_voltage_float = ((double) adc_voltage) / 1000.;
-  AppData.BufferSize = EncodePowerMeasurement((uint32_t) unixTimestamp,
-                                              LOGGER_ID, CELL_ID,
-                                              adc_voltage_float, 0.0,
-                                              AppData.Buffer);
-  return size_t();
+
+  // encode measurement
+  size_t data_len = EncodePowerMeasurement((uint32_t) ts, LOGGER_ID, CELL_ID,
+                                           adc_voltage_float, 0.0, data);
+
+  // return number of bytes in serialized measurement 
+  return data_len;
 }

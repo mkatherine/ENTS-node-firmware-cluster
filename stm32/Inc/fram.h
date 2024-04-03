@@ -25,11 +25,11 @@
 #ifdef __cplusplus
 extern "C"{
 #endif
-/* USER CODE END Header */
-#include "i2c.h"
-#include "fifo.h"
 
 #include <stdio.h>
+#include <stdint.h>
+
+#include "i2c.h"
 
 #ifndef FRAM_PAGES
 /** Number of pages on the fram chip */
@@ -70,7 +70,7 @@ typedef enum {
 } FramStatus;
 
 /** Max writeable address */
-const uint16_t fram_max_addr = FRAM_SEG_SIZE * FRAM_PAGES;
+static const uint16_t fram_max_addr = FRAM_SEG_SIZE * FRAM_PAGES;
 
 /**
  * @brief Writes bytes to an address

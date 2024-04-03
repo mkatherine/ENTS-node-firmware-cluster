@@ -1,7 +1,7 @@
 #include "fram.h"
 
 /** Timeout in seconds for the FRAM chip */
-const uint32_t fram_timeout = 10;
+const uint32_t fram_timeout = 100;
 
 /** Device I2C address */
 const uint16_t fram_i2c_addr = 0b10100000;
@@ -36,12 +36,11 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len)
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
-  for (int i = 0; i < len; i++) {
+  for (uint8_t *d = data; d < data+len; d++) {
     FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory
-    if (addr_mat.page > FRAM_PAGES)
-    {
+    if (addr_mat.page >= FRAM_PAGES) {
       return FRAM_OUT_OF_RANGE;
     }
 
@@ -53,7 +52,7 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len)
     // change of address.
     HAL_StatusTypeDef status;
     status = HAL_I2C_Mem_Write(&hi2c2, i2c_addr, addr_mat.seg,
-                               I2C_MEMADD_SIZE_8BIT, data[i], 1, fram_timeout);
+                               I2C_MEMADD_SIZE_8BIT, d, 1, fram_timeout);
     
     // return error if failed to write
     if (status != HAL_OK) {
@@ -62,7 +61,6 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len)
 
     // increment address
     ++addr;
-
   }
 
   return FRAM_OK;
@@ -73,12 +71,11 @@ FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data)
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
-  for (int i = 0; i < len; i++) {
+  for (uint8_t *d = data; d < data+len; d++) {
     FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory
-    if (addr_mat.page > FRAM_PAGES)
-    {
+    if (addr_mat.page >= FRAM_PAGES) {
       return FRAM_OUT_OF_RANGE;
     }
     // format the i2c address 
@@ -87,11 +84,8 @@ FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data)
     // Read byte to data address
     HAL_StatusTypeDef status;
     status = HAL_I2C_Mem_Read(&hi2c2, i2c_addr, addr_mat.seg,
-                              I2C_MEMADD_SIZE_8BIT, data, 1, fram_timeout);
+                              I2C_MEMADD_SIZE_8BIT, d, 1, fram_timeout);
 
-    // increment data addr
-    ++data;
-    
     // return error if failed to write
     if (status != HAL_OK) {
       return FRAM_ERROR;
@@ -126,7 +120,7 @@ FramAddress FramConvertAddrMem(uint16_t addr)
 {
   // convert flat address space to matrix
   FramAddress addr_mat;
-  addr_mat.page = addr / FRAM_PAGES;
+  addr_mat.page = addr / FRAM_SEG_SIZE;
   addr_mat.seg = addr % FRAM_SEG_SIZE;
 
   return addr_mat;

@@ -10,7 +10,7 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
-#include "fram.h"
+#include "fifo.h"
 
 
 void setUp(void) {
@@ -38,8 +38,9 @@ void test_FramPut_BufferFull(void) {
 
 void test_FramGet_BufferEmpty(void) {
   uint8_t data[fram_buffer_size];
+  uint8_t data_len;
 
-  FramStatus status = FramGet(data);
+  FramStatus status = FramGet(data, &data_len);
 
   TEST_ASSERT_EQUAL(FRAM_BUFFER_EMPTY, status);
 }
@@ -49,7 +50,8 @@ void test_FramGet_ValidData(void) {
   FramPut(put_data, sizeof(put_data));
 
   uint8_t get_data[sizeof(put_data)];
-  FramStatus status = FramGet(get_data);
+  uint8_t get_data_len;
+  FramStatus status = FramGet(get_data, &get_data_len);
 
   TEST_ASSERT_EQUAL(FRAM_OK, status);
   TEST_ASSERT_EQUAL_UINT8_ARRAY(put_data, get_data, sizeof(put_data));

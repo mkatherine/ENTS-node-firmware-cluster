@@ -20,7 +20,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_i2c(void){
-  uint8_t test = 34;
+  uint8_t test = 185;
   uint8_t received;
 
   HAL_StatusTypeDef status;
@@ -119,7 +119,7 @@ void test_FramRead_MultiplePages(void) {
   uint16_t addr = FRAM_SEG_SIZE;
 
   uint8_t write_data[] = {1, 2, 3, 4, 5}; 
-  FramRead(addr, write_data, sizeof(write_data));
+  FramWrite(addr, write_data, sizeof(write_data));
 
   uint8_t read_data[5];
   FramStatus status = FramRead(addr, sizeof(read_data), read_data);  

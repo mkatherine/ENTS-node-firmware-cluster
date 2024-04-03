@@ -8,8 +8,6 @@
 
 #include "fifo.h"
 
-
-
 static uint16_t read_addr = FRAM_BUFFER_START;
 static uint16_t write_addr = FRAM_BUFFER_START;
 
@@ -43,7 +41,7 @@ FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   update_addr(&write_addr, 1);
 
   // Write data to FRAM circular buffer
-  FramStatus status = FramWrite(write_addr, data, num_bytes);
+  status = FramWrite(write_addr, data, num_bytes);
   if (status != FRAM_OK) {
     return status;
   }

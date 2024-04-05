@@ -133,6 +133,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_UART_Transmit(&huart1, test, 10, 100);
   while (1)
   {
 
@@ -141,15 +142,15 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     if (HAL_UART_Receive(&huart1, clientMessage, 1, 100) == HAL_OK){
-        if (clientMessage[0] == 0x30){
-            voltage_reading = ADC_readVoltage();
-            current_reading = ADC_readCurrent();
-            bufferSize = EncodePowerMeasurement(0, 0, 0, voltage_reading, current_reading, powerMeasurment);
-            HAL_UART_Transmit(&huart1, bufferSize, 1, 100);
-            HAL_UART_Transmit(&huart1, powerMeasurment, bufferSize, 100);
-        } else {
-            HAL_UART_Transmit(&huart1, incorrectTx, 27, 100);
-        }
+      if (clientMessage[0] == 0x30){
+        voltage_reading = ADC_readVoltage();
+        current_reading = ADC_readCurrent();
+          bufferSize = EncodePowerMeasurement(0, 0, 0, voltage_reading, current_reading, powerMeasurment);
+          HAL_UART_Transmit(&huart1, bufferSize, 1, 100);
+          HAL_UART_Transmit(&huart1, powerMeasurment, bufferSize, 100);
+      } else {
+          HAL_UART_Transmit(&huart1, incorrectTx, 27, 100);
+      }
     }
 
   }

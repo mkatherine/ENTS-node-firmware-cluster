@@ -22,46 +22,67 @@ To see a list of all CLI parameters:::
 
     $ python recorder.py -h
 """
-
 import pdb
-
 import time
 import argparse
 import serial
+import socket
+from abc import ABC, abstractmethod  # Import ABC and abstractmethod
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from typing import Tuple
 from soil_power_sensor_protobuf import encode, decode
 
+class CommunicationInterface(ABC):  # Make CommunicationInterface an abstract class
+    def __init__(self):
+        pass
 
-class SerialController:
-    """Generic serial controller that will open and close serial connections"""
+    @abstractmethod
+    def write_command(self, command: bytes) -> None:
+        """Write a command to the communication interface."""
+        pass
 
-    # Serial port
-    ser = None
+    @abstractmethod
+    def read_response(self) -> str:
+        """Read and return the response from the communication interface."""
+        pass
 
+class SerialCommunication(CommunicationInterface):
     def __init__(self, port):
-        """Constructor
-
-        Initialises connection to serial port.
-
-        Parameters
-        ----------
-        port : str
-            Serial port of device
-        """
-
+        super().__init__()  # Call the superclass constructor
         self.ser = serial.Serial(port, timeout=1)
 
-    def __del__(self):
-        """Destructor
+    def write_command(self, command: bytes) -> None:
+        self.ser.write(command)
 
-        Closes connection to serial port.
-        """
-
+    def read_response(self) -> str:
+        return self.ser.readline()
+    
+    def close(self):
         self.ser.close()
 
+class LANCommunication(CommunicationInterface):
+    def __init__(self, ip, port):
+        super().__init__()  # Call the superclass constructor
+        self.ip = ip
+        self.port = port
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect((self.ip, self.port))
+
+    def write_command(self, command):
+        # Send a command
+        self.socket.sendall(command)
+
+    def read_response(self, buffer_size=1024):
+        # Receive the response
+        response = self.socket.recv(buffer_size)
+        return response.decode()
+
+    def close(self):
+        # Close the socket
+        if self.socket:
+            self.socket.close()
 
 class SoilPowerSensorController(SerialController):
     """Controller used to read values from the SPS"""
@@ -278,6 +299,12 @@ class SMUController(SerialController):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""Automated data recorder
         for Soil Power Sensor board using serial to control Keithley 2400 SMU""")
+    
+    # User-configurable parameters
+    communication_type = "serial"  # or "lan"
+    serial_port = "/dev/ttyACM0"
+    lan_ip = "128.114.204.219"
+    lan_port = 5025
 
     parser.add_argument(
         "--samples",

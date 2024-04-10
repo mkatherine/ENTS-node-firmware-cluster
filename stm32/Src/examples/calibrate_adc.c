@@ -111,7 +111,7 @@ int main(void)
     "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
     __DATE__,__TIME__
     );
-  HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
+  HAL_UART_Transmit_IT(&huart1, (const uint8_t *) info_str, info_len);
 
 
   /* USER CODE BEGIN 2 */
@@ -133,7 +133,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_UART_Transmit(&huart1, test, 10, 100);
+  HAL_UART_Transmit_IT(&huart1, test, 10);
   while (1)
   {
 
@@ -142,6 +142,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     if (HAL_UART_Receive(&huart1, clientMessage, 1, 100) == HAL_OK){
+      HAL_UART_Transmit(&huart1, test, 10, 100);
       if (clientMessage[0] == 0x30){
         voltage_reading = ADC_readVoltage();
         current_reading = ADC_readCurrent();

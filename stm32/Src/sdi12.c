@@ -346,7 +346,7 @@ size_t SDI12_Teros12Measure(uint8_t *data) {
   }
 
   // check return codes
-  APP_LOG(TS_OFF, VLEVEL_M, "TEROS12 HAL ret: ");
+  APP_LOG(TS_ON, VLEVEL_M, "TEROS12 HAL ret: ");
   if (ret == HAL_OK) {
     APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");
     teros_backup = teros_measurements;

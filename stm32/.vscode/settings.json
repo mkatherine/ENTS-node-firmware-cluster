@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "cmath": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "sdi12.h": "c",
+        "usart.h": "c"
     }
 }

@@ -109,15 +109,13 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
     //     return ret;
     // }
     char buffer[7];
-    char final_response[24];
-    char buf[22];
+    char final_response[40];
+    char buf[40];
     int buf_len = sprintf(buf, "0M!");
     char success[] = "HAL_OK\n";
     char failure[] = "HAL_FAIL\n";
     SDI12_SendCommand(buf, buf_len);
     if (SDI12_ReadData(buffer, 7, 10) == HAL_OK){
-      HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
-      HAL_UART_Transmit(&huart1, buffer, 7, 100);
     } else {
       HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
     }
@@ -146,6 +144,6 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
       return ret;
     }
     SDI12_SendCommand(sendData, size);
-    ret = SDI12_ReadData(final_response, 22, 100); 
+    ret = SDI12_ReadData(measurment_data, 18, 1000); 
     return ret;
 }

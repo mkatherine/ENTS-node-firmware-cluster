@@ -89,6 +89,19 @@ HAL_StatusTypeDef SDI12_SendCommand(const char *command, uint8_t size);
 */
 HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis);
 
+/**
+******************************************************************************
+* @brief    This is a function to read a measurment from a particular sensor.
+*
+* @param    char const addr, the device address
+* @param    SDI12_Measure_TypeDef, a custom struct to store the measurment information returned from start measurment
+* @param    char* the measurment data returned
+* @param    uint16_t timeoutMillis time out in milliseconds
+* @return   HAL_StatusTypeDef
+******************************************************************************
+*/
+HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
+
 #ifdef __cplusplus
 }
 #endif

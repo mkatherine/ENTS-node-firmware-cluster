@@ -44,7 +44,7 @@ void configureAsInput(void) {
 }
 
 
-HAL_StatusTypeDef ParseMeasurementResponse(const char *responseBuffer, char addr, SDI12_Measure_TypeDef *measurement_info)
+HAL_StatusTypeDef ParseMeasurementResponse_V1(const char *responseBuffer, char addr, SDI12_Measure_TypeDef *measurement_info)
 {
   char responseAddr;
   sscanf(responseBuffer, "%1c%3hu%1hhu", &responseAddr, &(measurement_info->Time), &(measurement_info->NumValues)); // Parse the response and populate the structure
@@ -61,7 +61,7 @@ HAL_StatusTypeDef ParseMeasurementResponse(const char *responseBuffer, char addr
   return HAL_OK;
 }
 
-HAL_StatusTypeDef ParseServiceRequest(const char *requestBuffer, char addr)
+HAL_StatusTypeDef ParseServiceReques_V1(const char *requestBuffer, char addr)
 {
   char expectedResponse[12];
   sprintf(expectedResponse, "%c\r\n", addr); // Construct the expected response ("a\r\n")
@@ -144,7 +144,7 @@ HAL_StatusTypeDef SDI12_ReadData_V1(char *buffer, uint16_t bufferSize, uint16_t 
   return HAL_TIMEOUT;
 }
 
-HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurement_data, uint16_t timeoutMillis)
+HAL_StatusTypeDef SDI12_GetMeasurment_V1(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurement_data, uint16_t timeoutMillis)
 {
   char command[MAX_RESPONSE_SIZE];        // Command to request measurement ("M1!\r\n" for example)
   char responseBuffer[MAX_RESPONSE_SIZE]; // Buffer to store the response    char responseAddr; // Address in sensor response
@@ -152,7 +152,7 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
   HAL_StatusTypeDef ret;
   //char error[15];
   configureAsOutput();
-  SDI12_WakeSensors();
+  SDI12_WakeSensors_V1();
 
   // Construct the command to request measurement
   sprintf(command, "%cM!", addr);
@@ -160,18 +160,18 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
   
 
   // Send the command to request measurement
-  SDI12_SendCommand(command, START_MEASUREMENT_COMMAND_SIZE);
+  SDI12_SendCommand_V1(command, START_MEASUREMENT_COMMAND_SIZE);
   configureAsInput();
 
   // Read the response from the device
-  ret = SDI12_ReadData(responseBuffer, START_MEASURMENT_RESPONSE_SIZE, timeoutMillis); // Will need to change the size to the size of the time till data ready function
+  ret = SDI12_ReadData_V1(responseBuffer, START_MEASURMENT_RESPONSE_SIZE, timeoutMillis); // Will need to change the size to the size of the time till data ready function
   if (ret != HAL_OK)
   {
     return ret;
   }
 
   // Parse the response and populate the structure
-  ret = ParseMeasurementResponse(responseBuffer, addr, measurment_info); // Will need to figure out what even is happening in here
+  ret = ParseMeasurementResponse_V1(responseBuffer, addr, measurment_info); // Will need to figure out what even is happening in here
   if (ret != HAL_OK)
   {
     //sprintf(error, "error %d", ret); // Why does this need to be here?
@@ -181,9 +181,9 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
   if (measurment_info->Time == 0)
   { // If data is ready now
     configureAsOutput();
-    SDI12_SendCommand(sendData, SEND_DATA_COMMAND_SIZE); 
+    SDI12_SendCommand_V1(sendData, SEND_DATA_COMMAND_SIZE); 
     configureAsInput();
-    ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); // double check the sizeof
+    ret = SDI12_ReadData_V1(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); // double check the sizeof
     return ret;
   }
 
@@ -192,21 +192,21 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
   { 
     if (HAL_GPIO_ReadPin(sdi12.Port, sdi12.Pin) == GPIO_PIN_SET) // If there is any activity on the data line
     { 
-      ret = SDI12_ReadData(responseBuffer, SERVICE_REQUEST_SIZE, timeoutMillis); // Read the data
+      ret = SDI12_ReadData_V1(responseBuffer, SERVICE_REQUEST_SIZE, timeoutMillis); // Read the data
       if (ret != HAL_OK)
       {
         return ret;
       }
-      ret = ParseServiceRequest(responseBuffer, measurment_info->Address); // Will need to go through this function again
+      ret = ParseServiceRequest_V1(responseBuffer, measurment_info->Address); // Will need to go through this function again
       if (ret != HAL_OK)
       {
         return ret;
       }
       configureAsOutput(); // Wake and tell the sensor to send the data
-      SDI12_WakeSensors();
-      SDI12_SendCommand(sendData, SEND_DATA_COMMAND_SIZE);
+      SDI12_WakeSensors_V1();
+      SDI12_SendCommand_V1(sendData, SEND_DATA_COMMAND_SIZE);
       configureAsInput();
-      ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // read the data and return
+      ret = SDI12_ReadData_V1(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // read the data and return
       return ret;
     }
   }

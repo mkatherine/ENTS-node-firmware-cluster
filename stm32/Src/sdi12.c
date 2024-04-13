@@ -14,13 +14,6 @@
 
 #include "sdi12.h"
 
-typedef struct
-{
-  char Address;
-  uint16_t Time;
-  uint8_t NumValues;
-} SDI12_Measure_TypeDef;
-
 // Start LPTIM for delay generation
 void LPTIM_Delay_Start() {
   HAL_LPTIM_Counter_Start_IT(&hlptim1, 0xFFFF); // Counter value doesn't matter
@@ -55,25 +48,26 @@ void SDI12_WakeSensors(void){
 }
 
 HAL_StatusTypeDef SDI12_SendCommand(const char *command, uint8_t size){
+    HAL_StatusTypeDef ret;
     SDI12_WakeSensors();
-    return HAL_UART_Transmit(&huart2, (const uint8_t *) command, size, 1000);
+    ret = HAL_UART_Transmit(&huart2, (const uint8_t *) command, size, 1000);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
+    return ret;
 }
 
 HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis){
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
     __HAL_UART_FLUSH_DRREGISTER(&huart2);
-    HAL_UART_Receive(&huart2,(uint8_t *) buffer, bufferSize, timeoutMillis);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Set to TX mode
+    HAL_UART_Receive(&huart2,(uint8_t *) buffer, bufferSize, HAL_MAX_DELAY);
+    //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Set to TX mode
     return HAL_OK;
 }
 
 HAL_StatusTypeDef ParseMeasurementResponse(const char *responseBuffer, char addr, SDI12_Measure_TypeDef *measurement_info)
 {
-  char responseAddr;
-  sscanf(responseBuffer, "%1c%3hu%1hhu", &responseAddr, &(measurement_info->Time), &(measurement_info->NumValues)); // Parse the response and populate the structure
-  measurement_info->Address = addr; // Update address
+  sscanf(responseBuffer, "%1c%3hu%1hhu", &(measurement_info->Address), &(measurement_info->Time), &(measurement_info->NumValues)); // Parse the response and populate the structure
   // Check if the response address matches the expected address
-  if (responseAddr == addr)
+  if (measurement_info->Address == addr)
   {
     return HAL_OK; // Return success
   }
@@ -108,20 +102,50 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
 
     uint8_t size = sprintf(reqMeas, "%cM!", addr); // Construct a command to request a measurment
 
-    SDI12_SendCommand(reqMeas, size); // Request a measurment
+    // SDI12_SendCommand(reqMeas, size); // Request a measurment
 
-    ret = SDI12_ReadData(responseBuffer, sizeof(responseBuffer), timeoutMillis); // Read the data
-    if (ret != HAL_OK){
-        return ret;
+    // ret = SDI12_ReadData(responseBuffer, START_MEASURMENT_RESPONSE_SIZE, timeoutMillis); // Read the data
+    // if (ret != HAL_OK){
+    //     return ret;
+    // }
+    char buffer[7];
+    char final_response[24];
+    char buf[22];
+    int buf_len = sprintf(buf, "0M!");
+    char success[] = "HAL_OK\n";
+    char failure[] = "HAL_FAIL\n";
+    SDI12_SendCommand(buf, buf_len);
+    if (SDI12_ReadData(buffer, 7, 10) == HAL_OK){
+      HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
+      HAL_UART_Transmit(&huart1, buffer, 7, 100);
+    } else {
+      HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
     }
 
     size = sprintf(sendData, "%cD0!", addr); // Construct a command to send the data
 
-    ret = ParseMeasurementResponse(responseBuffer, addr, measurment_info); // Patse the data
+    ret = ParseMeasurementResponse(buffer, addr, measurment_info); // Check if the addresses match, the response from a teros is the same every time so we're going to leave it for now
+    if (ret != HAL_OK){
+        return ret;
+    }
 
     if (measurment_info->Time == 0){ // If data is ready now
         SDI12_SendCommand(sendData, size); 
-        ret = SDI12_ReadData_V1(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); // hard coded for a teros measurment response size
+        ret = SDI12_ReadData(measurment_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); // hard coded for a teros measurment response size
         return ret;
     }
+
+    ret = SDI12_ReadData(buffer, 3, 10); // Read the service request
+    if (ret != HAL_OK)
+    {
+      return ret;
+    }
+    ret = ParseServiceRequest(buffer, measurment_info->Address); // make sure the service request is correct
+    if (ret != HAL_OK)
+    {
+      return ret;
+    }
+    SDI12_SendCommand(sendData, size);
+    ret = SDI12_ReadData(final_response, 22, 100); 
+    return ret;
 }

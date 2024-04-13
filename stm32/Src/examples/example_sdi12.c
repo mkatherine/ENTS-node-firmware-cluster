@@ -64,6 +64,10 @@ int main(void)
   char failure[] = "HAL_FAIL\n";
   char buffer[7];
   LPTIM_Delay_Start();
+  uint8_t addr = '0';
+  SDI12_Measure_TypeDef measurment_info;
+
+
   
   // Infinite loop
   while (1)
@@ -71,13 +75,19 @@ int main(void)
     // Print voltage level
     char buf[32];
     int buf_len = sprintf(buf, "0M!");
-    SDI12_SendCommand(buf, buf_len);
-    if (SDI12_ReadData(buffer, 7, 10) == HAL_OK){
-      //HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
+    // SDI12_SendCommand(buf, buf_len);
+    // if (SDI12_ReadData(buffer, 7, 10) == HAL_OK){
+    //   HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
+    //   HAL_UART_Transmit(&huart1, buffer, 7, 100);
+    // } else {
+    //   HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
+    // }
+    if (SDI12_GetMeasurment(addr, &measurment_info,  buffer, 10) == HAL_OK){
+      HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
       HAL_UART_Transmit(&huart1, buffer, 7, 100);
     } else {
       HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
-    }
+    };
 
     // Sleep
     //HAL_Delay(DELAY);

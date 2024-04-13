@@ -44,7 +44,7 @@ void configureAsInput(void) {
 }
 
 
-HAL_StatusTypeDef ParseMeasurementResponse_V1(const char *responseBuffer, char addr, SDI12_Measure_TypeDef *measurement_info)
+HAL_StatusTypeDef ParseMeasurementResponse_V1(const char *responseBuffer, char addr, SDI12_Measure_TypeDef_V1 *measurement_info)
 {
   char responseAddr;
   sscanf(responseBuffer, "%1c%3hu%1hhu", &responseAddr, &(measurement_info->Time), &(measurement_info->NumValues)); // Parse the response and populate the structure
@@ -61,7 +61,7 @@ HAL_StatusTypeDef ParseMeasurementResponse_V1(const char *responseBuffer, char a
   return HAL_OK;
 }
 
-HAL_StatusTypeDef ParseServiceReques_V1(const char *requestBuffer, char addr)
+HAL_StatusTypeDef ParseServiceRequest_V1(const char *requestBuffer, char addr)
 {
   char expectedResponse[12];
   sprintf(expectedResponse, "%c\r\n", addr); // Construct the expected response ("a\r\n")
@@ -144,7 +144,7 @@ HAL_StatusTypeDef SDI12_ReadData_V1(char *buffer, uint16_t bufferSize, uint16_t 
   return HAL_TIMEOUT;
 }
 
-HAL_StatusTypeDef SDI12_GetMeasurment_V1(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurement_data, uint16_t timeoutMillis)
+HAL_StatusTypeDef SDI12_GetMeasurment_V1(uint8_t addr, SDI12_Measure_TypeDef_V1 *measurment_info, char *measurement_data, uint16_t timeoutMillis)
 {
   char command[MAX_RESPONSE_SIZE];        // Command to request measurement ("M1!\r\n" for example)
   char responseBuffer[MAX_RESPONSE_SIZE]; // Buffer to store the response    char responseAddr; // Address in sensor response
@@ -212,20 +212,20 @@ HAL_StatusTypeDef SDI12_GetMeasurment_V1(uint8_t addr, SDI12_Measure_TypeDef *me
   }
 
   configureAsOutput();
-  SDI12_WakeSensors(); // If ttt does elapse wake the sensors
-  SDI12_SendCommand(sendData, SEND_DATA_COMMAND_SIZE);
+  SDI12_WakeSensors_V1(); // If ttt does elapse wake the sensors
+  SDI12_SendCommand_V1(sendData, SEND_DATA_COMMAND_SIZE);
   configureAsInput();
-  ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); 
+  ret = SDI12_ReadData_V1(measurement_data, SEND_DATA_RESPONSE_SIZE + measurment_info->NumValues, timeoutMillis); 
   return ret;
 }
 
 HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_readings, uint16_t timeoutMillis)
 {
-  SDI12_Measure_TypeDef measurment_info;
+  SDI12_Measure_TypeDef_V1 measurment_info;
   HAL_StatusTypeDef ret;
   char measurement_data[20];
 
-  ret = SDI12_GetMeasurment(addr, &measurment_info, measurement_data, timeoutMillis); // Read from the TEROS
+  ret = SDI12_GetMeasurment_V1(addr, &measurment_info, measurement_data, timeoutMillis); // Read from the TEROS
   if (ret != HAL_OK){
     return ret;
   }
@@ -259,7 +259,7 @@ HAL_StatusTypeDef SDI12_ParseTeros12Measurement(const char *buffer, Teros12_Data
     i++;
 
     // Parse tmp
-    int tmp = 0;
+    //int tmp = 0;
     while (buffer[i] != '+') {
         floatBuffer[i - 2] = buffer[i];
         i++;
@@ -292,11 +292,11 @@ HAL_StatusTypeDef SDI12_PingDevice(uint8_t deviceAddress, char *responseBuffer, 
   sprintf(expectedResponse, "%c\r\n", deviceAddress); // Construct the expected response ("a\r\n")
 
   configureAsOutput(); // Set serial line to output
-  SDI12_WakeSensors(); // Wake the sensors
-  SDI12_SendCommand(command, ACTIVE_AWCKNOWLEDGE_COMMAND_SIZE); // Send the Active Acknowledge command
+  SDI12_WakeSensors_V1(); // Wake the sensors
+  SDI12_SendCommand_V1(command, ACTIVE_AWCKNOWLEDGE_COMMAND_SIZE); // Send the Active Acknowledge command
   configureAsInput(); // Set the serial line as input
   
-  ret = SDI12_ReadData(responseBuffer, bufferSize, timeoutMillis); // Read the response from the device
+  ret = SDI12_ReadData_V1(responseBuffer, bufferSize, timeoutMillis); // Read the response from the device
   if (ret != HAL_OK)
   {
     return ret;

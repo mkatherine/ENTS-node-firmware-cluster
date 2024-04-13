@@ -47,7 +47,7 @@ extern "C"
     char Address;
     uint16_t Time;
     uint8_t NumValues;
-  } SDI12_Measure_TypeDef;
+  } SDI12_Measure_TypeDef_V1;
 
   typedef struct
   {
@@ -113,7 +113,7 @@ extern "C"
   * @return   HAL_StatusTypeDef
   ******************************************************************************
   */
-  HAL_StatusTypeDef SDI12_GetMeasurment_V1(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
+  HAL_StatusTypeDef SDI12_GetMeasurment_V1(uint8_t addr, SDI12_Measure_TypeDef_V1 *measurment_info, char *measurment_data, uint16_t timeoutMillis);
 
   /**
   ******************************************************************************

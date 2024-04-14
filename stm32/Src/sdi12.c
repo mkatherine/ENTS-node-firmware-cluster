@@ -96,25 +96,13 @@ HAL_StatusTypeDef ParseServiceRequest(const char *requestBuffer, char addr)
 HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis)
 {
     char reqMeas[MAX_RESPONSE_SIZE];        // Command to request measurement ("0!\r\n" for example)
-    char responseBuffer[MAX_RESPONSE_SIZE]; // Buffer to store the response    char responseAddr; // Address in sensor response
     char sendData[MAX_RESPONSE_SIZE];       // Command to send the data
     HAL_StatusTypeDef ret;
 
     uint8_t size = sprintf(reqMeas, "%cM!", addr); // Construct a command to request a measurment
 
-    // SDI12_SendCommand(reqMeas, size); // Request a measurment
-
-    // ret = SDI12_ReadData(responseBuffer, START_MEASURMENT_RESPONSE_SIZE, timeoutMillis); // Read the data
-    // if (ret != HAL_OK){
-    //     return ret;
-    // }
     char buffer[7];
-    char final_response[24];
-    char buf[22];
-    int buf_len = sprintf(buf, "0M!");
-    char success[] = "HAL_OK\n";
-    char failure[] = "HAL_FAIL\n";
-    SDI12_SendCommand(buf, buf_len);
+    SDI12_SendCommand(reqMeas, size);
     ret = SDI12_ReadData(buffer, 7, 10);
     if (ret != HAL_OK){
       return ret;

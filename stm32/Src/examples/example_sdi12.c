@@ -82,9 +82,11 @@ int main(void)
     // LPTIM_Delay_ms(10);
 
     // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
-    // TIM16_Delay_ms(10);
+    // TIM16_Delay_ms(1000);
     // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
-    // TIM16_Delay_ms(10);
+    // TIM16_Delay_ms(1000);
+
+    
 
     if (SDI12_GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
       HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
@@ -94,7 +96,7 @@ int main(void)
     };
 
     //Sleep
-    for (int i = 0; i <= 50000; i++){
+    for (int i = 0; i <= 1000000; i++){
       asm("nop");
     };
   }

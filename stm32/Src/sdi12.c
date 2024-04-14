@@ -37,10 +37,8 @@ void LPTIM_Delay_ms(uint32_t milliseconds) {
 
 void TIM16_Delay_ms(uint32_t milliseconds) {
     // Calculate the number of timer counts for specific pulse
-    uint32_t pulseCounts = milliseconds * (SystemCoreClock / 1000);  
     
     HAL_TIM_Base_Start(&htim16);
-    htim16.Instance->CNT = 0; 
     // Get the current value of the TIM16 counter
     uint32_t start_tick = __HAL_TIM_GET_COUNTER(&htim16);
 
@@ -48,7 +46,7 @@ void TIM16_Delay_ms(uint32_t milliseconds) {
     uint32_t max_target_tick = 65535;
 
     // Calculate the target value of the TIM16 counter after the delay
-    uint32_t target_tick = start_tick + pulseCounts;
+    uint32_t target_tick = start_tick + milliseconds;
 
     // Monitor the counter until the specified number of milliseconds have passed
     while (__HAL_TIM_GET_COUNTER(&htim16) < target_tick) {
@@ -74,7 +72,7 @@ void SDI12_WakeSensors(void){
     // for (int i = 0; i <= 20000; i++){ // Figure out a way to do this delay with the low-power timer
     //   asm("nop");
     // };
-    LPTIM_Delay_ms(10);
+    TIM16_Delay_ms(10);
 
 }
 

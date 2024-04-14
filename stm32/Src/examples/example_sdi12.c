@@ -62,7 +62,7 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
   char success[] = "HAL_OK\n";
   char failure[] = "HAL_FAIL\n";
-  char buffer[18];
+  char buffer[7];
   LPTIM_Delay_Start();
   uint8_t addr = '0';
   SDI12_Measure_TypeDef measurment_info;
@@ -84,7 +84,7 @@ int main(void)
     // }
     if (SDI12_GetMeasurment(addr, &measurment_info,  buffer, 10) == HAL_OK){
       HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
-      HAL_UART_Transmit(&huart1, buffer, 18, 100);
+      HAL_UART_Transmit(&huart1, buffer, 7, 100);
     } else {
       HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
     };

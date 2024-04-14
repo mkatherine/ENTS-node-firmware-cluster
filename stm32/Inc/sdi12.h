@@ -23,6 +23,7 @@ extern "C"
 #include "gpio.h"
 #include "lptim.h"
 #include "user_config.h"
+#include "tim.h"
 
 #define WAKE_SENSOR_DELAY 13
 #define MARKING_DELAY 9
@@ -36,6 +37,9 @@ extern "C"
 #define SERVICE_REQUEST_SIZE 3
 #define SCALE_VWC_TO_INT 100
 #define SCALE_TMP_TO_INT 10
+#define LPTIM_CLOCK_FREQUENCY 2100000 // 2.1 MHz
+#define LPTIM_MS_TO_TICKS 30
+
 
 typedef struct
 {
@@ -53,9 +57,10 @@ typedef struct
   int addr;
 } Teros12_Data;
 
-void LPTIM_Delay_Start();
 
-void LPTIM_Delay(uint32_t delay_ms);
+void LPTIM_Delay_ms(uint32_t delay_ms);
+
+void TIM16_Delay_ms(uint32_t delay_ms);
 /**
 ******************************************************************************
 * @brief    Wake all sensors on the data line.

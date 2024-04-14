@@ -23,6 +23,7 @@
 #include "i2c.h"
 #include "app_lorawan.h"
 #include "lptim.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -109,6 +110,7 @@ int main(void)
   MX_LoRaWAN_Init();
   MX_I2C2_Init();
   MX_LPTIM1_Init();
+  MX_TIM16_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();

@@ -3,6 +3,7 @@
         "cmath": "c",
         "*.tcc": "c",
         "sdi12.h": "c",
-        "usart.h": "c"
+        "usart.h": "c",
+        "user_config.h": "c"
     }
 }

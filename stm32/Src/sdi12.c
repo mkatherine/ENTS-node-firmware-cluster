@@ -14,36 +14,67 @@
 
 #include "sdi12.h"
 
-// Start LPTIM for delay generation
-void LPTIM_Delay_Start() {
-  HAL_LPTIM_Counter_Start_IT(&hlptim1, 0xFFFF); // Counter value doesn't matter
+void LPTIM_Delay_ms(uint32_t milliseconds) {
+    // Calculate the number of timer counts for specic pulse
+    uint32_t pulseCounts = milliseconds * LPTIM_MS_TO_TICKS;   
+
+    // Start the LPTIM in counter Mode
+    
+    
+      // Wait until the pulse is complete
+    // Get the current value of the LPTIM counter
+    uint32_t start_tick = HAL_LPTIM_ReadCounter(&hlptim1);
+
+    // Calculate the target value of the LPTIM counter after the delay
+    uint32_t target_tick = start_tick + pulseCounts;
+
+    // Monitor the counter until the specified number of milliseconds have passed
+    while (HAL_LPTIM_ReadCounter(&hlptim1) < target_tick) {
+        // Wait
+    }
+    
 }
 
-// Delay function using LPTIM
-void LPTIM_Delay(uint32_t delay_ms) {
-  // Start LPTIM for delay generation
-  LPTIM_Delay_Start();
-  // Calculate number of ticks required for the delay
-  //uint32_t ticks = (delay_ms * HAL_RCC_GetPCLK1Freq()) / (hlptim.Init.Clock.Prescaler * 1000);
-  // Get current tick count from LPTIM counter register
-  uint32_t start_tick = LPTIM1->CNT;
-  uint32_t ticks = LPTIM1->CNT;
-  // Wait until the specified number of ticks has passed
-  while ((ticks - start_tick) < 148){
-    ticks = LPTIM1->CNT;
-  }
-  // Stop LPTIM
-  HAL_LPTIM_Counter_Stop_IT(&hlptim1); 
+void TIM16_Delay_ms(uint32_t milliseconds) {
+    // Calculate the number of timer counts for specific pulse
+    uint32_t pulseCounts = milliseconds * (SystemCoreClock / 1000);  
+    
+    HAL_TIM_Base_Start(&htim16);
+    htim16.Instance->CNT = 0; 
+    // Get the current value of the TIM16 counter
+    uint32_t start_tick = __HAL_TIM_GET_COUNTER(&htim16);
+
+    // Calculate the maximum target value of the TIM16 counter after the delay
+    uint32_t max_target_tick = 65535;
+
+    // Calculate the target value of the TIM16 counter after the delay
+    uint32_t target_tick = start_tick + pulseCounts;
+
+    // Monitor the counter until the specified number of milliseconds have passed
+    while (__HAL_TIM_GET_COUNTER(&htim16) < target_tick) {
+        // Check for overflow
+        if (target_tick > max_target_tick) {
+            // Calculate the remaining counts after overflow
+            uint32_t remaining_counts = target_tick - max_target_tick;
+            // Wait until the remaining counts have also elapsed
+            while (__HAL_TIM_GET_COUNTER(&htim16) < remaining_counts) {
+                // Wait
+            }
+            // Exit the loop after handling overflow
+            break;
+        }
+    }
+    HAL_TIM_Base_Stop(&htim16);
 }
 
 
 void SDI12_WakeSensors(void){
     HAL_LIN_SendBreak(&huart2); // Send a break 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
-    for (int i = 0; i <= 20000; i++){ // Figure out a way to do this delay with the low-power timer
-      asm("nop");
-    };
-    //LPTIM_Delay(9);
+    // for (int i = 0; i <= 20000; i++){ // Figure out a way to do this delay with the low-power timer
+    //   asm("nop");
+    // };
+    LPTIM_Delay_ms(10);
 
 }
 
@@ -102,15 +133,15 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
     uint8_t size = sprintf(reqMeas, "%cM!", addr); // Construct a command to request a measurment
 
     char buffer[7];
-    SDI12_SendCommand(reqMeas, size);
-    ret = SDI12_ReadData(buffer, 7, 10);
+    SDI12_SendCommand(reqMeas, size); // Request a measurment and read the response
+    ret = SDI12_ReadData(buffer, 7, timeoutMillis);
     if (ret != HAL_OK){
       return ret;
     }
 
     size = sprintf(sendData, "%cD0!", addr); // Construct a command to send the data
 
-    ret = ParseMeasurementResponse(buffer, addr, measurment_info); // Check if the addresses match, the response from a teros is the same every time so we're going to leave it for now
+    ret = ParseMeasurementResponse(buffer, addr, measurment_info); // Check if the addresses match from the response above, the response from a teros is the same every time so we're going to leave it for now
     if (ret != HAL_OK){
         return ret;
     }
@@ -121,7 +152,7 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
         return ret;
     }
 
-    ret = SDI12_ReadData(buffer, 3, 10); // Read the service request
+    ret = SDI12_ReadData(buffer, 3, timeoutMillis); // Read the service request, wait's for one to arrive
     if (ret != HAL_OK)
     {
       return ret;
@@ -132,6 +163,6 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
       return ret;
     }
     SDI12_SendCommand(sendData, size);
-    ret = SDI12_ReadData(measurment_data, 18, 100); 
+    ret = SDI12_ReadData(measurment_data, 18, timeoutMillis); // IT IS VERY IMPORTANT THAT THE AMOUNT OF DATA EXPECTED TO BE READ (bufferSize) MATCH WHAT IS SENT EXACTLY. Or maybe slightly smaller, but any greater causes the program to hang
     return ret;
 }

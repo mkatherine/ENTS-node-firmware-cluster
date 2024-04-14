@@ -12,20 +12,20 @@
 #include <stdlib.h>
 
 #include "bitbang.h"
-#include "tim.h"
+//#include "tim.h"
 #include "usart.h"
 
-void delayMicroseconds(uint32_t microseconds)
-{
-  //uint32_t timerTicks = microseconds * (FOUR_MHZ / HZ_TO_MHZ); // Set the period of Timer 2
-  uint32_t timerTicks = 3332;
-  __HAL_TIM_SET_AUTORELOAD(&htim2, timerTicks);
- // __HAL_TIM_SET_COUNTER(&htim2, 0); // Clear the counter value of Timer 2
-  HAL_TIM_Base_Start(&htim2); // Start the timer
-  while (__HAL_TIM_GET_COUNTER(&htim2) < timerTicks); // Wait until the counter reaches the target value
- // __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE); // Clear the update event flag
-  HAL_TIM_Base_Stop(&htim2); // Stop the timer
-}
+// void delayMicroseconds(uint32_t microseconds)
+// {
+//   //uint32_t timerTicks = microseconds * (FOUR_MHZ / HZ_TO_MHZ); // Set the period of Timer 2
+//   uint32_t timerTicks = 3332;
+//   __HAL_TIM_SET_AUTORELOAD(&htim2, timerTicks);
+//  // __HAL_TIM_SET_COUNTER(&htim2, 0); // Clear the counter value of Timer 2
+//   HAL_TIM_Base_Start(&htim2); // Start the timer
+//   while (__HAL_TIM_GET_COUNTER(&htim2) < timerTicks); // Wait until the counter reaches the target value
+//  // __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE); // Clear the update event flag
+//   HAL_TIM_Base_Stop(&htim2); // Stop the timer
+// }
 
 void simpleDelay(){
   for (uint32_t i = 0; i < NUMBER_OF_LOOPS_PER_BIT; i++) {

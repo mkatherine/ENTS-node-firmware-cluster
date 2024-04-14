@@ -15,6 +15,7 @@
 #include "gpio.h"
 #include "lptim.h"
 #include "sdi12.h"
+//#include "tim.c"
 
 #include <stdio.h>
 
@@ -48,6 +49,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_LPTIM1_Init();
+  MX_TIM16_Init();
 
   // User level initialization
 
@@ -63,7 +65,6 @@ int main(void)
   char success[] = "HAL_OK\n";
   char failure[] = "HAL_FAIL\n";
   char buffer[20];
-  LPTIM_Delay_Start();
   uint8_t addr = '0';
   SDI12_Measure_TypeDef measurment_info;
 
@@ -75,23 +76,25 @@ int main(void)
     // Print voltage level
     char buf[32];
     int buf_len = sprintf(buf, "0M!");
-    // SDI12_SendCommand(buf, buf_len);
-    // if (SDI12_ReadData(buffer, 7, 10) == HAL_OK){
-    //   HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
-    //   HAL_UART_Transmit(&huart1, buffer, 7, 100);
-    // } else {
-    //   HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
-    // }
-    if (SDI12_GetMeasurment(addr, &measurment_info,  buffer, 10) == HAL_OK){
+    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
+    // LPTIM_Delay_ms(10);
+    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+    // LPTIM_Delay_ms(10);
+
+    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
+    // TIM16_Delay_ms(10);
+    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+    // TIM16_Delay_ms(10);
+
+    if (SDI12_GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
       HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
       HAL_UART_Transmit(&huart1, buffer, 18, 100);
     } else {
       HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
     };
 
-    // Sleep
-    //HAL_Delay(DELAY);
-    for (int i = 0; i <= 1000000; i++){
+    //Sleep
+    for (int i = 0; i <= 50000; i++){
       asm("nop");
     };
   }

@@ -39,7 +39,7 @@ void MX_LPTIM1_Init(void)
   /* USER CODE END LPTIM1_Init 1 */
   hlptim1.Instance = LPTIM1;
   hlptim1.Init.Clock.Source = LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC;
-  hlptim1.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV128;
+  hlptim1.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV1;
   hlptim1.Init.Trigger.Source = LPTIM_TRIGSOURCE_SOFTWARE;
   hlptim1.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
   hlptim1.Init.UpdateMode = LPTIM_UPDATE_IMMEDIATE;
@@ -51,6 +51,13 @@ void MX_LPTIM1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN LPTIM1_Init 2 */
+  /* Set Auto-Reload Register (ARR) value for 1 ms period */
+  // TimOut.Autoreload = 2100 - 1;  // For 2.1 MHz clock with prescaler of 1
+
+  // /* Configure LPTIM TimeOut feature */
+  // HAL_LPTIM_TimeOut_Config(&hlptim1, &TimOut);
+  __HAL_RCC_LPTIM1_CLK_ENABLE();
+  HAL_LPTIM_Counter_Start(&hlptim1, 0xFFFF);
 
   /* USER CODE END LPTIM1_Init 2 */
 

@@ -87,15 +87,6 @@ int main(void)
     // Print voltage level
     char buf[32];
     int buf_len = sprintf(buf, "0M!");
-    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
-    // LPTIM_Delay_ms(10);
-    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
-    // LPTIM_Delay_ms(10);
-
-    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
-    // TIM1_Delay_ms(10);
-    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
-    // TIM1_Delay_ms(10);
 
 
     if (SDI12_GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
@@ -105,15 +96,6 @@ int main(void)
       HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
     };
 
-  // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
-  // HAL_LIN_SendBreak(&huart2); // Send a break 
-  
-  // for (int i = 0; i <= 80000; i++){ // Figure out a way to do this delay with the low-power timer
-  //     asm("nop");
-  //   };
-
-  // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Send the marking 
-  // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
 
     //Sleep
     for (int i = 0; i <= 1000000; i++){

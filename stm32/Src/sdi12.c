@@ -3,8 +3,8 @@
  * @file    sdi12.c
  * @author  Stephen Taylor
  * @brief   This file provides a library to communicate between a STM32 MC
- *          and a SDI-12 device.
- * @date    1/30/2024
+ *          and a TEROS-12 via SDI-12.
+ * @date    4/1/2024
  *
  ******************************************************************************
  **/
@@ -83,7 +83,6 @@ void SDI12_WakeSensors(void){
     HAL_LIN_SendBreak(&huart2); // Send a break 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
     HAL_Delay(20); // Need an extra 10ms to account for the fact that HAL_LIN_SendBreak is nonblocking
-
 }
 
 HAL_StatusTypeDef SDI12_SendCommand(const char *command, uint8_t size){
@@ -98,7 +97,6 @@ HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t tim
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
     __HAL_UART_FLUSH_DRREGISTER(&huart2);
     HAL_UART_Receive(&huart2,(uint8_t *) buffer, bufferSize, HAL_MAX_DELAY);
-    //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Set to TX mode
     return HAL_OK;
 }
 

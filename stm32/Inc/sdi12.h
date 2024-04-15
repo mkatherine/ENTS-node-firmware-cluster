@@ -2,9 +2,10 @@
  ******************************************************************************
  * @file     sdi12.h
  * @author   Stephen Taylor
- * @brief    This file contains all the driver functions for the sdi12 interface
+ * @brief    This file contains all the driver functions for communication to a
+ *           TEROS-12 sensor via SDI-12.
  *
- * @date     1/30/2024
+ * @date     4/1/2024
  ******************************************************************************
  */
 
@@ -63,6 +64,7 @@ void LPTIM_Delay_ms(uint32_t delay_ms);
 void TIM16_Delay_ms(uint32_t delay_ms);
 
 void TIM1_Delay_ms(uint32_t milliseconds);
+
 /**
 ******************************************************************************
 * @brief    Wake all sensors on the data line.
@@ -85,7 +87,7 @@ HAL_StatusTypeDef SDI12_SendCommand(const char *command, uint8_t size);
 
 /**
 ******************************************************************************
-* @brief    Read data from a sensor via SDI-12
+* @brief    Read data from a TEROS-12 sensor via SDI-12
 *
 * @param    char *, buffer
 * @param    uint16_t, bufferSize

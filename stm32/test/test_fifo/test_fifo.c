@@ -56,13 +56,13 @@ void test_FramPut_Sequential(void) {
 }
 
 void test_FramPut_Sequential_BufferFull(void) {
-  const int niters = 20;
-  
   // starting values
   uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+  
+  const int niters = fram_buffer_size / (sizeof(data)+1);
 
   // write 100 times, therefore 1100 bytes (data + len)
-  for (int i = 0; i < (fram_buffer_size / (sizeof(data)+1)); i++) {
+  for (int i = 0; i < niters; i++) {
     FramStatus status_zero = FramPut(data, sizeof(data));
     TEST_ASSERT_EQUAL(FRAM_OK, status_zero);
   }
@@ -203,6 +203,38 @@ void test_FramBufferClear(void) {
   TEST_ASSERT_EQUAL(0, FramBufferLen());
 }
 
+void test_FramBuffer_Wraparound(void) {
+  // checks for errors when read addr > write addr
+  FramStatus status;
+
+  // number of bytes to get halfway on the address space
+  const uint16_t half_num_bytes = fram_buffer_size / 2;
+
+  const uint8_t zeros[fram_buffer_size];
+  
+  uint8_t buffer[sizeof(zeros)];
+
+  // move write to halfway point
+  status = FramPut(zeros, half_num_bytes);
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+
+  // move read head
+  uint8_t data_read_len;
+  status = FramGet(buffer, &data_read_len);
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+
+  // wrap round write head
+  // -1 is to account for the length byte
+  status = FramPut(zeros, fram_buffer_size-1);
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+
+  // write some data to check it read head is overwritten
+  const  uint8_t data[5] = {0, 1, 2, 3, 4};
+
+  status = FramPut(data, sizeof(data));
+  TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
+}
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -248,6 +280,7 @@ int main(void)
   RUN_TEST(test_FramGet_BufferEmpty);
   RUN_TEST(test_FramGet_Sequential);
   RUN_TEST(test_FramGet_Sequential_BufferFull);
+  RUN_TEST(test_FramBuffer_Wraparound);
   UNITY_END();
   /* USER CODE END 3 */
 }

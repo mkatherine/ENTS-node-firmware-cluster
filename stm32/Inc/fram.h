@@ -38,7 +38,7 @@ extern "C"{
 
 #ifndef FRAM_SEG_SIZE
 /** Size of each memory segment in bytes */
-#define FRAM_SEG_SIZE 255
+#define FRAM_SEG_SIZE 256
 #endif
 
 #define USER_DATA_PAGE_ADDRESS 0x07
@@ -70,7 +70,7 @@ typedef enum {
 } FramStatus;
 
 /** Max writeable address */
-static const uint16_t fram_max_addr = FRAM_SEG_SIZE * FRAM_PAGES;
+static const uint16_t fram_max_addr = (FRAM_SEG_SIZE * FRAM_PAGES) - 1;
 
 /**
  * @brief Writes bytes to an address

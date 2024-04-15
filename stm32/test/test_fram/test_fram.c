@@ -67,7 +67,7 @@ void test_FramWrite_ZeroLength(void) {
 void test_FramWrite_MultiplePages(void) {
   uint8_t data [] = {1, 2, 3, 4, 5};
   // right below the segment size
-  uint16_t addr = FRAM_SEG_SIZE;
+  uint16_t addr = FRAM_SEG_SIZE-1;
 
   FramStatus status = FramWrite(addr, data, sizeof(data));
 
@@ -116,7 +116,7 @@ void test_FramRead_OutOfRange(void) {
 
 void test_FramRead_MultiplePages(void) {
   // right below the segment size
-  uint16_t addr = FRAM_SEG_SIZE;
+  uint16_t addr = FRAM_SEG_SIZE-1;
 
   uint8_t write_data[] = {1, 2, 3, 4, 5}; 
   FramWrite(addr, write_data, sizeof(write_data));

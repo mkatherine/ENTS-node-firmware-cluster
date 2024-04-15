@@ -29,11 +29,46 @@ void test_FramPut_ValidData(void) {
 }
 
 void test_FramPut_BufferFull(void) {
-  uint8_t data[fram_buffer_size + 1];  // Data size is larger than the buffer size
+  // Data size is larger than the buffer size
+  uint8_t data[fram_buffer_size + 1];
 
   FramStatus status = FramPut(data, sizeof(data));
 
   TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
+}
+
+void test_FramPut_Sequential(void) {
+  const int niters = 20;
+
+  // starting values
+  uint8_t data[10] = {0, 1, 2, 3, 4};
+
+  // write 100 times, therefore 1100 bytes (data + len)
+  for (int i = 0; i < niters; i++) {
+    FramStatus status = FramPut(data, sizeof(data));
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+
+    // increment index of data
+    for (int j = 0; j < sizeof(data); j++) {
+      data[j]++;
+    }
+  }
+}
+
+void test_FramPut_Sequential_BufferFull(void) {
+  const int niters = 20;
+  
+  // starting values
+  uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+
+  // write 100 times, therefore 1100 bytes (data + len)
+  for (int i = 0; i < (fram_buffer_size / (sizeof(data)+1)); i++) {
+    FramStatus status_zero = FramPut(data, sizeof(data));
+    TEST_ASSERT_EQUAL(FRAM_OK, status_zero);
+  }
+
+  FramStatus status_full = FramPut(data, sizeof(data));
+  TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status_full);
 }
 
 void test_FramGet_BufferEmpty(void) {
@@ -55,6 +90,91 @@ void test_FramGet_ValidData(void) {
 
   TEST_ASSERT_EQUAL(FRAM_OK, status);
   TEST_ASSERT_EQUAL_UINT8_ARRAY(put_data, get_data, sizeof(put_data));
+}
+
+void test_FramGet_Sequential(void) {
+  const int niters = 20;
+
+  // starting values
+  uint8_t put_data[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+  // write 100 times, therefore 1100 bytes (data+len)
+  for (int i = 0; i < niters; i++) {
+    FramPut(put_data, sizeof(put_data));
+
+    // increment index of data
+    for (int j = 0; j < sizeof(put_data); j++) {
+      put_data[j]++;
+    }
+  }
+
+  // reset put_data to starting values
+  // was unsure about the behavior of memcpy
+  for (int i = 0; i < sizeof(put_data); i++) {
+    put_data[i] = i;
+  }
+
+  uint8_t get_data[10] = {0};
+
+  // read back all the data
+  for (int i = 0; i < niters; i++) {
+    uint8_t get_data_len = 0;
+    FramStatus status_get = FramGet(get_data, &get_data_len);
+
+    TEST_ASSERT_EQUAL(FRAM_OK, status_get);
+    TEST_ASSERT_EQUAL_INT(10, get_data_len);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(put_data, get_data, sizeof(put_data));
+    
+    // increment index of data
+    for (int j = 0; j < sizeof(put_data); j++) {
+      put_data[j]++;
+    }
+  }
+}
+
+void test_FramGet_Sequential_BufferFull(void) {
+  FramStatus status = FRAM_OK;
+
+  // starting values
+  uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+
+  const int niters = (fram_buffer_size / (sizeof(data)+1));
+
+  // write 100 times, therefore 1100 bytes (data + len)
+  for (int i = 0; i < niters; i++) {
+    status = FramPut(data, sizeof(data));
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+
+    // increment data
+    for (int j = 0; j < sizeof(data); j++) {
+      data[j] += sizeof(data);
+    }
+  }
+
+  // try writing data
+  status = FramPut(data, sizeof(data));
+  TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
+  
+  // reset data
+  for (int i = 0; i < sizeof(data); i++) {
+    data[i] = i;
+  }
+
+  uint8_t get_data[sizeof(data)] = {0};
+
+  for (int i = 0; i < niters; i++) {
+    uint8_t get_data_len = 0;
+    status = FramGet(get_data, &get_data_len);
+
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+    TEST_ASSERT_EQUAL_INT(sizeof(data), get_data_len);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(data, get_data, sizeof(data));
+
+    // increment data
+    for (int j = 0; j < sizeof(data); j++) {
+      data[j] += sizeof(data);
+    }
+  }
 }
 
 void test_FramBufferLen(void) {
@@ -109,6 +229,12 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+
+  // wait for UART
+  for (int i = 0; i < 1000000; i++) {
+      __NOP();
+  }
+
   UNITY_BEGIN();
   // other tests depend on the following two
   RUN_TEST(test_FramBufferClear);
@@ -116,8 +242,12 @@ int main(void)
   // test buffer functions
   RUN_TEST(test_FramPut_ValidData);
   RUN_TEST(test_FramPut_BufferFull);
+  RUN_TEST(test_FramPut_Sequential);
+  RUN_TEST(test_FramPut_Sequential_BufferFull);
   RUN_TEST(test_FramGet_ValidData);
   RUN_TEST(test_FramGet_BufferEmpty);
+  RUN_TEST(test_FramGet_Sequential);
+  RUN_TEST(test_FramGet_Sequential_BufferFull);
   UNITY_END();
   /* USER CODE END 3 */
 }

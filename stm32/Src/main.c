@@ -112,6 +112,7 @@ int main(void)
   MX_LPTIM1_Init();
   MX_TIM16_Init();
   MX_USART2_UART_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
   SDI12_Init(GPIOA, GPIO_PIN_2);

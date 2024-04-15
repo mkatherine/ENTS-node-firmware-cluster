@@ -61,6 +61,8 @@ typedef struct
 void LPTIM_Delay_ms(uint32_t delay_ms);
 
 void TIM16_Delay_ms(uint32_t delay_ms);
+
+void TIM1_Delay_ms(uint32_t milliseconds);
 /**
 ******************************************************************************
 * @brief    Wake all sensors on the data line.

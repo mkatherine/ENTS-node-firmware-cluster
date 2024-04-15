@@ -65,14 +65,24 @@ void TIM16_Delay_ms(uint32_t milliseconds) {
     HAL_TIM_Base_Stop(&htim16);
 }
 
+void TIM1_Delay_ms(uint32_t milliseconds) {
+    // Calculate the number of timer counts for specific pulse
+    
+    HAL_TIM_OnePulse_Start(&htim1, TIM_CHANNEL_1); // Needs a channel parameter but it should be disabled according to CubeMX
+    // Get the current value of the TIM16 counter
+    uint32_t start_tick = __HAL_TIM_GET_COUNTER(&htim16);
+
+    // Calculate the maximum target value of the TIM16 counter after the delay
+    while(__HAL_TIM_GET_COUNTER(&htim1) <= __HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1)){
+
+    }
+}
+
 
 void SDI12_WakeSensors(void){
     HAL_LIN_SendBreak(&huart2); // Send a break 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
-    // for (int i = 0; i <= 20000; i++){ // Figure out a way to do this delay with the low-power timer
-    //   asm("nop");
-    // };
-    TIM16_Delay_ms(10);
+    HAL_Delay(20); // Need an extra 10ms to account for the fact that HAL_LIN_SendBreak is nonblocking
 
 }
 
@@ -127,6 +137,7 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
     char reqMeas[MAX_RESPONSE_SIZE];        // Command to request measurement ("0!\r\n" for example)
     char sendData[MAX_RESPONSE_SIZE];       // Command to send the data
     HAL_StatusTypeDef ret;
+    char failure[] = "HAL_FAIL\n";
 
     uint8_t size = sprintf(reqMeas, "%cM!", addr); // Construct a command to request a measurment
 
@@ -136,6 +147,7 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
     if (ret != HAL_OK){
       return ret;
     }
+    
 
     size = sprintf(sendData, "%cD0!", addr); // Construct a command to send the data
 

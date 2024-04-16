@@ -118,7 +118,7 @@ int main(void)
 
   // configure sensors
   SensorsAdd(ADC_measure);
-  //SensorsAdd(SDI12_Teros12Measure);
+  SensorsAdd(SDI12_Teros12Measure);
 
   // start sensor measurements
   SensorsStart();

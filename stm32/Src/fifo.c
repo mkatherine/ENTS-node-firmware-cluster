@@ -38,11 +38,18 @@ static uint16_t get_remaining_space(void) {
   if (write_addr > read_addr) {
     space_used = write_addr - read_addr;  
   }
-  else if (read_addr < write_addr) {
-    space_used = read_addr - write_addr;
+  else if (write_addr < read_addr) {
+    space_used = fram_buffer_size - (read_addr - write_addr);
   }
   else {
-    space_used = 0;
+    // if anything is stored in buffer than entire capacity is used
+    // otherwise buffer is empty and all free space is available
+    if (buffer_len > 0) {
+      space_used = fram_buffer_size;
+    }
+    else {
+      space_used = 0;
+    }
   }
 
   uint16_t remaining_space = fram_buffer_size - space_used;

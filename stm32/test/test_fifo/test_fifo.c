@@ -207,6 +207,9 @@ void test_FramBuffer_Wraparound(void) {
   // checks for errors when read addr > write addr
   FramStatus status;
 
+  // write block size to handle length
+  const uint8_t block_size = 255;
+
   // number of bytes to get halfway on the address space
   const uint16_t half_num_bytes = fram_buffer_size / 2;
 
@@ -214,24 +217,27 @@ void test_FramBuffer_Wraparound(void) {
   
   uint8_t buffer[sizeof(zeros)];
 
-  // move write to halfway point
-  status = FramPut(zeros, half_num_bytes);
-  TEST_ASSERT_EQUAL(FRAM_OK, status);
+  // move write to roughly halfway point
+  for (int i = 0; i < (half_num_bytes / block_size); i++) {
+    status = FramPut(zeros, block_size);
+    TEST_ASSERT_EQUAL(FRAM_OK, status); 
+  }
 
-  // move read head
-  uint8_t data_read_len;
-  status = FramGet(buffer, &data_read_len);
-  TEST_ASSERT_EQUAL(FRAM_OK, status);
+  while (FramBufferLen() != 0) {
+    // move read head
+    uint8_t data_read_len;
+    status = FramGet(buffer, &data_read_len);
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+  }
 
-  // wrap round write head to just behind read
-  // -1 is to account for the length byte
-  status = FramPut(zeros, fram_buffer_size-2);
-  TEST_ASSERT_EQUAL(FRAM_OK, status);
+  for (int i = 0; i < (fram_buffer_size / block_size); i++) {
+    // wrap round write head to just behind read
+    // -1 is to account for the length byte
+    status = FramPut(zeros, block_size);
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+  }
 
-  // write some data to check it read head is overwritten
-  const  uint8_t data[5] = {0, 1, 2, 3, 4};
-
-  status = FramPut(data, sizeof(data));
+  status = FramPut(zeros, block_size);
   TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
 }
 

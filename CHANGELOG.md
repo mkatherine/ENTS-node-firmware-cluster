@@ -15,6 +15,9 @@ firmware versions for a hardware version.
 - Contributing resources ([Contributing](./CONTRIBUTING.md),
   [Code ofConduct](./CODE_OF_CONDUCT.md), and Changelog)
 - Issue and PR templates
+- RTC time synchronization support through LoRaWAN [#48](i48)
+
+[i48]: https://github.com/jlab-sensing/soil-power-sensor-firmware/issues/48
 
 ## [2.1.0] - 2024-02-25
 

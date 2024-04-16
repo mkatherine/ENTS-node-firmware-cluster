@@ -15,6 +15,16 @@ firmware versions for a hardware version.
 - Contributing resources ([Contributing](./CONTRIBUTING.md),
   [Code ofConduct](./CODE_OF_CONDUCT.md), and Changelog)
 - Issue and PR templates
+- New sensors library to simplify future sensor integrations
+- Transmit buffer [#41](i41)
+
+### Changed
+
+- Unit tests for fifo library in `test_fifo.c`
+- Implementation of fram to a flat address space
+- Implementation of fifo to a circular buffer
+
+[i41]: https://github.com/jlab-sensing/soil-power-sensor-firmware/issues/41
 
 ## [2.1.0] - 2024-02-25
 

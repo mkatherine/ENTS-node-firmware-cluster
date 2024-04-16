@@ -223,9 +223,9 @@ void test_FramBuffer_Wraparound(void) {
   status = FramGet(buffer, &data_read_len);
   TEST_ASSERT_EQUAL(FRAM_OK, status);
 
-  // wrap round write head
+  // wrap round write head to just behind read
   // -1 is to account for the length byte
-  status = FramPut(zeros, fram_buffer_size-1);
+  status = FramPut(zeros, fram_buffer_size-2);
   TEST_ASSERT_EQUAL(FRAM_OK, status);
 
   // write some data to check it read head is overwritten

@@ -82,7 +82,8 @@ void TIM1_Delay_ms(uint32_t milliseconds) {
 void SDI12_WakeSensors(void){
     HAL_LIN_SendBreak(&huart2); // Send a break 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking 
-    HAL_Delay(20); // Need an extra 10ms to account for the fact that HAL_LIN_SendBreak is nonblocking
+    //HAL_Delay(20); // Need an extra 10ms to account for the fact that HAL_LIN_SendBreak is nonblocking
+    TIM16_Delay_ms(25);
 }
 
 HAL_StatusTypeDef SDI12_SendCommand(const char *command, uint8_t size){

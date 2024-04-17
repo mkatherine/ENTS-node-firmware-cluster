@@ -130,7 +130,7 @@ void MX_TIM16_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM16_Init 2 */
-  // __HAL_RCC_TIM16_CLK_ENABLE();
+  __HAL_RCC_TIM16_CLK_ENABLE();
   
   /* USER CODE END TIM16_Init 2 */
 

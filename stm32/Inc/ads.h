@@ -11,6 +11,11 @@
 #ifndef __ADS_H__
 #define __ADS_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdio.h>
 
 #include "i2c.h"

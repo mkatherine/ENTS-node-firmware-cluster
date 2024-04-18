@@ -4,6 +4,7 @@
  * @author   Stephen Taylor
  * @brief    This file contains all the driver functions for communication to a
  *           TEROS-12 sensor via SDI-12.
+ *           https://www.sdi-12.org/
  *
  * @date     4/1/2024
  ******************************************************************************
@@ -26,22 +27,16 @@ extern "C"
 #include "user_config.h"
 #include "tim.h"
 
-#define WAKE_SENSOR_DELAY 13
-#define MARKING_DELAY 9
-#define MAX_RESPONSE_SIZE 100
-#define ACTIVE_AWCKNOWLEDGE_COMMAND_SIZE 2
-#define START_MEASUREMENT_COMMAND_SIZE 3
-#define START_MEASURMENT_RESPONSE_SIZE 7
-#define SEND_DATA_COMMAND_SIZE 4
-#define SEND_DATA_RESPONSE_SIZE 16 // You need to add the numvalues (n) value returned from start measurment
-#define SECONDS_TO_MILLISECONDS 1000
-#define SERVICE_REQUEST_SIZE 3
-#define SCALE_VWC_TO_INT 100
-#define SCALE_TMP_TO_INT 10
-#define LPTIM_CLOCK_FREQUENCY 2100000 // 2.1 MHz
-#define LPTIM_MS_TO_TICKS 30
+/** Status codes for the Fram library*/
+typedef enum {
+  SDI12_OK = 0,
+  SDI12_ERROR = -1,
+  SDI12_TIMEOUT_ON_READ = -2,
+  SDI12_PARSING_ERROR = -3,
+} SDI12Status;
 
 
+/* The returned values from a SDI12 get measurment command*/
 typedef struct
 {
   char Address;
@@ -49,6 +44,7 @@ typedef struct
   uint8_t NumValues;
 } SDI12_Measure_TypeDef;
 
+/* The relevant data for a TEROS-12 sensor*/
 typedef struct
 {
   int ec;
@@ -58,13 +54,6 @@ typedef struct
   int addr;
 } Teros12_Data;
 
-
-void LPTIM_Delay_ms(uint32_t delay_ms);
-
-void TIM16_Delay_ms(uint32_t delay_ms);
-
-void TIM1_Delay_ms(uint32_t milliseconds);
-
 /**
 ******************************************************************************
 * @brief    Wake all sensors on the data line.
@@ -73,17 +62,17 @@ void TIM1_Delay_ms(uint32_t milliseconds);
 * @return   void
 ******************************************************************************
 */
-void SDI12_WakeSensors(void);
+void SDI12WakeSensors(void);
 
 /**
 ******************************************************************************
 * @brief    Send a command via SDI12
 *
 * @param    const char *, command
-* @return   void
+* @return   SDI12Status
 ******************************************************************************
 */
-HAL_StatusTypeDef SDI12_SendCommand(const char *command, uint8_t size);
+SDI12Status SDI12SendCommand(const char *command, uint8_t size);
 
 /**
 ******************************************************************************
@@ -93,10 +82,10 @@ HAL_StatusTypeDef SDI12_SendCommand(const char *command, uint8_t size);
 * @param    uint16_t, bufferSize
 * @param    uint16_t, timeoutMillis
 * @param    const char *, command
-* @return   HAL_StatusTypeDef
+* @return   SDI12Status
 ******************************************************************************
 */
-HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis);
+SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis);
 
 /**
 ******************************************************************************
@@ -106,10 +95,10 @@ HAL_StatusTypeDef SDI12_ReadData(char *buffer, uint16_t bufferSize, uint16_t tim
 * @param    SDI12_Measure_TypeDef, a custom struct to store the measurment information returned from start measurment
 * @param    char* the measurment data returned
 * @param    uint16_t timeoutMillis time out in milliseconds
-* @return   HAL_StatusTypeDef
+* @return   SDI12Status
 ******************************************************************************
 */
-HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
+SDI12Status SDI12GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
 
 #ifdef __cplusplus
 }

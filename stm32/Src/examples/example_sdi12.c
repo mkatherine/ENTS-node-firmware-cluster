@@ -51,11 +51,8 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
-  MX_LPTIM1_Init();
-  MX_TIM16_Init();
-  MX_TIM1_Init();
-  //__HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-  MX_RTC_Init();
+  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI); add this back when the rtc is integrated, hopefully this will fix the issue, and than you can remove the nops in SDI12_WakeSensors
+  // MX_RTC_Init();
 
   HAL_TIM_OnePulse_MspInit(&htim1);
   __HAL_RCC_TIM1_CLK_ENABLE();
@@ -89,7 +86,7 @@ int main(void)
     int buf_len = sprintf(buf, "0M!");
 
 
-    if (SDI12_GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
+    if (SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
       HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
       HAL_UART_Transmit(&huart1, buffer, 18, 100);
     } else {

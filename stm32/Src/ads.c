@@ -72,7 +72,7 @@ HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
   
   code = ADS12_START_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
-  HAL_Delay(10); // Delay between reconfiguration and measurment
+  //HAL_Delay(10); // Delay between reconfiguration and measurment
   return ret;
 }
 

@@ -134,26 +134,19 @@ void test_FramRead_MultiplePages(void) {
   */
 int main(void)
 {
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  /* USER CODE BEGIN 2 */
+
+  // wait for UART
+  for (int i = 0; i < 1000000; i++) {
+      __NOP();
+  }
+
   UNITY_BEGIN();
   RUN_TEST(test_i2c);
   RUN_TEST(test_FramWrite_ValidData);
@@ -165,7 +158,6 @@ int main(void)
   RUN_TEST(test_FramRead_OutOfRange); 
   RUN_TEST(test_FramRead_MultiplePages);
   UNITY_END();
-  /* USER CODE END 3 */
 }
 
 /**

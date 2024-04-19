@@ -21,6 +21,7 @@ extern "C"
 
 #include "i2c.h"
 #include "sys_app.h"
+#include "stm32_systime.h"
 
 #include "bitbang.h"
 #include "user_config.h"

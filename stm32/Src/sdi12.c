@@ -328,7 +328,7 @@ size_t SDI12_Teros12Measure(uint8_t *data) {
   static Teros12_Data teros_backup;
 
   // get timestamp
-  time_t ts = TimestampNow();
+  SysTime_t ts = SysTimeGet();
 
   // get teros measurement
   HAL_StatusTypeDef ret;
@@ -361,7 +361,7 @@ size_t SDI12_Teros12Measure(uint8_t *data) {
   }
 
   // serialize data
-  size_t data_len = EncodeTeros12Measurement((uint32_t) ts, LOGGER_ID, CELL_ID,
+  size_t data_len = EncodeTeros12Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
                                              (double)teros_measurements.vwc_raw,
                                              (double)teros_measurements.vwc_adj,
                                              (double)teros_measurements.tmp,

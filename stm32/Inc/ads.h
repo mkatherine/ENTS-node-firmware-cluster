@@ -12,8 +12,7 @@
 #define __ADS_H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C"{
 #endif
 
 #include <stdio.h>
@@ -47,10 +46,7 @@ extern "C"
 #define CURRENT_SLOPE 0
 #define CURRENT_B 0
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+
 
 /**
 ******************************************************************************
@@ -66,6 +62,8 @@ extern "C"
 */
 HAL_StatusTypeDef ADC_init(void);
 
+HAL_StatusTypeDef ADC_configure(uint8_t reg_data);
+
 /**
 ******************************************************************************
 * @brief    This function reads the current ADC voltage value.
@@ -74,10 +72,10 @@ HAL_StatusTypeDef ADC_init(void);
 *           I2C the I2C communication protocol. This version simply chops the noisy bits.
 *           
 * @param    void
-* @return   int, current ADC reading in microvolts
+* @return   double, current ADC reading in microvolts
 ******************************************************************************
 */
-int ADC_readVoltage(void);
+double ADC_readVoltage(void);
 
 /**
 ******************************************************************************
@@ -87,10 +85,10 @@ int ADC_readVoltage(void);
 *           I2C the I2C communication protocol. This version simply chops the noisy bits.
 *           
 * @param    void
-* @return   int, current ADC reading in microamps
+* @return   double, current ADC reading in microamps
 ******************************************************************************
 */
-int ADC_readCurrent(void);
+double ADC_readCurrent(void);
 
 /**
 ******************************************************************************
@@ -102,31 +100,12 @@ int ADC_readCurrent(void);
 */
 HAL_StatusTypeDef ADC_probe(void);
 
-/**
-******************************************************************************
-* @brief    This function filters ADC
-*           
-* @param    int num[]
-* @param    int size
-* @return   int filtered_reading
-******************************************************************************
-*/
-int ADC_filter(int readings[], int size);
-
-/**
- * @brief Reads adc and serializes measurement
- * 
- * Both voltage and current channels are measured. Resulting measurements are
- * formatted into a protobuf PowerMeasurement.
- * 
- * @note Implemented for the sensors library
- * 
- * @see SensorsPrototypeMeasure
- */
-size_t ADC_measure(uint8_t* data);
+size_t ADC_measure(uint8_t *data);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __ADS_H__ */
+
+/* USER CODE END 1 */

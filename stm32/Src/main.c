@@ -112,7 +112,6 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
-  SDI12_Init(GPIOA, GPIO_PIN_2);
   MX_RTC_Init();
   SensorsInit();
 

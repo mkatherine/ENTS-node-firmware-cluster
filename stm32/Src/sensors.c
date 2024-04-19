@@ -14,10 +14,12 @@ static SensorsPrototypeMeasure callback_arr[MAX_SENSORS];
 /** Length of @ref callback_arr */
 static unsigned int callback_arr_len = 0;
 
-static buffer_size = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
+static const uint8_t buffer_size = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
 
 /** Periodic timer for querying sensors */
 static UTIL_TIMER_Object_t MeasureTimer;
+
+static const uint32_t measure_period = MEASUREMENT_PERIOD;
 
 /**
  * @brief Measures sensors and adds to tx buffer
@@ -40,7 +42,7 @@ void SensorsInit(void) {
                    SensorsMeasure);
 
   // create the run timer
-  UTIL_TIMER_Create(&MeasureTimer, MEASUREMENT_PERIOD, UTIL_TIMER_PERIODIC,
+  UTIL_TIMER_Create(&MeasureTimer, measure_period, UTIL_TIMER_PERIODIC,
                     SensorsRun, NULL);
 }
 
@@ -78,13 +80,13 @@ void SensorsMeasure(void) {
   for (int i = 0; i < callback_arr_len; i++) {
     // call measurement function
     buffer_len = callback_arr[i](buffer);
-    APP_LOG(TS_OFF, VLEVEL_H, "Callback index: %d\r\n", i);
-    APP_LOG(TS_OFF, VLEVEL_H, "Buffer length: %u\r\n", buffer_len);
-    APP_LOG(TS_OFF, VLEVEL_H, "Buffer: ");
+    APP_LOG(TS_ON, VLEVEL_M, "Callback index: %d\r\n", i);
+    APP_LOG(TS_ON, VLEVEL_M, "Buffer length: %u\r\n", buffer_len);
+    APP_LOG(TS_ON, VLEVEL_M, "Buffer: ");
     for (int j = 0; j < buffer_len; j++) {
-      APP_LOG(TS_OFF< VLEVEL_H, "%x", buffer[j]);
+      APP_LOG(TS_OFF, VLEVEL_M, "%x", buffer[j]);
     }
-    APP_LOG(TS_OFF, VLEVEL_H, "\r\n");
+    APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
     
     // add to tx buffer
     FramStatus status = FramPut(buffer, buffer_len);

@@ -15,6 +15,7 @@
 
 #include "i2c.h"
 #include "usart.h"
+#include "stm32_systime.h"
 
 #include "user_config.h"
 #include "timestamp.h"

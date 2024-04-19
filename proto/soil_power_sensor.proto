@@ -44,6 +44,14 @@ message Teros12Measurement {
   uint32 ec = 5;
 }
 
+/* Phytos measurement */
+message Phytos31Measurement {
+  // raw adc voltage
+  double voltage = 1;
+  // calibrated leaf wetness
+  double leaf_wetness = 2;
+}
+
 /* Top level measurement message */
 message Measurement {
   // Metadata
@@ -53,6 +61,7 @@ message Measurement {
   oneof measurement {
     PowerMeasurement power = 2;
     Teros12Measurement teros12 = 3;
+    Phytos31Measurement phytos31 = 4;
   }
 }
 

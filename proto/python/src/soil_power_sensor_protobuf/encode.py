@@ -82,7 +82,7 @@ def encode_teros12_measurement(ts: int, cell_id: int, logger_id: int,
         ec: Electrical conductivity
     
     Returns:
-        Serialized Power measurement 
+        Serialized Teros12 measurement 
     """
     
     meas = Measurement()
@@ -99,3 +99,32 @@ def encode_teros12_measurement(ts: int, cell_id: int, logger_id: int,
     meas.teros12.ec = ec
 
     return meas.SerializeToString()
+
+
+def encode_phytos31_measurement(ts: int, cell_id: int, logger_id: int,
+                                voltage: float, leaf_wetness: float) -> bytes:
+    """Encodes a Phytos31Measurement within the Measurement message
+   
+    Args:
+        ts: Timestamp in unix epochs
+        cell_id: Cell Id from Dirtviz
+        logger_id: Logger Id from Dirtviz
+        voltage: Raw voltage reading
+        leaf_wetness: Calibrated leaf wetness
+        
+    Returns:
+        Serialized Phytos31 measurement
+    """
+    
+    meas = Measurement()
+    
+    # metadata
+    meas.meta.ts = ts
+    meas.meta.cell_id = cell_id
+    meas.meta.logger_id = logger_id
+    
+    # phytos31
+    meas.phytos31.voltage = voltage
+    meas.phytos31.leaf_wetness = leaf_wetness
+    
+    return meas.SerializeToString() 

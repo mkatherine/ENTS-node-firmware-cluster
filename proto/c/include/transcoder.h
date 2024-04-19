@@ -69,6 +69,29 @@ size_t EncodeTeros12Measurement(uint32_t ts, uint32_t logger_id,
                                 uint8_t *buffer);
 
 /**
+ * @brief Encodes a Phytos31 measurement
+ * 
+ * Currently only the voltage measurement is used. Leaf wetness will
+ * be implemented once more is known about the sensor.
+ * 
+ * The timestamp is not able to encode timezones and is references from UTC+0.
+ * The serialized data is stored in @p buffer with the number of bytes written
+ * being returned by the function. A return value of -1 indicates an error in
+ * encoding.
+ * 
+ * @param ts Timestamp
+ * @param logger_id Logger Id
+ * @param cell_id Cell Id
+ * @param voltage Raw voltage reading
+ * @param leaf_wetness Calibrated leaf wetness
+ * @param buffer Buffer to store serialized measurement
+ * @return Number of bytes in @p buffer
+ */
+size_t EncodePhytos31Measurement(uint32_t ts, uint32_t logger_id,
+                                 uint32_t cell_id, double voltage,
+                                 double leaf_wetness, uint8_t *buffer);
+
+/**
  * @brief Decodes a response message
  * 
  * Take bytes in @p data withy length @p len and decodes into a response type.

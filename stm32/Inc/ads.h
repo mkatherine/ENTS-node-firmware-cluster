@@ -1,24 +1,26 @@
-/* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file     ads.h
-  * @author   Stephen Taylor
-  * @brief    This file contains all the function prototypes for
-  *           the ads.c file
-  * @date     11/27/2023
-  ******************************************************************************
-  */
-/* USER CODE END Header */
+ ******************************************************************************
+ * @file     ads.h
+ * @author   Stephen Taylor
+ * @brief    This file contains all the function prototypes for
+ *           the ads.c file
+ * @date     11/27/2023
+ ******************************************************************************
+ */
 
-/* USER CODE BEGIN Includes */
-#include "i2c.h"
-#include "usart.h"
+#ifndef __ADS_H__
+#define __ADS_H__
 
 #include <stdio.h>
 
+#include "i2c.h"
+#include "usart.h"
+#include "stm32_systime.h"
 
-/* USER CODE END Includes */
-/* USER CODE BEGIN PD */
+#include "user_config.h"
+#include "timestamp.h"
+#include "transcoder.h"
+
 #define ADS12_WRITE 0x80
 #define ADS12_READ 0x81
 
@@ -34,14 +36,16 @@
 
 #define TWO_POW_TWENTYTHREE 8388608 // Eqn 5 in ADS1219 datasheet
 
-#define VOLTAGE_SLOPE -0.102 // Change this to the slope output from the linear_regression.py file
-#define VOLTAGE_B 6648 // Change this to the b output from the linear_regression.py file
+#define VOLTAGE_SLOPE -0.1 // Change this to the slope output from the linear_regression.py file
+#define VOLTAGE_B 6575 // Change this to the b output from the linear_regression.py file
 
 #define CURRENT_SLOPE 0
 #define CURRENT_B 0
-/* USER CODE END PD */
 
-/* USER CODE BEGIN 1 */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /**
 ******************************************************************************

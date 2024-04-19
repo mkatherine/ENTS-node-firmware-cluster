@@ -30,6 +30,9 @@ HAL_StatusTypeDef ADC_init(void){
   uint8_t code = ADS12_RESET_CODE;
   uint8_t register_data[2] = {0x40, 0x03};
   HAL_StatusTypeDef ret;
+  uint8_t code = ADS12_RESET_CODE;
+  uint8_t register_data[2] = {0x40, 0x03};
+  HAL_StatusTypeDef ret;
 
   // Control register breakdown.
   //  7:5 MUX (default)
@@ -132,4 +135,29 @@ HAL_StatusTypeDef probeADS12(void){
   HAL_StatusTypeDef ret;
   ret = HAL_I2C_IsDeviceReady(&hi2c2, ADS12_WRITE, 10, 20);
   return ret;
+}
+
+int ADC_filter(int readings[], int size){
+  int filtered_reading = 0;
+  for(int i = 0; i < size; i++){
+    filtered_reading = filtered_reading + readings[i];
+  }
+  filtered_reading = filtered_reading / size;
+  return filtered_reading;
+}
+
+size_t ADC_measure(uint8_t *data) {
+  // get timestamp
+  SysTime_t ts = SysTimeGet();
+
+  // read voltage
+  int adc_voltage = ADC_readVoltage();
+  double adc_voltage_float = ((double) adc_voltage) / 1000.;
+
+  // encode measurement
+  size_t data_len = EncodePowerMeasurement(ts.Seconds, LOGGER_ID, CELL_ID,
+                                           adc_voltage_float, 0.0, data);
+
+  // return number of bytes in serialized measurement 
+  return data_len;
 }

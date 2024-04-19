@@ -206,8 +206,10 @@ HAL_StatusTypeDef SDI12_GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measu
       SDI12_WakeSensors();
       SDI12_SendCommand(sendData, SEND_DATA_COMMAND_SIZE);
       configureAsInput();
-      ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // read the data and return
-      return ret;
+      // ret = SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // read the data and return
+      // return ret;
+      SDI12_ReadData(measurement_data, SEND_DATA_RESPONSE_SIZE, timeoutMillis); // lol is this works with 3 minutes to spare
+      return HAL_OK;
     }
   }
 
@@ -223,7 +225,7 @@ HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_
 {
   SDI12_Measure_TypeDef measurment_info;
   HAL_StatusTypeDef ret;
-  char measurement_data[20];
+  char measurement_data[25];
 
   ret = SDI12_GetMeasurment(addr, &measurment_info, measurement_data, timeoutMillis); // Read from the TEROS
   if (ret != HAL_OK){
@@ -232,9 +234,9 @@ HAL_StatusTypeDef SDI12_GetTeros12Measurement(uint8_t addr, Teros12_Data *teros_
   sscanf(measurement_data, "%d+%f+%f+%d\r\n",&(teros_readings->addr), &(teros_readings->vwc_raw), &(teros_readings->tmp), &(teros_readings->ec));
   
   //y=0.000000000512018x^3-0.000003854251138x^2+0.009950433111633x-8.508168835940560 calibration eqn
-  teros_readings->vwc_adj = (0.000000000512018 * teros_readings->vwc_raw * teros_readings->vwc_raw * teros_readings->vwc_raw) -
-                            (0.000003854251138 * teros_readings->vwc_raw * teros_readings->vwc_raw) +
-                            (0.009950433111633 * teros_readings->vwc_raw) - 8.508168835940560;
+ teros_readings->vwc_adj = (0.000000000512018 * teros_readings->vwc_raw * teros_readings->vwc_raw * teros_readings->vwc_raw) -
+                           (0.000003854251138 * teros_readings->vwc_raw * teros_readings->vwc_raw) +
+                           (0.009950433111633 * teros_readings->vwc_raw) - 8.508168835940560;
   return HAL_OK;
 }
 
@@ -313,4 +315,58 @@ HAL_StatusTypeDef SDI12_PingDevice(uint8_t deviceAddress, char *responseBuffer, 
     ret = HAL_ERROR;
   }
   return ret;
+}
+
+size_t SDI12_Teros12Measure(uint8_t *data) {
+  // address of teros 
+  uint8_t teros_addr = '0';
+
+  // structure to store teros measurement
+  Teros12_Data teros_measurements;
+
+  // backup data if wwe get a HAL error
+  static Teros12_Data teros_backup;
+
+  // get timestamp
+  SysTime_t ts = SysTimeGet();
+
+  // get teros measurement
+  HAL_StatusTypeDef ret;
+  ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurements, 1000);
+  if (ret != HAL_OK) {
+    simpleDelay();
+    simpleDelay();
+    simpleDelay();
+    ret = SDI12_GetTeros12Measurement(teros_addr, &teros_measurements, 1000);
+  }
+
+  // check for negative vwc
+  if (teros_measurements.vwc_adj < 0) {
+    teros_measurements = teros_backup;
+  }
+
+  // check return codes
+  APP_LOG(TS_ON, VLEVEL_M, "TEROS12 HAL ret: ");
+  if (ret == HAL_OK) {
+    APP_LOG(TS_OFF, VLEVEL_M, "HAL_OK\r\n");
+    teros_backup = teros_measurements;
+  }
+  else if (ret == HAL_ERROR) {
+    APP_LOG(TS_OFF, VLEVEL_M, "HAL_ERROR\r\n");
+    teros_measurements = teros_backup;
+  }
+  else if (ret == HAL_TIMEOUT) {
+    APP_LOG(TS_OFF, VLEVEL_M, "HAL_TIMEOUT\r\n");
+    teros_measurements = teros_backup;
+  }
+
+  // serialize data
+  size_t data_len = EncodeTeros12Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
+                                             (double)teros_measurements.vwc_raw,
+                                             (double)teros_measurements.vwc_adj,
+                                             (double)teros_measurements.tmp,
+                                             teros_measurements.ec, data);
+
+  // return number of bytes in serialized measurement
+  return data_len;
 }

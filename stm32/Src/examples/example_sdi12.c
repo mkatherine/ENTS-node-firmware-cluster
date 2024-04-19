@@ -54,9 +54,15 @@ int main(void)
   // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI); add this back when the rtc is integrated, hopefully this will fix the issue, and than you can remove the nops in SDI12_WakeSensors
   // MX_RTC_Init();
 
-  HAL_TIM_OnePulse_MspInit(&htim1);
-  __HAL_RCC_TIM1_CLK_ENABLE();
-  HAL_TIM_OnePulse_Init(&htim1, TIM_OPMODE_SINGLE);
+  /* Ensure that MSI is wake-up system clock */
+  __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+
+  /*Initialize timer and RTC*/
+  UTIL_TIMER_Init();
+
+  // HAL_TIM_OnePulse_MspInit(&htim1);
+  // __HAL_RCC_TIM1_CLK_ENABLE();
+  // HAL_TIM_OnePulse_Init(&htim1, TIM_OPMODE_SINGLE);
   
 
   // User level initialization

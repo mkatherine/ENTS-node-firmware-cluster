@@ -40,7 +40,8 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len)
     FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory
-    if (addr_mat.page >= FRAM_PAGES) {
+    // pages are zero indexed
+    if (addr_mat.page > FRAM_PAGES-1) {
       return FRAM_OUT_OF_RANGE;
     }
 

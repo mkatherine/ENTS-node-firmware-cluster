@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "cmath": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "i2c.h": "c",
+        "app_lorawan.h": "c"
     }
 }

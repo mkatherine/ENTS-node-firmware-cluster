@@ -30,9 +30,6 @@ HAL_StatusTypeDef ADC_init(void){
   uint8_t code = ADS12_RESET_CODE;
   uint8_t register_data[2] = {0x40, 0x03};
   HAL_StatusTypeDef ret;
-  uint8_t code = ADS12_RESET_CODE;
-  uint8_t register_data[2] = {0x40, 0x03};
-  HAL_StatusTypeDef ret;
 
   // Control register breakdown.
   //  7:5 MUX (default)

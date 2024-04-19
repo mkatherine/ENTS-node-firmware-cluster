@@ -11,6 +11,10 @@
 #ifndef __ADS_H__
 #define __ADS_H__
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include <stdio.h>
 
 #include "i2c.h"
@@ -42,10 +46,7 @@
 #define CURRENT_SLOPE 0
 #define CURRENT_B 0
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+
 
 /**
 ******************************************************************************
@@ -98,5 +99,13 @@ double ADC_readCurrent(void);
 *******************************************f***********************************
 */
 HAL_StatusTypeDef ADC_probe(void);
+
+size_t ADC_measure(uint8_t *data);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __ADS_H__ */
 
 /* USER CODE END 1 */

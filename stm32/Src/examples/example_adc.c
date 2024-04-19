@@ -17,27 +17,24 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
 #include "adc.h"
 #include "dma.h"
 #include "i2c.h"
+#include "app_lorawan.h"
 #include "usart.h"
 #include "gpio.h"
-#include "fram.h"
-#include "ads.h"
-#include "app_lorawan.h"
-#include "sys_app.h"
-#include "stm32_timer.h"
-#include "rtc.h"
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include <stdlib.h>
 
+#include "sys_app.h"
+#include <stdlib.h>
+#include <stdbool.h>
+
+#include "ads.h"
+#include "sdi12.h"
 #include "rtc.h"
-#include "timer_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,6 +98,13 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
+
+  /*Initialize timer and RTC*/
+  /*Have to be initilized in example files because LoRaWan cannot be initialized like in main*/
+  __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+  UTIL_TIMER_Init();
+
+
   //TIMER_IF_Init();
   /* USER CODE BEGIN 2 */
 
@@ -139,21 +143,21 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 
-    //voltage_reading = ADC_readVoltage();
+    voltage_reading = ADC_readVoltage();
     reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
     // for (int i = 0; i < 10000; i++){
     //   asm("nop");
     // }
 
-    current_reading = ADC_readCurrent();
-    reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
+    // current_reading = ADC_readCurrent();
+    // reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
+    // HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
 
-    //HAL_Delay(100); //I guess HAL_Delay is broken somehow, don't understand why
-    for (int i = 0; i < 1000000; i++){
-      asm("nop");
-    }
+    HAL_Delay(1000); //I guess HAL_Delay is broken somehow, don't understand why
+    // for (int i = 0; i < 1000000; i++){
+    //   asm("nop");
+    // }
   }
   /* USER CODE END 3 */
 }
@@ -167,18 +171,22 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
   /** Configure the main internal regulator output voltage
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -196,12 +204,13 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
   HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
 }
+
 
 /* USER CODE BEGIN 4 */
 

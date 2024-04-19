@@ -18,7 +18,7 @@
 #include "transcoder.h"
 
 HAL_StatusTypeDef Phytos31Init(){
-  return ADS12_init();
+  return ADC_init();
 }
 
 phytos_measurments Phytos31GetMeasurment(){

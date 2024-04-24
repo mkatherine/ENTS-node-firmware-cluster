@@ -50,7 +50,20 @@ HAL_StatusTypeDef Phytos31Init(void);
 */
 phytos_measurments Phytos31GetMeasurment(void);
 
-
+/**
+ * @brief Read PHYTOS31 sensor and serialize measurement
+ * 
+ * The voltage output of the PHYTOS31 is measured. A calibration is applied
+ * to convert voltage into a leaf wetness measurement.
+ * 
+ * Current voltage and leaf wetness are the same value, until a calibration
+ * is obtained.
+ * 
+ * @note Implemented for the sensors library
+ * 
+ * @see SensorsPrototypeMeasure
+ */
+size_t Phytos31_measure(uint8_t *data);
 
 #ifdef __cplusplus
 }

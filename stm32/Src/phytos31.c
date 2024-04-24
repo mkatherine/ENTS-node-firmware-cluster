@@ -29,7 +29,7 @@ phytos_measurments Phytos31GetMeasurment(){
 
 size_t Phytos31_measure(uint8_t *data) {
   // get timestamp
-  time_t ts = TimestampNow();
+  SysTime_t ts = SysTimeGet();
   phytos_measurments measurment;
 
   // read voltage
@@ -37,7 +37,7 @@ size_t Phytos31_measure(uint8_t *data) {
   double adc_voltage_float = ((double) measurment.phytos31_raw) / 1000.;
 
   // encode measurement
-  size_t data_len = EncodePhytos31Measurement((uint32_t) ts, LOGGER_ID, CELL_ID,
+  size_t data_len = EncodePhytos31Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
                                            adc_voltage_float, 0.0, data);
 
   // return number of bytes in serialized measurement 

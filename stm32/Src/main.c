@@ -35,6 +35,7 @@
 
 #include "ads.h"
 #include "sdi12.h"
+#include "phytos31.h"
 #include "rtc.h"
 #include "sensors.h"
 /* USER CODE END Includes */
@@ -46,9 +47,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-#define FM24_WRITE 0xA0 // Device address of FM24 in write mode
-#define FM24_READ 0xA1  // Device address of FM24 in read mode
 
 /* USER CODE END PD */
 
@@ -117,8 +115,9 @@ int main(void)
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
   // configure sensors
-  SensorsAdd(ADC_measure);
-  SensorsAdd(SDI12_Teros12Measure);
+  //SensorsAdd(ADC_measure);
+  //SensorsAdd(SDI12_Teros12Measure);
+  SensorsAdd(Phytos31_measure);
 
 
   /* USER CODE END 2 */

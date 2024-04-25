@@ -67,6 +67,9 @@ HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
 
   // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return ret;
+  }
   
   code = ADS12_START_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
@@ -80,11 +83,20 @@ double ADC_readVoltage(void){
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
 
   ret = ADC_configure(0x03);
+  if (ret != HAL_OK){
+    return -1;
+  }
     
   while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return -1;
+  }
   ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
+  if (ret != HAL_OK){
+    return -1;
+  }
 
   uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); 
   reading = (double) temp;
@@ -106,11 +118,20 @@ double ADC_readCurrent(void){
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
 
   ret = ADC_configure(0x23); //configure to read current
+  if (ret != HAL_OK){
+    return -1;
+  }
     
   while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return -1;
+  }
   ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
+  if (ret != HAL_OK){
+    return -1;
+  }
 
   uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); 
   reading = (double) temp;

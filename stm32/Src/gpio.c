@@ -57,10 +57,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, RF_CTRL3_Pin|RF_CTRL2_Pin|RF_CTRL1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, RF_CTRL3_Pin|RF_CTRL2_Pin|SDI_12_MUX_Pin|RF_CTRL1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, POWERDOWN_Pin|SDI12_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(POWERDOWN_GPIO_Port, POWERDOWN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
@@ -85,10 +85,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PC13 PC2 PC1 PC0
-                           PC6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_2|GPIO_PIN_1|GPIO_PIN_0
-                          |GPIO_PIN_6;
+  /*Configure GPIO pins : PC13 PC2 PC0 PC6 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_2|GPIO_PIN_0|GPIO_PIN_6;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -100,25 +98,19 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PCPin PCPin PCPin */
-  GPIO_InitStruct.Pin = RF_CTRL3_Pin|RF_CTRL2_Pin|RF_CTRL1_Pin;
+  /*Configure GPIO pins : PCPin PCPin PCPin PCPin */
+  GPIO_InitStruct.Pin = RF_CTRL3_Pin|RF_CTRL2_Pin|SDI_12_MUX_Pin|RF_CTRL1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PAPin PAPin */
-  GPIO_InitStruct.Pin = POWERDOWN_Pin|SDI12_Pin;
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = POWERDOWN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = ADC_DRDY_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ADC_DRDY_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(POWERDOWN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PA8 */
   GPIO_InitStruct.Pin = GPIO_PIN_8;

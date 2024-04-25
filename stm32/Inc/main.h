@@ -68,12 +68,10 @@ void Error_Handler(void);
 #define RF_CTRL2_GPIO_Port GPIOC
 #define POWERDOWN_Pin GPIO_PIN_9
 #define POWERDOWN_GPIO_Port GPIOA
+#define SDI_12_MUX_Pin GPIO_PIN_1
+#define SDI_12_MUX_GPIO_Port GPIOC
 #define RF_CTRL1_Pin GPIO_PIN_4
 #define RF_CTRL1_GPIO_Port GPIOC
-#define ADC_DRDY_Pin GPIO_PIN_3
-#define ADC_DRDY_GPIO_Port GPIOA
-#define SDI12_Pin GPIO_PIN_2
-#define SDI12_GPIO_Port GPIOA
 #define ESP32_EN_Pin GPIO_PIN_10
 #define ESP32_EN_GPIO_Port GPIOB
 

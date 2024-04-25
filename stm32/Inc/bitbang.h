@@ -30,7 +30,7 @@ extern "C"{
 #define NUMBER_OF_LOOPS_PER_HALF_BIT 4550
 
 
-void delayMicroseconds(uint32_t microseconds);
+//void delayMicroseconds(uint32_t microseconds);
 void simpleDelay(void);
 void simpleDelayCentering(void);
 void SendContinousHigh(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, uint32_t milliseconds);

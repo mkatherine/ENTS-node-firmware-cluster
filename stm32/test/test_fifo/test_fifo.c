@@ -192,7 +192,8 @@ void test_FramBufferLen(void) {
 void test_FramBufferClear(void) {
   // Put some data into the buffer
   uint8_t data[] = {1, 2, 3, 4, 5};
-  FramPut(data, sizeof(data));
+  FramStatus status = FramPut(data, sizeof(data));
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
 
   TEST_ASSERT_EQUAL(1, FramBufferLen());
 

@@ -50,6 +50,14 @@ typedef struct _Teros12Measurement {
     uint32_t ec;
 } Teros12Measurement;
 
+/* Phytos measurement */
+typedef struct _Phytos31Measurement {
+    /* raw adc voltage */
+    double voltage;
+    /* calibrated leaf wetness */
+    double leaf_wetness;
+} Phytos31Measurement;
+
 /* Top level measurement message */
 typedef struct _Measurement {
     /* Metadata */
@@ -59,6 +67,7 @@ typedef struct _Measurement {
     union {
         PowerMeasurement power;
         Teros12Measurement teros12;
+        Phytos31Measurement phytos31;
     } measurement;
 } Measurement;
 
@@ -82,6 +91,7 @@ extern "C" {
 
 
 
+
 #define Response_resp_ENUMTYPE Response_ResponseType
 
 
@@ -89,11 +99,13 @@ extern "C" {
 #define MeasurementMetadata_init_default         {0, 0, 0}
 #define PowerMeasurement_init_default            {0, 0}
 #define Teros12Measurement_init_default          {0, 0, 0, 0}
+#define Phytos31Measurement_init_default         {0, 0}
 #define Measurement_init_default                 {false, MeasurementMetadata_init_default, 0, {PowerMeasurement_init_default}}
 #define Response_init_default                    {_Response_ResponseType_MIN}
 #define MeasurementMetadata_init_zero            {0, 0, 0}
 #define PowerMeasurement_init_zero               {0, 0}
 #define Teros12Measurement_init_zero             {0, 0, 0, 0}
+#define Phytos31Measurement_init_zero            {0, 0}
 #define Measurement_init_zero                    {false, MeasurementMetadata_init_zero, 0, {PowerMeasurement_init_zero}}
 #define Response_init_zero                       {_Response_ResponseType_MIN}
 
@@ -107,9 +119,12 @@ extern "C" {
 #define Teros12Measurement_vwc_adj_tag           3
 #define Teros12Measurement_temp_tag              4
 #define Teros12Measurement_ec_tag                5
+#define Phytos31Measurement_voltage_tag          1
+#define Phytos31Measurement_leaf_wetness_tag     2
 #define Measurement_meta_tag                     1
 #define Measurement_power_tag                    2
 #define Measurement_teros12_tag                  3
+#define Measurement_phytos31_tag                 4
 #define Response_resp_tag                        1
 
 /* Struct field encoding specification for nanopb */
@@ -134,15 +149,23 @@ X(a, STATIC,   SINGULAR, UINT32,   ec,                5)
 #define Teros12Measurement_CALLBACK NULL
 #define Teros12Measurement_DEFAULT NULL
 
+#define Phytos31Measurement_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, DOUBLE,   voltage,           1) \
+X(a, STATIC,   SINGULAR, DOUBLE,   leaf_wetness,      2)
+#define Phytos31Measurement_CALLBACK NULL
+#define Phytos31Measurement_DEFAULT NULL
+
 #define Measurement_FIELDLIST(X, a) \
 X(a, STATIC,   OPTIONAL, MESSAGE,  meta,              1) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,power,measurement.power),   2) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,teros12,measurement.teros12),   3)
+X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,teros12,measurement.teros12),   3) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,phytos31,measurement.phytos31),   4)
 #define Measurement_CALLBACK NULL
 #define Measurement_DEFAULT NULL
 #define Measurement_meta_MSGTYPE MeasurementMetadata
 #define Measurement_measurement_power_MSGTYPE PowerMeasurement
 #define Measurement_measurement_teros12_MSGTYPE Teros12Measurement
+#define Measurement_measurement_phytos31_MSGTYPE Phytos31Measurement
 
 #define Response_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
@@ -152,6 +175,7 @@ X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
 extern const pb_msgdesc_t MeasurementMetadata_msg;
 extern const pb_msgdesc_t PowerMeasurement_msg;
 extern const pb_msgdesc_t Teros12Measurement_msg;
+extern const pb_msgdesc_t Phytos31Measurement_msg;
 extern const pb_msgdesc_t Measurement_msg;
 extern const pb_msgdesc_t Response_msg;
 
@@ -159,12 +183,14 @@ extern const pb_msgdesc_t Response_msg;
 #define MeasurementMetadata_fields &MeasurementMetadata_msg
 #define PowerMeasurement_fields &PowerMeasurement_msg
 #define Teros12Measurement_fields &Teros12Measurement_msg
+#define Phytos31Measurement_fields &Phytos31Measurement_msg
 #define Measurement_fields &Measurement_msg
 #define Response_fields &Response_msg
 
 /* Maximum encoded size of messages (where known) */
 #define MeasurementMetadata_size                 18
 #define Measurement_size                         55
+#define Phytos31Measurement_size                 18
 #define PowerMeasurement_size                    18
 #define Response_size                            2
 #define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Measurement_size

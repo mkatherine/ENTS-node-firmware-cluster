@@ -39,7 +39,6 @@ HAL_StatusTypeDef ADC_init(void){
   //  0   VREF (External reference 3.3V)
 
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // Power down pin has to be set to high before any of the analog circuitry can function
-  //HAL_Delay(1000);
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
   if (ret != HAL_OK){
     return ret;
@@ -67,12 +66,13 @@ HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
   char reg_string[40];
 
   // Set the control register, leaving everything at default except for the VREF, which will be set to external reference mode
-  //ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);  // Send the reset code
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return ret;
+  }
   
   code = ADS12_START_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY); // Send a start code
-  //HAL_Delay(10); // Delay between reconfiguration and measurment
   return ret;
 }
 
@@ -83,13 +83,22 @@ double ADC_readVoltage(void){
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
 
   ret = ADC_configure(0x03);
+  if (ret != HAL_OK){
+    return -1;
+  }
     
   while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return -1;
+  }
   ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
+  if (ret != HAL_OK){
+    return -1;
+  }
 
-  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); // Chop the last byte, as it seems to be mostly noise
+  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); 
   reading = (double) temp;
 
   // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
@@ -106,16 +115,25 @@ double ADC_readCurrent(void){
   uint8_t code;
   double reading;
   HAL_StatusTypeDef ret;
-  uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
+  uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
 
-  ret = ADC_configure(0x23);
+  ret = ADC_configure(0x23); //configure to read current
+  if (ret != HAL_OK){
+    return -1;
+  }
     
   while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return -1;
+  }
   ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_data, 3, 1000);
+  if (ret != HAL_OK){
+    return -1;
+  }
 
-  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); // Chop the last byte, as it seems to be mostly noise
+  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); 
   reading = (double) temp;
 
   // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses
@@ -132,15 +150,6 @@ HAL_StatusTypeDef probeADS12(void){
   HAL_StatusTypeDef ret;
   ret = HAL_I2C_IsDeviceReady(&hi2c2, ADS12_WRITE, 10, 20);
   return ret;
-}
-
-int ADC_filter(int readings[], int size){
-  int filtered_reading = 0;
-  for(int i = 0; i < size; i++){
-    filtered_reading = filtered_reading + readings[i];
-  }
-  filtered_reading = filtered_reading / size;
-  return filtered_reading;
 }
 
 size_t ADC_measure(uint8_t *data) {

@@ -30,15 +30,7 @@ extern "C"{
 
 #define ADS12_START_CODE 0x08
 #define ADS12_RESET_CODE 0x06
-#define ADS12_POWERDOWN_CODE 0x02
 #define ADS12_READ_DATA_CODE 0x10
-#define ADS12_WRITE_TO_REGISTER 0x40E2
-#define ADS12_READ_CONTROL_REGISTER 0x20
-#define ADS12_CONTROL_REGISTER 0b00000001
-#define ADS12_CONFIGURE_READ_VOLTAGE 0x01
-#define ADS12_CONFIGURE_READ_CURRENT 0x21
-
-#define TWO_POW_TWENTYTHREE 8388608 // Eqn 5 in ADS1219 datasheet
 
 #define VOLTAGE_SLOPE -0.1 // Change this to the slope output from the linear_regression.py file
 #define VOLTAGE_B 6575 // Change this to the b output from the linear_regression.py file
@@ -62,6 +54,15 @@ extern "C"{
 */
 HAL_StatusTypeDef ADC_init(void);
 
+/**
+******************************************************************************
+* @brief    This function reconfigures the ADS1219 based on the parameter reg_data
+* 
+*
+* @param    reg_data
+* @return   HAL_StatusTypeDef
+******************************************************************************
+*/
 HAL_StatusTypeDef ADC_configure(uint8_t reg_data);
 
 /**
@@ -100,6 +101,14 @@ double ADC_readCurrent(void);
 */
 HAL_StatusTypeDef ADC_probe(void);
 
+/**
+******************************************************************************
+* @brief    This function encodes the ADS1219 power measurments into protobuf
+*           
+* @param    *data
+* @return   size_t
+*******************************************f***********************************
+*/
 size_t ADC_measure(uint8_t *data);
 
 #ifdef __cplusplus

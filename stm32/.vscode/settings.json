@@ -4,5 +4,8 @@
         "*.tcc": "c",
         "i2c.h": "c",
         "app_lorawan.h": "c"
+        "sdi12.h": "c",
+        "usart.h": "c",
+        "user_config.h": "c"
     }
 }

@@ -430,6 +430,34 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 /* Private functions ---------------------------------------------------------*/
 /* USER CODE BEGIN PrFD */
 
+void OnTimeSync(void)
+{
+  // schedule task in sequencer
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_TimeSync), CFG_SEQ_Prio_0);
+}
+
+void TimeSync(void)
+{
+  // try to sync the clock
+  LmHandlerErrorStatus_t status = LmhpClockSyncAppTimeReq();
+  if (status == LORAMAC_HANDLER_SUCCESS)
+  {
+    // stop timer
+    UTIL_TIMER_Stop(&TimeSyncTimer);
+
+    // start sensor measurements
+    SensorsStart();
+
+    APP_LOG(TS_ON, VLEVEL_M, "Clock initiated\r\n");
+  }
+  else
+  {
+    APP_LOG(TS_OFF, VLEVEL_M,
+            "Clock synchronization failed. Retrying in %u ms.\r\n",
+            TimeSyncPeriod)
+  }
+}
+
 /* USER CODE END PrFD */
 
 static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)

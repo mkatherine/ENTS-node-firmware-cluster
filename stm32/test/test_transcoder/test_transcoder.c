@@ -84,6 +84,24 @@ void TestEncodeTeros12(void)
   TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
 }
 
+void TestEncodePhytos31(void)
+{
+  uint8_t buffer[256];
+  size_t buffer_len;
+
+  buffer_len = EncodePhytos31Measurement(1436079600, 7, 4, 1425.12, 1962.2,
+                                         buffer);
+
+  uint8_t data[] = {0xa, 0xa, 0x8, 0x4, 0x10, 0x7, 0x18, 0xf0, 0xab, 0xe3, 0xac,
+                    0x5, 0x22, 0x12, 0x9, 0x14, 0xae, 0x47, 0xe1, 0x7a, 0x44,
+                    0x96, 0x40, 0x11, 0xcd, 0xcc, 0xcc, 0xcc, 0xcc, 0xa8, 0x9e,
+                    0x40};
+  size_t data_len = 32;
+
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(data, buffer, buffer_len);
+  TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
+}
+
 void TestDecodeResponseSuccess(void)
 {
   uint8_t data[] = {};
@@ -130,6 +148,7 @@ int main(void)
 
   RUN_TEST(TestEncodePower);
   RUN_TEST(TestEncodeTeros12);
+  RUN_TEST(TestEncodePhytos31);
   RUN_TEST(TestDecodeResponseSuccess);
   RUN_TEST(TestDecodeResponseError);
 

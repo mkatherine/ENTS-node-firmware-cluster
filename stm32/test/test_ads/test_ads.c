@@ -20,21 +20,21 @@ void tearDown(void) {}
 
 void test_ADC_Init(void) {
   HAL_StatusTypeDef ret;
-  ret = ADC_init()
+  ret = ADC_init();
 
   TEST_ASSERT_EQUAL(HAL_OK, ret);
 }
 
 void test_ADC_readVoltage(void) {
   // Data size is larger than the buffer size
-  double volt = test_ADC_readVoltage();
+  double volt = ADC_readVoltage();
 
   TEST_ASSERT_NOT_EQUAL(volt, -1);
 }
 
 void test_ADC_readCurrent(void) {
   // Data size is larger than the buffer size
-  double curr = test_ADC_readCurrent();
+  double curr = ADC_readCurrent();
 
   TEST_ASSERT_NOT_EQUAL(curr, -1);
 }

@@ -12,9 +12,11 @@ import unittest
 from datetime import datetime
 
 from soil_power_sensor_protobuf import encode_response, decode_measurement
-from soil_power_sensor_protobuf.soil_power_sensor_pb2 import (Measurement,
-                                                              Response,
-                                                              MeasurementMetadata)
+from soil_power_sensor_protobuf.soil_power_sensor_pb2 import (
+    Measurement,
+    Response,
+    MeasurementMetadata,
+)
 
 
 class TestEncode(unittest.TestCase):
@@ -59,7 +61,7 @@ class TestDecode(unittest.TestCase):
     def test_power(self):
         """Test decoding of PowerMeasurement"""
 
-        #import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         # format measurement
         meas = Measurement()
         meas.meta.CopyFrom(self.meta)
@@ -79,7 +81,6 @@ class TestDecode(unittest.TestCase):
         self.assertEqual(float, meas_dict["data_type"]["voltage"])
         self.assertAlmostEqual(514.81, meas_dict["data"]["current"])
         self.assertEqual(float, meas_dict["data_type"]["current"])
-        
 
     def test_teros12(self):
         """Test decoding of Teros12Measurement"""

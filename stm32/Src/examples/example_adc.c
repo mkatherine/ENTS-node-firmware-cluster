@@ -105,6 +105,7 @@ int main(void)
   UTIL_TIMER_Init();
 
   /* USER CODE BEGIN 2 */
+  char fail_str[100];
 
   // Print the compilation time at startup
   char info_str[100];
@@ -119,6 +120,8 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   ADC_init();
+  // int size = sprintf(fail_str, "Failed at ADC_init\n");
+  // HAL_UART_Transmit(&huart1, (const uint8_t *) fail_str, size, 100);
 
   char output[20];
   char output2[20];

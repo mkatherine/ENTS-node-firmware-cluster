@@ -55,7 +55,7 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO Project
+      - name: Run static code analysis
         run: pio check
   
   lint:

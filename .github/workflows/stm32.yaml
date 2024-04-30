@@ -6,12 +6,12 @@ on:
   pull_request:
 
 defaults:
-  runs-on: ubuntu-latest
   run:
     working-directory: ./stm32
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -38,6 +38,7 @@ jobs:
           path: stm32/.pio/build
   
   static:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -59,6 +60,7 @@ jobs:
         run: pio check
   
   lint:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 

@@ -5,14 +5,13 @@ on:
   push:
   pull_request:
 
+defaults:
+  runs-on: ubuntu-latest
+  run:
+    working-directory: ./stm32
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: ./stm32
-
     steps:
       - uses: actions/checkout@v3
 
@@ -37,3 +36,24 @@ jobs:
         with:
           name: build
           path: stm32/.pio/build
+  
+  static:
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build PlatformIO Project
+        run: pio check

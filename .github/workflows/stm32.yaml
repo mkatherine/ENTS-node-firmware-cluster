@@ -57,3 +57,23 @@ jobs:
 
       - name: Build PlatformIO Project
         run: pio check
+  
+  lint:
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+          key: ${{ runner.os }}-cpplint
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install cpplint
+        run: pip install --upgrade cpplint
+
+      - name: Run linter
+        run: cpplint --recursive --root=. Inc Src test

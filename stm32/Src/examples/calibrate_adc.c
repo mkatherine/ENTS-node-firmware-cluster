@@ -102,10 +102,11 @@ int main(void)
 
   /*Initialize timer and RTC*/
   /*Have to be initilized in example files because LoRaWan cannot be initialized like in main*/
-//   __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-//   UTIL_TIMER_Init();
+  __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+  UTIL_TIMER_Init();
 
   /* USER CODE BEGIN 2 */
+  ADC_init();
 
   // Print the compilation time at startup
   char info_str[100];
@@ -119,7 +120,7 @@ int main(void)
 
 
   /* USER CODE BEGIN 2 */
-  ADC_init();
+  
 
   char output[20];
   char output2[20];

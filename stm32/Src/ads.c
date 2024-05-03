@@ -55,6 +55,7 @@ HAL_StatusTypeDef ADC_init(void){
   if (ret != HAL_OK){
     return ret;
   }
+  HAL_Delay(500); // Delay to allow ADC start up, not really sure why this is neccesary, or why the minimum is 300
   return ret;
 }
 

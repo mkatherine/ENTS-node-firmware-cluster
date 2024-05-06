@@ -122,37 +122,41 @@ int main(void)
   /* USER CODE BEGIN 2 */
   
 
-  char output[20];
-  char output2[20];
   char controller_input[3];
+  char check_input[7];
+  char check_result[4];
+  char size_proto_string[250];
+  char encoded_measurment[256];
+  int size_check = sprintf(check_result, "ok\n");
+  bool checked = false;
 
-  double voltage_reading;
-  double current_reading;
-  size_t reading_len;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  
   while (1)
   {
 
     /* USER CODE END WHILE */    
 
     /* USER CODE BEGIN 3 */
-    HAL_UART_Receive(&huart1, (uint8_t *) controller_input, 2, 1000);
-
-    if (controller_input[0] == '0'){
-      voltage_reading = ADC_readVoltage();
-      reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
-      HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
-
-      current_reading = ADC_readCurrent();
-      reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
-      HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
-
-      controller_input[0] = 'n';
+    if (checked == false){ // this flag exists to make sure it only searches for the check command once
+      HAL_UART_Receive(&huart1, (uint8_t *) check_input, 5, 1000);
+      if (check_input[0] == 'c'){
+        HAL_UART_Transmit(&huart1, (uint8_t *) check_result, size_check, 100); // send response to the 'check' command
+      }
+      checked = true;
     }
-    HAL_Delay(100);
+
+    HAL_UART_Receive(&huart1, (uint8_t *) controller_input, 1, 1000); // On every other iteration, send the encoded measurment in response to the '0' command
+    if (controller_input[0] == '0'){
+      size_t measure = ADC_measure(&encoded_measurment);
+      size_check = sprintf(size_proto_string, "%d\n", measure);
+      HAL_UART_Transmit(&huart1, (uint8_t *) size_proto_string,size_check, 100);
+      HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measure, 100);
+    } 
+    //HAL_Delay(100);
   /* USER CODE END 3 */
   }
 }

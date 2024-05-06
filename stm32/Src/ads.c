@@ -158,12 +158,12 @@ size_t ADC_measure(uint8_t *data) {
   SysTime_t ts = SysTimeGet();
 
   // read voltage
-  int adc_voltage = ADC_readVoltage();
-  double adc_voltage_float = ((double) adc_voltage) / 1000.;
+  double adc_voltage = ADC_readVoltage();
+  double adc_current = ADC_readCurrent();
 
   // encode measurement
   size_t data_len = EncodePowerMeasurement(ts.Seconds, LOGGER_ID, CELL_ID,
-                                           adc_voltage_float, 0.0, data);
+                                           adc_voltage, adc_current, data);
 
   // return number of bytes in serialized measurement 
   return data_len;

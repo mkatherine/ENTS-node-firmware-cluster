@@ -152,7 +152,7 @@ int main(void)
     HAL_UART_Receive(&huart1, (uint8_t *) controller_input, 1, 1000); // On every other iteration, send the encoded measurment in response to the '0' command
     if (controller_input[0] == '0'){
       size_t measurement_size = ADC_measure(&encoded_measurment); // Read the measurment, and store it's size in measurement_size (size int 64)
-      snprintf(size_proto_string, sizeof(size_proto_string), "%03d", measurement_size); // Turn measurement_size into a string of the max possible bytes, with leading 0s if neccesarry
+      snprintf(size_proto_string, sizeof(size_proto_string), "%03d\n", measurement_size); // Turn measurement_size into a string of the max possible bytes, with leading 0s if neccesarry
       HAL_UART_Transmit(&huart1, (uint8_t *) size_proto_string, strlen(size_proto_string), 100); // Send all 64 bytes
       HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measurement_size, 100);
     } 

@@ -126,7 +126,7 @@ int main(void)
   char check_input[7];
   char check_result[4];
   char size_proto_string[4];
-  char encoded_measurment[256];
+  uint8_t encoded_measurment[256];
   int size_check = sprintf(check_result, "ok\n");
   bool checked = false;
 
@@ -152,22 +152,12 @@ int main(void)
     HAL_UART_Receive(&huart1, (uint8_t *) controller_input, 1, 1000); // On every other iteration, send the encoded measurment in response to the '0' command
     if (controller_input[0] == '0'){
       size_t measurement_size = ADC_measure(encoded_measurment); // Read the measurment, and store it's size in measurement_size (size int 64)
-      snprintf(size_proto_string, sizeof(size_proto_string), "%03d\n", measurement_size); // Turn measurement_size into a string of the max possible bytes, with leading 0s if neccesarry
-      HAL_UART_Transmit(&huart1, (uint8_t *) size_proto_string, strlen(size_proto_string), 100); // Send all 64 bytes
-      HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measurement_size, 100);
 
-      // // Define a buffer to hold the hex representation of each uint8_t value
-      // char hex_buffer[3];  // Two characters for the hexadecimal value and one for the null terminator
-      // // Loop through each byte in encoded_measurement
-      // for (size_t i = 0; i < measurement_size; i++) {
-      //   // Convert the uint8_t value to hexadecimal and store it in the hex_buffer
-      //   snprintf(hex_buffer, sizeof(hex_buffer), "%02X", encoded_measurment[i]);
-      //   // Transmit the hexadecimal value over UART
-      //   HAL_UART_Transmit(&huart1, (uint8_t *) hex_buffer, strlen(hex_buffer), 100);
-      // }
-      // // Transmit a newline character to signify the end of the transmission
-      HAL_UART_Transmit(&huart1, (uint8_t *) "\n", 1, 100);
-    } 
+      // send length
+      HAL_UART_Transmit(&huart1, (uint8_t *) &measurement_size, 1, 100);
+      // send data
+      HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measurement_size, 1000);
+    }
 
     //HAL_Delay(100);
   /* USER CODE END 3 */

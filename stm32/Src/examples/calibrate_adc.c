@@ -157,6 +157,19 @@ int main(void)
       HAL_UART_Transmit(&huart1, (uint8_t *) &measurement_size, 1, 100);
       // send data
       HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measurement_size, 1000);
+
+
+      //  // Define a buffer to hold the hex representation of each uint8_t value
+      // char hex_buffer[3];  // Two characters for the hexadecimal value and one for the null terminator
+      // // Loop through each byte in encoded_measurement
+      // for (size_t i = 0; i < measurement_size; i++) {
+      //   // Convert the uint8_t value to hexadecimal and store it in the hex_buffer
+      //   snprintf(hex_buffer, sizeof(hex_buffer), "%02X", encoded_measurment[i]);
+      //   // Transmit the hexadecimal value over UART
+      //   HAL_UART_Transmit(&huart1, (uint8_t *) hex_buffer, strlen(hex_buffer), 100);
+      // }
+      // // Transmit a newline character to signify the end of the transmission
+      // HAL_UART_Transmit(&huart1, (uint8_t *) "\n", 1, 100);
     }
 
     //HAL_Delay(100);

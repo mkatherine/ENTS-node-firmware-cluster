@@ -60,7 +60,7 @@ class SerialController:
 
         self.ser = serial.Serial(port, baudrate=baudrate, xonxoff=xonxoff, timeout=1)
         # Print serial port settings
-        print("Serial Port Settings:")
+        print("\nSerial Port Settings:")
         print("Port:", self.ser.port)
         print("Baudrate:", self.ser.baudrate)
         print("Byte size:", self.ser.bytesize)
@@ -70,6 +70,7 @@ class SerialController:
         print("Xon/Xoff:", self.ser.xonxoff)
         print("Rts/cts:", self.ser.rtscts)
         print("Dsr/dtr:", self.ser.dsrdtr)
+        print("\n")
 
     def __del__(self):
         """Destructor
@@ -100,6 +101,14 @@ class LANController:
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, port))
+        print("Ethernet settings:")
+        print("IP address: ", host)
+        if (port == 5025):
+            print("Raw socket port: ", port)
+        elif (port == 23):
+            print("TELENT port: ", port)
+        print("\n")
+        
 
     def __del__(self):
         """Destructor
@@ -141,10 +150,10 @@ class SoilPowerSensorController(SerialController):
         resp_len = int.from_bytes(resp_len_bytes)
 
         reply = self.ser.read(resp_len) # read said measurment
-
         meas_dict = decode_measurement(reply) # decode using protobuf
         voltage_value = meas_dict["data"]["voltage"]
         current_value = meas_dict["data"]["current"]
+
 
         return float(voltage_value), float(current_value)
 
@@ -367,7 +376,7 @@ class SMULANController(LANController):
             """
 
             self.v = None
-            self.sock.sendall(b':OUTP ON\n')
+            self.sock.sendall(b':OUTP ON\n') # scpi error here
             return self
 
 
@@ -420,12 +429,12 @@ class SMULANController(LANController):
         self.sock.sendall(b'*RST\n')
         # Voltage source
         self.sock.sendall(b':SOUR:FUNC VOLT\n')
-        self.sock.sendall(b':SOUR:VOLT:MODE FIXED\n')
+        self.sock.sendall(b':SOUR:VOLT:MODE FIXED\n') # scpi error here
         # 1mA compliance
-        self.sock.sendall(b':SENS:CURR:PROT 10e-3\n')
+        self.sock.sendall(b':SENS:CURR:PROT 10e-3\n') # scpi error here
         # Sensing functions
         self.sock.sendall(b':SENS:CURR:RANGE:AUTO ON\n')
-        self.sock.sendall(b':SENS:FUNC:OFF:ALL\n')
+        self.sock.sendall(b':SENS:FUNC:OFF:ALL\n') # scpi error here
         self.sock.sendall(b':SENS:FUNC:ON "VOLT"\n')
         self.sock.sendall(b':SENS:FUNC:ON "CURR"\n')
 
@@ -463,11 +472,11 @@ class SMULANController(LANController):
         float
             Measured voltage
         """
-
-        self.sock.sendall(b':FORM:ELEM VOLT\n')
+        self.sock.sendall(b':FORM:ELEM VOLT\n') # scpi error here
         self.sock.sendall(b':READ?\n')
         reply = self.sock.recv(256)
-        reply = reply.strip("\r")
+        reply = reply.decode() # convert to string
+        reply = reply.strip("\n")
         return float(reply)
 
 
@@ -482,8 +491,9 @@ class SMULANController(LANController):
 
         self.sock.sendall(b':FORM:ELEM CURR\n') # replace with serial.write with socket.write commands, std library aviable, lots of example code
         self.sock.sendall(b':READ?\n')
-        reply = self.sock.sendall()
-        reply = reply.strip("\r")
+        reply = self.sock.recv(256)
+        reply = reply.decode()
+        reply = reply.strip("\n")
         return float(reply)
 
 
@@ -511,7 +521,8 @@ if __name__ == "__main__":
 
 
     sps = SoilPowerSensorController(args.sps_port) 
-    smu = SMULANController(args.smu_host, args.smu_lan_port)
+    smu = SMULANController(args.smu_host, args.smu_lan_port) # switch to SMUSerialController with appropiate arguments if you choose to use USB
+    #smu = SMUSerialController(args.smu_port)
 
     data = {
         "V": [],
@@ -536,5 +547,6 @@ if __name__ == "__main__":
             data["V_i"].append(measured_current)
 
     data_df = pd.DataFrame(data)
+    print("\n---CALIBRATION SUCCESS!---")
     print(data_df)
     data_df.to_csv(args.data_file, index=False)

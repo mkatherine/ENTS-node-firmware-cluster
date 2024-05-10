@@ -157,12 +157,10 @@ size_t ADC_measure(uint8_t *data) {
   // get timestamp
   SysTime_t ts = SysTimeGet();
 
-  // read voltage
-  // double adc_voltage = ADC_readVoltage();
-  // double adc_current = ADC_readCurrent();
-    double adc_voltage = 50.0;
-  double adc_current = 25.0;
-  ts.Seconds = 100;
+  // read power
+  //double adc_voltage = ADC_readVoltage();
+  double adc_voltage = 10;
+  double adc_current = ADC_readCurrent();
 
   // encode measurement
   size_t data_len = EncodePowerMeasurement(ts.Seconds, LOGGER_ID, CELL_ID,

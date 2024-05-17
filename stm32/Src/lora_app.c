@@ -221,19 +221,6 @@ static void OnPingSlotPeriodicityChanged(uint8_t pingSlotPeriodicity);
 static void OnSystemReset(void);
 
 /* USER CODE BEGIN PFP */
-/**
- * @brief Time synchronization timer callback
- *
- * Registers TimeSync task with the synchronizer.
- */
-static void OnTimeSync(void);
-
-/**
- * @brief Requests a time synchronization from the application server
- *
- * Once the synchronization is completed the timer is stopped.
- */
-static void TimeSync(void);
 /* USER CODE END PFP */
 
 /* Private variables ---------------------------------------------------------*/
@@ -319,16 +306,6 @@ static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
  */
 static LmHandlerAppData_t AppData = {0, 0, AppDataBuffer};
 
-/**
- * @brief Timer for repeated time sync events
- */
-static UTIL_TIMER_Object_t TimeSyncTimer;
-
-/**
- * @brief Period for time sync events
- */
-static const UTIL_TIMER_Time_t TimeSyncPeriod = TIMESYNC_PERIOD;
-
 /* USER CODE END PV */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -406,35 +383,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 /* Private functions ---------------------------------------------------------*/
 /* USER CODE BEGIN PrFD */
-
-void OnTimeSync(void)
-{
-  // schedule task in sequencer
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_TimeSync), CFG_SEQ_Prio_0);
-}
-
-void TimeSync(void)
-{
-  // try to sync the clock
-  LmHandlerErrorStatus_t status = LmhpClockSyncAppTimeReq();
-  if (status == LORAMAC_HANDLER_SUCCESS)
-  {
-    // stop timer
-    UTIL_TIMER_Stop(&TimeSyncTimer);
-
-
-    // start sensor measurements
-    SensorsStart();
-
-    APP_LOG(TS_ON, VLEVEL_M, "Clock initiated\r\n");
-  }
-  else
-  {
-    APP_LOG(TS_OFF, VLEVEL_M,
-            "Clock synchronization failed. Retrying in %u ms.\r\n",
-            TimeSyncPeriod)
-  }
-}
 
 /* USER CODE END PrFD */
 

@@ -40,6 +40,7 @@
 
 #include "sdi12.h"
 #include "rtc.h"
+#include "sensors.h"
 
 #include <time.h>
 /* USER CODE END Includes */
@@ -366,35 +367,11 @@ void LoRaWAN_Init(void)
 
   LmHandlerJoin(ActivationType, ForceRejoin);
 
-  if (EventType == TX_ON_TIMER)
-  {
-    /* send every time timer elapses */
-    UTIL_TIMER_Create(&TxTimer, TxPeriodicity, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
-    UTIL_TIMER_Start(&TxTimer);
-  }
-  else
-  {
-    /* USER CODE BEGIN LoRaWAN_Init_3 */
-
-    /* USER CODE END LoRaWAN_Init_3 */
-  }
+  // start the tx timer
+  UTIL_TIMER_Create(&TxTimer, TxPeriodicity, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
+  UTIL_TIMER_Start(&TxTimer);
 
   /* USER CODE BEGIN LoRaWAN_Init_Last */
-  /*
-  // register task and create timer
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_TimeSync), UTIL_SEQ_RFU, TimeSync);
-  UTIL_TIMER_Create(&TimeSyncTimer, TIMESYNC_PERIOD, UTIL_TIMER_PERIODIC,
-                    OnTimeSync, NULL);
-
-  // start timer
-  UTIL_TIMER_Start(&TimeSyncTimer);
-  */
-
-  // register task and create timer
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_TimeSync), UTIL_SEQ_RFU, TimeSync);
-  UTIL_TIMER_Create(&TimeSyncTimer, TimeSyncPeriod, UTIL_TIMER_PERIODIC,
-                    OnTimeSync, NULL);
-
 
   /* USER CODE END LoRaWAN_Init_Last */
 }
@@ -445,6 +422,7 @@ void TimeSync(void)
     // stop timer
     UTIL_TIMER_Stop(&TimeSyncTimer);
 
+
     // start sensor measurements
     SensorsStart();
 
@@ -485,17 +463,40 @@ static void SendTxData(void)
 {
   /* USER CODE BEGIN SendTxData_1 */
 
+
   // preconditions
+
+  // local flag for if clock has been synced
+  static bool clock_synced = false;
+
+  // Sync clock
+  if (!clock_synced) {
+    // send request and heck return
+    if (LmhpClockSyncAppTimeReq() == LORAMAC_HANDLER_SUCCESS) {
+      APP_LOG(TS_OFF, VLEVEL_M, "Clock sync request send successfully\r\n")
+      // toggle flag
+      clock_synced = true;
+      // start taking measurements
+      SensorsStart();
+    }
+    else {
+      APP_LOG(TS_OFF, VLEVEL_M, "Could not sync clock, retrying on next tx\r\n");
+    }
+    // otherwise return
+    return;
+  }
 
   // check if radio is busy
   if (LmHandlerIsBusy())
   {
+    APP_LOG(TS_ON, VLEVEL_M, "LmHandler is busy\r\n");
     return;
   }
 
   // check if buffer is empty
   if (FramBufferLen() <= 0)
   {
+    APP_LOG(TS_ON, VLEVEL_M, "Nothing in buffer\r\n");
     return;
   }
 
@@ -592,8 +593,6 @@ static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
         APP_LOG(TS_OFF, VLEVEL_M, "OTAA =====================\r\n");
       }
 
-      // start timer to sync clock
-      UTIL_TIMER_Start(&TimeSyncTimer);
     }
     else
     {

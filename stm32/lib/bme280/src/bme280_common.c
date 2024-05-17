@@ -8,9 +8,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "coines.h"
 #include "bme280.h"
-#include "common.h"
+#include "bme280_common.h"
 
 /******************************************************************************/
 /*!                               Macros                                      */

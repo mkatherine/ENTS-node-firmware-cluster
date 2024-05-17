@@ -10,6 +10,8 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "sys_app.h"
+
 #include "fifo.h"
 #include "ads.h"
 
@@ -66,6 +68,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+  UTIL_TIMER_Init();
 
   // wait for UART
   for (int i = 0; i < 1000000; i++) {

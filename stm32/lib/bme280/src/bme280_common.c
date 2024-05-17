@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "stm32wlxx_hal.h"
+
 #include "bme280.h"
 #include "bme280_common.h"
 
@@ -50,9 +52,7 @@ BME280_INTF_RET_TYPE bme280_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
  */
 BME280_INTF_RET_TYPE bme280_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {
-    dev_addr = *(uint8_t*)intf_ptr;
-
-    return coines_read_spi(COINES_SPI_BUS_0, dev_addr, reg_addr, reg_data, (uint16_t)length);
+    return 0;
 }
 
 /*!
@@ -60,9 +60,7 @@ BME280_INTF_RET_TYPE bme280_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32
  */
 BME280_INTF_RET_TYPE bme280_spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {
-    dev_addr = *(uint8_t*)intf_ptr;
-
-    return coines_write_spi(COINES_SPI_BUS_0, dev_addr, reg_addr, (uint8_t *)reg_data, (uint16_t)length);
+    return 0;
 }
 
 /*!
@@ -70,7 +68,16 @@ BME280_INTF_RET_TYPE bme280_spi_write(uint8_t reg_addr, const uint8_t *reg_data,
  */
 void bme280_delay_us(uint32_t period, void *intf_ptr)
 {
-    coines_delay_usec(period);
+    // calculate us to ms
+    uint32_t period_ms = period / 1000;
+
+    // if no period then set to 1 to ensure delay
+    if (period_ms == 0) {
+        period_ms = 1;
+    }
+
+    // delay
+    HAL_Delay(period_ms);
 }
 
 /*!

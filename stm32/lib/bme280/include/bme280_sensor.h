@@ -1,3 +1,19 @@
+/**
+ * @file bme280_sensor.h
+ * @author John Madden (jmadden173@pm.me)
+ * @brief Sensor interface for the BME280 sensor
+ * @version 0.1
+ * @date 2024-05-17
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ * This is the user code file that allows for interaction with the BME280
+ * sensor. It provides a function for reading each measurement and a function
+ * for a function that can be integrated with the sensors api.
+ * 
+ * @see sensors.h
+ */
+
 #ifndef __BME280_H_
 #define __BME280_H_
 
@@ -17,11 +33,9 @@ typedef enum {
   BME280_ERROR
 } BME280Status;
 
-BME280Status BME280Init(uint16_t addr);
+BME280Status BME280Init(void);
 
 BME280Status BME280Deinit(void);
-
-BME280Status BME280Configure(void);
 
 BME280Status BME280MeasureTemperature(void);
 

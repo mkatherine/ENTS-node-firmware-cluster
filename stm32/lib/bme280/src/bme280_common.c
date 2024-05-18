@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "sys_app.h"
 #include "stm32wlxx_hal.h"
 #include "i2c.h"
 
@@ -111,33 +112,33 @@ void bme280_error_codes_print_result(const char api_name[], int8_t rslt)
 {
     if (rslt != BME280_OK)
     {
-        printf("%s\t", api_name);
+        APP_LOG(TS_ON, VLEVEL_M, "%s\t", api_name);
 
         switch (rslt)
         {
             case BME280_E_NULL_PTR:
-                printf("Error [%d] : Null pointer error.", rslt);
-                printf(
+                APP_LOG(TS_ON, VLEVEL_M, "Error [%d] : Null pointer error.", rslt);
+                APP_LOG(TS_ON, VLEVEL_M, 
                     "It occurs when the user tries to assign value (not address) to a pointer, which has been initialized to NULL.\r\n");
                 break;
 
             case BME280_E_COMM_FAIL:
-                printf("Error [%d] : Communication failure error.", rslt);
-                printf(
+                APP_LOG(TS_ON, VLEVEL_M, "Error [%d] : Communication failure error.", rslt);
+                APP_LOG(TS_ON, VLEVEL_M, 
                     "It occurs due to read/write operation failure and also due to power failure during communication\r\n");
                 break;
 
             case BME280_E_DEV_NOT_FOUND:
-                printf("Error [%d] : Device not found error. It occurs when the device chip id is incorrectly read\r\n",
+                APP_LOG(TS_ON, VLEVEL_M, "Error [%d] : Device not found error. It occurs when the device chip id is incorrectly read\r\n",
                        rslt);
                 break;
 
             case BME280_E_INVALID_LEN:
-                printf("Error [%d] : Invalid length error. It occurs when write is done with invalid length\r\n", rslt);
+                APP_LOG(TS_ON, VLEVEL_M, "Error [%d] : Invalid length error. It occurs when write is done with invalid length\r\n", rslt);
                 break;
 
             default:
-                printf("Error [%d] : Unknown error code\r\n", rslt);
+                APP_LOG(TS_ON, VLEVEL_M, "Error [%d] : Unknown error code\r\n", rslt);
                 break;
         }
     }
@@ -157,7 +158,7 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
 
         if (result < COINES_SUCCESS)
         {
-            printf(
+            APP_LOG(TS_ON, VLEVEL_M, 
                 "\n Unable to connect with Application Board ! \n" " 1. Check if the board is connected and powered on. \n" " 2. Check if Application Board USB driver is installed. \n"
                 " 3. Check if board is in use by another application. (Insufficient permissions to access USB) \n");
             exit(result);
@@ -171,13 +172,13 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
 
         if (COINES_SUCCESS != result)
         {
-            printf("\n Unable to retrieve board information ! \n");
+            APP_LOG(TS_ON, VLEVEL_M, "\n Unable to retrieve board information ! \n");
             exit(COINES_E_FAILURE);
         }
 
         if ((board_info.shuttle_id != BME280_SHUTTLE_ID))
         {
-            printf("! Warning invalid sensor shuttle \n ," "This application will not support this sensor \n");
+            APP_LOG(TS_ON, VLEVEL_M, "! Warning invalid sensor shuttle \n ," "This application will not support this sensor \n");
             exit(COINES_E_FAILURE);
         }
 
@@ -187,7 +188,7 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
         /* Bus configuration : I2C */
         if (intf == BME280_I2C_INTF)
         {
-            printf("I2C Interface\n");
+            APP_LOG(TS_ON, VLEVEL_M, "I2C Interface\n");
 
             dev_addr = BME280_I2C_ADDR_PRIM;
             dev->read = bme280_i2c_read;
@@ -202,7 +203,7 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
         /* Bus configuration : SPI */
         else if (intf == BME280_SPI_INTF)
         {
-            printf("SPI Interface\n");
+            APP_LOG(TS_ON, VLEVEL_M, "SPI Interface\n");
 
             dev_addr = COINES_SHUTTLE_PIN_7;
             dev->read = bme280_spi_read;

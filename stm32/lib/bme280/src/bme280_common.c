@@ -18,7 +18,6 @@
 /******************************************************************************/
 /*!                               Macros                                      */
 
-#define BME280_SHUTTLE_ID  UINT8_C(0x33)
 
 /******************************************************************************/
 /*!                Static variable definition                                 */
@@ -49,7 +48,7 @@ BME280_INTF_RET_TYPE bme280_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32
         return BME280_E_COMM_FAIL;
     }
 
-    return BME280_OK
+    return BME280_OK;
 }
 
 /*!
@@ -150,72 +149,21 @@ void bme280_error_codes_print_result(const char api_name[], int8_t rslt)
 int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
 {
     int8_t rslt = BME280_OK;
-    struct coines_board_info board_info;
 
     if (dev != NULL)
     {
-        int16_t result = coines_open_comm_intf(COINES_COMM_INTF_USB, NULL);
-
-        if (result < COINES_SUCCESS)
-        {
-            APP_LOG(TS_ON, VLEVEL_M, 
-                "\n Unable to connect with Application Board ! \n" " 1. Check if the board is connected and powered on. \n" " 2. Check if Application Board USB driver is installed. \n"
-                " 3. Check if board is in use by another application. (Insufficient permissions to access USB) \n");
-            exit(result);
-        }
-
-        result = coines_get_board_info(&board_info);
-
-#if defined(PC)
-        setbuf(stdout, NULL);
-#endif
-
-        if (COINES_SUCCESS != result)
-        {
-            APP_LOG(TS_ON, VLEVEL_M, "\n Unable to retrieve board information ! \n");
-            exit(COINES_E_FAILURE);
-        }
-
-        if ((board_info.shuttle_id != BME280_SHUTTLE_ID))
-        {
-            APP_LOG(TS_ON, VLEVEL_M, "! Warning invalid sensor shuttle \n ," "This application will not support this sensor \n");
-            exit(COINES_E_FAILURE);
-        }
-
-        coines_set_shuttleboard_vdd_vddio_config(0, 0);
-        coines_delay_msec(100);
-
         /* Bus configuration : I2C */
         if (intf == BME280_I2C_INTF)
         {
-            APP_LOG(TS_ON, VLEVEL_M, "I2C Interface\n");
-
             dev_addr = BME280_I2C_ADDR_PRIM;
             dev->read = bme280_i2c_read;
             dev->write = bme280_i2c_write;
             dev->intf = BME280_I2C_INTF;
-			/* SDO pin is made low*/
-            coines_set_pin_config(COINES_SHUTTLE_PIN_SDO, COINES_PIN_DIRECTION_OUT, COINES_PIN_VALUE_LOW);
-
-            /* set the sensor interface as I2C with 100kHz speed */
-            result = coines_config_i2c_bus(COINES_I2C_BUS_0, COINES_I2C_STANDARD_MODE);
         }
         /* Bus configuration : SPI */
         else if (intf == BME280_SPI_INTF)
         {
-            APP_LOG(TS_ON, VLEVEL_M, "SPI Interface\n");
-
-            dev_addr = COINES_SHUTTLE_PIN_7;
-            dev->read = bme280_spi_read;
-            dev->write = bme280_spi_write;
-            dev->intf = BME280_SPI_INTF;
-
-            result = coines_config_spi_bus(COINES_SPI_BUS_0, COINES_SPI_SPEED_5_MHZ, COINES_SPI_MODE3);
-        }
-
-        if(result != COINES_SUCCESS)
-        {
-            rslt = COINES_E_COMM_INIT_FAILED;
+            rslt = BME280_E_DEV_NOT_FOUND;
         }
 
         /* Holds the I2C device addr or SPI chip selection */
@@ -223,12 +171,6 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
 
         /* Configure delay in microseconds */
         dev->delay_us = bme280_delay_us;
-
-        coines_delay_msec(100);
-
-        coines_set_shuttleboard_vdd_vddio_config(3300, 3300);
-
-        coines_delay_msec(100);
     }
     else
     {
@@ -236,12 +178,4 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
     }
 
     return rslt;
-}
-
-/*!
- *  @brief Function deinitializes coines platform.
- */
-void bme280_coines_deinit(void)
-{
-    coines_close_comm_intf(COINES_COMM_INTF_USB, NULL);
 }

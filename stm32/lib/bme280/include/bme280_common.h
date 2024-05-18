@@ -125,14 +125,6 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf);
  */
 void bme280_error_codes_print_result(const char api_name[], int8_t rslt);
 
-/*!
- * @brief This function deinitializes coines platform
- *
- *  @return void.
- *
- */
-void bme280_coines_deinit(void);
-
 #ifdef __cplusplus
 }
 #endif /* End of CPP guard */

@@ -1,5 +1,8 @@
 #include "bme280_sensor.h"
 
+#include "sys_app.h"
+#include "bme280_common.h"
+
 /**
  * @brief Required time between measurements
  * 
@@ -22,7 +25,7 @@ static struct bme280_dev dev;
 static struct bme280_settings settings;
 
 
-BME280Status BME280Init(uint16_t addr) {
+BME280Status BME280Init(void) {
   int8_t rslt;
 
   /* Interface selection is to be updated as parameter
@@ -30,20 +33,17 @@ BME280Status BME280Init(uint16_t addr) {
    * For SPI :  BME280_SPI_INTF
    */
   rslt = bme280_interface_selection(&dev, BME280_I2C_INTF);
-  bme280_error_codes_print_result("bme280_interface_selection", rslt);
   if (rslt != BME280_OK) {
     return rslt;
   }
 
   rslt = bme280_init(&dev);
-  bme280_error_codes_print_result("bme280_init", rslt);
   if (rslt != BME280_OK) {
     return rslt;
   }
 
   /* Always read the current settings before writing, especially when all the configuration is not modified */
   rslt = bme280_get_sensor_settings(&settings, &dev);
-  bme280_error_codes_print_result("bme280_get_sensor_settings", rslt);
   if (rslt != BME280_OK) {
     return rslt;
   }
@@ -61,27 +61,23 @@ BME280Status BME280Init(uint16_t addr) {
   settings.standby_time = BME280_STANDBY_TIME_0_5_MS;
 
   rslt = bme280_set_sensor_settings(BME280_SEL_ALL_SETTINGS, &settings, &dev);
-  bme280_error_codes_print_result("bme280_set_sensor_settings", rslt);
   if (rslt != BME280_OK) {
     return rslt;
   }
 
   /* Always set the power mode after setting the configuration */
   rslt = bme280_set_sensor_mode(BME280_POWERMODE_NORMAL, &dev);
-  bme280_error_codes_print_result("bme280_set_power_mode", rslt);
   if (rslt != BME280_OK) {
     return rslt;
   }
 
   /* Calculate measurement time in microseconds */
   rslt = bme280_cal_meas_delay(&period, &settings);
-  bme280_error_codes_print_result("bme280_cal_meas_delay", rslt);
   if (rslt != BME280_OK) {
     return rslt;
   }
 
-  printf("\nTemperature calculation (Data displayed are compensated values)\n");
-  printf("Measurement time : %lu us\n\n", (long unsigned int)period);
+  return rslt;
 }
 
 BME280Status BME280MeasureAll(BME280Data *data) {
@@ -89,7 +85,6 @@ BME280Status BME280MeasureAll(BME280Data *data) {
   uint8_t status_reg;
 
   rslt = bme280_get_regs(BME280_REG_STATUS, &status_reg, 1, &dev);
-  bme280_error_codes_print_result("bme280_get_regs", rslt);
   if (rslt != BME280_OK) {
     return rslt;
   }
@@ -101,7 +96,6 @@ BME280Status BME280MeasureAll(BME280Data *data) {
 
     /* Read compensated data */
     rslt = bme280_get_sensor_data(BME280_TEMP, data, &dev);
-    bme280_error_codes_print_result("bme280_get_sensor_data", rslt);
     if (rslt != BME280_OK) {
       return rslt;
     }

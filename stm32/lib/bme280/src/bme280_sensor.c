@@ -1,7 +1,9 @@
 #include "bme280_sensor.h"
 
 #include "sys_app.h"
+#include "stm32_systime.h"
 #include "bme280_common.h"
+#include "user_config.h"
 
 /**
  * @brief Required time between measurements
@@ -112,4 +114,23 @@ BME280Status BME280MeasureAll(BME280Data *data) {
 #endif
 
   return rslt;
+}
+
+size_t BME280Measure(uint8_t *data) {
+  // get timestamp
+  SysTime_t ts = SysTimeGet();
+
+  // read sensor
+  BME280Data data;
+  BME280Status status = BME280MeasureAll(&data);
+  if (status != BME280_STATUS_OK) {
+    return -1;
+  }
+
+  // encode measurement
+  size_t data_len = EncodeBME280Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
+                                            data.pressure, data.temperature,
+                                            data.humidity, data);
+
+  return data_len;
 }

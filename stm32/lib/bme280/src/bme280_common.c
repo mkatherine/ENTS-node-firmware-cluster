@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include "stm32wlxx_hal.h"
+#include "i2c.h"
 
 #include "bme280.h"
 #include "bme280_common.h"
@@ -24,6 +25,11 @@
 /*! Variable that holds the I2C device address or SPI chip selection */
 static uint8_t dev_addr;
 
+/**
+ * @brief Timeout for I2C calls
+ */
+static const uint32_t i2c_timeout = 10;
+
 /******************************************************************************/
 /*!                User interface functions                                   */
 
@@ -34,7 +40,15 @@ BME280_INTF_RET_TYPE bme280_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32
 {
     dev_addr = *(uint8_t*)intf_ptr;
 
-    return coines_read_i2c(COINES_I2C_BUS_0, dev_addr, reg_addr, reg_data, (uint16_t)length);
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c2, dev_addr << 1, reg_addr,
+                                                I2C_MEMADD_SIZE_8BIT, reg_data,
+                                                length, i2c_timeout);
+
+    if (status != HAL_OK) {
+        return BME280_E_COMM_FAIL;
+    }
+
+    return BME280_OK
 }
 
 /*!
@@ -44,7 +58,15 @@ BME280_INTF_RET_TYPE bme280_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
 {
     dev_addr = *(uint8_t*)intf_ptr;
 
-    return coines_write_i2c(COINES_I2C_BUS_0, dev_addr, reg_addr, (uint8_t *)reg_data, (uint16_t)length);
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&hi2c2, dev_addr << 1,
+                                                 reg_addr, I2C_MEMADD_SIZE_8BIT,
+                                                 reg_data, length, i2c_timeout);
+
+    if (status != HAL_OK) {
+        return BME280_E_COMM_FAIL;
+    }
+
+    return BME280_OK;
 }
 
 /*!
@@ -52,6 +74,7 @@ BME280_INTF_RET_TYPE bme280_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
  */
 BME280_INTF_RET_TYPE bme280_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {
+    // not implemented
     return 0;
 }
 
@@ -60,6 +83,7 @@ BME280_INTF_RET_TYPE bme280_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32
  */
 BME280_INTF_RET_TYPE bme280_spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {
+    // not implemented
     return 0;
 }
 

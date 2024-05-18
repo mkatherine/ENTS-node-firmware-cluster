@@ -40,7 +40,50 @@ void tearDown(void) {}
 void test_init(void)
 {
   BME280Status status = BME280Init();
-  TEST_ASSERT_EQUAL(BME280)
+  TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
+}
+
+void test_measure_temperature(void)
+{
+  BME280Data data;
+  BME280Status status = BME280Measure(&data);
+
+  TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
+
+  TEST_ASSERT_GREATER_THAN(0, data.temperature);
+  TEST_ASSERT_LESS_THAN(65, data.temperature);
+}
+
+void test_measure_pressure(void)
+{
+  BME280Data data;
+  BME280Status status = BME280Measure(&data);
+
+  TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
+
+  TEST_ASSERT_GREATER_THAN(300, data.pressure);
+  TEST_ASSERT_LESS_THAN(1100, data.temperature);
+}
+
+void test_measure_humidity(void)
+{
+  BME280Data data;
+  BME280Status status = BME280Measure(&data);
+
+  TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
+
+  TEST_ASSERT_GREATER_THAN(0, data.temperature);
+  TEST_ASSERT_LESS_THAN(100, data.temperature);
+}
+
+void test_measure(void)
+{
+  uint8_t buffer[256];
+  size_t buffer_len = 0;
+
+  buffer_len = BME280Measure(buffer);
+
+  TEST_ASSERT_GREATER_THAN(0, buffer_len);
 }
 
 /**
@@ -55,12 +98,12 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+  SystemApp_Init();
+
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-
-  UTIL_TIMER_Init();
 
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
@@ -71,7 +114,11 @@ int main(void)
   UNITY_BEGIN();
 
   // Tests for timestamp
-  RUN_TEST(test_true);
+  RUN_TEST(test_init);
+  RUN_TEST(test_measure_temperature);
+  RUN_TEST(test_measure_pressure);
+  RUN_TEST(test_measure_humidity);
+  RUN_TEST(test_measure);
 
   UNITY_END();
 }

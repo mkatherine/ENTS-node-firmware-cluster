@@ -18,6 +18,9 @@ PB_BIND(Teros12Measurement, Teros12Measurement, AUTO)
 PB_BIND(Phytos31Measurement, Phytos31Measurement, AUTO)
 
 
+PB_BIND(BME280Measure, BME280Measure, AUTO)
+
+
 PB_BIND(Measurement, Measurement, AUTO)
 
 

@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17soil_power_sensor.proto\"E\n\x13MeasurementMetadata\x12\x0f\n\x07\x63\x65ll_id\x18\x01 \x01(\r\x12\x11\n\tlogger_id\x18\x02 \x01(\r\x12\n\n\x02ts\x18\x03 \x01(\r\"4\n\x10PowerMeasurement\x12\x0f\n\x07voltage\x18\x02 \x01(\x01\x12\x0f\n\x07\x63urrent\x18\x03 \x01(\x01\"P\n\x12Teros12Measurement\x12\x0f\n\x07vwc_raw\x18\x02 \x01(\x01\x12\x0f\n\x07vwc_adj\x18\x03 \x01(\x01\x12\x0c\n\x04temp\x18\x04 \x01(\x01\x12\n\n\x02\x65\x63\x18\x05 \x01(\r\"<\n\x13Phytos31Measurement\x12\x0f\n\x07voltage\x18\x01 \x01(\x01\x12\x14\n\x0cleaf_wetness\x18\x02 \x01(\x01\"\xb6\x01\n\x0bMeasurement\x12\"\n\x04meta\x18\x01 \x01(\x0b\x32\x14.MeasurementMetadata\x12\"\n\x05power\x18\x02 \x01(\x0b\x32\x11.PowerMeasurementH\x00\x12&\n\x07teros12\x18\x03 \x01(\x0b\x32\x13.Teros12MeasurementH\x00\x12(\n\x08phytos31\x18\x04 \x01(\x0b\x32\x14.Phytos31MeasurementH\x00\x42\r\n\x0bmeasurement\"X\n\x08Response\x12$\n\x04resp\x18\x01 \x01(\x0e\x32\x16.Response.ResponseType\"&\n\x0cResponseType\x12\x0b\n\x07SUCCESS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17soil_power_sensor.proto\"E\n\x13MeasurementMetadata\x12\x0f\n\x07\x63\x65ll_id\x18\x01 \x01(\r\x12\x11\n\tlogger_id\x18\x02 \x01(\r\x12\n\n\x02ts\x18\x03 \x01(\r\"4\n\x10PowerMeasurement\x12\x0f\n\x07voltage\x18\x02 \x01(\x01\x12\x0f\n\x07\x63urrent\x18\x03 \x01(\x01\"P\n\x12Teros12Measurement\x12\x0f\n\x07vwc_raw\x18\x02 \x01(\x01\x12\x0f\n\x07vwc_adj\x18\x03 \x01(\x01\x12\x0c\n\x04temp\x18\x04 \x01(\x01\x12\n\n\x02\x65\x63\x18\x05 \x01(\r\"<\n\x13Phytos31Measurement\x12\x0f\n\x07voltage\x18\x01 \x01(\x01\x12\x14\n\x0cleaf_wetness\x18\x02 \x01(\x01\"H\n\rBME280Measure\x12\x10\n\x08pressure\x18\x01 \x01(\r\x12\x13\n\x0btemperature\x18\x02 \x01(\x05\x12\x10\n\x08humidity\x18\x03 \x01(\r\"\xd8\x01\n\x0bMeasurement\x12\"\n\x04meta\x18\x01 \x01(\x0b\x32\x14.MeasurementMetadata\x12\"\n\x05power\x18\x02 \x01(\x0b\x32\x11.PowerMeasurementH\x00\x12&\n\x07teros12\x18\x03 \x01(\x0b\x32\x13.Teros12MeasurementH\x00\x12(\n\x08phytos31\x18\x04 \x01(\x0b\x32\x14.Phytos31MeasurementH\x00\x12 \n\x06\x62me280\x18\x05 \x01(\x0b\x32\x0e.BME280MeasureH\x00\x42\r\n\x0bmeasurement\"X\n\x08Response\x12$\n\x04resp\x18\x01 \x01(\x0e\x32\x16.Response.ResponseType\"&\n\x0cResponseType\x12\x0b\n\x07SUCCESS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -29,10 +29,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_TEROS12MEASUREMENT']._serialized_end=232
   _globals['_PHYTOS31MEASUREMENT']._serialized_start=234
   _globals['_PHYTOS31MEASUREMENT']._serialized_end=294
-  _globals['_MEASUREMENT']._serialized_start=297
-  _globals['_MEASUREMENT']._serialized_end=479
-  _globals['_RESPONSE']._serialized_start=481
-  _globals['_RESPONSE']._serialized_end=569
-  _globals['_RESPONSE_RESPONSETYPE']._serialized_start=531
-  _globals['_RESPONSE_RESPONSETYPE']._serialized_end=569
+  _globals['_BME280MEASURE']._serialized_start=296
+  _globals['_BME280MEASURE']._serialized_end=368
+  _globals['_MEASUREMENT']._serialized_start=371
+  _globals['_MEASUREMENT']._serialized_end=587
+  _globals['_RESPONSE']._serialized_start=589
+  _globals['_RESPONSE']._serialized_end=677
+  _globals['_RESPONSE_RESPONSETYPE']._serialized_start=639
+  _globals['_RESPONSE_RESPONSETYPE']._serialized_end=677
 # @@protoc_insertion_point(module_scope)

@@ -97,7 +97,7 @@ BME280Status BME280MeasureAll(BME280Data *data) {
     dev.delay_us(period, dev.intf_ptr);
 
     /* Read compensated data */
-    rslt = bme280_get_sensor_data(BME280_TEMP, data, &dev);
+    rslt = bme280_get_sensor_data(BME280_ALL, data, &dev);
     if (rslt != BME280_OK) {
       return rslt;
     }
@@ -105,8 +105,12 @@ BME280Status BME280MeasureAll(BME280Data *data) {
 
   // adjust based on defines
 #ifndef BME280_DOUBLE_ENABLE
+/*
   data->temperature = data->temperature / 100;
   data->humidity = data->humidity / 1000;
+  */
+  data->temperature = data->temperature;
+  data->humidity = data->humidity;
 #endif
     
 #ifdef BME280_64BIT_ENABLE 
@@ -121,16 +125,17 @@ size_t BME280Measure(uint8_t *data) {
   SysTime_t ts = SysTimeGet();
 
   // read sensor
-  BME280Data data;
-  BME280Status status = BME280MeasureAll(&data);
+  BME280Data sens_data;
+  BME280Status status = BME280MeasureAll(&sens_data);
   if (status != BME280_STATUS_OK) {
     return -1;
   }
 
   // encode measurement
   size_t data_len = EncodeBME280Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
-                                            data.pressure, data.temperature,
-                                            data.humidity, data);
+                                            sens_data.pressure,
+                                            sens_data.temperature,
+                                            sens_data.humidity, data);
 
   return data_len;
 }

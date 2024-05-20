@@ -28,7 +28,7 @@ static uint8_t dev_addr;
 /**
  * @brief Timeout for I2C calls
  */
-static const uint32_t i2c_timeout = 10;
+static const uint32_t i2c_timeout = 10000;
 
 /******************************************************************************/
 /*!                User interface functions                                   */
@@ -155,7 +155,7 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
         /* Bus configuration : I2C */
         if (intf == BME280_I2C_INTF)
         {
-            dev_addr = BME280_I2C_ADDR_PRIM;
+            dev_addr = BME280_I2C_ADDR_SEC;
             dev->read = bme280_i2c_read;
             dev->write = bme280_i2c_write;
             dev->intf = BME280_I2C_INTF;

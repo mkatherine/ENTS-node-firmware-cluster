@@ -19,6 +19,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "i2c.h"
+#include "sys_app.h"
 
 #include "bme280_sensor.h"
 
@@ -46,34 +47,34 @@ void test_init(void)
 void test_measure_temperature(void)
 {
   BME280Data data;
-  BME280Status status = BME280Measure(&data);
+  BME280Status status = BME280MeasureAll(&data);
 
   TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
 
   TEST_ASSERT_GREATER_THAN(0, data.temperature);
-  TEST_ASSERT_LESS_THAN(65, data.temperature);
+  TEST_ASSERT_LESS_THAN(6500, data.temperature);
 }
 
 void test_measure_pressure(void)
 {
   BME280Data data;
-  BME280Status status = BME280Measure(&data);
+  BME280Status status = BME280MeasureAll(&data);
 
   TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
 
-  TEST_ASSERT_GREATER_THAN(300, data.pressure);
-  TEST_ASSERT_LESS_THAN(1100, data.temperature);
+  TEST_ASSERT_GREATER_THAN(3000, data.pressure);
+  TEST_ASSERT_LESS_THAN(11000, data.temperature);
 }
 
 void test_measure_humidity(void)
 {
   BME280Data data;
-  BME280Status status = BME280Measure(&data);
+  BME280Status status = BME280MeasureAll(&data);
 
   TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
 
   TEST_ASSERT_GREATER_THAN(0, data.temperature);
-  TEST_ASSERT_LESS_THAN(100, data.temperature);
+  TEST_ASSERT_LESS_THAN(100000, data.temperature);
 }
 
 void test_measure(void)

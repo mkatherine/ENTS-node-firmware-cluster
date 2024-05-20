@@ -1,5 +1,8 @@
+"""To test connection to Soil Power Sensor over serial
+
+Stephen Taylor 5/20/2024
+"""
 import serial
-import pdb
 
 class SerialPing:
     """Simple serial ping utility"""

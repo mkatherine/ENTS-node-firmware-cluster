@@ -1,3 +1,7 @@
+"""SPS calibration and evaluation
+
+Stephen Taylor 5/20/2024
+"""
 #%%
 import os
 import pandas as pd

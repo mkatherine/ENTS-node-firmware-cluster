@@ -50,6 +50,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+const int uart_timeout = 1000;
 
 /* USER CODE END PM */
 
@@ -142,34 +143,22 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     if (checked == false){ // this flag exists to make sure it only searches for the check command once
-      HAL_UART_Receive(&huart1, (uint8_t *) check_input, 5, 1000);
+      HAL_UART_Receive(&huart1, (uint8_t *) check_input, 5, uart_timeout);
       if (check_input[0] == 'c'){
-        HAL_UART_Transmit(&huart1, (uint8_t *) check_result, size_check, 100); // send response to the 'check' command
+        HAL_UART_Transmit(&huart1, (uint8_t *) check_result, size_check, uart_timeout); // send response to the 'check' command
       }
       checked = true;
     }
 
-    HAL_UART_Receive(&huart1, (uint8_t *) controller_input, 1, 1000); // On every other iteration, send the encoded measurment in response to the '0' command
+    HAL_UART_Receive(&huart1, (uint8_t *) controller_input, 1, uart_timeout); // On every other iteration, send the encoded measurment in response to the '0' command
     if (controller_input[0] == '0'){
       size_t measurement_size = ADC_measure(encoded_measurment); // Read the measurment, and store it's size in measurement_size (size int 64)
 
       // send length
-      HAL_UART_Transmit(&huart1, (uint8_t *) &measurement_size, 1, 100);
+      HAL_UART_Transmit(&huart1, (uint8_t *) &measurement_size, 1, uart_timeout);
       // send data
-      HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measurement_size, 1000);
+      HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measurement_size, uart_timeout);
 
-
-      //  // Define a buffer to hold the hex representation of each uint8_t value
-      // char hex_buffer[3];  // Two characters for the hexadecimal value and one for the null terminator
-      // // Loop through each byte in encoded_measurement
-      // for (size_t i = 0; i < measurement_size; i++) {
-      //   // Convert the uint8_t value to hexadecimal and store it in the hex_buffer
-      //   snprintf(hex_buffer, sizeof(hex_buffer), "%02X", encoded_measurment[i]);
-      //   // Transmit the hexadecimal value over UART
-      //   HAL_UART_Transmit(&huart1, (uint8_t *) hex_buffer, strlen(hex_buffer), 100);
-      // }
-      // // Transmit a newline character to signify the end of the transmission
-      // HAL_UART_Transmit(&huart1, (uint8_t *) "\n", 1, 100);
     }
 
     //HAL_Delay(100);

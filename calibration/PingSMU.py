@@ -1,3 +1,7 @@
+"""To test connection via socket to Kiethley 2450
+
+Stephen Taylor, 5/20/2024
+"""
 import socket
 
 def ping_smu(host, port):

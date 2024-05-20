@@ -1,3 +1,7 @@
+"""SPS V1 Calibration and Evaluation, for postierity
+
+John Madden, Stephen Taylor
+"""
 #%%
 import os
 import pandas as pd

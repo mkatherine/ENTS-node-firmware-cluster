@@ -118,13 +118,9 @@ double ADC_readVoltage(void){
   // char raw[45];
   // sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
   // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
-  //if (positive_3v_raw < reading < near_0v_raw) { // if between 0v and +3v
-    reading = (positive_calibration_m * reading) + positive_calibration_b;
-  // } else if (reading < negative_3v_raw) { // if between -3v and 0
-  //   reading = (negative_calibration_m * reading) + negative_calibration_b;
-  // } else {
-  //   reading = -1111.11; //return an error
-  // }
+  reading = (positive_calibration_m * reading) + positive_calibration_b;
+  reading = reading * 1000.0; // Convert to millivolt
+
 
 
   //reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression

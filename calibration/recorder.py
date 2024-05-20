@@ -151,6 +151,7 @@ class SoilPowerSensorController(SerialController):
 
         reply = self.ser.read(resp_len) # read said measurment
         meas_dict = decode_measurement(reply) # decode using protobuf
+
         voltage_value = meas_dict["data"]["voltage"]
         current_value = meas_dict["data"]["current"]
 
@@ -528,8 +529,8 @@ if __name__ == "__main__":
         "V": [],
         "V_in": [],
         "I_in": [],
-        "V_i": [],
-        "V_2x": [],
+        "I_sps": [],
+        "V_sps": [],
     }
 
     for v in tqdm(smu.vrange(args.start, args.stop, args.step)):
@@ -539,12 +540,12 @@ if __name__ == "__main__":
             measured_voltage, measured_current = sps.get_power()
 
             # get smu values
+            data["I_in"].append(smu.get_current()) # V and I are switched rn for some reason
             data["V_in"].append(smu.get_voltage())
-            data["I_in"].append(smu.get_current())
 
             # get sps  values
-            data["V_2x"].append(measured_voltage)
-            data["V_i"].append(measured_current)
+            data["V_sps"].append(measured_voltage)
+            data["I_sps"].append(measured_current)
 
     data_df = pd.DataFrame(data)
     print("\n---CALIBRATION SUCCESS!---")

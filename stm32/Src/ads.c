@@ -12,6 +12,17 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ads.h"
 
+const double positive_calibration_m = -0.000000390312083;
+const double positive_calibration_b = 6.587938661367422;
+const double negative_calibration_m = -0.000000395077453;
+const double negative_calibration_b = -0.06046705571518807;
+
+const double negative_3v_raw = 7840000.0;
+
+const double near_0v_raw = 16800000.0;
+const double positive_3v_raw = 8460000.0;
+
+
 int HAL_status(HAL_StatusTypeDef ret) {
   int status;
   if (ret == HAL_OK){
@@ -107,6 +118,14 @@ double ADC_readVoltage(void){
   // char raw[45];
   // sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
   // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
+  //if (positive_3v_raw < reading < near_0v_raw) { // if between 0v and +3v
+    reading = (positive_calibration_m * reading) + positive_calibration_b;
+  // } else if (reading < negative_3v_raw) { // if between -3v and 0
+  //   reading = (negative_calibration_m * reading) + negative_calibration_b;
+  // } else {
+  //   reading = -1111.11; //return an error
+  // }
+
 
   //reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
   return reading;
@@ -159,8 +178,8 @@ size_t ADC_measure(uint8_t *data) {
 
   // read power
   //double adc_voltage = ADC_readVoltage();
-  double adc_voltage = 10;
-  double adc_current = ADC_readCurrent();
+  double adc_voltage = ADC_readVoltage();
+  double adc_current = 10;
 
   // encode measurement
   size_t data_len = EncodePowerMeasurement(ts.Seconds, LOGGER_ID, CELL_ID,

@@ -39,7 +39,6 @@
 #include "phytos31.h"
 #include "rtc.h"
 #include "sensors.h"
-#include "transcoder.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

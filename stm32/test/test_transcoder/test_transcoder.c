@@ -102,6 +102,19 @@ void TestEncodePhytos31(void)
   TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
 }
 
+void TestEncodeBME280(void)
+{
+  uint8_t buffer[256];
+  size_t buffer_len;
+
+  buffer_len = EncodeBME280Measurement(1436079600, 7, 4, buffer);
+
+
+
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(data, buffer, buffer_len);
+  TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
+}
+
 void TestDecodeResponseSuccess(void)
 {
   uint8_t data[] = {};

@@ -22,8 +22,8 @@
  * is defined by APP_TX_DUTY_CYCLE.
  */
 
-#ifndef __SENSORS_H__
-#define __SENSORS_H__
+#ifndef __USER_SENSORS_H__
+#define __USER_SENSORS_H__
 
 #include "stm32_seq.h"
 #include "stm32_timer.h"
@@ -43,7 +43,7 @@ extern "C"{
 
 #ifndef MEASUREMENT_PERIOD
 /** The amount of time between measurements */
-#define MEASUREMENT_PERIOD 1000
+#define MEASUREMENT_PERIOD 10000
 #endif /* MEASUREMENT_PERIOD */
 
 /**
@@ -86,4 +86,4 @@ int SensorsAdd(SensorsPrototypeMeasure cb);
 }
 #endif
 
-#endif // __SENSORS_H__
+#endif // __USER_SENSORS_H__

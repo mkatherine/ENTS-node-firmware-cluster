@@ -128,7 +128,7 @@ int16_t SYS_GetTemperatureLevel(void)
   uint32_t measuredLevel = 0;
   uint16_t batteryLevelmV = SYS_GetBatteryLevel();
 
-  measuredLevel = ADC_ReadChannels(ADC_CHANNEL_TEMPSENSOR);
+  measuredLevel = ADC_ReadChannels(1);
 
   /* convert ADC level to temperature */
   /* check whether device has temperature sensor calibrated in production */
@@ -169,7 +169,7 @@ uint16_t SYS_GetBatteryLevel(void)
   uint16_t batteryLevelmV = 0;
   uint32_t measuredLevel = 0;
 
-  measuredLevel = ADC_ReadChannels(ADC_CHANNEL_VREFINT);
+  measuredLevel = ADC_ReadChannels(2);
 
   if (measuredLevel == 0)
   {
@@ -220,42 +220,7 @@ static uint32_t ADC_ReadChannels(uint32_t channel)
   /* USER CODE BEGIN ADC_ReadChannels_1 */
 
   /* USER CODE END ADC_ReadChannels_1 */
-  uint32_t ADCxConvertedValues = 0;
-  ADC_ChannelConfTypeDef sConfig = {0};
-
-  MX_ADC_Init();
-
-  /* Start Calibration */
-  if (HAL_ADCEx_Calibration_Start(&hadc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /* Configure Regular Channel */
-  sConfig.Channel = channel;
-  sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLINGTIME_COMMON_1;
-  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  if (HAL_ADC_Start(&hadc) != HAL_OK)
-  {
-    /* Start Error */
-    Error_Handler();
-  }
-  /** Wait for end of conversion */
-  HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
-
-  /** Wait for end of conversion */
-  HAL_ADC_Stop(&hadc);   /* it calls also ADC_Disable() */
-
-  ADCxConvertedValues = HAL_ADC_GetValue(&hadc);
-
-  HAL_ADC_DeInit(&hadc);
-
-  return ADCxConvertedValues;
+  return adc_values[channel];
   /* USER CODE BEGIN ADC_ReadChannels_2 */
 
   /* USER CODE END ADC_ReadChannels_2 */

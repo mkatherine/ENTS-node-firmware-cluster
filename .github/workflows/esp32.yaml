@@ -5,14 +5,14 @@ on:
   push:
   pull_request:
 
+defaults:
+  run:
+    working-directory: ./esp32
+
 jobs:
   build:
     runs-on: ubuntu-latest
     
-    defaults:
-      run:
-        working-directory: ./esp32
-
     steps:
       - uses: actions/checkout@v3
 
@@ -37,3 +37,46 @@ jobs:
         with:
           name: build
           path: esp32/.pio/build/
+  
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Run static code analysis
+        run: pio check
+  
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+          key: ${{ runner.os }}-cpplint
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install cpplint
+        run: pip install --upgrade cpplint
+
+      - name: Run linter
+        run: cpplint --recursive --root=. Inc Src lib test

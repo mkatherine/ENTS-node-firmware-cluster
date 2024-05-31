@@ -227,7 +227,7 @@ void test_bme280(void) {
   TEST_ASSERT_EQUAL(Measurement_bme280_tag, bme280_decode.which_measurement);
   TEST_ASSERT_EQUAL(27, bme280_decode.measurement.bme280.temperature);
   TEST_ASSERT_EQUAL(300, bme280_decode.measurement.bme280.pressure);
-  TEST_ASSERT_EQUAL(10, bme280_decode.measurement.bme280.humidity)
+  TEST_ASSERT_EQUAL(10, bme280_decode.measurement.bme280.humidity);
 }
 
 void test_response(void)

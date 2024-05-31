@@ -128,12 +128,25 @@ class TestDecode(unittest.TestCase):
         # check dict
         self.assertEqual("bme280", meas_dict["type"])
         self.check_meta(meas_dict)
-        self.assertEqual(2275, meas_dict["data"]["pressure"])
+        self.assertEqual(98473, meas_dict["data"]["pressure"])
         self.assertEqual(int, meas_dict["data_type"]["pressure"])
-        self.assertEqual(98473, meas_dict["data"]["temperature"])
+        self.assertEqual(2275, meas_dict["data"]["temperature"])
         self.assertEqual(int, meas_dict["data_type"]["temperature"])
         self.assertEqual(43600, meas_dict["data"]["humidity"])
         self.assertEqual(int, meas_dict["data_type"]["humidity"])
+        
+        # decode
+        meas_dict = decode_measurement(data=meas_str, raw=False)
+
+        # check dict
+        self.assertEqual("bme280", meas_dict["type"])
+        self.check_meta(meas_dict)
+        self.assertAlmostEqual(9847.3, meas_dict["data"]["pressure"])
+        self.assertEqual(float, meas_dict["data_type"]["pressure"])
+        self.assertAlmostEqual(22.75, meas_dict["data"]["temperature"])
+        self.assertEqual(float, meas_dict["data_type"]["temperature"])
+        self.assertAlmostEqual(43.600, meas_dict["data"]["humidity"])
+        self.assertEqual(float, meas_dict["data_type"]["humidity"])
 
     def test_missing_meta(self):
         """Test that error is raised when meta is not set"""

@@ -12,6 +12,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ads.h"
 
+#include <stm32wlxx_hal_gpio.h>
+
 const double positive_calibration_m = -0.000000390312083;
 const double positive_calibration_b = 6.587938661367422;
 const double negative_calibration_m = -0.000000395077453;
@@ -22,6 +24,18 @@ const double negative_3v_raw = 7840000.0;
 const double near_0v_raw = 16800000.0;
 const double positive_3v_raw = 8460000.0;
 
+/**
+ * @brief GPIO port for adc data ready line
+ * 
+ * @see data_ready_pin
+ */
+const GPIO_TypeDef* data_ready_port = GPIOC;
+
+/**
+ * @brief GPIO pin for adc data ready line
+ * 
+ */
+const uint16_t data_ready_pin = GPIO_PIN_0;
 
 int HAL_status(HAL_StatusTypeDef ret) {
   int status;
@@ -99,7 +113,7 @@ double ADC_readVoltage(void){
     return -1;
   }
     
-  while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
+  while(HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
   if (ret != HAL_OK){
@@ -137,7 +151,7 @@ double ADC_readCurrent(void){
     return -1;
   }
     
-  while((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
+  while(HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
   if (ret != HAL_OK){

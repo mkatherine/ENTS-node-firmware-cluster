@@ -118,7 +118,7 @@ double ADC_readVoltage(void){
   // char raw[45];
   // sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
   // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
-  reading = (positive_calibration_m * reading) + positive_calibration_b;
+  //reading = (positive_calibration_m * reading) + positive_calibration_b;
 
 
 

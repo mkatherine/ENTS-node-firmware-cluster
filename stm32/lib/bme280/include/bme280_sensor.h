@@ -14,8 +14,8 @@
  * @see sensors.h
  */
 
-#ifndef __BME280_H_
-#define __BME280_H_
+#ifndef __BME280_SENSOR_H__
+#define __BME280_SENSOR_H__
 
 #include <stdint.h>
 #include <stddef.h>

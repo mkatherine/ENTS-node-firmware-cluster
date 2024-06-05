@@ -4,6 +4,7 @@
 #include "stm32_systime.h"
 #include "bme280_common.h"
 #include "user_config.h"
+#include "transcoder.h"
 
 /**
  * @brief Required time between measurements

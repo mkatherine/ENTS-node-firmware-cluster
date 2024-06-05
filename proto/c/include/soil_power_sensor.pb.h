@@ -44,7 +44,7 @@ typedef struct _Teros12Measurement {
     double vwc_raw;
     /* calibrated volumetric water content */
     double vwc_adj;
-    /* temperature in celsius */
+    /* temperature in celcious */
     double temp;
     /* electrical conductivity */
     uint32_t ec;

@@ -22,8 +22,8 @@
  * is defined by APP_TX_DUTY_CYCLE.
  */
 
-#ifndef __SENSORS_H__
-#define __SENSORS_H__
+#ifndef __USER_SENSORS_H__
+#define __USER_SENSORS_H__
 
 #include "stm32_seq.h"
 #include "stm32_timer.h"
@@ -86,4 +86,4 @@ int SensorsAdd(SensorsPrototypeMeasure cb);
 }
 #endif
 
-#endif // __SENSORS_H__
+#endif // __USER_SENSORS_H__

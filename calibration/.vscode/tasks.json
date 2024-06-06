@@ -15,7 +15,7 @@
         "0",
         "128.114.204.83",
         "23",
-        "COM12",
+        "/dev/ttyUSB1",
         "output.csv"
       ],
       "problemMatcher": []

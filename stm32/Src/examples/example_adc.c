@@ -35,17 +35,10 @@
 #include "ads.h"
 #include "sdi12.h"
 #include "rtc.h"
-#include "fifo.h"
-#include <stm32_timer.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-void OnTimeSync(void)
-{
-  // schedule task in sequencer
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_TimeSync), CFG_SEQ_Prio_0);
-}
 
 /* USER CODE END PTD */
 
@@ -105,7 +98,6 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
-  MX_RTC_Init();
 
   /*Initialize timer and RTC*/
   /*Have to be initilized in example files because LoRaWan cannot be initialized like in main*/
@@ -137,10 +129,6 @@ int main(void)
   double voltage_reading;
   double current_reading;
   size_t reading_len;
-  const char data[10] = "Hello\n";
-  uint32_t start_time;
-  uint32_t end_time;
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -152,12 +140,13 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     voltage_reading = ADC_readVoltage();
-    // reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
-    // HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+    reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
 
-    // current_reading = ADC_readCurrent();
-    // reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
-    // HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
+    current_reading = ADC_readCurrent();
+    reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
+
     HAL_Delay(1000); 
   }
   /* USER CODE END 3 */

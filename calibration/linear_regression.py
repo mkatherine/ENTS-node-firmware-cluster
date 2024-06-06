@@ -1,4 +1,4 @@
-"""SPS linear calibration and evaluation
+"""SPS calibration and evaluation
 
 Stephen Taylor 5/20/2024
 """
@@ -40,7 +40,7 @@ def load_data(cfg, datafiles):
 #%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps1_voltage_0to3.3v.csv"] # load voltage
+datafiles = ["data/calibration_data/sps1_voltage_n3.3ton0.1v.csv"] # load voltage
 
 #%%
 ### Load into a data frame ##
@@ -158,7 +158,7 @@ def load_data(cfg, datafiles):
 #%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps2_voltage_0to3.3v.csv"] # load voltage
+datafiles = ["data/calibration_data/sps1_voltage_0to3.3v.csv"] # load voltage
 
 #%%
 ### Load into a data frame ##

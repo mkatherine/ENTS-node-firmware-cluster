@@ -48,7 +48,7 @@ class SerialPing:
 # Example usage
 if __name__ == "__main__":
     # Replace 'COM1' with the appropriate serial port on your system
-    port = "COM12"
+    port = "COM14"
 
     # Create SerialPing object
     serial_ping = SerialPing(port)

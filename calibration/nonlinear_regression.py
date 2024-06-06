@@ -138,6 +138,9 @@ plt.xlabel("Predicted (V)")
 plt.legend()
 plt.show()
 
+residual_average = np.average(residuals)
+print("Average residual: ", residual_average)
+
 #%%
 ####################### NEGATIVE VOLTAGE #######################
 #%%

@@ -140,14 +140,7 @@ int main(void)
   const char data[10] = "Hello\n";
   uint32_t start_time;
   uint32_t end_time;
-  //static UTIL_TIMER_Object_t myTimer;
-  //UTIL_TIMER_Create(&myTimer, 1000, UTIL_TIMER_PERIODIC, OnTimeSync, NULL);
-  start_time = SysTick->VAL;
-  voltage_reading = ADC_readVoltage();
-  end_time = SysTick->VAL;
-  uint32_t elapsed_time = end_time - start_time;
-  reading_len = sprintf(output, "start %d end %d \r\n", start_time, end_time);
-  HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

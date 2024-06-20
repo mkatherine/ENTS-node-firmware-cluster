@@ -32,7 +32,7 @@ def load_data(cfg, datafiles):
     data = pd.concat(df_list, ignore_index=True)
     #data = data.set_index("V")
 
-    data["V_in"] = data["V_in"] * 1000
+    data["V_in"] = data["V_in"]
     data["I_in"] = data["I_in"] 
     data["I_meas"] = data["I_sps"] 
     data["V_meas"] = data["V_sps"]
@@ -42,7 +42,7 @@ def load_data(cfg, datafiles):
 #%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps1_voltage_calib_genomics_0to2v.csv"] # load voltage
+datafiles = ["data/calibration_data/sps2_voltage_0to3.3v.csv"] # load voltage
 
 #%%
 ### Load into a data frame ##
@@ -57,9 +57,6 @@ indexes_to_drop = []
 for i in range(0, len(data), 10):
     # Append the index to the list
     indexes_to_drop.append(i)
-
-# Exclude data from indexes 132 to 141
-indexes_to_drop.extend(range(132, 142))
 
 # Drop the rows with the specified indexes
 
@@ -104,12 +101,8 @@ print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coeffi
 
 #%%
 ### Load the eval files ###
-evalfiles = ["data/eval_data/sps1_voltage_eval_genomics_0to2v.csv"]
+evalfiles = ["data/eval_data/sps1_voltage_eval_0to2.2v.csv"]
 eval_data = load_data(cfg, evalfiles)
-
-#%% Drop the outliers ###
-indexes_to_drop = [117, 118, 119, 120, 121, 122, 123, 124, 125]
-eval_data = eval_data.drop(axis = 0, index=indexes_to_drop)
 
 #%%
 ### Test the fit ###
@@ -147,30 +140,6 @@ plt.show()
 
 residual_average = np.average(residuals)
 print("Average residual: ", residual_average)
-
-#%%
-### Histogram of residuals ###
-plt.figure()
-plt.hist(residuals, bins=30, edgecolor='k', alpha=0.7)
-plt.title("Histogram of Residuals")
-plt.xlabel("Residuals")
-plt.ylabel("Frequency")
-plt.show()
-
-#%%
-### Calculate standard deviation of residuals ###
-std_dev = np.std(residuals)
-print(f"Standard Deviation of Residuals: {std_dev:.4f}")
-
-#%%
-### Calculate the percentage of residuals within one standard deviation ###
-within_one_std_dev = np.sum(np.abs(residuals) <= std_dev) / len(residuals) * 100
-print(f"Percentage of residuals within one standard deviation: {within_one_std_dev:.2f}%")
-
-#%%
-for index, value in enumerate(residuals):
-    if np.abs(value) > 100:
-        print(f"Index: {index}, Value: {value}")
 
 #%%
 ####################### NEGATIVE VOLTAGE #######################

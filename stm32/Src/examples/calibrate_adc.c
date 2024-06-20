@@ -159,9 +159,8 @@ int main(void)
       // send data
       HAL_UART_Transmit(&huart1, (uint8_t *) encoded_measurment, measurement_size, 1000);
     }
-    //HAL_UART_Transmit(&huart1, (uint8_t *) check_result, size_check, uart_timeout); // send response to the 'check' command
 
-   //HAL_Delay(100);
+    HAL_Delay(100);
   /* USER CODE END 3 */
   }
 }

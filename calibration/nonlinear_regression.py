@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """SPS nonlinear calibration and evaluation
 
 The adc data might be non-linear, so this file will attempt to fit a non-linear model to the data.
@@ -7,20 +5,25 @@ The adc data might be non-linear, so this file will attempt to fit a non-linear 
 Stephen Taylor 5/20/2024
 """
 #%%
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from rocketlogger.data import RocketLoggerData
+from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
+import yaml
+import pdb
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
+
 #%%
 ####################### POSITIVE VOLTAGE #######################
 #%%
 ### Load the data ###
-def load_data(datafiles):
-    """Loads data from a csv into a dataframe
-    
-    Args:
-        datafiles: Iterable of strings with path to datafiles
-    """
+def load_data(cfg, datafiles):
     df_list = []
     for d in datafiles:
         df = pd.read_csv(d)
@@ -29,16 +32,39 @@ def load_data(datafiles):
     data = pd.concat(df_list, ignore_index=True)
     #data = data.set_index("V")
 
-    data["V_in"] = data["V_in"]
+    data["V_in"] = data["V_in"] * 1000
     data["I_in"] = data["I_in"] 
     data["I_meas"] = data["I_sps"] 
     data["V_meas"] = data["V_sps"]
     
     return data
 
+#%%
 ### Load the calibration CSVs ###
-datafiles = ["test.csv"] # load voltage
-data = load_data(datafiles)
+cfg_path = "data/config.yaml"
+datafiles = ["data/calibration_data/sps1_voltage_calib_genomics_0to2v.csv"] # load voltage
+
+#%%
+### Load into a data frame ##
+with open(cfg_path, "r") as f:
+    cfg = yaml.load(f, Loader=Loader)
+
+data = load_data(cfg, datafiles)
+
+#%%
+### Filter the 1st reading ###
+indexes_to_drop = []
+for i in range(0, len(data), 10):
+    # Append the index to the list
+    indexes_to_drop.append(i)
+
+# Exclude data from indexes 132 to 141
+indexes_to_drop.extend(range(132, 142))
+
+# Drop the rows with the specified indexes
+
+data = data.drop(axis = 0, index=indexes_to_drop)
+
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -78,8 +104,12 @@ print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coeffi
 
 #%%
 ### Load the eval files ###
-evalfiles = ["test.csv"]
-eval_data = load_data(evalfiles)
+evalfiles = ["data/eval_data/sps1_voltage_eval_genomics_0to2v.csv"]
+eval_data = load_data(cfg, evalfiles)
+
+#%% Drop the outliers ###
+indexes_to_drop = [117, 118, 119, 120, 121, 122, 123, 124, 125]
+eval_data = eval_data.drop(axis = 0, index=indexes_to_drop)
 
 #%%
 ### Test the fit ###
@@ -119,9 +149,72 @@ residual_average = np.average(residuals)
 print("Average residual: ", residual_average)
 
 #%%
+### Histogram of residuals ###
+plt.figure()
+plt.hist(residuals, bins=30, edgecolor='k', alpha=0.7)
+plt.title("Histogram of Residuals")
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.show()
+
+#%%
+### Calculate standard deviation of residuals ###
+std_dev = np.std(residuals)
+print(f"Standard Deviation of Residuals: {std_dev:.4f}")
+
+#%%
+### Calculate the percentage of residuals within one standard deviation ###
+within_one_std_dev = np.sum(np.abs(residuals) <= std_dev) / len(residuals) * 100
+print(f"Percentage of residuals within one standard deviation: {within_one_std_dev:.2f}%")
+
+#%%
+for index, value in enumerate(residuals):
+    if np.abs(value) > 100:
+        print(f"Index: {index}, Value: {value}")
+
+#%%
 ####################### NEGATIVE VOLTAGE #######################
-datafiles = ["test.csv"] # load voltage
-data = load_data(datafiles)
+#%%
+### Load the data ###
+def load_data(cfg, datafiles):
+    df_list = []
+    for d in datafiles:
+        df = pd.read_csv(d)
+        df_list.append(df)
+    
+    data = pd.concat(df_list, ignore_index=True)
+    #data = data.set_index("V")
+
+    data["V_in"] = data["V_in"]
+    data["I_in"] = data["I_in"] 
+    data["I_meas"] = data["I_sps"] 
+    data["V_meas"] = data["V_sps"]
+    
+    return data
+
+#%%
+### Load the calibration CSVs ###
+cfg_path = "data/config.yaml"
+datafiles = ["data/calibration_data/sps1_voltage_n2.2ton1.4v.csv"] # load voltage
+
+#%%
+### Load into a data frame ##
+with open(cfg_path, "r") as f:
+    cfg = yaml.load(f, Loader=Loader)
+
+data = load_data(cfg, datafiles)
+
+#%%
+### Filter the 1st reading ###
+indexes_to_drop = []
+for i in range(0, len(data), 10):
+    # Append the index to the list
+    indexes_to_drop.append(i)
+
+# Drop the rows with the specified indexes
+
+data = data.drop(axis = 0, index=indexes_to_drop)
+
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -161,8 +254,8 @@ print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coeffi
 
 #%%
 ### Load the eval files ###
-evalfiles = ["test.csv"]
-eval_data = load_data(evalfiles)
+evalfiles = ["data/eval_data/sps1_voltage_eval_n3.3to0v.csv"]
+eval_data = load_data(cfg, evalfiles)
 
 #%%
 ### Test the fit ###

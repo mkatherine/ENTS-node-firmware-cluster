@@ -10,6 +10,7 @@ Stephen Taylor 5/20/2024
 import os
 import pandas as pd
 import numpy as np
+from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
 from rocketlogger.data import RocketLoggerData
 from sklearn import linear_model
@@ -20,6 +21,7 @@ try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
+from scipy.stats import norm
 
 #%%
 ####################### POSITIVE VOLTAGE #######################
@@ -34,7 +36,7 @@ def load_data(datafiles):
     data = pd.concat(df_list, ignore_index=True)
     #data = data.set_index("V")
 
-    data["V_in"] = data["V_in"] * 1000
+    data["V_in"] = data["V_in"]
     data["I_in"] = data["I_in"] 
     data["I_meas"] = data["I_sps"] 
     data["V_meas"] = data["V_sps"]
@@ -43,7 +45,7 @@ def load_data(datafiles):
 
 #%%
 ### Load the calibration CSVs ###
-datafiles = ["calib.csv"] # load voltage
+datafiles = ["data/leafwetness/ph1-calib.csv"] # load voltage
 
 data = load_data(datafiles)
 
@@ -84,22 +86,23 @@ plt.show()
 
 #%%
 ### Fit the linear model ###
-v_input_cols = ["V_meas"]
-coefficients = np.polyfit(data["V_meas"], data["V_in"], 3)
-v_model_pos = np.poly1d(coefficients)
+model, params = Polynomial.fit(data["V_meas"], data["V_in"], 3, full=True)
+print(model)
+print(model.convert().coef)
 
-print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coefficients[1], "c", coefficients[2])
+#print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coefficients[1], "c", coefficients[2])
 
 #%%
 ### Load the eval files ###
-evalfiles = ["eval.csv"]
+evalfiles = ["data/leafwetness/ph1-eval.csv"]
 eval_data = load_data(evalfiles)
 
 #%%
 ### Test the fit ###
-predicted = v_model_pos(eval_data["V_meas"])
+predicted = model(eval_data["V_meas"])
 
 residuals = eval_data["V_in"] - predicted # Calculate the residuals
+
 
 print("Evaluate using sklearn.metrics")
 mae = mean_absolute_error(eval_data["V_in"], predicted)
@@ -133,9 +136,40 @@ residual_average = np.average(residuals)
 print("Average residual: ", residual_average)
 
 #%%
+
+def plot_residual_histogram(res, ax=None):
+    """Plot a histogram of residuals on a set of axis
+    
+    Args:
+        res: Iterable of residuals values
+        ax: Axis to plot on. If "None", a new figure is created
+        
+    Returns:
+        Mean and standard deviation of the normal distribution
+    """
+    
+    if ax == None:
+        pass
+   
+    # 
+    mu, std = norm.fit(residuals)
+    print(f"Norm distribution parameters: mu = {mu:.4f}, std = {std:.4f}")
+
+    normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
+    normdist_y = norm.pdf(normdist_x, mu, std)
+    
+    return mu, std
+
+mu, std = norm.fit(residuals)
+print(f"Norm distribution parameters: mu = {mu:.4f}, std = {std:.4f}")
+
+normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
+normdist_y = norm.pdf(normdist_x, mu, std)
+
 ### Histogram of residuals ###
 plt.figure()
-plt.hist(residuals, bins=30, edgecolor='k', alpha=0.7)
+plt.hist(residuals, bins=30, density=True, edgecolor='k', alpha=0.7)
+plt.plot(normdist_x, normdist_y, color="r")
 plt.title("Histogram of Residuals (Post Calibration)")
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
@@ -144,7 +178,10 @@ plt.show()
 #%%
 ### Calculate standard deviation of residuals ###
 std_dev = np.std(residuals)
-print(f"Standard Deviation of Residuals: {std_dev:.4f}")
+mean = np.mean(residuals)
+print(f"Residual mean: {mean:.4f}, std: {std_dev:.4f}")
+
+#%%
 
 #%%
 ### Calculate the percentage of residuals within one standard deviation ###

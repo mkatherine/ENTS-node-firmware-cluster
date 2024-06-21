@@ -132,11 +132,12 @@ double ADC_readVoltage(void){
   // char raw[45];
   // sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
   // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
+  #ifndef CALIBRATION
   reading = (positive_calibration_m * reading) + positive_calibration_b;
+  #endif /* CALIBRATION */
 
 
 
-  //reading =  (VOLTAGE_SLOPE * reading) + VOLTAGE_B; // Calculated from linear regression
   return reading;
 }
 
@@ -171,7 +172,10 @@ double ADC_readCurrent(void){
   // sprintf(raw, "Raw: %x %x %x Shifted: %f \r\n\r\n",rx_data[0], rx_data[1], rx_data[2], reading);
   // HAL_UART_Transmit(&huart1, (const uint8_t *) raw, 36, 19);
 
+  #ifndef CALIBRATION
   //reading =  (CURRENT_SLOPE * reading) + CURRENT_B; // Calculated from linear regression
+  #endif /* CALIBRATION */
+
   return reading;
 }
 
@@ -188,7 +192,7 @@ size_t ADC_measure(uint8_t *data) {
   // read power
   //double adc_voltage = ADC_readVoltage();
   double adc_voltage = ADC_readVoltage();
-  double adc_current = 10;
+  double adc_current = ADC_readCurrent();
 
   // encode measurement
   size_t data_len = EncodePowerMeasurement(ts.Seconds, LOGGER_ID, CELL_ID,

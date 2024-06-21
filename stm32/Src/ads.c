@@ -192,7 +192,7 @@ size_t ADC_measure(uint8_t *data) {
   // read power
   //double adc_voltage = ADC_readVoltage();
   double adc_voltage = ADC_readVoltage();
-  double adc_current = ADC_readCurrent();
+  double adc_current = 0;
 
   // encode measurement
   size_t data_len = EncodePowerMeasurement(ts.Seconds, LOGGER_ID, CELL_ID,

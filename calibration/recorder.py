@@ -547,6 +547,10 @@ if __name__ == "__main__":
     }
 
     for v in tqdm(smu.vrange(args.start, args.stop, args.step)):
+        
+        # Sleep after each step change to account for lpf
+        time.sleep(5) 
+        
         for _ in range(args.samples):
             data["V"].append(v)
             

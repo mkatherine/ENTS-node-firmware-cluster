@@ -23,7 +23,6 @@ To see a list of all CLI parameters:::
     $ python recorder.py -h
 """
 
-import pdb
 
 import time
 import argparse
@@ -31,7 +30,6 @@ import socket
 import serial
 import numpy as np
 import pandas as pd
-import pdb
 from tqdm import tqdm
 from typing import Tuple
 from soil_power_sensor_protobuf import decode_measurement
@@ -58,7 +56,7 @@ class SerialController:
             Flow control (default is on)
         """
 
-        self.ser = serial.Serial(port, baudrate=baudrate, xonxoff=xonxoff, timeout=1)
+        self.ser = serial.Serial(port, baudrate=baudrate, xonxoff=xonxoff)
         # Print serial port settings
         print("Serial Port Settings:")
         print("Port:", self.ser.port)
@@ -130,14 +128,17 @@ class SoilPowerSensorController(SerialController):
 
         Returns
         -------
-        tuple[float, float]
+        tuple[float, float
             voltage, current
         """
         
-        self.ser.write(b"0\n") # send a command to the SPS to send a power measurment
+        import pdb; pdb.set_trace()
+        
+        self.ser.write(b"0") # send a command to the SPS to send a power measurment
 
         # read a single byte for the length
         resp_len_bytes = self.ser.read()
+        
         resp_len = int.from_bytes(resp_len_bytes)
 
         reply = self.ser.read(resp_len) # read said measurment
@@ -157,6 +158,11 @@ class SoilPowerSensorController(SerialController):
         RuntimeError
             Checks that SPS replies "ok" when sent "check"
         """
+        
+       
+        # needed sleep to get write to work
+        # possibly due to linux usb stack initialized or mcu waiting to startup
+        time.sleep(1)
         self.ser.write(b"check\n")
         reply = self.ser.readline()
         #reply = reply.decode()
@@ -525,7 +531,7 @@ if __name__ == "__main__":
     for v in tqdm(smu.vrange(args.start, args.stop, args.step)):
         for _ in range(args.samples):
             data["V"].append(v)
-
+            
             measured_voltage, measured_current = sps.get_power()
 
             # get smu values

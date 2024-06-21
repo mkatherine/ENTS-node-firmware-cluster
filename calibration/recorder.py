@@ -131,9 +131,7 @@ class SoilPowerSensorController(SerialController):
         tuple[float, float
             voltage, current
         """
-        
-        import pdb; pdb.set_trace()
-        
+         
         self.ser.write(b"0") # send a command to the SPS to send a power measurment
 
         # read a single byte for the length
@@ -473,8 +471,11 @@ class SMULANController(LANController):
 
         self.sock.sendall(b':FORM:ELEM VOLT\n')
         self.sock.sendall(b':READ?\n')
+        # receive response
         reply = self.sock.recv(256)
-        reply = reply.strip("\r")
+        # strip trailing \r\n characters
+        reply = reply.strip()
+        # convert to float and return
         return float(reply)
 
 
@@ -489,8 +490,11 @@ class SMULANController(LANController):
 
         self.sock.sendall(b':FORM:ELEM CURR\n') # replace with serial.write with socket.write commands, std library aviable, lots of example code
         self.sock.sendall(b':READ?\n')
-        reply = self.sock.sendall()
-        reply = reply.strip("\r")
+        # receive response
+        reply = self.sock.recv(256)
+        # strip trailing \r\n characters
+        reply = reply.strip()
+        # convert to float and return
         return float(reply)
 
 

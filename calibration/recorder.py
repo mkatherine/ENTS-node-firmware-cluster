@@ -397,6 +397,12 @@ class SMULANController(LANController):
             else:
                 raise StopIteration
 
+        def __len__(self):
+            """Len
+            
+            The number of measurements points
+            """
+            return int((self.stop - self.start) / self.step) + 1
 
         def set_voltage(self, v):
             """Sets the voltage output"""
@@ -508,21 +514,29 @@ if __name__ == "__main__":
         default=10,
         help="Number of samples to takeat each voltage level"
     )
-
-    parser.add_argument("start", type=float, help="Start voltage in V")
-    parser.add_argument("stop", type=float, help="End voltage in V")
-    parser.add_argument("step", type=float, help="Step between voltages in V")
-    parser.add_argument("smu_port", type=str, help="SMU serial port (if SMU is configured to serial)")
-    parser.add_argument("smu_host", type=str, help="SMU IP address (if SMU is configured to LAN)")
-    parser.add_argument("smu_lan_port", type=int, help="SMU LAN port (if SMU is configured to LAN)")
+   
+    # TODO Implement switching between sourcing voltage and current
+    
+    range_group = parser.add_argument_group("Range")
+    parser.add_argument("--start", type=float, default= 0., help="Start voltage in V")
+    parser.add_argument("--stop", type=float, default=3., help="End voltage in V")
+    parser.add_argument("--step", type=float, default=0.1, help="Step between voltages in V")
+    
+    source_group = parser.add_mutually_exclusive_group(required=True)
+    source_group.add_argument("--smu_port", type=str, help="SMU serial port (if SMU is configured to serial)")
+    source_group.add_argument("--smu_host", type=str, help="SMU host in the format ip:port")
+    
     parser.add_argument("sps_port", type=str, help="SPS serial port")
-    parser.add_argument("data_file", type=str, help="Path to store data file")
+    parser.add_argument("data_file", type=str, default="data.csv", help="Path to store data file")
 
-    args = parser.parse_args()
-
-
+    args = parser.parse_args() 
+     
     sps = SoilPowerSensorController(args.sps_port) 
-    smu = SMULANController(args.smu_host, args.smu_lan_port)
+    if args.smu_port:
+        smu = SMUSerialController(args.smu_port)
+    elif args.smu_host:
+        host, port = args.smu_host.split(":")
+        smu = SMULANController(host, int(port))
 
     data = {
         "V": [],

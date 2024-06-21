@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """SPS nonlinear calibration and evaluation
 
 The adc data might be non-linear, so this file will attempt to fit a non-linear model to the data.
@@ -23,7 +25,7 @@ except ImportError:
 ####################### POSITIVE VOLTAGE #######################
 #%%
 ### Load the data ###
-def load_data(cfg, datafiles):
+def load_data(datafiles):
     df_list = []
     for d in datafiles:
         df = pd.read_csv(d)
@@ -41,30 +43,9 @@ def load_data(cfg, datafiles):
 
 #%%
 ### Load the calibration CSVs ###
-cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps1_voltage_calib_genomics_0to2v.csv"] # load voltage
+datafiles = ["calib.csv"] # load voltage
 
-#%%
-### Load into a data frame ##
-with open(cfg_path, "r") as f:
-    cfg = yaml.load(f, Loader=Loader)
-
-data = load_data(cfg, datafiles)
-
-#%%
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
-
-# Exclude data from indexes 132 to 141
-indexes_to_drop.extend(range(132, 142))
-
-# Drop the rows with the specified indexes
-
-data = data.drop(axis = 0, index=indexes_to_drop)
-
+data = load_data(datafiles)
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -94,6 +75,13 @@ plt.show()
 # plt.legend()
 # plt.show()
 
+plt.figure()
+plt.hist(data["V_sps"] - data["V_in"], bins=30, edgecolor='k', alpha=0.7)
+plt.title("Histogram of Residuals (Pre Calibration)")
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.show()
+
 #%%
 ### Fit the linear model ###
 v_input_cols = ["V_meas"]
@@ -104,12 +92,8 @@ print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coeffi
 
 #%%
 ### Load the eval files ###
-evalfiles = ["data/eval_data/sps1_voltage_eval_genomics_0to2v.csv"]
-eval_data = load_data(cfg, evalfiles)
-
-#%% Drop the outliers ###
-indexes_to_drop = [117, 118, 119, 120, 121, 122, 123, 124, 125]
-eval_data = eval_data.drop(axis = 0, index=indexes_to_drop)
+evalfiles = ["eval.csv"]
+eval_data = load_data(evalfiles)
 
 #%%
 ### Test the fit ###
@@ -152,7 +136,7 @@ print("Average residual: ", residual_average)
 ### Histogram of residuals ###
 plt.figure()
 plt.hist(residuals, bins=30, edgecolor='k', alpha=0.7)
-plt.title("Histogram of Residuals")
+plt.title("Histogram of Residuals (Post Calibration)")
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
 plt.show()
@@ -171,6 +155,8 @@ print(f"Percentage of residuals within one standard deviation: {within_one_std_d
 for index, value in enumerate(residuals):
     if np.abs(value) > 100:
         print(f"Index: {index}, Value: {value}")
+           
+quit()
 
 #%%
 ####################### NEGATIVE VOLTAGE #######################
@@ -195,7 +181,7 @@ def load_data(cfg, datafiles):
 #%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps1_voltage_n2.2ton1.4v.csv"] # load voltage
+datafiles = ["eval.csv"] # load voltage
 
 #%%
 ### Load into a data frame ##

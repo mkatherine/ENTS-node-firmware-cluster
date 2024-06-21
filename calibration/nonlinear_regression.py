@@ -7,25 +7,20 @@ The adc data might be non-linear, so this file will attempt to fit a non-linear 
 Stephen Taylor 5/20/2024
 """
 #%%
-import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from rocketlogger.data import RocketLoggerData
-from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
-import yaml
-import pdb
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
-
 #%%
 ####################### POSITIVE VOLTAGE #######################
 #%%
 ### Load the data ###
-def load_data(cfg, datafiles):
+def load_data(datafiles):
+    """Loads data from a csv into a dataframe
+    
+    Args:
+        datafiles: Iterable of strings with path to datafiles
+    """
     df_list = []
     for d in datafiles:
         df = pd.read_csv(d)
@@ -41,29 +36,9 @@ def load_data(cfg, datafiles):
     
     return data
 
-#%%
 ### Load the calibration CSVs ###
-cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps4_voltage_calib_genomics_0to2v.csv"] # load voltage
-
-#%%
-### Load into a data frame ##
-with open(cfg_path, "r") as f:
-    cfg = yaml.load(f, Loader=Loader)
-
-data = load_data(cfg, datafiles)
-
-#%%
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
-
-# Drop the rows with the specified indexes
-
-data = data.drop(axis = 0, index=indexes_to_drop)
-
+datafiles = ["test.csv"] # load voltage
+data = load_data(datafiles)
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -103,19 +78,8 @@ print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coeffi
 
 #%%
 ### Load the eval files ###
-evalfiles = ["data/eval_data/sps4_voltage_eval_genomics_0to2v.csv"]
-eval_data = load_data(cfg, evalfiles)
-
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(eval_data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
-
-
-# Drop the rows with the specified indexes
-eval_data = eval_data.drop(axis = 0, index=indexes_to_drop)
-
+evalfiles = ["test.csv"]
+eval_data = load_data(evalfiles)
 
 #%%
 ### Test the fit ###
@@ -156,47 +120,8 @@ print("Average residual: ", residual_average)
 
 #%%
 ####################### NEGATIVE VOLTAGE #######################
-#%%
-### Load the data ###
-def load_data(cfg, datafiles):
-    df_list = []
-    for d in datafiles:
-        df = pd.read_csv(d)
-        df_list.append(df)
-    
-    data = pd.concat(df_list, ignore_index=True)
-    #data = data.set_index("V")
-
-    data["V_in"] = data["V_in"]
-    data["I_in"] = data["I_in"] 
-    data["I_meas"] = data["I_sps"] 
-    data["V_meas"] = data["V_sps"]
-    
-    return data
-
-#%%
-### Load the calibration CSVs ###
-cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps1_voltage_n2.2ton1.4v.csv"] # load voltage
-
-#%%
-### Load into a data frame ##
-with open(cfg_path, "r") as f:
-    cfg = yaml.load(f, Loader=Loader)
-
-data = load_data(cfg, datafiles)
-
-#%%
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
-
-# Drop the rows with the specified indexes
-
-data = data.drop(axis = 0, index=indexes_to_drop)
-
+datafiles = ["test.csv"] # load voltage
+data = load_data(datafiles)
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -236,8 +161,8 @@ print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coeffi
 
 #%%
 ### Load the eval files ###
-evalfiles = ["data/eval_data/sps1_voltage_eval_n3.3to0v.csv"]
-eval_data = load_data(cfg, evalfiles)
+evalfiles = ["test.csv"]
+eval_data = load_data(evalfiles)
 
 #%%
 ### Test the fit ###

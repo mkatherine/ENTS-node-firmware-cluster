@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """SPS nonlinear calibration and evaluation
 
 The adc data might be non-linear, so this file will attempt to fit a non-linear model to the data.
@@ -42,11 +44,7 @@ def load_data(cfg, datafiles):
 #%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-<<<<<<< Updated upstream
-datafiles = ["data/calibration_data/sps2_voltage_0to3.3v.csv"] # load voltage
-=======
 datafiles = ["data/calibration_data/sps4_voltage_calib_genomics_0to2v.csv"] # load voltage
->>>>>>> Stashed changes
 
 #%%
 ### Load into a data frame ##
@@ -105,11 +103,6 @@ print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coeffi
 
 #%%
 ### Load the eval files ###
-<<<<<<< Updated upstream
-evalfiles = ["data/eval_data/sps1_voltage_eval_0to2.2v.csv"]
-eval_data = load_data(cfg, evalfiles)
-
-=======
 evalfiles = ["data/eval_data/sps4_voltage_eval_genomics_0to2v.csv"]
 eval_data = load_data(cfg, evalfiles)
 
@@ -124,7 +117,6 @@ for i in range(0, len(eval_data), 10):
 eval_data = eval_data.drop(axis = 0, index=indexes_to_drop)
 
 
->>>>>>> Stashed changes
 #%%
 ### Test the fit ###
 predicted = v_model_pos(eval_data["V_meas"])

@@ -42,11 +42,7 @@ def load_data(cfg, datafiles):
 #%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-<<<<<<< Updated upstream
-datafiles = ["data/calibration_data/sps2_voltage_0to3.3v.csv"] # load voltage
-=======
 datafiles = ["data/calibration_data/sps4_voltage_calib_genomics_0to2v.csv"] # load voltage
->>>>>>> Stashed changes
 
 #%%
 ### Load into a data frame ##
@@ -65,6 +61,7 @@ for i in range(0, len(data), 10):
 # Drop the rows with the specified indexes
 
 data = data.drop(axis = 0, index=indexes_to_drop)
+
 
 
 #%%
@@ -97,19 +94,25 @@ plt.show()
 
 #%%
 ### Fit the linear model ###
-v_input_cols = ["V_meas"]
-coefficients = np.polyfit(data["V_meas"], data["V_in"], 3)
-v_model_pos = np.poly1d(coefficients)
+# Segment the data into three parts based on V_in
+data_seg1 = data[data["V_in"] <= 1.0]
+data_seg2 = data[(data["V_in"] > 1.0) & (data["V_in"] <= 1.32)]
+data_seg3 = data[data["V_in"] > 1.32]
 
-print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coefficients[1], "c", coefficients[2])
+# Fit polynomial models for each segment
+coefficients_seg1 = np.polyfit(data_seg1["V_meas"], data_seg1["V_in"], 4)
+v_model_seg1 = np.poly1d(coefficients_seg1)
+
+coefficients_seg2 = np.polyfit(data_seg2["V_meas"], data_seg2["V_in"], 4)
+v_model_seg2 = np.poly1d(coefficients_seg2)
+
+coefficients_seg3 = np.polyfit(data_seg3["V_meas"], data_seg3["V_in"], 3)
+v_model_seg3 = np.poly1d(coefficients_seg3)
+
+#print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coefficients[1], "c", coefficients[2])
 
 #%%
 ### Load the eval files ###
-<<<<<<< Updated upstream
-evalfiles = ["data/eval_data/sps1_voltage_eval_0to2.2v.csv"]
-eval_data = load_data(cfg, evalfiles)
-
-=======
 evalfiles = ["data/eval_data/sps4_voltage_eval_genomics_0to2v.csv"]
 eval_data = load_data(cfg, evalfiles)
 
@@ -124,10 +127,22 @@ for i in range(0, len(eval_data), 10):
 eval_data = eval_data.drop(axis = 0, index=indexes_to_drop)
 
 
->>>>>>> Stashed changes
 #%%
 ### Test the fit ###
-predicted = v_model_pos(eval_data["V_meas"])
+# Segment the evaluation data
+eval_seg1 = eval_data[eval_data["V_in"] <= 1.0]
+eval_seg2 = eval_data[(eval_data["V_in"] > 1.0) & (eval_data["V_in"] <= 1.32)]
+eval_seg3 = eval_data[eval_data["V_in"] > 1.32]
+
+# Test the fit for each segment
+predicted_seg1 = v_model_seg1(eval_seg1["V_meas"])
+predicted_seg2 = v_model_seg2(eval_seg2["V_meas"])
+predicted_seg3 = v_model_seg3(eval_seg3["V_meas"])
+
+# Combine predictions
+predicted = pd.concat([pd.Series(predicted_seg1, index=eval_seg1.index),
+                       pd.Series(predicted_seg2, index=eval_seg2.index),
+                       pd.Series(predicted_seg3, index=eval_seg3.index)])
 
 residuals = eval_data["V_in"] - predicted # Calculate the residuals
 
@@ -159,8 +174,18 @@ plt.xlabel("Predicted (V)")
 plt.legend()
 plt.show()
 
+# Plot residuals histogram
+plt.figure()
+plt.title("Histogram of Residuals")
+plt.hist(residuals, bins=30, edgecolor='black')
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.show()
+
 residual_average = np.average(residuals)
 print("Average residual: ", residual_average)
+
+print("Standard Deviation of residuals: ", np.std(residuals))
 
 #%%
 ####################### NEGATIVE VOLTAGE #######################

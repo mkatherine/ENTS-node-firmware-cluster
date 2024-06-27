@@ -124,7 +124,13 @@ double ADC_readVoltage(void){
     return -1;
   }
 
-  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) | ((uint64_t)rx_data[2]); 
+  // Combine the 3 bytes into a 24-bit value
+  int32_t temp = ((int32_t)rx_data[0] << 16) | ((int32_t)rx_data[1] << 8) | ((int32_t)rx_data[2]);
+  // Check if the sign bit (24th bit) is set
+  if (temp & 0x800000) {
+      // Extend the sign to 32 bits
+      temp |= 0xFF000000;
+  }
   reading = (double) temp;
 
   // Uncomment these lines if you wish to see the raw and shifted values from the ADC for calibration purpouses

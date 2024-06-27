@@ -132,6 +132,14 @@ plt.xlabel("Predicted (V)")
 plt.legend()
 plt.show()
 
+# Plot residuals histogram
+plt.figure()
+plt.title("Histogram of Residuals")
+plt.hist(residuals, bins=30, edgecolor='black')
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.show()
+
 residual_average = np.average(residuals)
 print("Average residual: ", residual_average)
 

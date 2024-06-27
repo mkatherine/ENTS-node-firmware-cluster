@@ -4,6 +4,10 @@
 # docs
 docs/html
 
+# cppcheck
+*.ctu-info
+*.dump
+
 ## Python
 
 # Byte-compiled / optimized / DLL files

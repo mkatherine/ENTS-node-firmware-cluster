@@ -7,6 +7,39 @@
       "label": "doxygen",
       "type": "shell",
       "command": "doxygen Doxyfile"
+    },
+    {
+      "label": "Lint stm32",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "-m",
+        "cpplint",
+        "--recursive",
+        "--root=stm32",
+        "--output=vs7",
+        "stm32/Inc",
+        "stm32/Src",
+        "stm32/test"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint esp32",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "-m",
+        "cpplint",
+        "--recursive",
+        "--root=esp32",
+        "--output=vs7",
+        "esp32/Inc",
+        "esp32/Src",
+        "esp32/test",
+        "esp32/lib"
+      ],
+      "problemMatcher": []
     }
   ]
 }

@@ -40,6 +40,7 @@
 
 #include "sdi12.h"
 #include "rtc.h"
+#include "sensors.h"
 
 #include <time.h>
 /* USER CODE END Includes */
@@ -220,19 +221,6 @@ static void OnPingSlotPeriodicityChanged(uint8_t pingSlotPeriodicity);
 static void OnSystemReset(void);
 
 /* USER CODE BEGIN PFP */
-/**
- * @brief Time synchronization timer callback
- *
- * Registers TimeSync task with the synchronizer.
- */
-static void OnTimeSync(void);
-
-/**
- * @brief Requests a time synchronization from the application server
- *
- * Once the synchronization is completed the timer is stopped.
- */
-static void TimeSync(void);
 /* USER CODE END PFP */
 
 /* Private variables ---------------------------------------------------------*/
@@ -318,16 +306,6 @@ static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
  */
 static LmHandlerAppData_t AppData = {0, 0, AppDataBuffer};
 
-/**
- * @brief Timer for repeated time sync events
- */
-static UTIL_TIMER_Object_t TimeSyncTimer;
-
-/**
- * @brief Period for time sync events
- */
-static const UTIL_TIMER_Time_t TimeSyncPeriod = TIMESYNC_PERIOD;
-
 /* USER CODE END PV */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -366,35 +344,11 @@ void LoRaWAN_Init(void)
 
   LmHandlerJoin(ActivationType, ForceRejoin);
 
-  if (EventType == TX_ON_TIMER)
-  {
-    /* send every time timer elapses */
-    UTIL_TIMER_Create(&TxTimer, TxPeriodicity, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
-    UTIL_TIMER_Start(&TxTimer);
-  }
-  else
-  {
-    /* USER CODE BEGIN LoRaWAN_Init_3 */
-
-    /* USER CODE END LoRaWAN_Init_3 */
-  }
+  // start the tx timer
+  UTIL_TIMER_Create(&TxTimer, TxPeriodicity, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
+  UTIL_TIMER_Start(&TxTimer);
 
   /* USER CODE BEGIN LoRaWAN_Init_Last */
-  /*
-  // register task and create timer
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_TimeSync), UTIL_SEQ_RFU, TimeSync);
-  UTIL_TIMER_Create(&TimeSyncTimer, TIMESYNC_PERIOD, UTIL_TIMER_PERIODIC,
-                    OnTimeSync, NULL);
-
-  // start timer
-  UTIL_TIMER_Start(&TimeSyncTimer);
-  */
-
-  // register task and create timer
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_TimeSync), UTIL_SEQ_RFU, TimeSync);
-  UTIL_TIMER_Create(&TimeSyncTimer, TimeSyncPeriod, UTIL_TIMER_PERIODIC,
-                    OnTimeSync, NULL);
-
 
   /* USER CODE END LoRaWAN_Init_Last */
 }
@@ -430,34 +384,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 /* Private functions ---------------------------------------------------------*/
 /* USER CODE BEGIN PrFD */
 
-void OnTimeSync(void)
-{
-  // schedule task in sequencer
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_TimeSync), CFG_SEQ_Prio_0);
-}
-
-void TimeSync(void)
-{
-  // try to sync the clock
-  LmHandlerErrorStatus_t status = LmhpClockSyncAppTimeReq();
-  if (status == LORAMAC_HANDLER_SUCCESS)
-  {
-    // stop timer
-    UTIL_TIMER_Stop(&TimeSyncTimer);
-
-    // start sensor measurements
-    SensorsStart();
-
-    APP_LOG(TS_ON, VLEVEL_M, "Clock initiated\r\n");
-  }
-  else
-  {
-    APP_LOG(TS_OFF, VLEVEL_M,
-            "Clock synchronization failed. Retrying in %u ms.\r\n",
-            TimeSyncPeriod)
-  }
-}
-
 /* USER CODE END PrFD */
 
 static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
@@ -485,17 +411,40 @@ static void SendTxData(void)
 {
   /* USER CODE BEGIN SendTxData_1 */
 
+
   // preconditions
+
+  // local flag for if clock has been synced
+  static bool clock_synced = false;
+
+  // Sync clock
+  if (!clock_synced) {
+    // send request and heck return
+    if (LmhpClockSyncAppTimeReq() == LORAMAC_HANDLER_SUCCESS) {
+      APP_LOG(TS_OFF, VLEVEL_M, "Clock sync request send successfully\r\n")
+      // toggle flag
+      clock_synced = true;
+      // start taking measurements
+      SensorsStart();
+    }
+    else {
+      APP_LOG(TS_OFF, VLEVEL_M, "Could not sync clock, retrying on next tx\r\n");
+    }
+    // otherwise return
+    return;
+  }
 
   // check if radio is busy
   if (LmHandlerIsBusy())
   {
+    APP_LOG(TS_ON, VLEVEL_M, "LmHandler is busy\r\n");
     return;
   }
 
   // check if buffer is empty
   if (FramBufferLen() <= 0)
   {
+    APP_LOG(TS_ON, VLEVEL_M, "Nothing in buffer\r\n");
     return;
   }
 
@@ -592,8 +541,6 @@ static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
         APP_LOG(TS_OFF, VLEVEL_M, "OTAA =====================\r\n");
       }
 
-      // start timer to sync clock
-      UTIL_TIMER_Start(&TimeSyncTimer);
     }
     else
     {

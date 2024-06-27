@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """SPS nonlinear calibration and evaluation
 
 The adc data might be non-linear, so this file will attempt to fit a non-linear model to the data.
@@ -8,6 +10,7 @@ Stephen Taylor 5/20/2024
 import os
 import pandas as pd
 import numpy as np
+from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
 from rocketlogger.data import RocketLoggerData
 from sklearn import linear_model
@@ -18,12 +21,13 @@ try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
+from scipy.stats import norm
 
 #%%
 ####################### POSITIVE VOLTAGE #######################
 #%%
 ### Load the data ###
-def load_data(cfg, datafiles):
+def load_data(datafiles):
     df_list = []
     for d in datafiles:
         df = pd.read_csv(d)
@@ -41,28 +45,9 @@ def load_data(cfg, datafiles):
 
 #%%
 ### Load the calibration CSVs ###
-cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps4_voltage_calib_genomics_0to2v.csv"] # load voltage
+datafiles = ["data/leafwetness/ph1-calib.csv"] # load voltage
 
-#%%
-### Load into a data frame ##
-with open(cfg_path, "r") as f:
-    cfg = yaml.load(f, Loader=Loader)
-
-data = load_data(cfg, datafiles)
-
-#%%
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
-
-# Drop the rows with the specified indexes
-
-data = data.drop(axis = 0, index=indexes_to_drop)
-
-
+data = load_data(datafiles)
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -92,59 +77,32 @@ plt.show()
 # plt.legend()
 # plt.show()
 
+plt.figure()
+plt.hist(data["V_sps"] - data["V_in"], bins=30, edgecolor='k', alpha=0.7)
+plt.title("Histogram of Residuals (Pre Calibration)")
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.show()
+
 #%%
 ### Fit the linear model ###
-# Segment the data into three parts based on V_in
-data_seg1 = data[data["V_in"] <= 1.0]
-data_seg2 = data[(data["V_in"] > 1.0) & (data["V_in"] <= 1.32)]
-data_seg3 = data[data["V_in"] > 1.32]
-
-# Fit polynomial models for each segment
-coefficients_seg1 = np.polyfit(data_seg1["V_meas"], data_seg1["V_in"], 4)
-v_model_seg1 = np.poly1d(coefficients_seg1)
-
-coefficients_seg2 = np.polyfit(data_seg2["V_meas"], data_seg2["V_in"], 4)
-v_model_seg2 = np.poly1d(coefficients_seg2)
-
-coefficients_seg3 = np.polyfit(data_seg3["V_meas"], data_seg3["V_in"], 3)
-v_model_seg3 = np.poly1d(coefficients_seg3)
+model, params = Polynomial.fit(data["V_meas"], data["V_in"], 3, full=True)
+print(model)
+print(model.convert().coef)
 
 #print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coefficients[1], "c", coefficients[2])
 
 #%%
 ### Load the eval files ###
-evalfiles = ["data/eval_data/sps4_voltage_eval_genomics_0to2v.csv"]
-eval_data = load_data(cfg, evalfiles)
-
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(eval_data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
-
-
-# Drop the rows with the specified indexes
-eval_data = eval_data.drop(axis = 0, index=indexes_to_drop)
-
+evalfiles = ["data/leafwetness/ph1-eval.csv"]
+eval_data = load_data(evalfiles)
 
 #%%
 ### Test the fit ###
-# Segment the evaluation data
-eval_seg1 = eval_data[eval_data["V_in"] <= 1.0]
-eval_seg2 = eval_data[(eval_data["V_in"] > 1.0) & (eval_data["V_in"] <= 1.32)]
-eval_seg3 = eval_data[eval_data["V_in"] > 1.32]
-
-# Test the fit for each segment
-predicted_seg1 = v_model_seg1(eval_seg1["V_meas"])
-predicted_seg2 = v_model_seg2(eval_seg2["V_meas"])
-predicted_seg3 = v_model_seg3(eval_seg3["V_meas"])
-
-# Combine predictions
-predicted = pd.concat([pd.Series(predicted_seg1, index=eval_seg1.index),
-                       pd.Series(predicted_seg2, index=eval_seg2.index),
-                       pd.Series(predicted_seg3, index=eval_seg3.index)])
+predicted = model(eval_data["V_meas"])
 
 residuals = eval_data["V_in"] - predicted # Calculate the residuals
+
 
 print("Evaluate using sklearn.metrics")
 mae = mean_absolute_error(eval_data["V_in"], predicted)
@@ -185,7 +143,65 @@ plt.show()
 residual_average = np.average(residuals)
 print("Average residual: ", residual_average)
 
-print("Standard Deviation of residuals: ", np.std(residuals))
+#%%
+
+def plot_residual_histogram(res, ax=None):
+    """Plot a histogram of residuals on a set of axis
+    
+    Args:
+        res: Iterable of residuals values
+        ax: Axis to plot on. If "None", a new figure is created
+        
+    Returns:
+        Mean and standard deviation of the normal distribution
+    """
+    
+    if ax == None:
+        pass
+   
+    # 
+    mu, std = norm.fit(residuals)
+    print(f"Norm distribution parameters: mu = {mu:.4f}, std = {std:.4f}")
+
+    normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
+    normdist_y = norm.pdf(normdist_x, mu, std)
+    
+    return mu, std
+
+mu, std = norm.fit(residuals)
+print(f"Norm distribution parameters: mu = {mu:.4f}, std = {std:.4f}")
+
+normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
+normdist_y = norm.pdf(normdist_x, mu, std)
+
+### Histogram of residuals ###
+plt.figure()
+plt.hist(residuals, bins=30, density=True, edgecolor='k', alpha=0.7)
+plt.plot(normdist_x, normdist_y, color="r")
+plt.title("Histogram of Residuals (Post Calibration)")
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.show()
+
+#%%
+### Calculate standard deviation of residuals ###
+std_dev = np.std(residuals)
+mean = np.mean(residuals)
+print(f"Residual mean: {mean:.4f}, std: {std_dev:.4f}")
+
+#%%
+
+#%%
+### Calculate the percentage of residuals within one standard deviation ###
+within_one_std_dev = np.sum(np.abs(residuals) <= std_dev) / len(residuals) * 100
+print(f"Percentage of residuals within one standard deviation: {within_one_std_dev:.2f}%")
+
+#%%
+for index, value in enumerate(residuals):
+    if np.abs(value) > 100:
+        print(f"Index: {index}, Value: {value}")
+           
+quit()
 
 #%%
 ####################### NEGATIVE VOLTAGE #######################
@@ -210,7 +226,7 @@ def load_data(cfg, datafiles):
 #%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-datafiles = ["data/calibration_data/sps1_voltage_n2.2ton1.4v.csv"] # load voltage
+datafiles = ["eval.csv"] # load voltage
 
 #%%
 ### Load into a data frame ##

@@ -23,7 +23,6 @@ To see a list of all CLI parameters:::
     $ python recorder.py -h
 """
 
-import pdb
 
 import time
 import argparse
@@ -31,7 +30,6 @@ import socket
 import serial
 import numpy as np
 import pandas as pd
-import pdb
 from tqdm import tqdm
 from typing import Tuple
 from soil_power_sensor_protobuf import decode_measurement
@@ -58,7 +56,7 @@ class SerialController:
             Flow control (default is on)
         """
 
-        self.ser = serial.Serial(port, baudrate=baudrate, xonxoff=xonxoff, timeout=1)
+        self.ser = serial.Serial(port, baudrate=baudrate, xonxoff=xonxoff)
         # Print serial port settings
         print("Serial Port Settings:")
         print("Port:", self.ser.port)
@@ -130,14 +128,15 @@ class SoilPowerSensorController(SerialController):
 
         Returns
         -------
-        tuple[float, float]
+        tuple[float, float
             voltage, current
         """
-        
-        self.ser.write(b"0\n") # send a command to the SPS to send a power measurment
+         
+        self.ser.write(b"0") # send a command to the SPS to send a power measurment
 
         # read a single byte for the length
         resp_len_bytes = self.ser.read()
+        
         resp_len = int.from_bytes(resp_len_bytes)
 
         reply = self.ser.read(resp_len) # read said measurment
@@ -157,6 +156,11 @@ class SoilPowerSensorController(SerialController):
         RuntimeError
             Checks that SPS replies "ok" when sent "check"
         """
+        
+       
+        # needed sleep to get write to work
+        # possibly due to linux usb stack initialized or mcu waiting to startup
+        time.sleep(1)
         self.ser.write(b"check\n")
         reply = self.ser.readline()
         #reply = reply.decode()
@@ -393,6 +397,12 @@ class SMULANController(LANController):
             else:
                 raise StopIteration
 
+        def __len__(self):
+            """Len
+            
+            The number of measurements points
+            """
+            return int((self.stop - self.start) / self.step) + 1
 
         def set_voltage(self, v):
             """Sets the voltage output"""
@@ -467,8 +477,11 @@ class SMULANController(LANController):
 
         self.sock.sendall(b':FORM:ELEM VOLT\n')
         self.sock.sendall(b':READ?\n')
+        # receive response
         reply = self.sock.recv(256)
-        reply = reply.strip("\r")
+        # strip trailing \r\n characters
+        reply = reply.strip()
+        # convert to float and return
         return float(reply)
 
 
@@ -483,8 +496,11 @@ class SMULANController(LANController):
 
         self.sock.sendall(b':FORM:ELEM CURR\n') # replace with serial.write with socket.write commands, std library aviable, lots of example code
         self.sock.sendall(b':READ?\n')
-        reply = self.sock.sendall()
-        reply = reply.strip("\r")
+        # receive response
+        reply = self.sock.recv(256)
+        # strip trailing \r\n characters
+        reply = reply.strip()
+        # convert to float and return
         return float(reply)
 
 
@@ -498,21 +514,29 @@ if __name__ == "__main__":
         default=10,
         help="Number of samples to takeat each voltage level"
     )
-
-    parser.add_argument("start", type=float, help="Start voltage in V")
-    parser.add_argument("stop", type=float, help="End voltage in V")
-    parser.add_argument("step", type=float, help="Step between voltages in V")
-    parser.add_argument("smu_port", type=str, help="SMU serial port (if SMU is configured to serial)")
-    parser.add_argument("smu_host", type=str, help="SMU IP address (if SMU is configured to LAN)")
-    parser.add_argument("smu_lan_port", type=int, help="SMU LAN port (if SMU is configured to LAN)")
+   
+    # TODO Implement switching between sourcing voltage and current
+    
+    range_group = parser.add_argument_group("Range")
+    parser.add_argument("--start", type=float, default= 0., help="Start voltage in V")
+    parser.add_argument("--stop", type=float, default=3., help="End voltage in V")
+    parser.add_argument("--step", type=float, default=0.1, help="Step between voltages in V")
+    
+    source_group = parser.add_mutually_exclusive_group(required=True)
+    source_group.add_argument("--smu_port", type=str, help="SMU serial port (if SMU is configured to serial)")
+    source_group.add_argument("--smu_host", type=str, help="SMU host in the format ip:port")
+    
     parser.add_argument("sps_port", type=str, help="SPS serial port")
-    parser.add_argument("data_file", type=str, help="Path to store data file")
+    parser.add_argument("data_file", type=str, default="data.csv", help="Path to store data file")
 
-    args = parser.parse_args()
-
-
+    args = parser.parse_args() 
+     
     sps = SoilPowerSensorController(args.sps_port) 
-    smu = SMULANController(args.smu_host, args.smu_lan_port)
+    if args.smu_port:
+        smu = SMUSerialController(args.smu_port)
+    elif args.smu_host:
+        host, port = args.smu_host.split(":")
+        smu = SMULANController(host, int(port))
 
     data = {
         "V": [],
@@ -523,9 +547,13 @@ if __name__ == "__main__":
     }
 
     for v in tqdm(smu.vrange(args.start, args.stop, args.step)):
+        
+        # Sleep after each step change to account for lpf
+        time.sleep(5) 
+        
         for _ in range(args.samples):
             data["V"].append(v)
-
+            
             measured_voltage, measured_current = sps.get_power()
 
             # get smu values

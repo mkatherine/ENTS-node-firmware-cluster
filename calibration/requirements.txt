@@ -3,3 +3,5 @@ pandas
 pyserial
 tqdm
 scikit-learn
+rocketlogger
+pyyaml

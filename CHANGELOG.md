@@ -25,6 +25,7 @@ firmware versions for a hardware version.
 - Implementation of fram to a flat address space
 - Implementation of fifo to a circular buffer
 - Added delay to start of tests to remove requirement of manual reset during testing
+- Removed [custom OpenOCD](https://github.com/jlab-sensing/tool-openocd) dependency
 
 [i41]: https://github.com/jlab-sensing/soil-power-sensor-firmware/issues/41
 [i48]: https://github.com/jlab-sensing/soil-power-sensor-firmware/issues/48

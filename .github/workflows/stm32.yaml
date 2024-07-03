@@ -103,4 +103,4 @@ jobs:
       - name: Build PlatformIO Project
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
-        run: pio remote test -e tests -i test_sdi12
+        run: pio remote test -e tests -i test_sdi12 -r 

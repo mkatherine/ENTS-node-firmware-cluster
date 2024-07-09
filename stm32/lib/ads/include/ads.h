@@ -20,7 +20,7 @@ extern "C" {
 
 #include "../Inc/i2c.h"
 #include "../Inc/usart.h"
-#include "stm32_systime.h"
+#include "../../../../../.platformio/packages/framework-stm32cubewl/Utilities/misc/stm32_systime.h"
 
 #include "../Inc/user_config.h"
 #include "../Inc/timestamp.h"

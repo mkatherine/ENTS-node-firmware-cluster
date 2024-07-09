@@ -17,7 +17,7 @@
 #include <string.h>
 
 #include "stm32/lib/phytos31/include/phytos31.h"
-// #include "transcoder.h"
+#include "proto/c/include/transcoder.h"
 
 HAL_StatusTypeDef Phytos31Init() {
   return ADC_init();

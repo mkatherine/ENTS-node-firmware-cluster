@@ -21,7 +21,7 @@ except ImportError:
 
 #%%
 ### Load the data ###
-def load_data(cfg, datafiles):
+def load_data(datafiles):
     df_list = []
     for d in datafiles:
         df = pd.read_csv(d)
@@ -39,27 +39,8 @@ def load_data(cfg, datafiles):
 
 #%%
 ### Load the calibration CSVs ###
-cfg_path = "data/config.yaml"
-datafiles_pos = ["data/calibration_data/sps1_voltage_0to3.3v.csv"] # load voltage positive
-datafiles_neg = ["data/calibration_data/sps1_voltage_n3.3ton0.1v.csv"] # load voltage negative
-
-#%%
-### Load into a data frame ##
-with open(cfg_path, "r") as f:
-    cfg = yaml.load(f, Loader=Loader)
-
-data = load_data(cfg, datafiles_pos + datafiles_neg)
-
-#%%
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
-
-
-# Drop the rows with the specified indexes
-data = data.drop(axis = 0, index=indexes_to_drop)
+datafiles = ["data/calibration_data/sps4_voltage_calib_-3to3v.csv"] # load voltage
+data = load_data(datafiles)
 
 #%%
 ### Fit the linear model ###
@@ -71,15 +52,13 @@ print("Voltage coefficients: ", v_model.coef_, "Voltage intercept: ", v_model.in
 
 #%%
 ### Load the eval files ###
-evalfiles_pos = ["data/eval_data/sps1_voltage_eval_0to2.2v.csv"]
-evalfiles_neg = ["data/eval_data/sps1_voltage_eval_n3.3to0v.csv"]
-eval_data = load_data(cfg, evalfiles_pos + evalfiles_neg)
-
-### Filter the 1st reading ###
-indexes_to_drop = []
-for i in range(0, len(eval_data), 10):
-    # Append the index to the list
-    indexes_to_drop.append(i)
+n = 5 # Number of eval files
+evalfiles_pattern = "data/eval_data/sps4_voltage_eval_-3to3v_sweep"
+evalfiles = [f"{evalfiles_pattern}{i}.csv" for i in range(1, n+1)] # Replace 'n' with the number of CSV files
+eval_data_list = []
+for f in evalfiles:
+    eval_data = load_data([f])
+    eval_data_list.append(eval_data)
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -94,17 +73,21 @@ plt.legend()
 plt.show()
 
 #%%
-### Test the fit ###
-predicted = v_model.predict(eval_data["V_meas"].values.reshape(-1, 1))
-
-residuals = eval_data["V_in"] - predicted # Calculate the residuals
+### Test the fit and plot residuals ###
+colors = plt.cm.jet(np.linspace(0, 1, len(eval_data_list)))
 
 plt.figure()
-plt.title("Residual plot")
-plt.scatter(predicted, residuals)
+plt.title("Residual plot SPS4")
+
+for i, eval_data in enumerate(eval_data_list):
+    predicted = v_model.predict(eval_data["V_meas"].values.reshape(-1, 1))
+    residuals = eval_data["V_in"] - predicted # Calculate the residuals
+    plt.scatter(predicted, residuals, color=colors[i], label=f'Sweep {i+1}')
+
 plt.axhline(y=0, color='r', linestyle='--')
 plt.ylabel("Residuals")
 plt.xlabel("Predicted (V)")
 plt.legend()
 plt.show()
-# %%
+
+#%%

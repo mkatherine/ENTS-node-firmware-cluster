@@ -153,7 +153,7 @@ int main(void)
   RUN_TEST(test_i2c);
   RUN_TEST(test_FramWrite_ValidData);
   RUN_TEST(test_FramWrite_ZeroLength);
-  RUN_TEST(test_FramWrite_OutOfRange); 
+  RUN_TEST(test_FramWrite_OutOfRange);
   RUN_TEST(test_FramWrite_MultiplePages);
   RUN_TEST(test_FramRead_ValidData);
   RUN_TEST(test_FramRead_ZeroLength);

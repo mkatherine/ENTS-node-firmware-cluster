@@ -78,4 +78,4 @@ jobs:
         run: pip install --upgrade cpplint
 
       - name: Run linter
-        run: cpplint --recursive --root=. Inc Src test
+        run: cpplint --recursive Inc Src test

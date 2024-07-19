@@ -46,8 +46,8 @@
  * SOFTWARE.
  */
 
-#ifndef __USER_SENSORS_H__
-#define __USER_SENSORS_H__
+#ifndef LIB_SENSORS_INCLUDE_SENSORS_H_
+#define LIB_SENSORS_INCLUDE_SENSORS_H_
 
 #include "stm32_seq.h"
 #include "stm32_timer.h"
@@ -110,4 +110,4 @@ int SensorsAdd(SensorsPrototypeMeasure cb);
 }
 #endif
 
-#endif  // __USER_SENSORS_H__
+#endif  // LIB_SENSORS_INCLUDE_SENSORS_H_

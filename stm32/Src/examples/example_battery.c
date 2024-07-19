@@ -41,7 +41,7 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
+  
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
@@ -70,7 +70,11 @@ int main(void)
     HAL_UART_Transmit(&huart1, (const uint8_t *) buf, buf_len, 1000);
 
     // Sleep
-    HAL_Delay(DELAY);
+    //HAL_Delay(DELAY);
+
+    for (int i=0; i < 1000000; i++) {
+      __NOP();
+    }
   }
 }
 

@@ -6,3 +6,4 @@ This folder stores any extra documentation that is useful for the overall projec
 - @subpage rg191
 - @subpage add-device-to-tnn
 - @subpage bsp-components
+- @subpage remote-dev

@@ -14,7 +14,7 @@ static SensorsPrototypeMeasure callback_arr[MAX_SENSORS];
 /** Length of @ref callback_arr */
 static unsigned int callback_arr_len = 0;
 
-static const uint8_t buffer_size = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
+static const uint8_t kBufferSize = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
 
 /** Periodic timer for querying sensors */
 static UTIL_TIMER_Object_t MeasureTimer;
@@ -56,9 +56,8 @@ void SensorsStop(void) {
   UTIL_TIMER_Stop(&MeasureTimer);
 }
 
-int SensorsAdd(SensorsPrototypeMeasure cb)
-{
-  // check for out of range error 
+int SensorsAdd(SensorsPrototypeMeasure cb) {
+  // check for out of range error
   if (callback_arr_len >= MAX_SENSORS) {
     APP_LOG(TS_OFF, VLEVEL_M, "Error: Too many sensors added!\r\n");
     return -1;
@@ -73,7 +72,7 @@ int SensorsAdd(SensorsPrototypeMeasure cb)
 
 void SensorsMeasure(void) {
   // buffer to store measurements
-  uint8_t buffer[buffer_size];
+  uint8_t buffer[kBufferSize];
   size_t buffer_len;
 
   // loop over callbacks
@@ -87,15 +86,14 @@ void SensorsMeasure(void) {
       APP_LOG(TS_OFF, VLEVEL_M, "%x", buffer[j]);
     }
     APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
-    
+
     // add to tx buffer
     FramStatus status = FramPut(buffer, buffer_len);
     if (status == FRAM_BUFFER_FULL) {
       APP_LOG(TS_OFF, VLEVEL_M, "Error: TX Buffer full!\r\n");
-    }
-    else if (status != FRAM_OK) {
+    } else if (status != FRAM_OK) {
       APP_LOG(TS_OFF, VLEVEL_M, "Error: General FRAM buffer!\r\n");
-    } 
+    }
   }
 }
 

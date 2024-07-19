@@ -82,6 +82,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    concurrency:
+      group: remote-test 
     needs: build
     steps:
       - uses: actions/checkout@v4

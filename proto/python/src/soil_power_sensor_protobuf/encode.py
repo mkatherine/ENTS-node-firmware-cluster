@@ -10,7 +10,7 @@ Each type of measurement has a corresponding encoding function as follows:
     Teros12Measurement -> encode_teros12_measurement()
 """
 
-from .soil_power_sensor_pb2 import MeasurementMetadata, Measurement, Response
+from .soil_power_sensor_pb2 import Measurement, Response
 
 
 def encode_response(success: bool = True) -> bytes:

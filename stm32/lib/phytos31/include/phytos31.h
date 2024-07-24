@@ -14,8 +14,8 @@
  ******************************************************************************
  */
 
-#ifndef STM32_LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
-#define STM32_LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
+#ifndef LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
+#define LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ size_t Phytos31_measure(uint8_t *data);
 }
 #endif
 
-#endif  // STM32_LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
+#endif  // LIB_PHYTOS31_INCLUDE_PHYTOS31_H_

@@ -254,3 +254,5 @@ plt.xlabel("Predicted (V)")
 plt.legend()
 plt.show()
 
+print("STD of residuals: ", np.std(residuals))
+#%%

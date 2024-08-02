@@ -43,7 +43,7 @@ def load_data(datafiles):
 
 #%%
 ### Load the calibration CSVs ###
-datafiles = ["data/calibration_data/sps4_voltage_calib_-3to3v.csv"] # load voltage
+datafiles = ["data/calibration_data/sps8_voltage_calib_0to3v_sweep2.csv"] # load voltage
 
 data = load_data(datafiles)
 
@@ -92,7 +92,7 @@ print(model.convert().coef)
 
 #%%
 ### Load the eval files ###
-evalfiles = ["data/eval_data/sps4_voltage_eval_-3to3v.csv"]
+evalfiles = ["data/eval_data/sps8_voltage_eval_0to3v_sweep2.csv"]
 eval_data = load_data(evalfiles)
 
 #%%

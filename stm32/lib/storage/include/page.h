@@ -5,6 +5,22 @@
  * @version 0.1
  * @date 2024-08-02
  * 
+ * Implements a linked list for storing pages on external memory. 
+ * 
+ * Front (Head)                   Back (Tail)
+ *     |                              |
+ *     v                              v
+ * +--------+    +--------+       +--------+
+ * | Page 1 | -> | Page 2 | -> ...| Page N |
+ * +--------+    +--------+       +--------+
+ *     ^                              ^
+ *     |                              |
+ *    NULL                           NULL
+ * 
+ * Each page in the linked list contains a 'next' pointer pointing towards the
+ * tail (Back) and a 'prev' pointer pointing towards the head (Front).
+ * 
+ * 
  * @copyright Copyright (c) 2024
  * 
  */
@@ -12,10 +28,21 @@
 #ifndef STM32_LIB_STORAGE_INCLUDE_PAGE_H_
 #define STM32_LIB_STORAGE_INCLUDE_PAGE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 
-typedef void Page;
+typedef struct {
+  /** Next element in ll */
+  Page* next;
+  /** Prev element in ll */
+  Page* prev;
+  /** File index the page corresponds to */
+  size_t file_idx;
+} Page;
 
 /**
  * @brief Loads the last saved page state
@@ -27,18 +54,18 @@ void PageInit(void);
  * @brief Get the front page
  * 
  */
-Page PageFront(void);
+Page* PageFront(void);
 
 /**
  * @brief Get the back page
  * 
  */
-Page PageBack(void);
+Page* PageBack(void);
 
 /**
  * @brief Push a page to the front of the linked list
  */
-Page PagePushFront(void);
+Page* PagePushFront(void);
 
 /**
  * @brief Pop a page from the front of the linked list
@@ -51,7 +78,7 @@ void PagePopFront(void);
  * @brief Push a page to the back of the linked list
  * 
  */
-Page PagePushBack(void);
+Page* PagePushBack(void);
 
 /**
  * @brief Pop a page from the back of the linked list
@@ -118,5 +145,9 @@ void PageStateSave(void);
  * 
  */
 void PageStateLoad(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // STM32_LIB_STORAGE_INCLUDE_PAGE_H_

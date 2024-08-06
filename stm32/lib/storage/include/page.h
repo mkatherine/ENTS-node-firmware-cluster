@@ -34,15 +34,21 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
-typedef struct {
+
+typedef struct Page_s Page;
+
+struct Page_s {
   /** Next element in ll */
   Page* next;
   /** Prev element in ll */
   Page* prev;
   /** File index the page corresponds to */
   size_t file_idx;
-} Page;
+  /** Flag for file open */
+  bool open;
+};
 
 /**
  * @brief Loads the last saved page state

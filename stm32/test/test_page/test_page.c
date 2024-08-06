@@ -71,10 +71,33 @@ void test_PagePushFront_single(void) {
   TEST_ASSERT_EQUAL(page, back);
   TEST_ASSERT_EQUAL(NULL, page->next);
   TEST_ASSERT_EQUAL(NULL, page->prev);
+  TEST_ASSERT_FALSE(page->open);
 
   // check size
   size_t size = PageSize();
-  TEST_ASSERT_EQUAL(size, 1);
+  TEST_ASSERT_EQUAL(1, size);
+}
+
+void test_PagePushFront_multiple(void) {
+  // add 3 elements
+  for (int i = 0; i < 3; i++) {
+    PagePushFront();    
+  }
+
+  // check size
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(3, size);
+
+  // check first element
+  Page* page = PageFront();
+  TEST_ASSERT_EQUAL(false, page->open);
+  TEST_ASSERT_NOT_NULL(page);
+  TEST_ASSERT_NULL(page->prev);
+  TEST_ASSERT_NOT_NULL(page->next);
+
+  Page* page_next = page->next;
+  TEST_ASSERT_EQUAL(false, page->open);
+  TEST_ASSERT_
 }
 
 void test_PagePushBack_single(void) {
@@ -93,11 +116,13 @@ void test_PagePushBack_single(void) {
   TEST_ASSERT_EQUAL(page, back);
   TEST_ASSERT_EQUAL(NULL, page->next);
   TEST_ASSERT_EQUAL(NULL, page->prev);
+  TEST_ASSERT_FALSE(page->open);
 
   // check size
   size_t size = PageSize();
   TEST_ASSERT_EQUAL(size, 1);
 }
+
 
 /**
   * @brief Entry point for protobuf test

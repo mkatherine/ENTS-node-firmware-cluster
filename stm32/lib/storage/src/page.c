@@ -18,6 +18,18 @@ static Page* front = NULL;
 /** Reference to back of ll */
 static Page* back = NULL;
 
+Page* AllocatePage(void);
+
+Page* AllocatePage(void) {
+  // allocate new page
+  Page* new_page = NULL;
+  new_page = malloc(sizeof(Page));
+  // initial values
+  new_page->next = NULL;
+  new_page->prev = NULL;
+  new_page->open = false;
+}
+
 void PageInit(void) {
   // reset to default values, see variable definitions
   size = 0;
@@ -43,10 +55,7 @@ Page* PageBack(void) {
 
 Page* PagePushFront(void) {
   // allocate new page
-  Page* new_page = NULL;
-  new_page = malloc(sizeof(Page));
-  new_page->next = NULL;
-  new_page->prev = NULL;
+  Page* new_page = AllocatePage();
 
   // check for malloc error
   if (new_page == NULL) {
@@ -79,6 +88,11 @@ void PagePopFront(void) {
     return;
   }
   
+  // close file if open
+  if (back->open) {
+    PageClose(back);
+  }
+  
   // NULL pointers if one element left
   if ((front == back) && (size == 1)) {
     // free memory
@@ -103,10 +117,7 @@ void PagePopFront(void) {
 
 Page* PagePushBack(void) {
   // allocate new page
-  Page* new_page = NULL;
-  new_page = malloc(sizeof(Page));
-  new_page->next = NULL;
-  new_page->prev = NULL;
+  Page* new_page = AllocatePage();
 
   // check for malloc error
   if (new_page == NULL) {
@@ -139,6 +150,11 @@ void PagePopBack(void) {
   if (PageEmpty()) {
     return;
   }
+
+  // close file if open
+  if (back->open) {
+    PageClose(back);
+  }
   
   // NULL pointers if one element left
   if ((front == back) && (size == 1)) {
@@ -164,10 +180,14 @@ void PagePopBack(void) {
 
 void PageOpen(Page* page) {
   // TODO
+
+  page->open = true;
 }
 
 void PageClose(Page* page) {
   // TODO
+
+  page->open = false;
 }
 
 inline size_t PageSize(void) {

@@ -19,7 +19,18 @@ static Page* front = NULL;
 static Page* back = NULL;
 
 void PageInit(void) {
-  return;
+  // reset to default values, see variable definitions
+  size = 0;
+  file_counter = 0;
+  front = NULL;
+  back = NULL;
+}
+
+void PageDeinit(void) {
+  // pop all elements from linked list
+  while (PageSize() > 0) {
+    PagePopFront();
+  }
 }
 
 Page* PageFront(void) {
@@ -159,22 +170,22 @@ void PageClose(Page* page) {
   // TODO
 }
 
-size_t PageSize(void) {
+inline size_t PageSize(void) {
   return size;
 }
 
-bool PageEmpty(void) {
+inline bool PageEmpty(void) {
   if ((front == NULL) && (back == NULL) && (size == 0)) {
     return true;
-  } else [
+  } else {
     return false;
-  ]
+  }
 }
 
 void PageStateSave(void) {
   // TODO
 }
 
-void PageStateLoad(void) 
+void PageStateLoad(void) {
   // TODO
 }

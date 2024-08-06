@@ -21,18 +21,82 @@ void SystemClock_Config(void);
 
 /**
  * @brief Setup code that runs at the start of every test
+ * 
+ * Initialises library to know state
 */
-void setUp(void) {}
+void setUp(void) {
+  PageInit();
+}
 
 /**
  * @brief Tear down code that runs at the end of every test
+ * 
+ * Clean up memory from linked list
 */
-void tearDown(void) {}
+void tearDown(void) {
+  PageDeinit();
+}
 
+void test_PageInit(void) {
+  // check front
+  Page* front = PageFront();
+  TEST_ASSERT_EQUAL(NULL, back);
 
-void test_true(void)
-{
-  TEST_ASSERT_TRUE(1);
+  // check back
+  Page* back = PageBack();
+  TEST_ASSERT_EQUAL(NULL, back);
+
+  // check size
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(0, size);
+
+  // check empty
+  bool empty = PageEmpty();
+  TEST_ASSERT_EQUAL(true, empty);
+}
+
+void test_PagePushFront_single(void) {
+  // push page to front
+  Page* page = PagePushFront();
+
+  // get front and  back
+  Page* front = PageFront();
+  Page* back = PageBack();
+
+  // check for NULL
+  TEST_ASSERT_NOT_NULL(page);
+
+  // check front and back are equal
+  TEST_ASSERT_EQUAL(page, front);
+  TEST_ASSERT_EQUAL(page, back);
+  TEST_ASSERT_EQUAL(NULL, page->next);
+  TEST_ASSERT_EQUAL(NULL, page->prev);
+
+  // check size
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(size, 1);
+}
+
+void test_PagePushBack_single(void) {
+  // push page to back
+  Page* page = PagePushBack();
+
+  // get front and  back
+  Page* front = PageFront();
+  Page* back = PageBack();
+
+  // check for NULL
+  TEST_ASSERT_NOT_NULL(page);
+
+  // check front and back are equal
+  TEST_ASSERT_EQUAL(page, front);
+  TEST_ASSERT_EQUAL(page, back);
+  TEST_ASSERT_EQUAL(NULL, page->next);
+  TEST_ASSERT_EQUAL(NULL, page->prev);
+
+  // check size
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(size, 1);
 }
 
 /**
@@ -60,7 +124,7 @@ int main(void)
   UNITY_BEGIN();
 
   // Tests for timestamp
-  RUN_TEST(test_true);
+  RUN_TEST(test_PageInit);
 
   UNITY_END();
 }

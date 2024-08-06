@@ -51,6 +51,12 @@ typedef struct {
 void PageInit(void);
 
 /**
+ * @brief Safely frees all memory in linked list
+ * 
+ */
+void PageDeinit(void);
+
+/**
  * @brief Get the front page
  * 
  */
@@ -125,14 +131,14 @@ size_t PageRead(Page* page, uint8_t* buf, size_t buf_size);
  * 
  * @return Number of elements in the linked list
  */
-size_t PageSize(void);
+inline size_t PageSize(void);
 
 /**
  * @brief Check if linked list is empty
  * 
  * @return true if linked list is empty, false otherwise
  */
-bool PageEmpty(void);
+inline bool PageEmpty(void);
 
 /**
  * @brief Saves the current page state 

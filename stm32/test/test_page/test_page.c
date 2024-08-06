@@ -16,6 +16,8 @@
 
 #include <unity.h>
 
+#include "page.h"
+
 void SystemClock_Config(void);
   
 
@@ -55,6 +57,28 @@ void test_PageInit(void) {
   TEST_ASSERT_EQUAL(true, empty);
 }
 
+void test_PageEmpty(void) {
+  bool empty = PageEmpty();
+  TEST_ASSERT_TRUE(empty);
+}
+
+void test_PageSize(void) {
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(0, size);
+
+  PagePushFront();
+  size = PageSize();
+  TEST_ASSERT_EQUAL(1, size);
+
+  PagePushFront();
+  size = PageSize();
+  TEST_ASSERT_EQUAL(2, size);
+
+  PagePushFront();
+  size = PageSize();
+  TEST_ASSERT_EQUAL(3, size);
+}
+
 void test_PagePushFront_single(void) {
   // push page to front
   Page* page = PagePushFront();
@@ -90,14 +114,26 @@ void test_PagePushFront_multiple(void) {
 
   // check first element
   Page* page = PageFront();
-  TEST_ASSERT_EQUAL(false, page->open);
   TEST_ASSERT_NOT_NULL(page);
   TEST_ASSERT_NULL(page->prev);
   TEST_ASSERT_NOT_NULL(page->next);
-
-  Page* page_next = page->next;
   TEST_ASSERT_EQUAL(false, page->open);
-  TEST_ASSERT_
+  TEST_ASSERT_EQUAL(0, file_counter);
+
+  // check second element
+  Page* page_next = page->next;
+  TEST_ASSERT_EQUAL(page, page_next->prev)
+  TEST_ASSERT_NOT_NULL(page_next->next);
+  TEST_ASSERT_EQUAL(false, page_next->open);
+  TEST_ASSERT_EQUAL(1, file_counter);
+
+  // check third element
+  page = page_next;
+  page_next = page->next;
+  TEST_ASSERT_EQUAL(page, page_next->prev)
+  TEST_ASSERT_NULL(page_next->next);
+  TEST_ASSERT_EQUAL(false, page_next->open);
+  TEST_ASSERT_EQUAL(2, file_counter);
 }
 
 void test_PagePushBack_single(void) {
@@ -123,6 +159,137 @@ void test_PagePushBack_single(void) {
   TEST_ASSERT_EQUAL(size, 1);
 }
 
+void test_PagePushBack_multiple(void) {
+  // add 3 elements
+  for (int i = 0; i < 3; i++) {
+    PagePushBack();
+  }
+
+  // check size
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(3, size);
+
+  // check first element
+  Page* page = PageFront();
+  TEST_ASSERT_NOT_NULL(page);
+  TEST_ASSERT_NULL(page->prev);
+  TEST_ASSERT_NOT_NULL(page->next);
+  TEST_ASSERT_EQUAL(false, page->open);
+  TEST_ASSERT_EQUAL(0, file_counter);
+
+  // check second element
+  Page* page_next = page->next;
+  TEST_ASSERT_EQUAL(page, page_next->prev)
+  TEST_ASSERT_NOT_NULL(page_next->next);
+  TEST_ASSERT_EQUAL(false, page_next->open);
+  TEST_ASSERT_EQUAL(1, file_counter);
+
+  // check third element
+  page = page_next;
+  page_next = page->next;
+  TEST_ASSERT_EQUAL(page, page_next->prev)
+  TEST_ASSERT_NULL(page_next->next);
+  TEST_ASSERT_EQUAL(false, page_next->open);
+  TEST_ASSERT_EQUAL(2, file_counter);
+}
+
+void test_PagePopFront_single(void) {
+  PagePushFront();
+
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(1, size);
+
+  PagePopFront();
+
+  Page* front = PageFront();
+  TEST_ASSERT_NULL(front);
+  Page* back = PageBack();
+  TEST_ASSERT_NULL(back);
+  size = PageSize();
+  TEST_ASSERT_EQUAL(0, size);
+}
+
+void test_PagePopFront_multiple(void) {
+  // add 3 items to list
+  for (int i = 0; i < 3; i++) {
+    PagePushFront();
+  }
+  
+
+  Page* front_pop = PageFront();
+
+  PagePopFront();
+  
+  // check size
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(2, size);
+
+  // check pointers for first element
+  Page* front = PageFront()
+  TEST_ASSERT_NOT_EQUAL(front_pop, front);
+  TEST_ASSERT_NULL(front->prev);
+  TEST_ASSERT_NOT_NULL(front->next);
+}
+
+void test_pagePopBack_single(void) {
+  PagePushFront();
+
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(1, size);
+
+  PagePopBack();
+
+  Page* front = PageFront();
+  TEST_ASSERT_NULL(front);
+  Page* back = PageBack();
+  TEST_ASSERT_NULL(back);
+  size = PageSize();
+  TEST_ASSERT_EQUAL(0, size);
+}
+
+void test_PagePopBack_multiple(void) {
+  // add 3 items to list
+  for (int i = 0; i < 3; i++) {
+    PagePushFront();
+  }
+  
+
+  Page* back_pop = PageBack();
+
+  PagePopBack();
+  
+  // check size
+  size_t size = PageSize();
+  TEST_ASSERT_EQUAL(2, size);
+
+  // check pointers for last element
+  Page* back = PageBack()
+  TEST_ASSERT_NOT_EQUAL(back_pop, back);
+  TEST_ASSERT_NULL(back->next);
+  TEST_ASSERT_NOT_NULL(back->prev);
+}
+
+void test_PageOpen(void) {
+  Page* page = PagePushFront();
+
+  TEST_ASSERT_EQUAL(false, page);
+
+  PageOpen(page);
+
+  TEST_ASSERT_EQUAL(true, page);
+}
+
+void test_PageClose(void) {
+  Page* page = PagePushFront();
+
+  PageOpen(page);
+
+  TEST_ASSERT_EQUAL(true, page->open);
+
+  PageClose(page);
+
+  TEST_ASSERT_EQUAL(false, page->open);
+}
 
 /**
   * @brief Entry point for protobuf test

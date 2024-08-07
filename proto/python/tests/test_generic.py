@@ -10,12 +10,20 @@ correct dictionary format is returned.
 
 import unittest
 
-from soil_power_sensor_protobuf import encode_response, decode_measurement
+from soil_power_sensor_protobuf import (
+    encode_response,
+    decode_measurement,
+    encode_esp32command,
+    decode_esp32command,
+)
 from soil_power_sensor_protobuf.soil_power_sensor_pb2 import (
     Measurement,
     Response,
     MeasurementMetadata,
+    Esp32Command,
 )
+
+from soil_power_sensor_protobuf.esp32 import PageCommand
 
 
 class TestEncode(unittest.TestCase):
@@ -139,6 +147,60 @@ class TestDecode(unittest.TestCase):
         with self.assertRaises(KeyError):
             decode_measurement(data=meas_str)
 
+class TestEsp32(unittest.TestCase):
+    def test_cmd_not_implemented(self):
+        """Checks that an exception is raised when a non-existing command is
+        called"""
+        
+        with self.assertRaises(NotImplementedError):
+            encode_esp32command("agg", req="open", fd=123, bs=456, n=789)
+    
+    def test_page_encode(self):
+        """Test encoding a page command"""
+        
+        req = "open"
+        fd = 1
+        bs = 512
+        n = 1024
+        
+        cmd_str = encode_esp32command("page", req=req, fd=fd, bs=bs, n=n)
+        
+        cmd = Esp32Command()
+        cmd.ParseFromString(cmd_str)
+       
+        # check the command type 
+        cmd_type = cmd.WhichOneof("command")
+        self.assertEqual(cmd_type, "PageCommand")
+      
+        # check individual values
+        self.assertEqual(cmd.page_command.file_request, PageCommand.RequestType.OPEN)
+        self.assertEqual(cmd.page_command.file_descriptor, fd)
+        self.assertEqual(cmd.page_command.block_size, bs)
+        self.assertEqual(cmd.page_command.num_bytes, n)
+
+    def test_page_decode(self):
+        """Test decoding a page command"""
+        
+        req = "open"
+        fd = 1
+        bs = 512
+        n = 1024
+        
+        cmd_str = encode_esp32command("page", req=req, fd=fd, bs=bs, n=n)
+      
+        cmd = decode_esp32command(cmd_str)
+      
+        # check individual values
+        self.assertEqual(cmd["file_request"], PageCommand.RequestType.OPEN)
+        self.assertEqual(cmd["file_descriptor"], fd)
+        self.assertEqual(cmd["block_size"], bs)
+        self.assertEqual(cmd["num_bytes"], n)
+
+    def test_page_req_not_implemented(self):
+        """Test encoding a page command with a not implemented request"""
+        
+        with self.assertRaises(NotImplementedError):
+            encode_esp32command("page", req="agg", fd=123, bs=456, n=789)
 
 if __name__ == "__main__":
     unittest.main()

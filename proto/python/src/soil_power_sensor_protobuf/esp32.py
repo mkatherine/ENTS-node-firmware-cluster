@@ -17,7 +17,8 @@ def encode_esp32command(cmd_type: str, **kwargs) -> bytes:
     cmd = Esp32Command()
      
     if (cmd_type == "page"):
-        page_cmd = encode_page_command(*kwargs)
+        #import pdb; pdb.set_trace()
+        page_cmd = encode_page_command(**kwargs)
         cmd.page_command.CopyFrom(page_cmd)
     else:
         raise NotImplementedError(f"Command type {cmd_type} not implemented!")
@@ -72,7 +73,7 @@ def decode_esp32command(data: bytes) -> dict:
     cmd = Esp32Command()
    
     # parse serialized message
-    cmd.ParseFromString()
-   
+    cmd.ParseFromString(data)
+    
     # return dicti
-    return MessageToDict(cmd)
+    return MessageToDict(cmd, always_print_fields_with_no_presence=True)

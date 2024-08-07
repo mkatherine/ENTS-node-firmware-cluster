@@ -170,7 +170,7 @@ class TestEsp32(unittest.TestCase):
        
         # check the command type 
         cmd_type = cmd.WhichOneof("command")
-        self.assertEqual(cmd_type, "PageCommand")
+        self.assertEqual(cmd_type, "page_command")
       
         # check individual values
         self.assertEqual(cmd.page_command.file_request, PageCommand.RequestType.OPEN)
@@ -189,12 +189,17 @@ class TestEsp32(unittest.TestCase):
         cmd_str = encode_esp32command("page", req=req, fd=fd, bs=bs, n=n)
       
         cmd = decode_esp32command(cmd_str)
-      
+       
+        # check page command 
+        self.assertIn("pageCommand", cmd)
+        
+        cmd = cmd["pageCommand"]
+        
         # check individual values
-        self.assertEqual(cmd["file_request"], PageCommand.RequestType.OPEN)
-        self.assertEqual(cmd["file_descriptor"], fd)
-        self.assertEqual(cmd["block_size"], bs)
-        self.assertEqual(cmd["num_bytes"], n)
+        self.assertEqual(cmd["fileRequest"], "OPEN")
+        self.assertEqual(cmd["fileDescriptor"], fd)
+        self.assertEqual(cmd["blockSize"], bs)
+        self.assertEqual(cmd["numBytes"], n)
 
     def test_page_req_not_implemented(self):
         """Test encoding a page command with a not implemented request"""

@@ -24,6 +24,13 @@ PB_BIND(Measurement, Measurement, AUTO)
 PB_BIND(Response, Response, AUTO)
 
 
+PB_BIND(Esp32Command, Esp32Command, AUTO)
+
+
+PB_BIND(PageCommand, PageCommand, AUTO)
+
+
+
 
 
 #ifndef PB_CONVERT_DOUBLE_FLOAT

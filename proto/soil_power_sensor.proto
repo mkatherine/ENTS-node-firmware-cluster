@@ -78,3 +78,28 @@ message Response {
   /* Response from server */
   ResponseType resp = 1; 
 }
+
+message Esp32Command {
+  oneof command {
+    PageCommand page_command = 1;
+  }
+}
+
+message PageCommand {
+  /* Type of request */
+  enum RequestType {
+    OPEN = 0;
+    CLOSE = 1;
+    READ = 2;
+    WRITE = 3;
+  }
+
+  /* File request type */
+  RequestType file_request = 1;
+  /* Integer for file descriptor */
+  uint32 file_descriptor = 2;
+  /* Block size of read/write */
+  uint32 block_size = 3;
+  /* Number of bytes */
+  uint32 num_bytes = 4;
+}

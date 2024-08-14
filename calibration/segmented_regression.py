@@ -2,7 +2,7 @@
 
 """SPS nonlinear calibration and evaluation
 
-The adc data might be non-linear, so this file will attempt to fit a non-linear model to the data.
+The ADC data might be non-linear, so this file will attempt to fit a non-linear model to the data.
 
 Stephen Taylor 5/20/2024
 """
@@ -12,7 +12,10 @@ import pandas as pd
 import numpy as np
 from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
+from sklearn import linear_model
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
+from scipy.fft import fft, fftfreq
 from scipy.stats import norm
 
 #%%
@@ -24,7 +27,7 @@ def load_data(datafiles):
         df_list.append(df)
     
     data = pd.concat(df_list, ignore_index=True)
-    data["V_in"] = data["V_in"]
+    data["V_in"] = data["V_in"] * 1000
     data["I_in"] = data["I_in"] 
     data["I_meas"] = data["I_sps"] 
     data["V_meas"] = data["V_sps"]
@@ -33,8 +36,7 @@ def load_data(datafiles):
 
 #%%
 ### Load the calibration CSVs ###
-datafiles = ["data/calibration_data/sps4_voltage_calib_-3to3v.csv"] # load voltage
-
+datafiles = ["data/calibration_data/sps4_voltage_calib_-3to3v.csv"]  # Load voltage
 data = load_data(datafiles)
 
 #%%
@@ -55,25 +57,65 @@ plt.show()
 
 #%%
 ### Fit the polynomial model (non-segmented) ###
-model, params = Polynomial.fit(data["V_meas"], data["V_in"], 4, full=True)
-print(model)
-print(model.convert().coef)
+poly = PolynomialFeatures(degree=4)
+V_meas_poly = poly.fit_transform(data[["V_meas"]])
+model_poly = linear_model.LinearRegression()
+model_poly.fit(V_meas_poly, data["V_in"])
+
+print("Polynomial Model Coefficients:")
+print(model_poly.coef_)
+
+# Get residuals from the polynomial fit
+poly_predicted = model_poly.predict(V_meas_poly)
+residuals = data["V_in"] - poly_predicted
+
+#%%
+### Estimate period from residuals and combine with original model ###
+# Use FFT on residuals to estimate the period
+y_fft = fft(residuals.values)
+frequencies = fftfreq(len(residuals), data["V_meas"].values[1] - data["V_meas"].values[0])
+positive_frequencies = frequencies[frequencies > 0]
+magnitudes = np.abs(y_fft[frequencies > 0])
+
+# Find the dominant frequency and estimate the period
+dominant_frequency = positive_frequencies[np.argmax(magnitudes)]
+estimated_period = 1 / dominant_frequency
+print(f"Estimated period: {estimated_period:.4f}")
+
+# Add sine and cosine features based on the estimated period
+data["X_sin"] = np.sin(2 * np.pi * data["V_meas"] / estimated_period)
+data["X_cos"] = np.cos(2 * np.pi * data["V_meas"] / estimated_period)
+
+# Combine polynomial and trigonometric features
+X_poly_sin_cos = np.column_stack((V_meas_poly, data[["X_sin", "X_cos"]]))
+
+# Fit the linear model with combined features
+model_combined = linear_model.LinearRegression()
+model_combined.fit(X_poly_sin_cos, data["V_in"])
+
+print("Combined Model Coefficients:")
+print(model_combined.coef_)
 
 #%%
 ### Load the eval files ###
 evalfiles = ["data/eval_data/sps4_voltage_eval_-3to3v_sweep1.csv"]
 eval_data = load_data(evalfiles)
 
-#%%
-### Test the fit ###
-predicted = model(eval_data["V_meas"])
-residuals = eval_data["V_in"] - predicted
+# Add sine and cosine features for the evaluation data
+eval_data["X_eval_sin"] = np.sin(2 * np.pi * eval_data["V_meas"] / estimated_period)
+eval_data["X_eval_cos"] = np.cos(2 * np.pi * eval_data["V_meas"] / estimated_period)
+V_eval_poly = poly.transform(eval_data[["V_meas"]])
+X_eval_poly_sin_cos = np.column_stack((V_eval_poly, eval_data[["X_eval_sin", "X_eval_cos"]]))
+
+# Test the linear model with combined features
+combined_predicted = model_combined.predict(X_eval_poly_sin_cos)
+combined_residuals = eval_data["V_in"] - combined_predicted
 
 print("Evaluate using sklearn.metrics")
-mae = mean_absolute_error(eval_data["V_in"], predicted)
-rmse = np.sqrt(mean_squared_error(eval_data["V_in"], predicted))
-r2 = r2_score(eval_data["V_in"], predicted)
-mape = mean_absolute_percentage_error(eval_data["V_in"], predicted)
+mae = mean_absolute_error(eval_data["V_in"], combined_predicted)
+rmse = np.sqrt(mean_squared_error(eval_data["V_in"], combined_predicted))
+r2 = r2_score(eval_data["V_in"], combined_predicted)
+mape = mean_absolute_percentage_error(eval_data["V_in"], combined_predicted)
 print(f"Mean absolute error: {mae:.4f}")
 print(f"Mean absolute percentage error: {mape:.4f}")
 print(f"Root mean square error: {rmse:.4f}")
@@ -81,7 +123,7 @@ print(f"R-squared: {r2:.4f}")
 
 plt.figure()
 plt.title("SPS to predicted voltage")
-plt.scatter(eval_data["V_sps"], predicted, label = "Non-linear model")
+plt.scatter(eval_data["V_sps"], combined_predicted, label="Non-linear model with trigonometric features")
 plt.ylabel("Predicted (V)")
 plt.xlabel("Raw SPS value")
 plt.legend()
@@ -89,7 +131,7 @@ plt.show()
 
 plt.figure()
 plt.title("Residual plot")
-plt.scatter(predicted, residuals)
+plt.scatter(combined_predicted, combined_residuals)
 plt.axhline(y=0, color='r', linestyle='--')
 plt.ylabel("Residuals")
 plt.xlabel("Predicted (V)")
@@ -98,13 +140,30 @@ plt.show()
 
 plt.figure()
 plt.title("Histogram of Residuals (Post Calibration)")
-plt.hist(residuals, bins=30, edgecolor='black')
+plt.hist(combined_residuals, bins=30, edgecolor='black')
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
 plt.show()
 
-residual_average = np.average(residuals)
+residual_average = np.average(combined_residuals)
 print("Average residual: ", residual_average)
+
+mu, std = norm.fit(combined_residuals)
+print(f"Norm distribution parameters: mu = {mu:.4f}, std = {std:.4f}")
+
+#%%
+### Print the full equation of the combined model ###
+def print_equation(poly_features, coefs):
+    terms = poly_features.get_feature_names_out()
+    equation = "V_in = "
+    for coef, term in zip(coefs, terms):
+        if coef != 0:
+            equation += f"{coef:.4f} * {term} + "
+    equation = equation.rstrip(" + ")
+    print(f"Full Model Equation: {equation}")
+
+print_equation(poly, model_combined.coef_)
+
 
 #%%
 def plot_residual_histogram(res, ax=None):

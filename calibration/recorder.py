@@ -30,6 +30,7 @@ import socket
 import serial
 import numpy as np
 import pandas as pd
+import pdb
 from tqdm import tqdm
 from typing import Tuple
 from soil_power_sensor_protobuf import decode_measurement
@@ -68,6 +69,7 @@ class SerialController:
         print("Xon/Xoff:", self.ser.xonxoff)
         print("Rts/cts:", self.ser.rtscts)
         print("Dsr/dtr:", self.ser.dsrdtr)
+        
 
     def __del__(self):
         """Destructor
@@ -162,9 +164,11 @@ class SoilPowerSensorController(SerialController):
         # possibly due to linux usb stack initialized or mcu waiting to startup
         time.sleep(1)
         self.ser.write(b"check\n")
+        
         reply = self.ser.readline()
         #reply = reply.decode()
         #reply = reply.strip("\r\n")
+
         if (reply != b'ok\n'):
             raise RuntimeError(f"SPS check failed. Reply received: {reply}")
 
@@ -247,7 +251,7 @@ class SMUSerialController(SerialController):
             return self.v
 
 
-    def __init__(self, port):
+    def __init__(self, port, source_mode):
         """Constructor
 
         Opens serial port, restore to known defaults
@@ -411,9 +415,79 @@ class SMULANController(LANController):
             cmd = f":SOUR:VOLT:LEV {v}\n"
             self.sock.sendall(bytes(cmd, 'ascii'))
             return self.v
+        
+    class CurrentIterator:
+        """CurrentIterator Class
+
+        Implements a iterator for looping through current output values
+        """
+
+        def __init__(self, sock, start, stop, step):
+            """Constructor
+
+            Parameters
+            ----------
+            sock : serial.Socket
+                Initialised socket connection
+            start : float
+                Starting current
+            stop : float
+                End current
+            step : float
+                Current step
+            """
+            self.sock = sock
+            self.start = start
+            self.stop = stop
+            self.step = step
+
+        def __iter__(self):
+            """Iterator
+
+            Sets current value to start
+            """
+
+            self.i = None
+            self.sock.sendall(b':OUTP ON\n')
+            return self
+
+        def __next__(self):
+            """Next
+
+            Steps to next voltage level, stopping once stop is reached
+
+            Raises
+            ------
+            StopIteration
+                When the next step exceeds the stop level
+            """
+
+            if self.i is None:
+                return self.set_current(self.start)
+            i_next = self.i + self.step
+            if (i_next <= self.stop):
+                return self.set_current(i_next)
+            else:
+                raise StopIteration
+            
+        def __len__(self):
+            """Len
+            
+            The number of measurements points
+            """
+            return int((self.stop - self.start) / self.step) + 1
+
+        def set_current(self, i):
+            """Sets the current output"""
+
+            self.i = i
+            cmd = f":SOUR:CURR:LEV {i}\n"
+            self.sock.sendall(bytes(cmd, 'ascii'))
+            return self.i
+        
 
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, source_mode):
         """Constructor
 
         Opens LAN connection and sets initial SMU configurations.
@@ -429,16 +503,29 @@ class SMULANController(LANController):
         super().__init__(host, port)
         # Reset settings
         self.sock.sendall(b'*RST\n')
-        # Voltage source
-        self.sock.sendall(b':SOUR:FUNC VOLT\n')
-        self.sock.sendall(b':SOUR:VOLT:MODE FIXED\n')
-        # 1mA compliance
-        self.sock.sendall(b':SENS:CURR:PROT 10e-3\n')
-        # Sensing functions
-        self.sock.sendall(b':SENS:CURR:RANGE:AUTO ON\n')
-        self.sock.sendall(b':SENS:FUNC:OFF:ALL\n')
-        self.sock.sendall(b':SENS:FUNC:ON "VOLT"\n')
-        self.sock.sendall(b':SENS:FUNC:ON "CURR"\n')
+        if source_mode == "voltage":
+            # Voltage source
+            self.sock.sendall(b':SOUR:FUNC VOLT\n')
+            self.sock.sendall(b':SOUR:VOLT:MODE FIXED\n')
+            # 1mA compliance
+            self.sock.sendall(b':SENS:CURR:PROT 10e-3\n')
+            # Sensing functions
+            self.sock.sendall(b':SENS:CURR:RANGE:AUTO ON\n')
+            self.sock.sendall(b':SENS:FUNC:OFF:ALL\n')
+            self.sock.sendall(b':SENS:FUNC:ON "VOLT"\n')
+            self.sock.sendall(b':SENS:FUNC:ON "CURR"\n')
+
+        elif source_mode == "current":
+            # Current source
+            self.sock.sendall(b':SOUR:FUNC CURR\n')
+            self.sock.sendall(b':SOUR:CURR:MODE FIXED\n')
+            # 1V compliance
+            self.sock.sendall(b':SENSE:CURR:PROT 1\n')
+            # Sensing functions
+            self.sock.sendall(b':SENS:VOLT:RANGE:AUTO ON\n')
+            self.sock.sendall(b':SENS:FUNC:OFF:ALL\n')
+            self.sock.sendall(b':SENS:FUNC:ON "CURR"\n')
+            self.sock.sendall(b':SENS:FUNC:ON "VOLT"\n')
 
 
     def __del__(self):
@@ -464,6 +551,20 @@ class SMULANController(LANController):
         """
 
         return self.VoltageIterator(self.sock, start, stop, step)
+    
+    def irange(self, start, stop , step) -> CurrentIterator:
+        """Gets iterator to range of currents
+
+        Parameters
+        ----------
+        start : float
+            Starting current
+        stop : float
+            End current
+        step : float
+            Current step
+        """
+        return self.CurrentIterator(self.sock, start, stop, step)
 
 
     def get_voltage(self) -> float:
@@ -514,7 +615,7 @@ if __name__ == "__main__":
         default=10,
         help="Number of samples to takeat each voltage level"
     )
-   
+    
     # TODO Implement switching between sourcing voltage and current
     
     range_group = parser.add_argument_group("Range")
@@ -525,6 +626,8 @@ if __name__ == "__main__":
     source_group = parser.add_mutually_exclusive_group(required=True)
     source_group.add_argument("--smu_port", type=str, help="SMU serial port (if SMU is configured to serial)")
     source_group.add_argument("--smu_host", type=str, help="SMU host in the format ip:port")
+
+    parser.add_argument("--source_mode", type=str, choices=["voltage", "current"], required=True, help="Mode to source either voltage or current")
     
     parser.add_argument("sps_port", type=str, help="SPS serial port")
     parser.add_argument("data_file", type=str, default="data.csv", help="Path to store data file")
@@ -533,34 +636,40 @@ if __name__ == "__main__":
      
     sps = SoilPowerSensorController(args.sps_port) 
     if args.smu_port:
-        smu = SMUSerialController(args.smu_port)
+        smu = SMUSerialController(args.smu_port, args.source_mode)
     elif args.smu_host:
         host, port = args.smu_host.split(":")
-        smu = SMULANController(host, int(port))
+        smu = SMULANController(host, int(port), args.source_mode)
 
     data = {
         "V": [],
+        "I": [],
         "V_in": [],
         "I_in": [],
         "I_sps": [],
         "V_sps": [],
     }
 
-    for v in tqdm(smu.vrange(args.start, args.stop, args.step)):
-        
-        # Sleep after each step change to account for lpf
-        time.sleep(5) 
-        
+    if args.source_mode == "voltage":
+        iterator = smu.vrange(args.start, args.stop, args.step)
+    elif args.source_mode == "current":
+        iterator = smu.irange(args.start, args.stop, args.step)
+
+    for value in tqdm(iterator):
+        time.sleep(5)
         for _ in range(args.samples):
-            data["V"].append(v)
+            if args.source_mode == "voltage":
+                data["V"].append(value)
+                data["I"].append(0)
+            elif args.source_mode == "current":
+                data["I"].append(value)
+                data["V"].append(0)
             
             measured_voltage, measured_current = sps.get_power()
 
-            # get smu values
-            data["I_in"].append(smu.get_current()) # V and I are switched rn for some reason
+            data["I_in"].append(smu.get_current())
             data["V_in"].append(smu.get_voltage())
 
-            # get sps  values
             data["V_sps"].append(measured_voltage)
             data["I_sps"].append(measured_current)
 

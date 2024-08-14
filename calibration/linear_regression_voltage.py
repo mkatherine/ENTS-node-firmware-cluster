@@ -1,8 +1,4 @@
-#!/usr/bin/env python
-
-"""SPS nonlinear calibration and evaluation
-
-The adc data might be non-linear, so this file will attempt to fit a non-linear model to the data.
+"""SPS calibration and evaluation
 
 Stephen Taylor 5/20/2024
 """
@@ -10,22 +6,23 @@ Stephen Taylor 5/20/2024
 import os
 import pandas as pd
 import numpy as np
-from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
 from rocketlogger.data import RocketLoggerData
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
 import yaml
 import pdb
+from scipy.stats import norm
 try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
-from scipy.stats import norm
-
+#%%
+########## VOLTAGE CALIBRARTION ###########
+print("Voltage calibration")
 #%%
 ### Load the data ###
-def load_data(datafiles):
+def load_data(cfg, datafiles):
     df_list = []
     for d in datafiles:
         df = pd.read_csv(d)
@@ -43,8 +40,17 @@ def load_data(datafiles):
 
 #%%
 ### Load the calibration CSVs ###
+cfg_path = "data/config.yaml"
 datafiles = ["data/calibration_data/voltage_calib_-3.3to3.3v_C3removed.csv"] # load voltage
-data = load_data(datafiles)
+
+#%%
+### Load into a data frame ##
+with open(cfg_path, "r") as f:
+    cfg = yaml.load(f, Loader=Loader)
+
+data = load_data(cfg, datafiles)
+data = data[(data["V_in"] > -2000) & (data["V_in"] < 2000)]
+
 
 #%%
 #### Plot the SMU voltage and the raw SPS values to check for linearity ###
@@ -58,48 +64,25 @@ plt.ylabel("ADC Raw")
 plt.legend()
 plt.show()
 
-# plt.figure()
-# plt.plot(data["V_in"], label = "SMU Voltage")
-# plt.title("SMU")
-# plt.xlabel("Index")
-# plt.ylabel("(V)")
-# plt.legend()
-# plt.show()
-
-# plt.figure()
-# plt.plot(data["V_sps"], label = "Soil Power Sensor Raw")
-# plt.title("Raw SPS")
-# plt.xlabel("Index")
-# plt.ylabel("SPS raw values")
-# plt.legend()
-# plt.show()
-
-plt.figure()
-plt.hist(data["V_sps"] - data["V_in"], bins=30, edgecolor='k', alpha=0.7)
-plt.title("Histogram of Residuals (Pre Calibration)")
-plt.xlabel("Residuals")
-plt.ylabel("Frequency")
-plt.show()
-
 #%%
 ### Fit the linear model ###
-model, params = Polynomial.fit(data["V_meas"], data["V_in"], 5, full=True)
-print(model)
-print(model.convert().coef)
+v_input_cols = ["V_meas"]
+v_model_pos = linear_model.LinearRegression()
+v_model_pos.fit(data[v_input_cols], data["V_in"])
 
-#print("Voltage coefficients ax^2 + bx + c: ", "a:", coefficients[0], "b", coefficients[1], "c", coefficients[2])
+print("Voltage coefficients: ", v_model_pos.coef_, "Voltage intercept: ", v_model_pos.intercept_)
 
 #%%
 ### Load the eval files ###
 evalfiles = ["data/eval_data/voltage_eval_-3.3to3.3v_C3removed.csv"]
-eval_data = load_data(evalfiles)
+eval_data = load_data(cfg, evalfiles)
+eval_data = eval_data[(eval_data["V_in"] > -2000) & (eval_data["V_in"] < 2000)]
 
 #%%
 ### Test the fit ###
-predicted = model(eval_data["V_meas"])
+predicted = v_model_pos.predict(eval_data["V_meas"].values.reshape(-1, 1))
 
 residuals = eval_data["V_in"] - predicted # Calculate the residuals
-
 
 print("Evaluate using sklearn.metrics")
 mae = mean_absolute_error(eval_data["V_in"], predicted)
@@ -129,66 +112,17 @@ plt.xlabel("Predicted (V)")
 plt.legend()
 plt.show()
 
+mu, std = norm.fit(residuals)
+normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
+normdist_y = norm.pdf(normdist_x, mu, std)
+
 # Plot residuals histogram
 plt.figure()
 plt.title("Histogram of Residuals")
 plt.hist(residuals, bins=30, edgecolor='black')
-plt.xlabel("Residuals")
-plt.ylabel("Frequency")
-plt.show()
-
-residual_average = np.average(residuals)
-print("Average residual: ", residual_average)
-
-#%%
-
-def plot_residual_histogram(res, ax=None):
-    """Plot a histogram of residuals on a set of axis
-    
-    Args:
-        res: Iterable of residuals values
-        ax: Axis to plot on. If "None", a new figure is created
-        
-    Returns:
-        Mean and standard deviation of the normal distribution
-    """
-    
-    if ax == None:
-        pass
-   
-    # 
-    mu, std = norm.fit(residuals)
-    print(f"Norm distribution parameters: mu = {mu:.4f}, std = {std:.4f}")
-
-    normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
-    normdist_y = norm.pdf(normdist_x, mu, std)
-    
-    return mu, std
-
-mu, std = norm.fit(residuals)
-print(f"Norm distribution parameters: mu = {mu:.4f}, std = {std:.4f}")
-
-normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
-normdist_y = norm.pdf(normdist_x, mu, std)
-
-### Histogram of residuals ###
-plt.figure()
-plt.hist(residuals, bins=30, density=True, edgecolor='k', alpha=0.7)
 plt.plot(normdist_x, normdist_y, color="r")
-plt.title("Histogram of Residuals (Post Calibration)")
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
 plt.show()
 
-#%%
-### Calculate standard deviation of residuals ###
-std_dev = np.std(residuals)
-mean = np.mean(residuals)
-print(f"Residual mean: {mean:.4f}, std: {std_dev:.4f}")
-
-#%%
-for index, value in enumerate(residuals):
-    if np.abs(value) > 100:
-        print(f"Index: {index}, Value: {value}")
-           
-quit()
+print("STD of residuals: ", np.std(residuals))

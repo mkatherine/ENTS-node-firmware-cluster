@@ -32,8 +32,8 @@ def load_data(datafiles):
 
 #%%
 # Load the calibration and evaluation CSVs
-datafiles = ["data/calibration_data/sps4_voltage_calib_-3to3v.csv"] # Load voltage calibration data
-evalfiles = [f"data/eval_data/sps4_voltage_eval_-3to3v_sweep{i}.csv" for i in range(1, 5)] # Load evaluation data
+datafiles = ["data/calibration_data/sps4_voltage_calib_-3to3v_sweep6.csv"] # Load voltage calibration data
+evalfiles = [f"data/eval_data/sps4_voltage_eval_-3to3v_sweep{i}.csv" for i in range(1, 6)] # Load evaluation data
 
 # Load calibration data
 data = load_data(datafiles)

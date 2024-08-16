@@ -189,7 +189,7 @@ size_t ADC_measure(uint8_t *data) {
   SysTime_t ts = SysTimeGet();
 
   // read power
-  double adc_voltage = 0;
+  double adc_voltage = ADC_readVoltage();
   double adc_current = ADC_readCurrent();
 
   // encode measurement

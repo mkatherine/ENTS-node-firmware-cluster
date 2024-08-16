@@ -17,9 +17,26 @@ except ImportError:
 ########## CURRENT CALIBRARTION ###########
 print("Current Calibration")
 #%%
+### Load the data ###
+def load_data(cfg, datafiles):
+    df_list = []
+    for d in datafiles:
+        df = pd.read_csv(d)
+        df_list.append(df)
+    
+    data = pd.concat(df_list, ignore_index=True)
+    #data = data.set_index("V")
+
+    data["V_in"] = data["V_in"]*1000
+    data["I_in"] = data["I_in"] 
+    data["I_meas"] = data["I_sps"] 
+    data["V_meas"] = data["V_sps"]
+    
+    return data
+#%%
 ### Load the calibration CSVs ###
 cfg_path = "data/config.yaml"
-curr_datafiles = ["data/calibration_data/current_calib_-0.0009to0.0009a_C3removed.csv"] # load voltage
+curr_datafiles = ["data/calibration_data/221_2_current_calib_-0.0009to0.0009a.csv"] # load voltage
 
 #%%
 ### Load into a data frame ##
@@ -49,7 +66,7 @@ print("Current coefficients: ", i_model.coef_, "Current intercept: ", i_model.in
 
 #%%
 ### Load the eval files ###
-evalfiles = ["data/eval_data/current_eval_-0.0009to0.0009a_C3removed.csv"]
+evalfiles = ["data/eval_data/221_2_current_eval_-0.0009to0.0009a.csv"]
 eval_data = load_data(cfg, evalfiles)
 
 #%%

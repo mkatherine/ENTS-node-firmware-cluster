@@ -15,8 +15,6 @@
 #include <cstddef>
 #include <cstddef>
 
-static uint8_t buffer[256];
-
 namespace ModuleHandler {
   class Module {
     public:

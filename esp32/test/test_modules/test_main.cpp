@@ -71,7 +71,6 @@ void TestReset(void) {
 }
 
 void TestOnReceive(void) {
-
 }
 
 void TestOnRequest(void) {

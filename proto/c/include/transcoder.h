@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include <string.h>
+#include <stddef.h>
 
 #include "soil_power_sensor.pb.h"
 
@@ -104,6 +105,30 @@ size_t EncodePhytos31Measurement(uint32_t ts, uint32_t logger_id,
  * @return Response type
 */
 Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len);
+
+/**
+ * @brief Decodes an Esp32Command message
+ * 
+ * The type of command and the data from the command will need to be manually
+ * extracted, @see soil_power_sensor.ph.h.
+ * 
+ * @returns Esp32Command data
+ */
+Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len);
+
+/**
+ * @brief Encodes a page command
+ * 
+ * @param req Request type
+ * @param fd File descriptor
+ * @param bs Block size
+ * @param n Number of bytes
+ * @param buffer Buffer to store serialized command
+ * 
+ * @returns Number of bytes in @p buffer
+ */
+size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
+                         size_t n, uint8_t* buffer);
 
 #ifdef __cplusplus
 }

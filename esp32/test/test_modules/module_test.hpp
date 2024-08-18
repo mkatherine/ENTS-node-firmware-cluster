@@ -3,12 +3,15 @@
 
 #include "template_module.hpp"
 
+
 class ModuleTest: public ModuleHandler::Module {
   public:
   ModuleTest(void);
   ~ModuleTest(void);
 
-  unsigned int CheckState(void);
+  uint8_t* input_buffer;
+  uint8_t buffer[32];
+  uint8_t output_buffer[32];
 
   private:
 

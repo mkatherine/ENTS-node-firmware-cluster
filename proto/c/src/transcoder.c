@@ -118,3 +118,37 @@ size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer)
   // return number of bytes written
   return ostream.bytes_written;
 }
+
+Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len)
+{
+  Esp32Command cmd;
+
+  pb_istream_t istream = pb_istream_from_buffer(data, len);
+  pb_decode(&istream, Esp32Command_fields, &cmd);
+
+  return cmd;
+}
+
+size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
+                         size_t n, uint8_t* buffer)
+{
+  // create command object
+  Esp32Command cmd = Esp32Command_init_default;
+  cmd.which_command = Esp32Command_page_command_tag;
+  cmd.command.page_command.file_request = req;
+  cmd.command.page_command.file_descriptor = fd;
+  cmd.command.page_command.block_size = bs;
+  cmd.command.page_command.num_bytes = n;
+
+  // create output stream
+  pb_ostream_t ostream = pb_ostream_from_buffer(buffer, Esp32Command_size);
+  // encode message and check rc
+  bool status = pb_encode(&ostream, Esp32Command_fields, &cmd);
+  if (!status)
+  {
+    return -1;
+  }
+
+  // return number of bytes written
+  return ostream.bytes_written;
+}

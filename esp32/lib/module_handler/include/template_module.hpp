@@ -13,6 +13,9 @@
 #define ESP32_LIB_MODULE_HANDLER_INCLUDE_TEMPLATE_MODULE_H_
 
 #include <cstddef>
+#include <cstddef>
+
+static uint8_t buffer[256];
 
 namespace ModuleHandler {
   class Module {
@@ -35,20 +38,33 @@ namespace ModuleHandler {
      * 
      * @param num_bytes Number of bytes received from controller
      */
-    void OnReceive(size_t num_bytes);
+    virtual void OnReceive(size_t num_bytes);
 
     /**
      * @brief Arduino I2C onRequest
      * 
      */
-    void OnRequest(void);
+    virtual void OnRequest(void);
+    
+    /**
+     * @brief Get the current state of the module
+     * 
+     * @return Integer of state enum
+     */
+    virtual int State(void);
+
+    /**
+     * @brief Resets the module to default state
+     * 
+     */
+    virtual void Reset();
 
     protected:
     /**
      * @brief Decodes a protobuf message
      * 
      */
-    void DecodeMessage(void); 
+    void DecodeMessage(void);
   };
 }
 

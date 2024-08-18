@@ -47,17 +47,19 @@ namespace ModuleHandler {
     void DeregisterModule(Module& module);
 
     /**
+     * @brief Get the module associated with a specific message type
+     * 
+     * @param type Message type
+     * 
+     * @returns Reference to module associated with the type
+     */
+    const Module& GetModule(int type);
+
+    /**
      * @brief Resets all modules
      * 
      */
-    void ResetModule(void);
-
-    /**
-     * @brief Resets individual module
-     * 
-     * @param module Module to be reset
-     */
-    void ResetModule(Module& module);
+    void ResetModules(void);
 
     /**
      * @brief Arduino I2C onRecieve

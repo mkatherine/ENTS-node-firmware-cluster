@@ -245,7 +245,7 @@ class TestEsp32(unittest.TestCase):
         self.assertEqual(cmd["state"], "RECEIVE")
         self.assertEqual(cmd["data"], num)
         
-    def test_page_state_not_implemented(self):
+    def test_test_state_not_implemented(self):
         """Test encoding a page command with a not implemented state"""
         
         with self.assertRaises(NotImplementedError):

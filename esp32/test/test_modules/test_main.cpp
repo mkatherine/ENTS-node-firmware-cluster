@@ -16,26 +16,23 @@
 #include "module_test.hpp"
   
 // create handler
-ModuleHandler module_handler;
-
+static ModuleHandler::ModuleHandler module_handler;
+// create test module
+static ModuleTest module_test;
 
 void setUp(void) {}
 
 void tearDown(void) {}
 
 void TestRegister(void) {
-  // test module
-  ModuleTest module_test = new ModuleTest();
-
   // register module with message
-  module_handler.RegisterModule(module_test, 0);
+  module_handler.RegisterModule(0, module_test);
 
   bool mod_exist = true;
 
   // check if module exists in map
   try {
-    Module* mod = module_module_test = new ModuleTest();
-    handler.GetModule(0);
+    ModuleHandler::Module& mod = module_handler.GetModule(0);
   } catch(const std::out_of_range& oor) {
     mod_exist = false;
   }
@@ -44,14 +41,14 @@ void TestRegister(void) {
 }
 
 void TestDeregister(void) {
-  module_handler.DeregisterModule(module_test);
+  module_handler.DeregisterModule(0);
 
   bool mod_exist = true;
 
   // check that module doesn't exist anymore
   try {
     // get the module of that message type
-    const Module mod = module_handler.GetModule(0);
+    ModuleHandler::Module& mod = module_handler.GetModule(0);
   } catch (const std::out_of_range& oor) {
     mod_exist = false;
   }
@@ -64,10 +61,10 @@ void TestReset(void) {
   module_handler.ResetModules();
 
   // get reference to module
-  Module mod = module_handler.GetModule(0);
+  ModuleHandler::Module& mod = module_handler.GetModule(0);
 
   // check for the 0th state
-  TEST_ASSERT_EQUAL(0, mod.State())
+  TEST_ASSERT_EQUAL(0, mod.State());
 }
 
 void TestOnReceive(void) {

@@ -13,8 +13,18 @@
 #define ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULE_HANDLER_H_
 
 #include <cstddef>
+#include <cstdint>
+#include <map>
 
 #include "template_module.hpp"
+
+#include "transcoder.h"
+
+// buffers that are used in place of i2c communication
+#ifdef UNIT_TEST
+static uint8_t module_handler_rx_buffer[32] = {}
+static uint8_t module_handler_tx_buffer[32] = {};
+#endif
 
 namespace ModuleHandler {
   class ModuleHandler {
@@ -37,14 +47,14 @@ namespace ModuleHandler {
      * @param module Reference to module object
      * @param type Message type
      */
-    void RegisterModule(Module& module, int type);
+    void RegisterModule(int type, Module& module);
 
     /**
      * @brief Deregister a module
      * 
-     * @param module Reference to module object
+     * @param type Message type of module
      */
-    void DeregisterModule(Module& module);
+    void DeregisterModule(int type);
 
     /**
      * @brief Get the module associated with a specific message type
@@ -53,7 +63,7 @@ namespace ModuleHandler {
      * 
      * @returns Reference to module associated with the type
      */
-    const Module& GetModule(int type);
+    Module& GetModule(int type);
 
     /**
      * @brief Resets all modules
@@ -71,17 +81,18 @@ namespace ModuleHandler {
     /**
      * @brief Arduino I2C onRequest
      * 
+     * Due to the I2C buffer size on Arduino, the buffer passed to the module is
+     * limited to 32 bytes.
      */
     void OnRequest(void);
 
-    /**
-     * @brief Run the module handler
-     * 
-     */
-    void Run(void);
-
     private:
 
+    /** Map of request types to modules */
+    std::map<int, Module&> req_map;
+
+    /** Store reference to last module */
+    Module& last_module;
   };
 }
 

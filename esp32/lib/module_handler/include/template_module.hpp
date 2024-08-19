@@ -13,7 +13,6 @@
 #define ESP32_LIB_MODULE_HANDLER_INCLUDE_TEMPLATE_MODULE_H_
 
 #include <cstddef>
-#include <cstddef>
 
 namespace ModuleHandler {
   class Module {
@@ -36,13 +35,16 @@ namespace ModuleHandler {
      * 
      * @param num_bytes Number of bytes received from controller
      */
-    virtual void OnReceive(size_t num_bytes);
+    virtual void OnReceive(const Esp32Command& cmd);
 
     /**
      * @brief Arduino I2C onRequest
      * 
+     * @param buffer Pointer to store requested data
+     * 
+     * @returns Number of bytes in buffer
      */
-    virtual void OnRequest(void);
+    virtual size_t OnRequest(uint8_t* buffer);
     
     /**
      * @brief Get the current state of the module
@@ -58,11 +60,6 @@ namespace ModuleHandler {
     virtual void Reset();
 
     protected:
-    /**
-     * @brief Decodes a protobuf message
-     * 
-     */
-    void DecodeMessage(void);
   };
 }
 

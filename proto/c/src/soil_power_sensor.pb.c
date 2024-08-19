@@ -30,6 +30,10 @@ PB_BIND(Esp32Command, Esp32Command, AUTO)
 PB_BIND(PageCommand, PageCommand, AUTO)
 
 
+PB_BIND(TestCommand, TestCommand, AUTO)
+
+
+
 
 
 

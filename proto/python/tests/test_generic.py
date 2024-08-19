@@ -23,7 +23,7 @@ from soil_power_sensor_protobuf.soil_power_sensor_pb2 import (
     Esp32Command,
 )
 
-from soil_power_sensor_protobuf.esp32 import PageCommand
+from soil_power_sensor_protobuf.esp32 import PageCommand, TestCommand
 
 
 class TestEncode(unittest.TestCase):
@@ -206,6 +206,50 @@ class TestEsp32(unittest.TestCase):
         
         with self.assertRaises(NotImplementedError):
             encode_esp32command("page", req="agg", fd=123, bs=456, n=789)
-
+            
+    def test_test_encode(self):
+        """Test encoding a test command"""
+        
+        state = "receive"
+        num = 123
+        
+        cmd_str = encode_esp32command("test", state=state, data=num)
+        
+        cmd = Esp32Command()
+        cmd.ParseFromString(cmd_str)
+       
+        # check the command type 
+        cmd_type = cmd.WhichOneof("command")
+        self.assertEqual(cmd_type, "test_command")
+      
+        # check individual values
+        self.assertEqual(cmd.test_command.state, TestCommand.ChangeState.RECEIVE)
+        self.assertEqual(cmd.test_command.data, num)
+    
+    def test_test_decode(self):
+        """Test decoding a test command"""
+        
+        state = "receive"
+        num = 123
+        
+        cmd_str = encode_esp32command("test", state=state, data=num)
+      
+        cmd = decode_esp32command(cmd_str)
+       
+        # check test command 
+        self.assertIn("testCommand", cmd)
+        
+        cmd = cmd["testCommand"]
+        
+        # check individual values
+        self.assertEqual(cmd["state"], "RECEIVE")
+        self.assertEqual(cmd["data"], num)
+        
+    def test_page_state_not_implemented(self):
+        """Test encoding a page command with a not implemented state"""
+        
+        with self.assertRaises(NotImplementedError):
+            encode_esp32command("test", state="agg", data=123)
+    
 if __name__ == "__main__":
     unittest.main()

@@ -26,6 +26,15 @@ typedef enum _PageCommand_RequestType {
     PageCommand_RequestType_WRITE = 3
 } PageCommand_RequestType;
 
+typedef enum _TestCommand_ChangeState {
+    /* Data is received by the module */
+    TestCommand_ChangeState_RECEIVE = 0,
+    /* Data is received by the module indicating data for subsequent request */
+    TestCommand_ChangeState_RECEIVE_REQUEST = 1,
+    /* Data is sent my the module */
+    TestCommand_ChangeState_REQUEST = 2
+} TestCommand_ChangeState;
+
 /* Struct definitions */
 /* Data shared between all measurement messages */
 typedef struct _MeasurementMetadata {
@@ -96,10 +105,18 @@ typedef struct _PageCommand {
     uint32_t num_bytes;
 } PageCommand;
 
+typedef struct _TestCommand {
+    /* State to put module into */
+    TestCommand_ChangeState state;
+    /* Data field for test command data */
+    int32_t data;
+} TestCommand;
+
 typedef struct _Esp32Command {
     pb_size_t which_command;
     union {
         PageCommand page_command;
+        TestCommand test_command;
     } command;
 } Esp32Command;
 
@@ -117,6 +134,10 @@ extern "C" {
 #define _PageCommand_RequestType_MAX PageCommand_RequestType_WRITE
 #define _PageCommand_RequestType_ARRAYSIZE ((PageCommand_RequestType)(PageCommand_RequestType_WRITE+1))
 
+#define _TestCommand_ChangeState_MIN TestCommand_ChangeState_RECEIVE
+#define _TestCommand_ChangeState_MAX TestCommand_ChangeState_REQUEST
+#define _TestCommand_ChangeState_ARRAYSIZE ((TestCommand_ChangeState)(TestCommand_ChangeState_REQUEST+1))
+
 
 
 
@@ -126,6 +147,8 @@ extern "C" {
 
 
 #define PageCommand_file_request_ENUMTYPE PageCommand_RequestType
+
+#define TestCommand_state_ENUMTYPE TestCommand_ChangeState
 
 
 /* Initializer values for message structs */
@@ -137,6 +160,7 @@ extern "C" {
 #define Response_init_default                    {_Response_ResponseType_MIN}
 #define Esp32Command_init_default                {0, {PageCommand_init_default}}
 #define PageCommand_init_default                 {_PageCommand_RequestType_MIN, 0, 0, 0}
+#define TestCommand_init_default                 {_TestCommand_ChangeState_MIN, 0}
 #define MeasurementMetadata_init_zero            {0, 0, 0}
 #define PowerMeasurement_init_zero               {0, 0}
 #define Teros12Measurement_init_zero             {0, 0, 0, 0}
@@ -145,6 +169,7 @@ extern "C" {
 #define Response_init_zero                       {_Response_ResponseType_MIN}
 #define Esp32Command_init_zero                   {0, {PageCommand_init_zero}}
 #define PageCommand_init_zero                    {_PageCommand_RequestType_MIN, 0, 0, 0}
+#define TestCommand_init_zero                    {_TestCommand_ChangeState_MIN, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define MeasurementMetadata_cell_id_tag          1
@@ -167,7 +192,10 @@ extern "C" {
 #define PageCommand_file_descriptor_tag          2
 #define PageCommand_block_size_tag               3
 #define PageCommand_num_bytes_tag                4
+#define TestCommand_state_tag                    1
+#define TestCommand_data_tag                     2
 #define Esp32Command_page_command_tag            1
+#define Esp32Command_test_command_tag            2
 
 /* Struct field encoding specification for nanopb */
 #define MeasurementMetadata_FIELDLIST(X, a) \
@@ -215,10 +243,12 @@ X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
 #define Response_DEFAULT NULL
 
 #define Esp32Command_FIELDLIST(X, a) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (command,page_command,command.page_command),   1)
+X(a, STATIC,   ONEOF,    MESSAGE,  (command,page_command,command.page_command),   1) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (command,test_command,command.test_command),   2)
 #define Esp32Command_CALLBACK NULL
 #define Esp32Command_DEFAULT NULL
 #define Esp32Command_command_page_command_MSGTYPE PageCommand
+#define Esp32Command_command_test_command_MSGTYPE TestCommand
 
 #define PageCommand_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UENUM,    file_request,      1) \
@@ -228,6 +258,12 @@ X(a, STATIC,   SINGULAR, UINT32,   num_bytes,         4)
 #define PageCommand_CALLBACK NULL
 #define PageCommand_DEFAULT NULL
 
+#define TestCommand_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UENUM,    state,             1) \
+X(a, STATIC,   SINGULAR, INT32,    data,              2)
+#define TestCommand_CALLBACK NULL
+#define TestCommand_DEFAULT NULL
+
 extern const pb_msgdesc_t MeasurementMetadata_msg;
 extern const pb_msgdesc_t PowerMeasurement_msg;
 extern const pb_msgdesc_t Teros12Measurement_msg;
@@ -236,6 +272,7 @@ extern const pb_msgdesc_t Measurement_msg;
 extern const pb_msgdesc_t Response_msg;
 extern const pb_msgdesc_t Esp32Command_msg;
 extern const pb_msgdesc_t PageCommand_msg;
+extern const pb_msgdesc_t TestCommand_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define MeasurementMetadata_fields &MeasurementMetadata_msg
@@ -246,6 +283,7 @@ extern const pb_msgdesc_t PageCommand_msg;
 #define Response_fields &Response_msg
 #define Esp32Command_fields &Esp32Command_msg
 #define PageCommand_fields &PageCommand_msg
+#define TestCommand_fields &TestCommand_msg
 
 /* Maximum encoded size of messages (where known) */
 #define Esp32Command_size                        22
@@ -257,6 +295,7 @@ extern const pb_msgdesc_t PageCommand_msg;
 #define Response_size                            2
 #define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Measurement_size
 #define Teros12Measurement_size                  33
+#define TestCommand_size                         13
 
 #ifdef __cplusplus
 } /* extern "C" */

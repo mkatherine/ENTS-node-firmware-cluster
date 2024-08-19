@@ -82,6 +82,7 @@ message Response {
 message Esp32Command {
   oneof command {
     PageCommand page_command = 1;
+    TestCommand test_command = 2;
   }
 }
 
@@ -102,4 +103,20 @@ message PageCommand {
   uint32 block_size = 3;
   /* Number of bytes */
   uint32 num_bytes = 4;
+}
+
+message TestCommand {
+  enum ChangeState {
+    /* Data is received by the module */
+    RECEIVE = 0;
+    /* Data is received by the module indicating data for subsequent request */
+    RECEIVE_REQUEST = 1;
+    /* Data is sent my the module */
+    REQUEST = 2;
+  }
+
+  /* State to put module into */
+  ChangeState state = 1;
+  /* Data field for test command data */
+  int32 data = 2;
 }

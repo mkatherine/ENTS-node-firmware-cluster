@@ -130,6 +130,18 @@ Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len);
 size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
                          size_t n, uint8_t* buffer);
 
+/**
+ * @brief Encodes a test command
+ * 
+ * @param state State to change to
+ * @param data Data to encode
+ * @param buffer Buffer to store serialized command
+ * 
+ * @return Number of bytes in @p buffer
+ */
+size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
+                         uint8_t* buffer);
+
 #ifdef __cplusplus
 }
 #endif

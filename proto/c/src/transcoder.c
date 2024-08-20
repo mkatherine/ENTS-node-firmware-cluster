@@ -7,10 +7,10 @@
  * @date 2023-01-04
 */
 
-#include "transcoder.h"
 
 #include "pb_encode.h"
 #include "pb_decode.h"
+#include "transcoder.h"
 
 
 /**
@@ -25,6 +25,18 @@
  * @return Length of buffer, -1 indicates there was an error
 */
 size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer);
+
+/**
+ * @brief Encodes a esp32command
+ * 
+ * Serializes a esp32command object and stores result in buffer. The resulting
+ * number of bytes is returned with -1 indicating there was an error.
+ * 
+ * @param cmd Reference to command
+ * @param buffer Buffer to store serialized esp32command
+ * @return Length of buffer, -1 indicates there was an error
+ */
+size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer);
 
 size_t EncodePowerMeasurement(uint32_t ts, uint32_t logger_id,
                               uint32_t cell_id, double voltage,
@@ -140,10 +152,28 @@ size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
   cmd.command.page_command.block_size = bs;
   cmd.command.page_command.num_bytes = n;
 
+  return EncodeEsp32Command(&cmd, buffer);
+}
+
+size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
+                         uint8_t *buffer)
+{
+  Esp32Command cmd = Esp32Command_init_default;
+  cmd.which_command = Esp32Command_test_command_tag;
+  cmd.command.test_command.state = state;
+  cmd.command.test_command.data = data;
+
+  return EncodeEsp32Command(&cmd, buffer);
+}
+
+size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer)
+{
+  const size_t buffer_size = Esp32Command_size;
+
   // create output stream
   pb_ostream_t ostream = pb_ostream_from_buffer(buffer, Esp32Command_size);
   // encode message and check rc
-  bool status = pb_encode(&ostream, Esp32Command_fields, &cmd);
+  bool status = pb_encode(&ostream, Measurement_fields, cmd);
   if (!status)
   {
     return -1;

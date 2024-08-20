@@ -160,7 +160,7 @@ def handle_encode_esp32command_page(args):
 def print_data(args, data: bytes) -> str:
     if (args.c):
         print_bytes_c(data)
-    if (args.raw):
+    elif (args.raw):
         print(data)
     else:
         print(data.hex())

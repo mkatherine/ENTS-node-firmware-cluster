@@ -1,16 +1,16 @@
-[![Build stm32](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/stm32.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/stm32.yaml) [![Build esp32](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/esp32.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/esp32.yaml) [![Doxygen](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/docs.yaml/badge.svg)](https://github.com/jlab-sensing/soil-power-sensor-firmware/actions/workflows/docs.yaml)
+[![Build stm32](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/stm32.yaml/badge.svg)](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/stm32.yaml) [![Build esp32](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/esp32.yaml/badge.svg)](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/esp32.yaml) [![Doxygen](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/docs.yaml/badge.svg)](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/docs.yaml)
 
-# Soil Power Sensor Firmware
+# Environmental NeTworked Sensor (ENTS) Node Firmware
 
-Firmware repository for STM32 and ESP32 microcontrollers on the Soil Power Sensor board along with supporting libraries. This repository acts as the central hub for all repositories related to the project.
+Firmware repository for STM32 and ESP32 microcontrollers on the ENTS-node board along with supporting libraries. This repository acts as the central hub for all repositories related to the project.
 
 ## Project Structure
 
-All components of the soil power sensor project are open source and live across a range of repositories. This repository serves as a central hub for all components for the project including software and hardware.
+All components of the ENTS project are open source and live across a range of repositories. This repository serves as a central hub for all components for the project including software and hardware.
 
 | Repository | Description |
 | --- | --- |
-| https://github.com/jlab-sensing/soil-power-sensor-firmware | Firmware for microcontrollers |
+| https://github.com/jlab-sensing/ents-node-firmware | Firmware for microcontrollers |
 | https://github.com/jlab-sensing/platform-ststm32 | Fork with our board and modifications to build script |
 | https://github.com/jlab-sensing/tool-openocd | For allowing for user defined `openocd` binary |
 | https://github.com/jlab-sensing/STM32CubeWL | Platformio library for STMicroelectronics HAL and other libraries |
@@ -49,7 +49,7 @@ This project use [Doxygen](https://www.doxygen.nl/) for its code documentation. 
 doxygen Doxyfile
 ```
 
-Online version of the documentation for the `main` branch is available at https://jlab-sensing.github.io/soil-power-sensor-firmware/
+Online version of the documentation for the `main` branch is available at https://jlab-sensing.github.io/ents-node-firmware/
 
 ## Resources
 

@@ -14,6 +14,8 @@
 
 #include <cstddef>
 
+#include "soil_power_sensor.pb.h"
+
 namespace ModuleHandler {
   class Module {
     public:

@@ -3,25 +3,74 @@
 
 #include "template_module.hpp"
 
+#include "soil_power_sensor.pb.h"
 
 class ModuleTest: public ModuleHandler::Module {
   public:
+
+  /**
+   * @brief Construct a new Module Test object
+   * 
+   */
   ModuleTest(void);
+
+  /**
+   * @brief Destroy the Module Test object
+   * 
+   */
   ~ModuleTest(void);
 
-  uint8_t* input_buffer;
-  uint8_t buffer[32];
-  uint8_t output_buffer[32];
-
-  private:
-
+  /** Possible internal states */
   typedef enum {
     INIT = 0,
     RECEIVE = 1,
-    REQUEST = 2
+    RECEIVE_REQUEST = 2, 
+    REQUEST = 3
   } StateEnum;
 
+  /**
+   * @brief Handles i2c receive messages
+   * 
+   * If cmd state is RECEIVE then change internal state
+   * 
+   * If cmd state is REQUEST store inter in data as byte array
+   * 
+   * @param cmd 
+   */
+  void OnReceive(const Esp32Command& cmd);
+
+  /**
+   * @brief Handles i2c request messages
+   * 
+   * Replies with data from receive message
+   * 
+   * @param buffer Reference to tx buffer
+   * @return Number of bytes written to @p buffer
+   */
+  size_t OnRequest(uint8_t* buffer);
+
+  /**
+   * @brief Get the current state of the module
+   * 
+   * @return Integer representation of state
+   */
+  int State(void);
+
+  private:
+
+  /** Current state */
   StateEnum state = INIT;
+
+  /** Internal buffer for byte array from int32 */ 
+  uint8_t buffer[32];
+
+  /**
+   * @brief Convert an int32 to a byte array
+   * 
+   * @param value int32 value
+   * @param buffer Buffer to store byte array
+   */
+  void Int32ToByteArray(int32_t value, uint8_t* buffer);
 };
 
 #endif // ESP32_TEST_TEST_MODULE_MODULE_TEST_HPP_

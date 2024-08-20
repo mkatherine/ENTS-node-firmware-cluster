@@ -22,8 +22,9 @@
 
 // buffers that are used in place of i2c communication
 #ifdef UNIT_TEST
-static uint8_t module_handler_rx_buffer[32] = {}
-static uint8_t module_handler_tx_buffer[32] = {};
+static const uint8_t module_handler_buffer_size = 32;
+static uint8_t module_handler_rx_buffer[module_handler_buffer_size] = {}
+static uint8_t module_handler_tx_buffer[module_handler_buffer_size] = {};
 #endif
 
 namespace ModuleHandler {

@@ -37,7 +37,7 @@ namespace ModuleHandler {
      * 
      * @param num_bytes Number of bytes received from controller
      */
-    virtual void OnReceive(const Esp32Command& cmd);
+    virtual void OnReceive(const Esp32Command& cmd) = 0;
 
     /**
      * @brief Arduino I2C onRequest
@@ -46,22 +46,20 @@ namespace ModuleHandler {
      * 
      * @returns Number of bytes in buffer
      */
-    virtual size_t OnRequest(uint8_t* buffer);
+    virtual size_t OnRequest(uint8_t* buffer) = 0;
     
     /**
      * @brief Get the current state of the module
      * 
      * @return Integer of state enum
      */
-    virtual int State(void);
+    virtual int State(void) = 0;
 
     /**
      * @brief Resets the module to default state
      * 
      */
-    virtual void Reset();
-
-    protected:
+    virtual void Reset(void) = 0;
   };
 }
 

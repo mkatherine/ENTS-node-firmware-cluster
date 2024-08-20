@@ -23,7 +23,7 @@
 // buffers that are used in place of i2c communication
 #ifdef UNIT_TEST
 static const uint8_t module_handler_buffer_size = 32;
-static uint8_t module_handler_rx_buffer[module_handler_buffer_size] = {}
+static uint8_t module_handler_rx_buffer[module_handler_buffer_size] = {};
 static uint8_t module_handler_tx_buffer[module_handler_buffer_size] = {};
 #endif
 
@@ -45,10 +45,10 @@ namespace ModuleHandler {
     /**
      * @brief Register a module with a message type
      * 
-     * @param module Reference to module object
+     * @param module Pointer to module object
      * @param type Message type
      */
-    void RegisterModule(int type, Module& module);
+    void RegisterModule(int type, Module* module);
 
     /**
      * @brief Deregister a module
@@ -64,7 +64,7 @@ namespace ModuleHandler {
      * 
      * @returns Reference to module associated with the type
      */
-    Module& GetModule(int type);
+    Module* GetModule(int type);
 
     /**
      * @brief Resets all modules
@@ -90,10 +90,10 @@ namespace ModuleHandler {
     private:
 
     /** Map of request types to modules */
-    std::map<int, Module&> req_map;
+    std::map<int, Module*> req_map;
 
     /** Store reference to last module */
-    Module& last_module;
+    Module* last_module;
   };
 }
 

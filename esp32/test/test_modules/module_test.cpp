@@ -13,16 +13,29 @@ void ModuleTest::OnReceive(const Esp32Command& cmd) {
     this->state = REQUEST;
     // store data in buffer
     this->Int32ToByteArray(cmd.command.test_command.data, this->buffer);
+    // int32 is 4 bytes
+    this->buffer_len = 4;
   }
-  
 }
 
 size_t ModuleTest::OnRequest(uint8_t* buffer) {
-  this->state = REQUEST;
+  // set state to init
+  this->state = INIT;
+
+  // copy internal buffer to tx buffer
+  memcpy(buffer, this->buffer, buffer_len);
+
+  // return length of buffer
+  return this->buffer_len;
 }
 
 int ModuleTest::State(void) {
   return this->state;
+}
+
+void ModuleTest::Reset(void)
+{
+  this->state = INIT;
 }
 
 void ModuleTest::Int32ToByteArray(int32_t value, uint8_t* buffer) {

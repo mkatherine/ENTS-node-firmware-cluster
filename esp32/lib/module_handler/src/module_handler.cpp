@@ -7,7 +7,12 @@
 
 #include "transcoder.h"
 
-void ModuleHandler::ModuleHandler::RegisterModule(int type, Module &module) {
+ModuleHandler::ModuleHandler::ModuleHandler() {}
+
+ModuleHandler::ModuleHandler::~ModuleHandler() {}
+
+void ModuleHandler::ModuleHandler::RegisterModule(int type, Module *module)
+{
   // add module to map
   this->req_map[type] = module;
 }
@@ -40,7 +45,7 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
   // store reference to module for future OnRequest calls
   this->last_module = this->req_map.at(cmd.which_command);
   // forward command to module
-  this->last_module.OnReceive(cmd);
+  this->last_module->OnReceive(cmd);
 }
 
 void ModuleHandler::ModuleHandler::OnRequest(void) {
@@ -49,7 +54,7 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
   uint8_t buffer[32];
 
   // forward request to last module received
-  len = this->last_module.OnRequest(buffer);
+  len = this->last_module->OnRequest(buffer);
 
   #ifdef UNIT_TEST
   std::memcpy(module_handler_tx_buffer, buffer, len);
@@ -57,4 +62,15 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
   // wire to i2c
   Wire.write(buffer, len);
   #endif
+}
+
+ModuleHandler::Module* ModuleHandler::ModuleHandler::GetModule(int type) {
+  return this->req_map.at(type);
+}
+
+void ModuleHandler::ModuleHandler::ResetModules(void) {
+  // call Reset() for all modules in req_map
+  for (auto& entry : this->req_map) {
+    entry.second->Reset();
+  }
 }

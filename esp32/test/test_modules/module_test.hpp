@@ -56,13 +56,21 @@ class ModuleTest: public ModuleHandler::Module {
    */
   int State(void);
 
+  /**
+   * @brief Reset state of module
+   * 
+   */
+  void Reset(void);
+
   private:
 
   /** Current state */
   StateEnum state = INIT;
 
   /** Internal buffer for byte array from int32 */ 
-  uint8_t buffer[32];
+  uint8_t buffer[32] = {};
+  /** Length of buffer */
+  size_t buffer_len = 0;
 
   /**
    * @brief Convert an int32 to a byte array

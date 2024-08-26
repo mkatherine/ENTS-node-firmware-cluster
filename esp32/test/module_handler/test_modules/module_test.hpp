@@ -49,23 +49,7 @@ class ModuleTest: public ModuleHandler::Module {
    */
   size_t OnRequest(uint8_t* buffer);
 
-  /**
-   * @brief Get the current state of the module
-   * 
-   * @return Integer representation of state
-   */
-  int State(void);
-
-  /**
-   * @brief Reset state of module
-   * 
-   */
-  void Reset(void);
-
   private:
-
-  /** Current state */
-  StateEnum state = INIT;
 
   /** Internal buffer for byte array from int32 */ 
   uint8_t buffer[32] = {};

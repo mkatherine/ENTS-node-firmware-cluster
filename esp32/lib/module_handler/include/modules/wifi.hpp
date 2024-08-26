@@ -22,6 +22,17 @@ class ModuleWiFi: public ModuleHandler::Module {
   ModuleWiFi(void);
 
   ~ModuleWiFi(void);
+
+  private:
+
+  typedef enum {
+    /** Waiting to receive data */
+    RECEIVE = 0,
+    /** Waiting for request for data */
+    REQUEST = 1
+  } StateEnum;
+
+  
 };
 
 #endif // ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_

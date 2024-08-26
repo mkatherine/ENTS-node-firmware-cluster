@@ -29,15 +29,6 @@ size_t ModuleTest::OnRequest(uint8_t* buffer) {
   return this->buffer_len;
 }
 
-int ModuleTest::State(void) {
-  return this->state;
-}
-
-void ModuleTest::Reset(void)
-{
-  this->state = INIT;
-}
-
 void ModuleTest::Int32ToByteArray(int32_t value, uint8_t* buffer) {
   // Extract the highest byte
   buffer[0] = (value >> 24) & 0xFF;

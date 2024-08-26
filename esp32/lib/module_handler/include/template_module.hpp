@@ -53,13 +53,19 @@ namespace ModuleHandler {
      * 
      * @return Integer of state enum
      */
-    virtual int State(void) = 0;
+    int State(void);
 
     /**
      * @brief Resets the module to default state
      * 
+     * The default state is 
      */
-    virtual void Reset(void) = 0;
+    void Reset(void);
+
+    private:
+
+    /** Integer representing current state */
+    int state = 0;
   };
 }
 

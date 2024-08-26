@@ -1,9 +1,13 @@
 #include "template_module.hpp"
 
-ModuleHandler::Module::Module(void) {
+ModuleHandler::Module::Module(void) {}
 
+ModuleHandler::Module::~Module(void) {}
+
+void ModuleHandler::Module::Reset(void) {
+  this->state = 0;
 }
 
-ModuleHandler::Module::~Module(void) {
-
+int ModuleHandler::Module::State(void) {
+  return this->state;
 }

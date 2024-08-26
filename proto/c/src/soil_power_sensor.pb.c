@@ -33,6 +33,10 @@ PB_BIND(PageCommand, PageCommand, AUTO)
 PB_BIND(TestCommand, TestCommand, AUTO)
 
 
+PB_BIND(WiFiCommand, WiFiCommand, AUTO)
+
+
+
 
 
 

@@ -1,7 +1,7 @@
 from google.protobuf import message
 from google.protobuf.json_format import MessageToDict
 
-from .soil_power_sensor_pb2 import Esp32Command, PageCommand, TestCommand
+from .soil_power_sensor_pb2 import Esp32Command, PageCommand, TestCommand, WiFiCommand
 
 def encode_esp32command(cmd_type: str, **kwargs) -> bytes:
     """Encodes a command for the esp32
@@ -22,6 +22,9 @@ def encode_esp32command(cmd_type: str, **kwargs) -> bytes:
     elif (cmd_type == "test"):
         test_cmd = encode_test_command(**kwargs)
         cmd.test_command.CopyFrom(test_cmd)
+    elif (cmd_type == "wifi"):
+        wifi_cmd = encode_wifi_command(**kwargs)
+        cmd.wifi_command.CopyFrom(wifi_cmd)
     else:
         raise NotImplementedError(f"Command type {cmd_type} not implemented!")
     
@@ -109,11 +112,68 @@ def encode_test_command(state : str, data : int) -> message:
     
     return test_cmd
 
+def encode_wifi_command(
+    _type : str,
+    ssid : str="",
+    passwd : str="",
+    url : str="",
+    rc : int=0,
+    ts : int=0,
+    resp : bytes=b"",
+) -> message:
+    """Encodes a WiFi command
+    
+    Valid strings for _type are:
+        "connect": Connecting to a WiFi network and any other setup
+        "post": Posting data to the endpoint
+   
+    Not all arguments are necessary for valid commands.
+        
+    Args:
+        _type; Type of request
+        ssid: WiFi SSID
+        passwd: WiFi password
+        url: Endpoint URL
+        rc: Return code
+        ts: Timestamp
+        resp: Binary data response from server
+        
+    Returns:
+        WiFiCommand message
+        
+    Raises:
+        NotImplementedError: When _type does not exist 
+    """
+   
+    # look up table for _type strings
+    _type_lut = {
+        "connect": WiFiCommand.Type.CONNECT,
+        "post": WiFiCommand.Type.POST
+    }
+   
+    # ensure all lower case 
+    _type = _type.lower()
+    
+    wifi_cmd = WiFiCommand()
+    try:
+        wifi_cmd.type = _type_lut[_type]
+    except KeyError as exc:
+        raise NotImplementedError(f"Type {_type} is not implemented") from exc
+    
+    wifi_cmd.ssid = ssid
+    wifi_cmd.passwd = passwd
+    wifi_cmd.url = url
+    wifi_cmd.rc = rc
+    wifi_cmd.ts = ts
+    wifi_cmd.resp = resp
+    
+    return wifi_cmd
+
 def decode_esp32command(data: bytes) -> dict:
     cmd = Esp32Command()
    
     # parse serialized message
     cmd.ParseFromString(data)
     
-    # return dicti
+    # return dict
     return MessageToDict(cmd, always_print_fields_with_no_presence=True)

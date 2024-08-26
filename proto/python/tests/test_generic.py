@@ -9,6 +9,7 @@ correct dictionary format is returned.
 """
 
 import unittest
+import base64
 
 from soil_power_sensor_protobuf import (
     encode_response,
@@ -250,6 +251,58 @@ class TestEsp32(unittest.TestCase):
         
         with self.assertRaises(NotImplementedError):
             encode_esp32command("test", state="agg", data=123)
+            
+    def test_wifi(self):
+        """Test encoding/decoding a WiFi command
+       
+        All parameters are tested at once. This is not the intended
+        implementation.
+        """
+        
+        _type = "POST"
+        ssid = "HelloWorld"
+        passwd = "password"
+        url = "https://test.com"
+        rc = 200
+        ts = 1652346246
+        resp = b"agga"
+       
+        # encode 
+        cmd_str = encode_esp32command(
+            "wifi",
+            _type=_type,
+            ssid=ssid,
+            passwd=passwd,
+            url=url,
+            rc=rc,
+            ts=ts,
+            resp=resp
+        )
+       
+        # decode 
+        cmd = decode_esp32command(cmd_str)
+        
+        # check the command key exists 
+        self.assertIn("wifiCommand", cmd)
+        
+        cmd = cmd["wifiCommand"]
+        
+        # check individual values
+        self.assertEqual(cmd["type"], _type)
+        self.assertEqual(cmd["ssid"], ssid)
+        self.assertEqual(cmd["passwd"], passwd)
+        self.assertEqual(cmd["url"], url)
+        self.assertEqual(cmd["rc"], rc)
+        self.assertEqual(cmd["ts"], ts)
+        self.assertEqual(base64.b64decode(cmd["resp"]), resp)
+
+    def test_wifi_type_not_implemented(self):
+        """Encode a WiFiCommand with a improper type to check for
+        NotImplementedError 
+        """
+        
+        with self.assertRaises(NotImplementedError):
+            encode_esp32command("wifi", _type="bla")
     
 if __name__ == "__main__":
     unittest.main()

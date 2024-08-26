@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 
 from .encode import encode_power_measurement, encode_phytos31_measurement, encode_teros12_measurement, encode_response
 from .decode import decode_measurement, decode_response
@@ -87,6 +88,16 @@ def create_encode_parser(subparsers):
         esp32_parser.add_argument('num', type=int, help='Number of bytes')
         esp32_parser.set_defaults(func=handle_encode_esp32command_page)
         
+        wifi_parser = esp32command_subparser.add_parser('wifi', help='WiFiCommand')
+        wifi_parser.add_argument('type', type=str, help="WiFi command type")
+        wifi_parser.add_argument('--ssid', type=str, default="", help="WiFi SSID")
+        wifi_parser.add_argument('--passwd', type=str, default="", help="WiFi password")
+        wifi_parser.add_argument('--url', type=str, default="", help="Endpoint url")
+        wifi_parser.add_argument('--rc', type=int, default=0, help="Return code")
+        wifi_parser.add_argument('--ts', type=str, help="Timestamp")
+        wifi_parser.add_argument('--resp', type=str, default=b"", help="Serialized response message")
+        wifi_parser.set_defaults(func=handle_encode_esp32command_wifi)
+        
         return esp32command_parser
    
     # create subparsers
@@ -154,6 +165,26 @@ def handle_encode_esp32command_page(args):
         fd=args.fd,
         bs=args.bs,
         n=args.num
+    )
+    print_data(args, data)
+    
+def handle_encode_esp32command_wifi(args):
+    # process timestamp string
+    if (args.ts):
+        ts = datetime.fromisoformat(args.ts)
+        ts = ts.timestamp()
+    else:
+        ts = 0
+    
+    data = encode_esp32command(
+        "wifi",
+        _type=args.type.lower(),
+        ssid=args.ssid,
+        passwd=args.passwd,
+        url=args.url,
+        rc=args.rc,
+        ts=ts,
+        resp=args.resp
     )
     print_data(args, data)
  

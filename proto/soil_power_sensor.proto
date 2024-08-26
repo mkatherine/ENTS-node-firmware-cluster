@@ -83,6 +83,7 @@ message Esp32Command {
   oneof command {
     PageCommand page_command = 1;
     TestCommand test_command = 2;
+    WiFiCommand wifi_command = 3;
   }
 }
 
@@ -119,4 +120,32 @@ message TestCommand {
   ChangeState state = 1;
   /* Data field for test command data */
   int32 data = 2;
+}
+
+message WiFiCommand {
+  enum Type {
+    /* Connect to WiFi network*/
+    CONNECT = 0;
+    /* Post data to endpoint */
+    POST = 1;
+  }
+
+  /* Command type */
+  Type type = 1;
+
+  /* Group for Connect */
+  /* WiFI SSID */
+  string ssid = 2;
+  /* WiFi Password */
+  string passwd = 3;
+  /* Endpoint url */
+  string url = 4;
+ 
+  /* Group for request repsonses */
+  /* Return code */
+  uint32 rc = 5;
+  /* Timestamp n unix epochs */
+  uint32 ts = 6;
+  // binary data response
+  bytes resp = 7;
 }

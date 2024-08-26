@@ -35,6 +35,13 @@ typedef enum _TestCommand_ChangeState {
     TestCommand_ChangeState_REQUEST = 2
 } TestCommand_ChangeState;
 
+typedef enum _WiFiCommand_Type {
+    /* Connect to WiFi network */
+    WiFiCommand_Type_CONNECT = 0,
+    /* Post data to endpoint */
+    WiFiCommand_Type_POST = 1
+} WiFiCommand_Type;
+
 /* Struct definitions */
 /* Data shared between all measurement messages */
 typedef struct _MeasurementMetadata {
@@ -112,11 +119,29 @@ typedef struct _TestCommand {
     int32_t data;
 } TestCommand;
 
+typedef struct _WiFiCommand {
+    /* Command type */
+    WiFiCommand_Type type;
+    /* WiFI SSID */
+    pb_callback_t ssid;
+    /* WiFi Password */
+    pb_callback_t passwd;
+    /* Endpoint url */
+    pb_callback_t url;
+    /* Return code */
+    uint32_t rc;
+    /* Timestamp n unix epochs */
+    uint32_t ts;
+    /* binary data response */
+    pb_callback_t resp;
+} WiFiCommand;
+
 typedef struct _Esp32Command {
     pb_size_t which_command;
     union {
         PageCommand page_command;
         TestCommand test_command;
+        WiFiCommand wifi_command;
     } command;
 } Esp32Command;
 
@@ -138,6 +163,10 @@ extern "C" {
 #define _TestCommand_ChangeState_MAX TestCommand_ChangeState_REQUEST
 #define _TestCommand_ChangeState_ARRAYSIZE ((TestCommand_ChangeState)(TestCommand_ChangeState_REQUEST+1))
 
+#define _WiFiCommand_Type_MIN WiFiCommand_Type_CONNECT
+#define _WiFiCommand_Type_MAX WiFiCommand_Type_POST
+#define _WiFiCommand_Type_ARRAYSIZE ((WiFiCommand_Type)(WiFiCommand_Type_POST+1))
+
 
 
 
@@ -150,6 +179,8 @@ extern "C" {
 
 #define TestCommand_state_ENUMTYPE TestCommand_ChangeState
 
+#define WiFiCommand_type_ENUMTYPE WiFiCommand_Type
+
 
 /* Initializer values for message structs */
 #define MeasurementMetadata_init_default         {0, 0, 0}
@@ -161,6 +192,7 @@ extern "C" {
 #define Esp32Command_init_default                {0, {PageCommand_init_default}}
 #define PageCommand_init_default                 {_PageCommand_RequestType_MIN, 0, 0, 0}
 #define TestCommand_init_default                 {_TestCommand_ChangeState_MIN, 0}
+#define WiFiCommand_init_default                 {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
 #define MeasurementMetadata_init_zero            {0, 0, 0}
 #define PowerMeasurement_init_zero               {0, 0}
 #define Teros12Measurement_init_zero             {0, 0, 0, 0}
@@ -170,6 +202,7 @@ extern "C" {
 #define Esp32Command_init_zero                   {0, {PageCommand_init_zero}}
 #define PageCommand_init_zero                    {_PageCommand_RequestType_MIN, 0, 0, 0}
 #define TestCommand_init_zero                    {_TestCommand_ChangeState_MIN, 0}
+#define WiFiCommand_init_zero                    {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define MeasurementMetadata_cell_id_tag          1
@@ -194,8 +227,16 @@ extern "C" {
 #define PageCommand_num_bytes_tag                4
 #define TestCommand_state_tag                    1
 #define TestCommand_data_tag                     2
+#define WiFiCommand_type_tag                     1
+#define WiFiCommand_ssid_tag                     2
+#define WiFiCommand_passwd_tag                   3
+#define WiFiCommand_url_tag                      4
+#define WiFiCommand_rc_tag                       5
+#define WiFiCommand_ts_tag                       6
+#define WiFiCommand_resp_tag                     7
 #define Esp32Command_page_command_tag            1
 #define Esp32Command_test_command_tag            2
+#define Esp32Command_wifi_command_tag            3
 
 /* Struct field encoding specification for nanopb */
 #define MeasurementMetadata_FIELDLIST(X, a) \
@@ -244,11 +285,13 @@ X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
 
 #define Esp32Command_FIELDLIST(X, a) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (command,page_command,command.page_command),   1) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (command,test_command,command.test_command),   2)
+X(a, STATIC,   ONEOF,    MESSAGE,  (command,test_command,command.test_command),   2) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (command,wifi_command,command.wifi_command),   3)
 #define Esp32Command_CALLBACK NULL
 #define Esp32Command_DEFAULT NULL
 #define Esp32Command_command_page_command_MSGTYPE PageCommand
 #define Esp32Command_command_test_command_MSGTYPE TestCommand
+#define Esp32Command_command_wifi_command_MSGTYPE WiFiCommand
 
 #define PageCommand_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UENUM,    file_request,      1) \
@@ -264,6 +307,17 @@ X(a, STATIC,   SINGULAR, INT32,    data,              2)
 #define TestCommand_CALLBACK NULL
 #define TestCommand_DEFAULT NULL
 
+#define WiFiCommand_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UENUM,    type,              1) \
+X(a, CALLBACK, SINGULAR, STRING,   ssid,              2) \
+X(a, CALLBACK, SINGULAR, STRING,   passwd,            3) \
+X(a, CALLBACK, SINGULAR, STRING,   url,               4) \
+X(a, STATIC,   SINGULAR, UINT32,   rc,                5) \
+X(a, STATIC,   SINGULAR, UINT32,   ts,                6) \
+X(a, CALLBACK, SINGULAR, BYTES,    resp,              7)
+#define WiFiCommand_CALLBACK pb_default_field_callback
+#define WiFiCommand_DEFAULT NULL
+
 extern const pb_msgdesc_t MeasurementMetadata_msg;
 extern const pb_msgdesc_t PowerMeasurement_msg;
 extern const pb_msgdesc_t Teros12Measurement_msg;
@@ -273,6 +327,7 @@ extern const pb_msgdesc_t Response_msg;
 extern const pb_msgdesc_t Esp32Command_msg;
 extern const pb_msgdesc_t PageCommand_msg;
 extern const pb_msgdesc_t TestCommand_msg;
+extern const pb_msgdesc_t WiFiCommand_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define MeasurementMetadata_fields &MeasurementMetadata_msg
@@ -284,9 +339,11 @@ extern const pb_msgdesc_t TestCommand_msg;
 #define Esp32Command_fields &Esp32Command_msg
 #define PageCommand_fields &PageCommand_msg
 #define TestCommand_fields &TestCommand_msg
+#define WiFiCommand_fields &WiFiCommand_msg
 
 /* Maximum encoded size of messages (where known) */
-#define Esp32Command_size                        22
+/* Esp32Command_size depends on runtime parameters */
+/* WiFiCommand_size depends on runtime parameters */
 #define MeasurementMetadata_size                 18
 #define Measurement_size                         55
 #define PageCommand_size                         20

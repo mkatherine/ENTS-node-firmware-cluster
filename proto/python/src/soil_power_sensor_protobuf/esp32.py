@@ -117,6 +117,7 @@ def encode_wifi_command(
     ssid : str="",
     passwd : str="",
     url : str="",
+    port : int=0,
     rc : int=0,
     ts : int=0,
     resp : bytes=b"",
@@ -134,6 +135,7 @@ def encode_wifi_command(
         ssid: WiFi SSID
         passwd: WiFi password
         url: Endpoint URL
+        port: Port of webserver
         rc: Return code
         ts: Timestamp
         resp: Binary data response from server
@@ -163,6 +165,7 @@ def encode_wifi_command(
     wifi_cmd.ssid = ssid
     wifi_cmd.passwd = passwd
     wifi_cmd.url = url
+    wifi_cmd.port = port
     wifi_cmd.rc = rc
     wifi_cmd.ts = ts
     wifi_cmd.resp = resp

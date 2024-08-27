@@ -134,6 +134,8 @@ typedef struct _WiFiCommand {
     uint32_t ts;
     /* binary data response */
     pb_callback_t resp;
+    /* Port */
+    uint32_t port;
 } WiFiCommand;
 
 typedef struct _Esp32Command {
@@ -192,7 +194,7 @@ extern "C" {
 #define Esp32Command_init_default                {0, {PageCommand_init_default}}
 #define PageCommand_init_default                 {_PageCommand_RequestType_MIN, 0, 0, 0}
 #define TestCommand_init_default                 {_TestCommand_ChangeState_MIN, 0}
-#define WiFiCommand_init_default                 {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
+#define WiFiCommand_init_default                 {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}, 0}
 #define MeasurementMetadata_init_zero            {0, 0, 0}
 #define PowerMeasurement_init_zero               {0, 0}
 #define Teros12Measurement_init_zero             {0, 0, 0, 0}
@@ -202,7 +204,7 @@ extern "C" {
 #define Esp32Command_init_zero                   {0, {PageCommand_init_zero}}
 #define PageCommand_init_zero                    {_PageCommand_RequestType_MIN, 0, 0, 0}
 #define TestCommand_init_zero                    {_TestCommand_ChangeState_MIN, 0}
-#define WiFiCommand_init_zero                    {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
+#define WiFiCommand_init_zero                    {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define MeasurementMetadata_cell_id_tag          1
@@ -234,6 +236,7 @@ extern "C" {
 #define WiFiCommand_rc_tag                       5
 #define WiFiCommand_ts_tag                       6
 #define WiFiCommand_resp_tag                     7
+#define WiFiCommand_port_tag                     8
 #define Esp32Command_page_command_tag            1
 #define Esp32Command_test_command_tag            2
 #define Esp32Command_wifi_command_tag            3
@@ -314,7 +317,8 @@ X(a, CALLBACK, SINGULAR, STRING,   passwd,            3) \
 X(a, CALLBACK, SINGULAR, STRING,   url,               4) \
 X(a, STATIC,   SINGULAR, UINT32,   rc,                5) \
 X(a, STATIC,   SINGULAR, UINT32,   ts,                6) \
-X(a, CALLBACK, SINGULAR, BYTES,    resp,              7)
+X(a, CALLBACK, SINGULAR, BYTES,    resp,              7) \
+X(a, STATIC,   SINGULAR, UINT32,   port,              8)
 #define WiFiCommand_CALLBACK pb_default_field_callback
 #define WiFiCommand_DEFAULT NULL
 

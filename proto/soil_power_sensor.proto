@@ -140,6 +140,8 @@ message WiFiCommand {
   string passwd = 3;
   /* Endpoint url */
   string url = 4;
+  /* Port */
+  uint32 port = 8;
  
   /* Group for request repsonses */
   /* Return code */

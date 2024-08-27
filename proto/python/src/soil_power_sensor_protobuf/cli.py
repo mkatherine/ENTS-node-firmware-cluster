@@ -93,6 +93,7 @@ def create_encode_parser(subparsers):
         wifi_parser.add_argument('--ssid', type=str, default="", help="WiFi SSID")
         wifi_parser.add_argument('--passwd', type=str, default="", help="WiFi password")
         wifi_parser.add_argument('--url', type=str, default="", help="Endpoint url")
+        wifi_parser.add_argument('--port', type=int, default=0, help="Endpoint port")
         wifi_parser.add_argument('--rc', type=int, default=0, help="Return code")
         wifi_parser.add_argument('--ts', type=str, help="Timestamp")
         wifi_parser.add_argument('--resp', type=str, default=b"", help="Serialized response message")
@@ -182,6 +183,7 @@ def handle_encode_esp32command_wifi(args):
         ssid=args.ssid,
         passwd=args.passwd,
         url=args.url,
+        port=args.port,
         rc=args.rc,
         ts=ts,
         resp=args.resp

@@ -168,6 +168,8 @@ size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
   return EncodeEsp32Command(&cmd, buffer, size);
 }
 
+size_t EncodeWiFiCommand(WiFiCommand_Type type, const char* ssid, const char* passwd, const char)
+
 size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer, size_t size)
 {
   // create output stream

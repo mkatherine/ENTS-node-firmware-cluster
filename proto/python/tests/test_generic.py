@@ -263,6 +263,7 @@ class TestEsp32(unittest.TestCase):
         ssid = "HelloWorld"
         passwd = "password"
         url = "https://test.com"
+        port = 6969
         rc = 200
         ts = 1652346246
         resp = b"agga"
@@ -274,6 +275,7 @@ class TestEsp32(unittest.TestCase):
             ssid=ssid,
             passwd=passwd,
             url=url,
+            port=port,
             rc=rc,
             ts=ts,
             resp=resp
@@ -292,6 +294,7 @@ class TestEsp32(unittest.TestCase):
         self.assertEqual(cmd["ssid"], ssid)
         self.assertEqual(cmd["passwd"], passwd)
         self.assertEqual(cmd["url"], url)
+        self.assertEqual(cmd["port"], port)
         self.assertEqual(cmd["rc"], rc)
         self.assertEqual(cmd["ts"], ts)
         self.assertEqual(base64.b64decode(cmd["resp"]), resp)

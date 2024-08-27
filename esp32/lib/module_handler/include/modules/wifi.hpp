@@ -23,16 +23,24 @@ class ModuleWiFi: public ModuleHandler::Module {
 
   ~ModuleWiFi(void);
 
+  /**
+   * @see ModuleHandler::Module.OnReceive
+   */
+  void OnReceive(const Esp32Command& cmd);
+
+  /**
+   * @see ModuleHandler::Module.OnRequest
+   */
+  size_t OnRequest(uint8_t* buffer);
+
   private:
 
   typedef enum {
-    /** Waiting to receive data */
-    RECEIVE = 0,
-    /** Waiting for request for data */
-    REQUEST = 1
-  } StateEnum;
-
-  
+    /** Receive WiFi SSID, password, and URL */
+    CONNECT = 0,
+    /** Post data to the endpoint */
+    POST = 1,
+  } StateEnum; 
 };
 
 #endif // ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_

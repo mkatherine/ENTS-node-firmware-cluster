@@ -124,11 +124,12 @@ Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len);
  * @param bs Block size
  * @param n Number of bytes
  * @param buffer Buffer to store serialized command
+ * @param size Size of buffer
  * 
  * @returns Number of bytes in @p buffer
  */
 size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
-                         size_t n, uint8_t* buffer);
+                         size_t n, uint8_t* buffer, size_t size);
 
 /**
  * @brief Encodes a test command
@@ -136,11 +137,12 @@ size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
  * @param state State to change to
  * @param data Data to encode
  * @param buffer Buffer to store serialized command
+ * @param size Size of buffer
  * 
  * @return Number of bytes in @p buffer
  */
 size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
-                         uint8_t* buffer);
+                         uint8_t* buffer, size_t size);
 
 #ifdef __cplusplus
 }

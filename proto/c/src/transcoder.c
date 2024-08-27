@@ -34,9 +34,11 @@ size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer);
  * 
  * @param cmd Reference to command
  * @param buffer Buffer to store serialized esp32command
+ * @param size Size of buffer
+ * 
  * @return Length of buffer, -1 indicates there was an error
  */
-size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer);
+size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer, size_t size);
 
 size_t EncodePowerMeasurement(uint32_t ts, uint32_t logger_id,
                               uint32_t cell_id, double voltage,
@@ -142,7 +144,7 @@ Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len)
 }
 
 size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
-                         size_t n, uint8_t* buffer)
+                         size_t n, uint8_t* buffer, size_t size)
 {
   // create command object
   Esp32Command cmd = Esp32Command_init_default;
@@ -152,26 +154,24 @@ size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
   cmd.command.page_command.block_size = bs;
   cmd.command.page_command.num_bytes = n;
 
-  return EncodeEsp32Command(&cmd, buffer);
+  return EncodeEsp32Command(&cmd, buffer, size);
 }
 
 size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
-                         uint8_t *buffer)
+                         uint8_t *buffer, size_t size)
 {
   Esp32Command cmd = Esp32Command_init_default;
   cmd.which_command = Esp32Command_test_command_tag;
   cmd.command.test_command.state = state;
   cmd.command.test_command.data = data;
 
-  return EncodeEsp32Command(&cmd, buffer);
+  return EncodeEsp32Command(&cmd, buffer, size);
 }
 
-size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer)
+size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer, size_t size)
 {
-  const size_t buffer_size = Esp32Command_size;
-
   // create output stream
-  pb_ostream_t ostream = pb_ostream_from_buffer(buffer, Esp32Command_size);
+  pb_ostream_t ostream = pb_ostream_from_buffer(buffer, size);
   // encode message and check rc
   bool status = pb_encode(&ostream, Measurement_fields, cmd);
   if (!status)

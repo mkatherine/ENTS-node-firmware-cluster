@@ -16,10 +16,10 @@
 
 #define CALIBRATION
 
-const double voltage_calibration_m = -0.00039368;
-const double voltage_calibration_b = -1.062985611873808;
-const double current_calibration_m = -0.000000395077453;
-const double current_calibration_b = -0.06046705571518807;
+const double voltage_calibration_m = -0.00039367;
+const double voltage_calibration_b = -1.6887690619205245;
+const double current_calibration_m = -1.18844302e-10;
+const double current_calibration_b = 3.554079888291547e-05;
 
 /**
  * @brief GPIO port for adc data ready line
@@ -131,7 +131,7 @@ double ADC_readVoltage(void){
   reading = (double) temp;
 
   #ifndef CALIBRATION
-  // reading = (voltage_calibration_m * reading) + voltage_calibration_b;
+  reading = (voltage_calibration_m * reading) + voltage_calibration_b;
   #endif /* CALIBRATION */
 
 

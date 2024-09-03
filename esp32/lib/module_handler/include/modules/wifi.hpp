@@ -12,9 +12,14 @@
 #ifndef ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_
 #define ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_
 
+#include <WiFi.h>
+
+#include "dirtviz.hpp"
+
 #include "template_module.hpp"
 
 #include "soil_power_sensor.pb.h"
+#include "transcoder.h"
 
 class ModuleWiFi: public ModuleHandler::Module {
   public:
@@ -40,7 +45,24 @@ class ModuleWiFi: public ModuleHandler::Module {
     CONNECT = 0,
     /** Post data to the endpoint */
     POST = 1,
-  } StateEnum; 
+  } StateEnum;
+
+  /**
+   * @brief Object interface to Dirtviz
+   * 
+   */
+  Dirtviz dirtviz;
+
+  void Post(const Esp32Command& cmd);
+
+  void Connect(const Esp32Command& cmd);
+
+  /** Timeout for wifi connect */
+  static const unsigned long connect_timeout_ms = 10000;
+
+  /** Buffer for i2c requests */
+  uint8_t* request_buffer[WiFiCommand_size] = {};
+  size_t request_buffer_len = 0;
 };
 
 #endif // ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_

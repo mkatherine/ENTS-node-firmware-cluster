@@ -94,7 +94,24 @@ namespace ModuleHandler {
 
     /** Store reference to last module */
     Module* last_module;
-  };
+
+    typedef struct {
+      /** Size of receive/request buffer */
+      static const size_t size = Esp32Command_size;
+      /** Buffer to store data */
+      uint8_t data[size] = {};
+      /** Length of data */
+      size_t len = 0;
+      /** Current index of buffer */
+      size_t idx = 0;
+    } Buffer;
+
+    /** Receive buffer */
+    Buffer receive_buffer;
+
+    /** Request buffer */
+    Buffer request_buffer;
+  }; 
 }
 
 #endif // ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULE_HANDLER_H_

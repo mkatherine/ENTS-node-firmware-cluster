@@ -23,45 +23,107 @@ void ModuleHandler::ModuleHandler::DeregisterModule(int type) {
 }
 
 void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
-  uint8_t buffer[num_bytes] = {};
+  if (this->receive_buffer.len + num_bytes > this->receive_buffer.size) {
+    // TODO handle error
+  }
 
   #ifdef UNIT_TEST
-  std::memcpy(buffer, module_handler_rx_buffer, num_bytes);
+  // Store pointer to the rx buffer
+  uint8_t* module_handler_rx_buffer_idx = module_handler_rx_buffer;
+  // get msg end flag
+  bool msg_end = module_handler_rx_buffer_idx;
+  // increment idx
+  ++module_handler_rx_buffer_idx;
   #else
-  for (int i = 0; i < num_bytes; i++) {
+  // set continue flag to first byte
+  bool msg_end = (bool) Wire.read();
+  #endif
+
+  // get end of buffer
+  uint8_t* prev_end = this->receive_buffer.data + this->receive_buffer.len + 1;
+
+  // loop over available bytes in buffer
+  for (uint8_t* end = prev_end; end < prev_end + num_bytes - 1; end++) {
+    #ifdef UNIT_TEST
+    // copy bytes
+    *end = *module_handler_rx_buffer_idx;
+    // increment idx
+    module_handler_rx_buffer_idx++;
+    #else
     // check if available
     if (!Wire.available()) {
       Serial.printf("Specified number of bytes is not available");
     }
 
-    // read bytes
-    buffer[i] = Wire.read();
+    // read data
+    *end = Wire.read();
+    #endif
+
+    // increment length
+    this->receive_buffer.len++;
   }
-  #endif
 
-  // decode measurement
-  Esp32Command cmd = DecodeEsp32Command(buffer, num_bytes);
+  // call module OnReceive
+  if (msg_end) {
+    // decode measurement
+    Esp32Command cmd = DecodeEsp32Command(this->receive_buffer.data, this->receive_buffer.len);
 
-  // store reference to module for future OnRequest calls
-  this->last_module = this->req_map.at(cmd.which_command);
-  // forward command to module
-  this->last_module->OnReceive(cmd);
+    // store reference to module for future OnRequest calls
+    this->last_module = this->req_map.at(cmd.which_command);
+    // forward command to module
+    this->last_module->OnReceive(cmd);
+  }
 }
 
 void ModuleHandler::ModuleHandler::OnRequest(void) {
-  // create buffer with same size of arduino
-  size_t len = 0;
-  uint8_t buffer[32];
+  /** Buffer size for the Wire Arduino library. Determines the max number of
+   * bytes that can be communicated. Varies between platforms but avr uses a
+   * buffer size of 32. */
+  static const int wire_buffer_size = 32;
+ 
+  // only call module if nothing in buffer
+  if (this->request_buffer.len == 0) {
+    // forward request to last module received
+    this->request_buffer.len = this->last_module->OnRequest(this->request_buffer.data);
+  }
 
-  // forward request to last module received
-  len = this->last_module->OnRequest(buffer);
+  // check if length is less than size
+  if (this->request_buffer.len > this->request_buffer.size) {
+    // TODO handle error
+  }
 
-  #ifdef UNIT_TEST
-  std::memcpy(module_handler_tx_buffer, buffer, len);
-  #else
-  // wire to i2c
-  Wire.write(buffer, len);
-  #endif
+  // optimization if length is less than buffer size
+  if (this->request_buffer.len < wire_buffer_size-1) {
+    // write finished flag
+    Wire.write(1);
+    // write data to i2c
+    Wire.write(this->request_buffer.data, this->request_buffer.len);
+  }
+
+  // get number of bytes remaining
+  size_t bytes_remaining = this->request_buffer.len - this->request_buffer.idx;
+
+  // check if length is less than buffer size
+  if (bytes_remaining > wire_buffer_size-1) {
+    // write finished flag
+    Wire.write(1);
+    // write directly to i2c
+    Wire.write(this->request_buffer.data, this->request_buffer.len);
+
+    // reset to indicate flushed buffer
+    this->request_buffer.len = 0;
+    this->request_buffer.idx = 0;  
+  } else {
+    // write unfinished flag
+    Wire.write(0);
+
+    // write block of data
+    uint8_t* end = this->request_buffer.data + this->request_buffer.idx;
+    Wire.write(end, wire_buffer_size-1);
+
+    // increment idx
+    this->request_buffer.idx += wire_buffer_size-1;
+  }
 }
 
 ModuleHandler::Module* ModuleHandler::ModuleHandler::GetModule(int type) {

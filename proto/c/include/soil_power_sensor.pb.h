@@ -119,21 +119,22 @@ typedef struct _TestCommand {
     int32_t data;
 } TestCommand;
 
+typedef PB_BYTES_ARRAY_T(222) WiFiCommand_resp_t;
 typedef struct _WiFiCommand {
     /* Command type */
     WiFiCommand_Type type;
     /* WiFI SSID */
-    pb_callback_t ssid;
+    char ssid[33];
     /* WiFi Password */
-    pb_callback_t passwd;
+    char passwd[65];
     /* Endpoint url */
-    pb_callback_t url;
+    char url[257];
     /* Return code */
     uint32_t rc;
     /* Timestamp n unix epochs */
     uint32_t ts;
     /* binary data response */
-    pb_callback_t resp;
+    WiFiCommand_resp_t resp;
     /* Port */
     uint32_t port;
 } WiFiCommand;
@@ -194,7 +195,7 @@ extern "C" {
 #define Esp32Command_init_default                {0, {PageCommand_init_default}}
 #define PageCommand_init_default                 {_PageCommand_RequestType_MIN, 0, 0, 0}
 #define TestCommand_init_default                 {_TestCommand_ChangeState_MIN, 0}
-#define WiFiCommand_init_default                 {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}, 0}
+#define WiFiCommand_init_default                 {_WiFiCommand_Type_MIN, "", "", "", 0, 0, {0, {0}}, 0}
 #define MeasurementMetadata_init_zero            {0, 0, 0}
 #define PowerMeasurement_init_zero               {0, 0}
 #define Teros12Measurement_init_zero             {0, 0, 0, 0}
@@ -204,7 +205,7 @@ extern "C" {
 #define Esp32Command_init_zero                   {0, {PageCommand_init_zero}}
 #define PageCommand_init_zero                    {_PageCommand_RequestType_MIN, 0, 0, 0}
 #define TestCommand_init_zero                    {_TestCommand_ChangeState_MIN, 0}
-#define WiFiCommand_init_zero                    {_WiFiCommand_Type_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}, 0}
+#define WiFiCommand_init_zero                    {_WiFiCommand_Type_MIN, "", "", "", 0, 0, {0, {0}}, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define MeasurementMetadata_cell_id_tag          1
@@ -312,14 +313,14 @@ X(a, STATIC,   SINGULAR, INT32,    data,              2)
 
 #define WiFiCommand_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UENUM,    type,              1) \
-X(a, CALLBACK, SINGULAR, STRING,   ssid,              2) \
-X(a, CALLBACK, SINGULAR, STRING,   passwd,            3) \
-X(a, CALLBACK, SINGULAR, STRING,   url,               4) \
+X(a, STATIC,   SINGULAR, STRING,   ssid,              2) \
+X(a, STATIC,   SINGULAR, STRING,   passwd,            3) \
+X(a, STATIC,   SINGULAR, STRING,   url,               4) \
 X(a, STATIC,   SINGULAR, UINT32,   rc,                5) \
 X(a, STATIC,   SINGULAR, UINT32,   ts,                6) \
-X(a, CALLBACK, SINGULAR, BYTES,    resp,              7) \
+X(a, STATIC,   SINGULAR, BYTES,    resp,              7) \
 X(a, STATIC,   SINGULAR, UINT32,   port,              8)
-#define WiFiCommand_CALLBACK pb_default_field_callback
+#define WiFiCommand_CALLBACK NULL
 #define WiFiCommand_DEFAULT NULL
 
 extern const pb_msgdesc_t MeasurementMetadata_msg;
@@ -346,17 +347,17 @@ extern const pb_msgdesc_t WiFiCommand_msg;
 #define WiFiCommand_fields &WiFiCommand_msg
 
 /* Maximum encoded size of messages (where known) */
-/* Esp32Command_size depends on runtime parameters */
-/* WiFiCommand_size depends on runtime parameters */
+#define Esp32Command_size                        607
 #define MeasurementMetadata_size                 18
 #define Measurement_size                         55
 #define PageCommand_size                         20
 #define Phytos31Measurement_size                 18
 #define PowerMeasurement_size                    18
 #define Response_size                            2
-#define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Measurement_size
+#define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Esp32Command_size
 #define Teros12Measurement_size                  33
 #define TestCommand_size                         13
+#define WiFiCommand_size                         604
 
 #ifdef __cplusplus
 } /* extern "C" */

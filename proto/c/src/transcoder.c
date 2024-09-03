@@ -168,7 +168,33 @@ size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
   return EncodeEsp32Command(&cmd, buffer, size);
 }
 
-size_t EncodeWiFiCommand(WiFiCommand_Type type, const char* ssid, const char* passwd, const char)
+size_t EncodeWiFiCommand(
+  WiFiCommand_Type type,
+  const char* ssid,
+  const char* passwd,
+  const char* url,
+  uint32_t port,
+  uint32_t rc,
+  uint32_t ts,
+  const uint8_t* resp,
+  size_t resp_len,
+  uint8_t* buffer,
+  size_t size
+) {
+  Esp32Command cmd = Esp32Command_init_default;
+
+  cmd.wifi_command.type = type;
+  strcpy(cmd.wifi_command.ssid, ssid);
+  strcpy(cmd.wifi_command.passwd, passwd);
+  strcpy(cmd.wifi_command.url, url);
+  cmd.wifi_command.port = port;
+  cmd.wifi_command.rc = rc;
+  cmd.wifi_command.ts = ts;
+  memcpy(cmd.wifi_command.resp.bytes, resp, resp_len);
+  cmd.wifi_command.resp.size = resp_len;
+
+  return EncodeEsp32Command(&cmd, buffer, size);
+}
 
 size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer, size_t size)
 {

@@ -24,7 +24,7 @@ PB_BIND(Measurement, Measurement, AUTO)
 PB_BIND(Response, Response, AUTO)
 
 
-PB_BIND(Esp32Command, Esp32Command, AUTO)
+PB_BIND(Esp32Command, Esp32Command, 2)
 
 
 PB_BIND(PageCommand, PageCommand, AUTO)
@@ -33,7 +33,7 @@ PB_BIND(PageCommand, PageCommand, AUTO)
 PB_BIND(TestCommand, TestCommand, AUTO)
 
 
-PB_BIND(WiFiCommand, WiFiCommand, AUTO)
+PB_BIND(WiFiCommand, WiFiCommand, 2)
 
 
 

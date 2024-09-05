@@ -10,7 +10,7 @@ Connect the ST-Link to `D2` at the top of the board. Connect Wio-E5 to your comp
 
 Check the correct environment is selected. Should be `env:stm32 (stm32)`
 
-![VSCode env](../images/vscode_env_stm.jpeg)
+![VSCode env](../images/vscode_env_stm32.jpeg)
 
 Goto *PlatformIO Tab -> Project Tasks -> Upload and Monitor*
 

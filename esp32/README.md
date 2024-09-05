@@ -16,7 +16,7 @@ Check the correct environment is selected. Should be `env:esp32 (esp32)`
 
 Goto *PlatformIO Tab -> Project Tasks -> Upload and Monitor*
 
-![VSCode Upload and Monitor](images/vscode_upload_monitor.jpeg)
+![VSCode Upload and Monitor](../images/vscode_upload_monitor.jpeg)
 
 ### CLI
 

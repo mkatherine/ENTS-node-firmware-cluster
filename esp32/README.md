@@ -6,11 +6,13 @@ The ESP32 firmware acts as a WiFi interface the STM32 module. It gets binary dat
 
 > Before running the following ensure you have updated the ports in `platformio.ini` described in the root [README.md](../README.md).
 
+The esp32 is programmed through a bootloader through 
+
 ### VSCode
 
 Check the correct environment is selected. Should be `env:esp32 (esp32)`
 
-![VSCode env](images/vscode_env_esp32.jpeg)
+![VSCode env](../images/vscode_env_esp32.jpeg)
 
 Goto *PlatformIO Tab -> Project Tasks -> Upload and Monitor*
 

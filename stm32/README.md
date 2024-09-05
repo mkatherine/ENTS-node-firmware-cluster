@@ -4,15 +4,17 @@
 
 > Before running the following ensure you have updated the ports in `platformio.ini` described in the root [README.md](../README.md).
 
+Connect the ST-Link to `D2` at the top of the board. Connect Wio-E5 to your computer using a USB-C cable.
+
 ### VSCode
 
 Check the correct environment is selected. Should be `env:stm32 (stm32)`
 
-![VSCode env](images/vscode_env_stm.jpeg)
+![VSCode env](../images/vscode_env_stm.jpeg)
 
 Goto *PlatformIO Tab -> Project Tasks -> Upload and Monitor*
 
-![VSCode Upload and Monitor](images/vscode_upload_monitor.jpeg)
+![VSCode Upload and Monitor](../images/vscode_upload_monitor.jpeg)
 
 ### CLI
 

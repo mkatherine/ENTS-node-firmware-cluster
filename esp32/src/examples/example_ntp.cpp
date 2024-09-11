@@ -36,8 +36,7 @@ void setup() {
     WiFi.begin(ssid, pass);
 
     // Wait for WiFi to connect
-    while (WiFi.status() != WL_CONNECTED)
-    {
+    while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
     }
@@ -56,7 +55,7 @@ void setup() {
 
 void loop() {
     // Prints time in HH:MM:SS format
-    while(!timeClient.update()) {
+    while (!timeClient.update()) {
         timeClient.forceUpdate();
     }
     currentTime = timeClient.getFormattedTime();

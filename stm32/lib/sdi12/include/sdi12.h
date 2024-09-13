@@ -1,5 +1,6 @@
 /**
  ******************************************************************************
+ * Copyright 2024 jLab
  * @file     sdi12.h
  * @author   Stephen Taylor
  * @brief    This file contains all the driver functions for communication to a
@@ -10,12 +11,11 @@
  ******************************************************************************
  */
 
-#ifndef __SDI12_H__
-#define __SDI12_H__
+#ifndef LIB_SDI12_INCLUDE_SDI12_H_
+#define LIB_SDI12_INCLUDE_SDI12_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stdio.h>
@@ -37,16 +37,14 @@ typedef enum {
 
 
 /* The returned values from a SDI12 get measurment command*/
-typedef struct
-{
+typedef struct {
   char Address;
   uint16_t Time;
   uint8_t NumValues;
 } SDI12_Measure_TypeDef;
 
 /* The relevant data for a TEROS-12 sensor*/
-typedef struct
-{
+typedef struct {
   int ec;
   float vwc_raw;
   float vwc_adj;
@@ -104,4 +102,4 @@ SDI12Status SDI12GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_i
 }
 #endif
 
-#endif /* __SDI12_H__ */
+#endif  // LIB_SDI12_INCLUDE_SDI12_H_

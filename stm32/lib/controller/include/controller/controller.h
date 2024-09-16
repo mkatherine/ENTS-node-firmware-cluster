@@ -6,16 +6,18 @@ extern "C" {
 #endif
 
 /**
- * @brief Initialize the esp32 controller
+ * @brief Shared initialization for all esp32  modules
  * 
- * Currently nothing is done as the i2c peripherial is expected to already be
- * initialized.In the future a quick communication check will happen.
+ * Allocates memory to the tx and rx buffers.
+ * 
+ * @todo Add check for communication with the esp32
  */
 void ControllerInit(void);
 
 /**
- * @brief Deinitialize the esp32 controller
+ * @brief Shared deinitialize for all esp32 modules
  * 
+ * Free memory associated with the tx and rx buffers.
  */
 void ControllerDeinit(void);
 

@@ -183,15 +183,15 @@ size_t EncodeWiFiCommand(
 ) {
   Esp32Command cmd = Esp32Command_init_default;
 
-  cmd.wifi_command.type = type;
-  strcpy(cmd.wifi_command.ssid, ssid);
-  strcpy(cmd.wifi_command.passwd, passwd);
-  strcpy(cmd.wifi_command.url, url);
-  cmd.wifi_command.port = port;
-  cmd.wifi_command.rc = rc;
-  cmd.wifi_command.ts = ts;
-  memcpy(cmd.wifi_command.resp.bytes, resp, resp_len);
-  cmd.wifi_command.resp.size = resp_len;
+  cmd.command.wifi_command.type = type;
+  strcpy(cmd.command.wifi_command.ssid, ssid);
+  strcpy(cmd.command.wifi_command.passwd, passwd);
+  strcpy(cmd.command.wifi_command.url, url);
+  cmd.command.wifi_command.port = port;
+  cmd.command.wifi_command.rc = rc;
+  cmd.command.wifi_command.ts = ts;
+  memcpy(cmd.command.wifi_command.resp.bytes, resp, resp_len);
+  cmd.command.wifi_command.resp.size = resp_len;
 
   return EncodeEsp32Command(&cmd, buffer, size);
 }

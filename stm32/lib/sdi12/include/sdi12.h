@@ -83,7 +83,8 @@ SDI12Status SDI12SendCommand(const char *command, uint8_t size);
 * @return   SDI12Status
 ******************************************************************************
 */
-SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMillis);
+SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize,
+uint16_t timeoutMillis);
 
 /**
 ******************************************************************************
@@ -96,7 +97,9 @@ SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMil
 * @return   SDI12Status
 ******************************************************************************
 */
-SDI12Status SDI12GetMeasurment(uint8_t addr, SDI12_Measure_TypeDef *measurment_info, char *measurment_data, uint16_t timeoutMillis);
+SDI12Status SDI12GetMeasurment(uint8_t addr,
+SDI12_Measure_TypeDef *measurment_info,
+char *measurment_data, uint16_t timeoutMillis);
 
 #ifdef __cplusplus
 }

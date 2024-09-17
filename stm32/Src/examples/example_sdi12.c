@@ -39,7 +39,8 @@ HAL_StatusTypeDef rc;
   * @retval int
   */
 int main(void) {
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  /* Reset of all peripherals, 
+  Initializes the Flash interface and the Systick. */
   HAL_Init();
 
   /* Configure the system clock */
@@ -49,7 +50,10 @@ int main(void) {
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
-  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI); add this back when the rtc is integrated, hopefully this will fix the issue, and than you can remove the nops in SDI12_WakeSensors
+  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+  // Add this back when the rtc is integrated.
+  // Hopefully this will fix the issue.
+  // Then you can remove the nops in SDI12_WakeSensors
   // MX_RTC_Init();
 
   /* Ensure that MSI is wake-up system clock */
@@ -67,8 +71,8 @@ int main(void) {
   // Print the compilation time at startup
   char info_str[128];
   int info_len;
-  info_len = sprintf(
-    info_str,
+  info_len = snprintf(
+    info_str, sizeof(info_str),
     "Soil Power Sensor Wio-E5 firmware, test: %s, compiled on %s %s\n",
     __FILE__, __DATE__, __TIME__);
   HAL_UART_Transmit(&huart1, (const uint8_t *) info_str, info_len, 1000);
@@ -82,7 +86,7 @@ int main(void) {
   while (1) {
     // Print voltage level
     char buf[32];
-    int buf_len = sprintf(buf, "0M!");
+    int buf_len = snprintf(buf, sizeof(buf), "0M!");
 
 
     if (SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK) {

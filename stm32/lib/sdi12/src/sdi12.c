@@ -86,7 +86,7 @@ SDI12Status ParseMeasurementResponse(const char *responseBuffer,
 SDI12Status ParseServiceRequest(const char *requestBuffer, char addr) {
   char expectedResponse[12];
   // Construct the expected response ("a\r\n")
-  sprintf(expectedResponse, "%c\r\n", addr);
+  snprintf(expectedResponse, sizeof(expectedResponse), "%c\r\n", addr);
   // Parse the service request
   // Check if the response matches the expected Active Acknowledge response
   if (memcmp(requestBuffer, expectedResponse, 3) == 0) {
@@ -106,7 +106,7 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
   SDI12Status ret;
 
   // Construct a command to request a measurment
-  uint8_t size = sprintf(reqMeas, "%cM!", addr);
+  uint8_t size = snprintf(reqMeas, sizeof(reqMeas), "%cM!", addr);
 
   char buffer[7];
   // Request a measurment and read the response
@@ -117,7 +117,7 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
   }
 
   // Construct a command to send the data
-  size = sprintf(sendData, "%cD0!", addr);
+  size = snprintf(sendData, sizeof(sendData), "%cD0!", addr);
   // Check if the addresses match from the response above.
   // The response from a teros is the same every
   // time so we're going to leave it for now

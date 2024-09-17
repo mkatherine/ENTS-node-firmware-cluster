@@ -76,53 +76,66 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
 }
 
 void ModuleHandler::ModuleHandler::OnRequest(void) {
-  /** Buffer size for the Wire Arduino library. Determines the max number of
-   * bytes that can be communicated. Varies between platforms but avr uses a
-   * buffer size of 32. */
-  static const int wire_buffer_size = 32;
- 
-  // only call module if nothing in buffer
-  if (this->request_buffer.len == 0) {
-    // forward request to last module received
-    this->request_buffer.len = this->last_module->OnRequest(this->request_buffer.data);
-  }
+  // check if we should send length
+  if (this->send_length) {
+    // send in little-endian
+    uint8_t len_bytes[2] = {};
+    len_bytes[1] = (uint8_t) this->request_buffer.len & 0xFF;
+    len_bytes[0] = (uint8_t) ((this->request_buffer.len >> 8) & 0xFF);
 
-  // check if length is less than size
-  if (this->request_buffer.len > this->request_buffer.size) {
-    // TODO handle error
-  }
+    // write to buffer
+    Wire.write(len_bytes, sizeof(len_bytes));
 
-  // optimization if length is less than buffer size
-  if (this->request_buffer.len < wire_buffer_size-1) {
-    // write finished flag
-    Wire.write(1);
-    // write data to i2c
-    Wire.write(this->request_buffer.data, this->request_buffer.len);
-  }
-
-  // get number of bytes remaining
-  size_t bytes_remaining = this->request_buffer.len - this->request_buffer.idx;
-
-  // check if length is less than buffer size
-  if (bytes_remaining > wire_buffer_size-1) {
-    // write finished flag
-    Wire.write(1);
-    // write directly to i2c
-    Wire.write(this->request_buffer.data, this->request_buffer.len);
-
-    // reset to indicate flushed buffer
-    this->request_buffer.len = 0;
-    this->request_buffer.idx = 0;  
+  // otherwise send data
   } else {
-    // write unfinished flag
-    Wire.write(0);
+    /** Buffer size for the Wire Arduino library. Determines the max number of
+     * bytes that can be communicated. Varies between platforms but avr uses a
+     * buffer size of 32. */
+    static const int wire_buffer_size = 32;
+  
+    // only call module if nothing in buffer
+    if (this->request_buffer.len == 0) {
+      // forward request to last module received
+      this->request_buffer.len = this->last_module->OnRequest(this->request_buffer.data);
+    }
 
-    // write block of data
-    uint8_t* end = this->request_buffer.data + this->request_buffer.idx;
-    Wire.write(end, wire_buffer_size-1);
+    // check if length is less than size
+    if (this->request_buffer.len > this->request_buffer.size) {
+      // TODO handle error
+    }
 
-    // increment idx
-    this->request_buffer.idx += wire_buffer_size-1;
+    // optimization if length is less than buffer size
+    if (this->request_buffer.len < wire_buffer_size-1) {
+      // write finished flag
+      Wire.write(1);
+      // write data to i2c
+      Wire.write(this->request_buffer.data, this->request_buffer.len);
+    }
+
+    // get number of bytes remaining
+    size_t bytes_remaining = this->request_buffer.len - this->request_buffer.idx;
+
+    // check if length is less than buffer size
+    if (bytes_remaining > wire_buffer_size-1) {
+      // write finished flag
+      Wire.write(1);
+      // write directly to i2c
+      Wire.write(this->request_buffer.data, this->request_buffer.len);
+
+      // reset to indicate flushed buffer
+      this->request_buffer.len = 0;
+      this->request_buffer.idx = 0;  
+    } else {
+      // write unfinished flag
+      Wire.write(0);
+
+      // write block of data
+      uint8_t* end = this->request_buffer.data + this->request_buffer.idx;
+      Wire.write(end, wire_buffer_size-1);
+
+      // increment idx
+      this->request_buffer.idx += wire_buffer_size-1;
+    }
   }
 }
 

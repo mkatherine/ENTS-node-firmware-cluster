@@ -111,6 +111,9 @@ namespace ModuleHandler {
 
     /** Request buffer */
     Buffer request_buffer;
+
+    /** Flag to write length on request before sending data */
+    bool send_length;
   }; 
 }
 

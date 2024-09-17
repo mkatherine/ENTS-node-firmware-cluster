@@ -9,6 +9,17 @@
 extern "C" {
 #endif
 
+typedef enum {
+  /** Success */
+  CONTROLLER_SUCCESS = 0,
+  /** General error */
+  CONTROLLER_ERROR,
+  /** Timeout for i2c functions */
+  CONTROLLER_TIMEOUT,
+  /** For mutex violations */
+  CONTROLLER_MUTEX
+} ControllerStatus;
+
 typedef struct {
   /** State in buffer */
   uint8_t* data;
@@ -29,21 +40,21 @@ static Buffer rx = {};
  * 
  * @param timeout Timeout duration in ms
  */
-void ControllerTransmit(unsigned int timeout);
+ControllerStatus ControllerTransmit(unsigned int timeout);
 
 /**
  * @brief Receive bytes from esp32
  * 
  * @param timeout Timeout duration in ms
  */
-void ControllerReceive(unsigned int timeout);
+ControllerStatus ControllerReceive(unsigned int timeout);
 
 /**
  * @brief Send message and receive response from esp32
  * 
  * @param timeout Timeout duration in ms
  */
-void ControllerTransaction(unsigned int timeout);
+ControllerStatus ControllerTransaction(unsigned int timeout);
 
 #ifdef __cplusplus
 }

@@ -11,6 +11,8 @@
  * @date 2023-11-17
 */
 
+#include <stdio.h>
+
 #include "main.h"
 #include "app_lorawan.h"
 #include "usart.h"
@@ -20,9 +22,6 @@
 #include "stm32_timer.h"
 #include "rtc.h"
 #include "sys_app.h"
-
-#include <stdio.h>
-
 
 /** Delay between print statements */
 #ifndef DELAY
@@ -123,7 +122,8 @@ void SystemClock_Config(void) {
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|
+                                     RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
@@ -169,7 +169,7 @@ void Error_Handler(void) {
 
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
-  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  int error_len = snprintf(error, 30, "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, (const uint8_t *) error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

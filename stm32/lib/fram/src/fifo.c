@@ -23,7 +23,7 @@ static uint16_t buffer_len = 0;
  * @param num_bytes 
  */
 static inline void update_addr(uint16_t *addr, const uint16_t num_bytes) {
-  *addr = (*addr + num_bytes) % fram_buffer_size;
+  *addr = (*addr + num_bytes) % kFramBufferSize;
 }
 
 /**
@@ -40,18 +40,18 @@ static uint16_t get_remaining_space(void) {
   if (write_addr > read_addr) {
     space_used = write_addr - read_addr;
   } else if (write_addr < read_addr) {
-    space_used = fram_buffer_size - (read_addr - write_addr);
+    space_used = kFramBufferSize - (read_addr - write_addr);
   } else {
     // if anything is stored in buffer than entire capacity is used
     // otherwise buffer is empty and all free space is available
     if (buffer_len > 0) {
-      space_used = fram_buffer_size;
+      space_used = kFramBufferSize;
     } else {
       space_used = 0;
     }
   }
 
-  uint16_t remaining_space = fram_buffer_size - space_used;
+  uint16_t remaining_space = kFramBufferSize - space_used;
   return remaining_space;
 }
 

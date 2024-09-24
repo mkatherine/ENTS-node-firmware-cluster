@@ -21,8 +21,8 @@
  * @date     11/17/2023 
  */
 
-#ifndef STM32_LIB_FRAM_INCLUDE_FRAM_H_
-#define STM32_LIB_FRAM_INCLUDE_FRAM_H_
+#ifndef LIB_FRAM_INCLUDE_FRAM_H_
+#define LIB_FRAM_INCLUDE_FRAM_H_
 
 #ifdef __cplusplus
 extern "C" {

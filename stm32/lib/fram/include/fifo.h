@@ -21,8 +21,8 @@
  * @date     11/17/2023
  */
 
-#ifndef STM32_LIB_FRAM_INCLUDE_FIFO_H_
-#define STM32_LIB_FRAM_INCLUDE_FIFO_H_
+#ifndef LIB_FRAM_INCLUDE_FIFO_H_
+#define LIB_FRAM_INCLUDE_FIFO_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 /** Amount of bytes that can be stored in the buffer*/
-static const uint16_t fram_buffer_size = FRAM_BUFFER_END - FRAM_BUFFER_START;
+static const uint16_t kFramBufferSize = FRAM_BUFFER_END - FRAM_BUFFER_START;
 
 /**
  * @brief Puts a measurement into the circular buffer
@@ -91,4 +91,4 @@ FramStatus FramBufferClear(void);
 }
 #endif
 
-#endif  // STM32_LIB_FRAM_INCLUDE_FIFO_H_
+#endif  // LIB_FRAM_INCLUDE_FIFO_H_

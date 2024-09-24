@@ -7,11 +7,12 @@
 #include <stdio.h>
 #include <unity.h>
 
-#include "Inc/main.h"
-#include "Inc/i2c.h"
-#include "Inc/usart.h"
-#include "Inc/gpio.h"
-#include "include/fifo.h"
+#include "main.h"
+#include "main_helper.h"
+#include "i2c.h"
+#include "usart.h"
+#include "gpio.h"
+#include "fifo.h"
 
 
 void setUp(void) {
@@ -31,8 +32,8 @@ void test_FramPut_ValidData(void) {
 
 void test_FramPut_BufferFull(void) {
   // Data size is larger than the buffer size
-  uint16_t full_buffer_size = fram_buffer_size + 1;
-  uint8_t data[fram_buffer_size + 1];
+  const uint16_t kFullBufferSize = kFramBufferSize + 1;
+  uint8_t data[kFullBufferSize];
 
   FramStatus status = FramPut(data, sizeof(data));
 
@@ -61,7 +62,7 @@ void test_FramPut_Sequential_BufferFull(void) {
   // starting values
   uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
-  const int niters = fram_buffer_size / (sizeof(data)+1);
+  const int niters = kFramBufferSize / (sizeof(data)+1);
 
   // write 100 times, therefore 1100 bytes (data + len)
   for (int i = 0; i < niters; i++) {
@@ -74,7 +75,7 @@ void test_FramPut_Sequential_BufferFull(void) {
 }
 
 void test_FramGet_BufferEmpty(void) {
-  uint8_t data[fram_buffer_size];
+  uint8_t data[kFramBufferSize];
   uint8_t data_len;
 
   FramStatus status = FramGet(data, &data_len);
@@ -140,7 +141,7 @@ void test_FramGet_Sequential_BufferFull(void) {
   // starting values
   uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
-  const int niters = (fram_buffer_size / (sizeof(data)+1));
+  const int niters = (kFramBufferSize / (sizeof(data)+1));
 
   // write 100 times, therefore 1100 bytes (data + len)
   for (int i = 0; i < niters; i++) {
@@ -213,9 +214,9 @@ void test_FramBuffer_Wraparound(void) {
   const uint8_t block_size = 255;
 
   // number of bytes to get halfway on the address space
-  const uint16_t half_num_bytes = fram_buffer_size / 2;
+  const uint16_t half_num_bytes = kFramBufferSize / 2;
 
-  const uint8_t zeros[fram_buffer_size];
+  const uint8_t zeros[kFramBufferSize];
 
   uint8_t buffer[sizeof(zeros)];
 
@@ -232,7 +233,7 @@ void test_FramBuffer_Wraparound(void) {
     TEST_ASSERT_EQUAL(FRAM_OK, status);
   }
 
-  for (int i = 0; i < (fram_buffer_size / block_size); i++) {
+  for (int i = 0; i < (kFramBufferSize / block_size); i++) {
     // wrap round write head to just behind read
     // -1 is to account for the length byte
     status = FramPut(zeros, block_size);
@@ -247,7 +248,7 @@ void test_FramBuffer_Wraparound(void) {
   * @brief  The application entry point.
   * @retval int
   */
-int main(void) 
+int main(void)
 {
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -293,82 +294,3 @@ int main(void)
   UNITY_END();
   /* USER CODE END 3 */
 }
-
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
-
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3|RCC_CLOCKTYPE_HCLK
-                              |RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
-                              |RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
-}
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
-}
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */

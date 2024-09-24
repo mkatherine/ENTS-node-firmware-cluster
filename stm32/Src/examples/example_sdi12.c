@@ -169,7 +169,7 @@ void Error_Handler(void) {
 
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
-  int error_len = snprintf(error, 30, "Error!  HAL Status: %d\n", rc);
+  int error_len = snprintf(error, sizeof(error), "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, (const uint8_t *) error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

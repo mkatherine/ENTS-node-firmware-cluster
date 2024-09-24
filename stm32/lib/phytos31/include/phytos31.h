@@ -1,3 +1,5 @@
+// Copyright 2024 Jlab sensing
+
 /**
  ******************************************************************************
  * @file     phytos31.h
@@ -12,17 +14,16 @@
  ******************************************************************************
  */
 
-#ifndef __PHYTOS31_H__
-#define __PHYTOS31_H__
+#ifndef LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
+#define LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "ads.h"
+#include "stm32/lib/ads/ads.h"
 
 typedef struct {
     double phytos31_raw;
@@ -69,4 +70,4 @@ size_t Phytos31_measure(uint8_t *data);
 }
 #endif
 
-#endif /* __PHYTOS31_H__ */
+#endif  // LIB_PHYTOS31_INCLUDE_PHYTOS31_H_

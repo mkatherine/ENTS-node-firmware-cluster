@@ -135,8 +135,7 @@ void test_FramRead_MultiplePages(void) {
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
+int main(void) {
   HAL_Init();
 
   SystemClock_Config();

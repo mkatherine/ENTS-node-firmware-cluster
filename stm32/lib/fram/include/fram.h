@@ -125,4 +125,4 @@ configuration ReadSettings(void);
 }
 #endif
 
-#endif  // STM32_LIB_FRAM_INCLUDE_FRAM_H_
+#endif  // LIB_FRAM_INCLUDE_FRAM_H_

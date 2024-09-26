@@ -1,3 +1,5 @@
+// Copyright 2023 UCSC
+
 /**
  * @file test_fram.c
  * @brief Tests the fram library
@@ -7,6 +9,7 @@
 #include <unity.h>
 
 #include "main.h"
+#include "main_helper.h"
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
@@ -19,7 +22,7 @@ void setUp(void) {}
 */
 void tearDown(void) {}
 
-void test_i2c(void){
+void test_i2c(void) {
   uint8_t test = 185;
   uint8_t received;
 
@@ -65,7 +68,7 @@ void test_FramWrite_ZeroLength(void) {
 }
 
 void test_FramWrite_MultiplePages(void) {
-  uint8_t data [] = {1, 2, 3, 4, 5};
+  uint8_t data[] = {1, 2, 3, 4, 5};
   // right below the segment size
   uint16_t addr = FRAM_SEG_SIZE-1;
 
@@ -118,11 +121,11 @@ void test_FramRead_MultiplePages(void) {
   // right below the segment size
   uint16_t addr = FRAM_SEG_SIZE-1;
 
-  uint8_t write_data[] = {1, 2, 3, 4, 5}; 
+  uint8_t write_data[] = {1, 2, 3, 4, 5};
   FramWrite(addr, write_data, sizeof(write_data));
 
   uint8_t read_data[5];
-  FramStatus status = FramRead(addr, sizeof(read_data), read_data);  
+  FramStatus status = FramRead(addr, sizeof(read_data), read_data);
 
   TEST_ASSERT_EQUAL(FRAM_OK, status);
   TEST_ASSERT_EQUAL_UINT8_ARRAY(write_data, read_data, 5);
@@ -132,8 +135,7 @@ void test_FramRead_MultiplePages(void) {
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
+int main(void) {
   HAL_Init();
 
   SystemClock_Config();
@@ -151,90 +153,11 @@ int main(void)
   RUN_TEST(test_i2c);
   RUN_TEST(test_FramWrite_ValidData);
   RUN_TEST(test_FramWrite_ZeroLength);
-  RUN_TEST(test_FramWrite_OutOfRange); 
+  RUN_TEST(test_FramWrite_OutOfRange);
   RUN_TEST(test_FramWrite_MultiplePages);
   RUN_TEST(test_FramRead_ValidData);
   RUN_TEST(test_FramRead_ZeroLength);
-  RUN_TEST(test_FramRead_OutOfRange); 
+  RUN_TEST(test_FramRead_OutOfRange);
   RUN_TEST(test_FramRead_MultiplePages);
   UNITY_END();
 }
-
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
-
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3|RCC_CLOCKTYPE_HCLK
-                              |RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
-                              |RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
-}
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
-}
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */

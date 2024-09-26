@@ -7,8 +7,8 @@
  * @date 2023-11-27
  */
 
-#ifndef UNITY_CONFIG_H
-#define UNITY_CONFIG_H
+#ifndef TEST_UNITY_CONFIG_H_
+#define TEST_UNITY_CONFIG_H_
 
 #include "usart.h"
 
@@ -46,6 +46,6 @@ void UnityOutputChar(char c);
 
 #ifdef __cplusplus
 }
-#endif /* extern "C" */
+#endif  // extern "C"
 
-#endif /* UNITY_CONFIG_H */
+#endif  // TEST_UNITY_CONFIG_H_

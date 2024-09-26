@@ -18,7 +18,7 @@
         "--recursive",
         "stm32/Src/examples",
         "stm32/lib",
-        "stm32/tests",
+        "stm32/test",
         "esp32/include",
         "esp32/src",
         "esp32/test",

@@ -1,6 +1,6 @@
 /**
  * @brief Main file for the Soil Power Sensor firmware
- * 
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-28
  */
@@ -23,15 +23,16 @@ const size_t data_len = 12;
 
 /**
  * @brief Initialization code run on startup
- * 
- * 
-*/
-void setup()
-{
+ *
+ *
+ */
+void setup() {
   // Start serial interface
   Serial.begin(115200);
   // Wait for serial connection
-  while (!Serial) { delay(100); }
+  while (!Serial) {
+    delay(100);
+  }
 
   Serial.print("SSID: ");
   Serial.println(ssid);
@@ -43,8 +44,7 @@ void setup()
   WiFi.begin(ssid, pass);
 
   // Wait for WiFi to connect
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -54,16 +54,15 @@ void setup()
   Serial.println(WiFi.localIP());
 }
 
-void loop()
-{
+void loop() {
   // Buffer to store response
   static uint8_t resp[256];
   static size_t resp_len;
 
   // Send example measurement
-  resp_len = api.SendMeasurement((const uint8_t*) data, data_len);
+  resp_len = api.SendMeasurement((const uint8_t*)data, data_len);
 
   // Print response
   Serial.print("Response:");
-  Serial.println((char*) resp);
+  Serial.println(reinterpret_cast<char*>(resp));
 }

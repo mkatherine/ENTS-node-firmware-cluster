@@ -9,8 +9,8 @@
  * Copyright [2023] <Stephen Taylor>
  */
 
-#ifndef STM32_LIB_ADS_INCLUDE_ADS_H_
-#define STM32_LIB_ADS_INCLUDE_ADS_H_
+#ifndef LIB_ADS_INCLUDE_ADS_H_
+#define LIB_ADS_INCLUDE_ADS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,6 +117,4 @@ size_t ADC_measure(uint8_t *data);
 }
 #endif
 
-#endif  // STM32_LIB_ADS_INCLUDE_ADS_H_
-
-/* USER CODE END 1 */
+#endif  // LIB_ADS_INCLUDE_ADS_H_

@@ -17,6 +17,10 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "adc.h"
 #include "app_lorawan.h"
 #include "dma.h"
@@ -26,9 +30,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "ads.h"
 #include "rtc.h"
@@ -110,9 +111,9 @@ int main(void) {
   // Print the compilation time at startup
   char info_str[100];
   int info_len;
-  info_len = sprintf(info_str,
-                     "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
-                     __DATE__, __TIME__);
+  info_len = snprintf(info_str, sizeof(info_str),
+                      "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
+                      __DATE__, __TIME__);
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
 
   /* USER CODE BEGIN 2 */
@@ -135,12 +136,14 @@ int main(void) {
 
     /* USER CODE BEGIN 3 */
     voltage_reading = ADC_readVoltage();
-    reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
+    reading_len =
+        snprintf(output, sizeof(output), "Voltage: %f\r\n", voltage_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *)output, reading_len,
                       HAL_MAX_DELAY);
 
     current_reading = ADC_readCurrent();
-    reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
+    reading_len =
+        snprintf(output2, sizeof(output), "Current: %f\r\n", current_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *)output2, reading_len,
                       HAL_MAX_DELAY);
 
@@ -207,7 +210,8 @@ void SystemClock_Config(void) {
 void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
-  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  int error_len =
+      snprintf(error, sizeof(error), "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

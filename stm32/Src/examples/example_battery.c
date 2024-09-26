@@ -56,8 +56,8 @@ int main(void) {
   // Print the compilation time at startup
   char info_str[128];
   int info_len;
-  info_len = sprintf(
-      info_str,
+  info_len = snprintf(
+      info_str, sizeof(info_str),
       "Soil Power Sensor Wio-E5 firmware, test: %s, compiled on %s %s\n",
       __FILE__, __DATE__, __TIME__);
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
@@ -66,7 +66,8 @@ int main(void) {
   while (1) {
     // Print voltage level
     char buf[32];
-    int buf_len = sprintf(buf, "Battery Voltage: %d mV\n", battery_voltage());
+    int buf_len = snprintf(buf, sizeof(buf), "Battery Voltage: %d mV\n",
+                           battery_voltage());
     HAL_UART_Transmit(&huart1, (const uint8_t *)buf, buf_len, 1000);
 
     // Sleep
@@ -134,7 +135,8 @@ void Error_Handler(void) {
 
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
-  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  int error_len =
+      snprintf(error, sizeof(error), "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

@@ -10,8 +10,8 @@
  * @date 2023-11-16
  */
 
-#ifndef __BATTERY_H__
-#define __BATTERY_H__
+#ifndef LIB_BATTERY_INCLUDE_BATTERY_H_
+#define LIB_BATTERY_INCLUDE_BATTERY_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,4 +39,4 @@ unsigned int battery_voltage(void);
 }
 #endif
 
-#endif /* __BATTERY_H__*/
+#endif  // LIB_BATTERY_INCLUDE_BATTERY_H_

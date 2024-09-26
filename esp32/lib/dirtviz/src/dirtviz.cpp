@@ -28,13 +28,12 @@ void Dirtviz::SetUrl(const char *new_url) {
   ++url_len;
 
   // allocate memory
-  char *temp_url = (char *)realloc(this->url, url_len);
+  char *temp_url = reinterpret_cast<char *>(realloc(this->url, url_len));
 
   if (temp_url != nullptr) {
     this->url = temp_url;
-    strcpy(
-        this->url,
-        new_url);  // strcpy is safe here because we just allocated enough space
+    // strcpy is safe here because we just allocated enough space
+    strncpy(this->url, new_url, url_len);
   } else {
     // Handle allocation failure (e.g., set an error flag, use a default URL,
     // etc.)
@@ -77,7 +76,7 @@ int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   // type of data
   client.println("Content-Type: application/octet-stream");
   // length of data (specific to application/octet-stream)
-  sprintf(buffer, "Content-Length: %d", meas_len);
+  snprintf(buffer, sizeof(buffer), "Content-Length: %d", meas_len);
   client.println(buffer);
   // close connection after data is sent
   client.println("Connection: close");
@@ -98,7 +97,8 @@ int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   this->response = nullptr;
 
   // allocate memory
-  this->response = (char *)realloc(this->response, resp_len + 1);
+  this->response =
+      reinterpret_cast<char *>(realloc(this->response, resp_len + 1));
 
   // copy into buffer
   if (this->response != nullptr) {

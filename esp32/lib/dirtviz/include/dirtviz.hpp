@@ -7,6 +7,9 @@
  * @date 2023-11-29
  */
 
+#ifndef LIB_DIRTVIZ_INCLUDE_DIRTVIZ_HPP_
+#define LIB_DIRTVIZ_INCLUDE_DIRTVIZ_HPP_
+
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
@@ -97,3 +100,5 @@ class Dirtviz {
    */
   size_t GetResponse(const uint8_t *data) const;
 };
+
+#endif  // LIB_DIRTVIZ_INCLUDE_DIRTVIZ_HPP_

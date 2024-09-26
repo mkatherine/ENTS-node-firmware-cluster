@@ -14,8 +14,8 @@
  * @date 2024-01-04
  */
 
-#ifndef __TRANSCODER_H__
-#define __TRANSCODER_H__
+#ifndef PROTO_C_INCLUDE_TRANSCODER_H_
+#define PROTO_C_INCLUDE_TRANSCODER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,4 +108,4 @@ Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len);
 }
 #endif
 
-#endif /* __TRANSCODER_H__ */
+#endif  // PROTO_C_INCLUDE_TRANSCODER_H_

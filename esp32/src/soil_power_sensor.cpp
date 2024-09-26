@@ -64,5 +64,5 @@ void loop() {
 
   // Print response
   Serial.print("Response:");
-  Serial.println((char*)resp);
+  Serial.println(reinterpret_cast<char*>(resp));
 }

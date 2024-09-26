@@ -12,7 +12,7 @@
  **/
 
 /* Includes ------------------------------------------------------------------*/
-#include "../include/ads.h"
+#include "ads.h"
 
 #include <stm32wlxx_hal_gpio.h>
 

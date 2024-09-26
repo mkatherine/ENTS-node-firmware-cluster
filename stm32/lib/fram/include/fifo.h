@@ -30,8 +30,8 @@ extern "C" {
 
 #include <stdio.h>
 
-#include "Inc/i2c.h"
-#include "include/fram.h"
+#include "fram.h"
+#include "i2c.h"
 
 #ifndef FRAM_BUFFER_START
 /** Starting address of buffer */

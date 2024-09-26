@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 
+#include "stm32wlxx_hal.h"
+
 /**
  * @brief Initializes the battery monitoring module.
  *

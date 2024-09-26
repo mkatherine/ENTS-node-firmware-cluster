@@ -24,7 +24,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "stm32/lib/ads/ads.h"
+#include "ads.h"
 
 typedef struct {
   double phytos31_raw;

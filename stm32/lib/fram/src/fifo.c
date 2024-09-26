@@ -8,7 +8,7 @@
  * @see fifo.h
  **/
 
-#include "include/fifo.h"
+#include "fifo.h"
 
 static uint16_t read_addr = FRAM_BUFFER_START;
 static uint16_t write_addr = FRAM_BUFFER_START;

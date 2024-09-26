@@ -31,7 +31,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 
-#include "Inc/i2c.h"
+#include "i2c.h"
 
 #ifndef FRAM_PAGES
 /** Number of pages on the fram chip */

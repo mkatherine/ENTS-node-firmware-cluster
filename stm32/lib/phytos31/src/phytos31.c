@@ -12,13 +12,13 @@
  ******************************************************************************
  */
 
-#include "stm32/lib/phytos31/include/phytos31.h"
+#include "phytos31.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "proto/c/include/transcoder.h"
+#include "transcoder.h"
 
 HAL_StatusTypeDef Phytos31Init() { return ADC_init(); }
 

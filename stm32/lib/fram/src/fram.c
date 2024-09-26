@@ -8,7 +8,7 @@
  *
  * Copyright 2023 jLab, UCSC MIT License
  */
-#include "include/fram.h"
+#include "fram.h"
 
 /** Timeout in seconds for the FRAM chip */
 const uint32_t fram_timeout = 100;

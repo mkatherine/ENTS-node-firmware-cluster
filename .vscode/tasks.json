@@ -19,12 +19,12 @@
         "stm32/Src/examples",
         "stm32/lib",
         "stm32/tests",
-        "esp32/Inc",
-        "esp32/Src",
+        "esp32/include",
+        "esp32/src",
         "esp32/test",
         "esp32/lib",
         "proto/c/include/transcoder.h",
-        "proto/c/include/transcoder.c"
+        "proto/c/src/transcoder.c"
       ],
       "problemMatcher": []
     },

@@ -6,35 +6,30 @@
 #include <stdio.h>
 #include <unity.h>
 
+#include "fram.h"
+#include "gpio.h"
+#include "i2c.h"
 #include "main.h"
 #include "main_helper.h"
-#include "i2c.h"
 #include "usart.h"
-#include "gpio.h"
-#include "fram.h"
 
-void setUp(void) {
-
-}
+void setUp(void) {}
 
 /**
  * @brief Tear down code that runs at the end of every test
-*/
+ */
 void tearDown(void) {}
 
-void test_GetTick(void){
+void test_GetTick(void) {
   uint32_t ticks = HAL_GetTick();
-  TEST_ASSERT_NOT_EQUAL(ticks, 0); // if zero, it means timer was never started
+  TEST_ASSERT_NOT_EQUAL(ticks, 0);  // if zero, it means timer was never started
 }
 
-
-
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -61,7 +56,7 @@ int main(void)
 
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
-      __NOP();
+    __NOP();
   }
 
   UNITY_BEGIN();

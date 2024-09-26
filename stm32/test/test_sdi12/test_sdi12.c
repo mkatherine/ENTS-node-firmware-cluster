@@ -6,18 +6,17 @@
 #include <stdio.h>
 #include <unity.h>
 
+#include "gpio.h"
+#include "i2c.h"
 #include "main.h"
 #include "main_helper.h"
-#include "i2c.h"
-#include "usart.h"
-#include "gpio.h"
 #include "sdi12.h"
+#include "usart.h"
 
 /**
  * @brief Generated from CubeMX
-*/
+ */
 void SystemClock_Config(void);
-
 
 void setUp(void) {}
 
@@ -34,24 +33,22 @@ void test_SDI12_SendCommand_success(void) {
   TEST_ASSERT_EQUAL(SDI12_OK, status);
 }
 
-void test_SDI12_Read_success(void) {
-  TEST_IGNORE();
-}
+void test_SDI12_Read_success(void) { TEST_IGNORE(); }
 
 void test_SDI12_GetMeasurment_success(void) {
   SDI12Status status;
   uint8_t addr = '0';
   SDI12_Measure_TypeDef measurment_info;
   char buffer[20];
-  status = SDI12GetMeasurment(addr, &measurment_info, buffer,  1000);
+  status = SDI12GetMeasurment(addr, &measurment_info, buffer, 1000);
 
   TEST_ASSERT_EQUAL(SDI12_OK, status);
 }
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void) {
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -77,7 +74,7 @@ int main(void) {
 
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
-      __NOP();
+    __NOP();
   }
 
   UNITY_BEGIN();

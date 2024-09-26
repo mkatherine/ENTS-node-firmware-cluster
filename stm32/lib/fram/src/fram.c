@@ -3,8 +3,9 @@
 /**
  * @file     fram.c
  * @author   Stephen Taylor
- * @brief    This file contains all the function definitions for the fram library. 
- * 
+ * @brief    This file contains all the function definitions for the fram
+ * library.
+ *
  * Copyright 2023 jLab, UCSC MIT License
  */
 #include "include/fram.h"
@@ -43,12 +44,12 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
-  for (uint8_t *d = data; d < data+len; d++) {
+  for (uint8_t *d = data; d < data + len; d++) {
     FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory
     // pages are zero indexed
-    if (addr_mat.page > FRAM_PAGES-1) {
+    if (addr_mat.page > FRAM_PAGES - 1) {
       return FRAM_OUT_OF_RANGE;
     }
 
@@ -77,7 +78,7 @@ FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data) {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
-  for (uint8_t *d = data; d < data+len; d++) {
+  for (uint8_t *d = data; d < data + len; d++) {
     FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory

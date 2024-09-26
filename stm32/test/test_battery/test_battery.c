@@ -1,55 +1,54 @@
 /**
  * @file test_battery.c
  * @brief unit test for battery.c
- * 
+ *
  * @author Ahmed Falah <ahmed.falah600@gmail.com>
  * @date 2024-03-18
-*/
-
-#include "main.h"
-#include "main_helper.h"
-#include "usart.h"
-#include "gpio.h"
+ */
 
 #include <stdio.h>
-
 #include <unity.h>
 
 #include "battery.h"
+#include "gpio.h"
+#include "main.h"
+#include "main_helper.h"
+#include "usart.h"
 
 void SystemClock_Config(void);
-  
 
 /**
  * @brief Setup code that runs at the start of every test
-*/
+ */
 void setUp(void) {}
 
 /**
  * @brief Tear down code that runs at the end of every test
-*/
+ */
 void tearDown(void) {}
 
 // Test case for battery_init
 void test_battery_init_success(void) {
-    HAL_StatusTypeDef ret = battery_init();
-    // Assert successful initialization
-    TEST_ASSERT_EQUAL(HAL_OK, ret);
-    /* We can add conditions based on the return status of the battery_init()*/
+  HAL_StatusTypeDef ret = battery_init();
+  // Assert successful initialization
+  TEST_ASSERT_EQUAL(HAL_OK, ret);
+  /* We can add conditions based on the return status of the battery_init()*/
 }
 
 // Test case for battery_voltage valid reading
 void test_battery_voltage_stability(void) {
   // Threshold for voltage change
   const int MAX_VOLTAGE_CHANGE = 100;
-  // Calling battery_voltage() function multiple times with delay between readings
+  // Calling battery_voltage() function multiple times with delay between
+  // readings
   unsigned int voltage1 = battery_voltage();
-  HAL_Delay(1000); // Delay 1sec 
+  HAL_Delay(1000);  // Delay 1sec
   unsigned int voltage2 = battery_voltage();
 
   // Assert that the change in voltage is within the threshold
-  TEST_ASSERT_INT_WITHIN_MESSAGE(-MAX_VOLTAGE_CHANGE, MAX_VOLTAGE_CHANGE, voltage2 - voltage1,
-                                    "Battery voltage changed excessively between readings.");
+  TEST_ASSERT_INT_WITHIN_MESSAGE(
+      -MAX_VOLTAGE_CHANGE, MAX_VOLTAGE_CHANGE, voltage2 - voltage1,
+      "Battery voltage changed excessively between readings.");
 }
 
 // void test_battery_voltage_usb_power(void) {
@@ -67,22 +66,23 @@ void test_battery_voltage_stability(void) {
 //   average_voltage /= 5;
 //   // Expected voltage range for USB power
 //   const int EXPECTED_USB_VOLTAGE = (VOLTAGE_REF * 1000) / FULL_SCALE; // mV
-//   const int USB_VOLTAGE_TOLERANCE = 200; 
+//   const int USB_VOLTAGE_TOLERANCE = 200;
 //   // Assert that the average voltage is within the expected range
-//   TEST_ASSERT_INT_WITHIN_MESSAGE(EXPECTED_USB_VOLTAGE - USB_VOLTAGE_TOLERANCE,
-//                                  EXPECTED_USB_VOLTAGE + USB_VOLTAGE_TOLERANCE,
-//                                  average_voltage,
-//                                  "Battery voltage under USB power is outside expected range.");
+//   TEST_ASSERT_INT_WITHIN_MESSAGE(EXPECTED_USB_VOLTAGE -
+//   USB_VOLTAGE_TOLERANCE,
+//                                  EXPECTED_USB_VOLTAGE +
+//                                  USB_VOLTAGE_TOLERANCE, average_voltage,
+//                                  "Battery voltage under USB power is outside
+//                                  expected range.");
 // }
 
-
 /**
-  * @brief Entry point for protobuf test
-  * @retval int
-  */
-int main(void)
-{
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ * @brief Entry point for protobuf test
+ * @retval int
+ */
+int main(void) {
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* Configure the system clock */
@@ -91,10 +91,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  
+
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
-      __NOP();
+    __NOP();
   }
 
   // Unit testing
@@ -102,6 +102,6 @@ int main(void)
   // Run all the tests
   RUN_TEST(test_battery_init_success);
   RUN_TEST(test_battery_voltage_stability);
-  //RUN_TEST(test_battery_voltage_usb_power);
+  // RUN_TEST(test_battery_voltage_usb_power);
   UNITY_END();
 }

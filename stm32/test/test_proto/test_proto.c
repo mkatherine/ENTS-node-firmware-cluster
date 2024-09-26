@@ -1,29 +1,24 @@
 /**
  * @file test_proto.c
  * @brief Tests ability to encode and decode protobuf messages
- * 
+ *
  * Encoding/decoding of each message type is tested to ensure functionality of
  * nanopb and correctly matched tests with generate protobuf source files.
- * 
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-27
-*/
-
-#include "main.h"
-#include "main_helper.h"
-#include "usart.h"
-#include "gpio.h"
+ */
 
 #include <stdio.h>
-
 #include <unity.h>
 
-#include "pb_encode.h"
+#include "gpio.h"
+#include "main.h"
+#include "main_helper.h"
 #include "pb_decode.h"
-
+#include "pb_encode.h"
 #include "soil_power_sensor.pb.h"
-
-
+#include "usart.h"
 
 #ifndef UNIX_EPOCHS
 /** Unix epochs encoded in timestamp. Default corresponds to Mon Nov 27 2023
@@ -36,9 +31,7 @@
 #define FLOAT_DELTA 1e-4
 #endif /* FLOAT_DELTA */
 
-
 void SystemClock_Config(void);
-  
 
 /** Buffer for encoded data */
 uint8_t buffer[256];
@@ -55,27 +48,25 @@ bool status;
 
 /**
  * @brief Default MeasurementMetadata
- * 
+ *
  * Uses as submessage when testing parent messages. Defaults to zeros with
  * ts_default
- * 
+ *
  * @see ts_default
-*/
+ */
 MeasurementMetadata meta_default;
 
 /**
  * @brief Setup code that runs at the start of every test
- * 
+ *
  * Creates required variables that are shared between all tests. The output
  * buffer is initialized based on length of the buffer. Input buffer is defined,
  * but not initialized since it depends on the message length. Default values
  * are defined for Timestamp and MeasurementMetadata.
-*/
-void setUp(void)
-{
+ */
+void setUp(void) {
   // create output buffer
   ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-
 
   // Set default measurement metadata
   meta_default.ts = UNIX_EPOCHS;
@@ -85,11 +76,10 @@ void setUp(void)
 
 /**
  * @brief Tear down code that runs at the end of every test
-*/
+ */
 void tearDown(void) {}
 
-void test_meta(void)
-{
+void test_meta(void) {
   MeasurementMetadata meta_encode = MeasurementMetadata_init_zero;
 
   meta_encode.ts = UNIX_EPOCHS;
@@ -102,7 +92,6 @@ void test_meta(void)
   TEST_ASSERT_TRUE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
 
-
   MeasurementMetadata meta_decode;
 
   istream = pb_istream_from_buffer(buffer, msg_len);
@@ -114,11 +103,9 @@ void test_meta(void)
   TEST_ASSERT_EQUAL(1, meta_decode.logger_id);
 
   TEST_ASSERT_EQUAL(UNIX_EPOCHS, meta_decode.ts);
-
 }
 
-void test_power(void)
-{
+void test_power(void) {
   Measurement power_encode = Measurement_init_zero;
   power_encode.which_measurement = Measurement_power_tag;
   power_encode.has_meta = true;
@@ -131,7 +118,6 @@ void test_power(void)
 
   TEST_ASSERT_TRUE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
-
 
   Measurement power_decode;
 
@@ -154,8 +140,7 @@ void test_power(void)
                             power_decode.measurement.power.current);
 }
 
-void test_teros12(void)
-{
+void test_teros12(void) {
   Measurement teros12_encode = Measurement_init_zero;
   teros12_encode.which_measurement = Measurement_teros12_tag;
   teros12_encode.has_meta = true;
@@ -170,7 +155,6 @@ void test_teros12(void)
 
   TEST_ASSERT_TRUE(status);
   TEST_ASSERT_GREATER_THAN(0, msg_len);
-
 
   Measurement teros12_decode;
 
@@ -196,16 +180,14 @@ void test_teros12(void)
                             teros12_decode.measurement.teros12.vwc_raw);
 }
 
-void test_response(void)
-{
+void test_response(void) {
   Response response_encode = Response_init_zero;
   response_encode.resp = Response_ResponseType_SUCCESS;
 
   status = pb_encode(&ostream, Response_fields, &response_encode);
   msg_len = ostream.bytes_written;
-  
-  TEST_ASSERT_TRUE(status);
 
+  TEST_ASSERT_TRUE(status);
 
   Response response_decode;
 
@@ -217,14 +199,13 @@ void test_response(void)
   TEST_ASSERT_EQUAL(Response_ResponseType_SUCCESS, response_decode.resp);
 }
 
-
 /**
-  * @brief Entry point for protobuf test
-  * @retval int
-  */
-int main(void)
-{
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ * @brief Entry point for protobuf test
+ * @retval int
+ */
+int main(void) {
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* Configure the system clock */
@@ -233,10 +214,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  
+
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
-      __NOP();
+    __NOP();
   }
 
   // Unit testing

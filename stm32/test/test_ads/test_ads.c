@@ -6,16 +6,14 @@
 #include <stdio.h>
 #include <unity.h>
 
+#include "ads.h"
+#include "fifo.h"
+#include "gpio.h"
+#include "i2c.h"
 #include "main.h"
 #include "main_helper.h"
-#include "i2c.h"
-#include "usart.h"
-#include "gpio.h"
 #include "sys_app.h"
-
-#include "fifo.h"
-#include "ads.h"
-
+#include "usart.h"
 
 void setUp(void) {}
 
@@ -42,16 +40,15 @@ void test_ADC_readCurrent(void) {
   TEST_ASSERT_NOT_EQUAL(curr, -1);
 }
 
-
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -73,7 +70,7 @@ int main(void)
 
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
-      __NOP();
+    __NOP();
   }
 
   UNITY_BEGIN();

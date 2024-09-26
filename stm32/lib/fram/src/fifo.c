@@ -4,7 +4,7 @@
  * @file    fifo.c
  * @author  Stephen Taylor
  * @date    11/17/2023
- * 
+ *
  * @see fifo.h
  **/
 
@@ -18,9 +18,9 @@ static uint16_t buffer_len = 0;
 
 /**
  * @brief Updates circular buffer address based on number of bytes
- * 
- * @param addr 
- * @param num_bytes 
+ *
+ * @param addr
+ * @param num_bytes
  */
 static inline void update_addr(uint16_t *addr, const uint16_t num_bytes) {
   *addr = (*addr + num_bytes) % kFramBufferSize;
@@ -28,11 +28,11 @@ static inline void update_addr(uint16_t *addr, const uint16_t num_bytes) {
 
 /**
  * @brief Get the remaining space in the buffer
- * 
+ *
  * Calculates the difference between the write and read address in a single
  * forward direction in the circular buffer. If they are equal then nothing has
  * been written.
- * 
+ *
  * @return Remaining space in bytes
  */
 static uint16_t get_remaining_space(void) {
@@ -57,7 +57,7 @@ static uint16_t get_remaining_space(void) {
 
 FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   // check remaining space
-  if (num_bytes+1 > get_remaining_space()) {
+  if (num_bytes + 1 > get_remaining_space()) {
     return FRAM_BUFFER_FULL;
   }
 
@@ -110,9 +110,7 @@ FramStatus FramGet(uint8_t *data, uint8_t *len) {
   return FRAM_OK;
 }
 
-uint16_t FramBufferLen(void) {
-  return buffer_len;
-}
+uint16_t FramBufferLen(void) { return buffer_len; }
 
 FramStatus FramBufferClear(void) {
   // Set read and write addresses to their default values

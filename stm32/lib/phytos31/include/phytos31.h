@@ -6,8 +6,8 @@
  * @author   Stephen Taylor
  * @brief    This file contains all the function prototypes for
  *           the phytos31.c file.
- * 
- *           This library is designed to read measurements from a PHYTOS-31 
+ *
+ *           This library is designed to read measurements from a PHYTOS-31
  *           sensor from METER.
  *           https://metergroup.com/products/phytos-31/
  * @date     4/18/2024
@@ -23,16 +23,17 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "stm32/lib/ads/ads.h"
 
 typedef struct {
-    double phytos31_raw;
-    double phytos31_calibrated;
+  double phytos31_raw;
+  double phytos31_calibrated;
 } phytos_measurments;
 
 /**
 ******************************************************************************
-* @brief    Wrapper function for the ADC initilization. 
+* @brief    Wrapper function for the ADC initilization.
 *
 * @param    void
 * @return   HAL_StatusTypeDef
@@ -53,15 +54,15 @@ phytos_measurments Phytos31GetMeasurment(void);
 
 /**
  * @brief Read PHYTOS31 sensor and serialize measurement
- * 
+ *
  * The voltage output of the PHYTOS31 is measured. A calibration is applied
  * to convert voltage into a leaf wetness measurement.
- * 
+ *
  * Current voltage and leaf wetness are the same value, until a calibration
  * is obtained.
- * 
+ *
  * @note Implemented for the sensors library
- * 
+ *
  * @see SensorsPrototypeMeasure
  */
 size_t Phytos31_measure(uint8_t *data);

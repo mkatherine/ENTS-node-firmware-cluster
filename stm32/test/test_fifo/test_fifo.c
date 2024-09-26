@@ -7,17 +7,14 @@
 #include <stdio.h>
 #include <unity.h>
 
+#include "fifo.h"
+#include "gpio.h"
+#include "i2c.h"
 #include "main.h"
 #include "main_helper.h"
-#include "i2c.h"
 #include "usart.h"
-#include "gpio.h"
-#include "fifo.h"
 
-
-void setUp(void) {
-  FramBufferClear();
-}
+void setUp(void) { FramBufferClear(); }
 
 void tearDown(void) {}
 
@@ -62,7 +59,7 @@ void test_FramPut_Sequential_BufferFull(void) {
   // starting values
   uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
-  const int niters = kFramBufferSize / (sizeof(data)+1);
+  const int niters = kFramBufferSize / (sizeof(data) + 1);
 
   // write 100 times, therefore 1100 bytes (data + len)
   for (int i = 0; i < niters; i++) {
@@ -141,7 +138,7 @@ void test_FramGet_Sequential_BufferFull(void) {
   // starting values
   uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
-  const int niters = (kFramBufferSize / (sizeof(data)+1));
+  const int niters = (kFramBufferSize / (sizeof(data) + 1));
 
   // write 100 times, therefore 1100 bytes (data + len)
   for (int i = 0; i < niters; i++) {
@@ -245,13 +242,13 @@ void test_FramBuffer_Wraparound(void) {
 }
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void) {
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface 
+  /* Reset of all peripherals, Initializes the Flash interface
   and the Systick. */
   HAL_Init();
 
@@ -273,7 +270,7 @@ int main(void) {
 
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
-      __NOP();
+    __NOP();
   }
 
   UNITY_BEGIN();

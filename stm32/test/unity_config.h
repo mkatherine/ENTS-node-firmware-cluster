@@ -1,11 +1,11 @@
 /**
  * @brief Unity test framework configuration for STM32 HAL libraries
- * 
- * 
- * 
+ *
+ *
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-27
-*/
+ */
 
 #ifndef UNITY_CONFIG_H
 #define UNITY_CONFIG_H
@@ -29,15 +29,14 @@
 #define UART_TIMEOUT 1000
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /**
  * @brief Transmits single charater to USART1
- * 
+ *
  * The return code is checked. Requires the USART library to be initialized.
- * 
+ *
  * @param c Character to transmit
  */
 void UnityOutputChar(char c);

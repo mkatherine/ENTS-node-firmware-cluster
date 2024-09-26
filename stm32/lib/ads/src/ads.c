@@ -1,14 +1,15 @@
 /**
-  ******************************************************************************
-  * @file    ads.c
-  * @author  Stephen Taylor
-  * @brief   Soil Power Sensor ADS12 library
-  *          This file provides a function to read from the onboard ADC (ADS1219).
-  * @date    11/27/2023
-  *
-  ******************************************************************************
-  * Copyright [2023] <Stephen Taylor>
-  **/
+ ******************************************************************************
+ * @file    ads.c
+ * @author  Stephen Taylor
+ * @brief   Soil Power Sensor ADS12 library
+ *          This file provides a function to read from the onboard ADC
+ *(ADS1219).
+ * @date    11/27/2023
+ *
+ ******************************************************************************
+ * Copyright [2023] <Stephen Taylor>
+ **/
 
 /* Includes ------------------------------------------------------------------*/
 #include "../include/ads.h"
@@ -17,14 +18,14 @@
 
 /**
  * @brief GPIO port for adc data ready line
- * 
+ *
  * @see data_ready_pin
  */
 const GPIO_TypeDef* data_ready_port = GPIOC;
 
 /**
  * @brief GPIO pin for adc data ready line
- * 
+ *
  */
 const uint16_t data_ready_pin = GPIO_PIN_0;
 
@@ -65,8 +66,8 @@ HAL_StatusTypeDef ADC_init(void) {
 
   // Set control register, leaving everything at default except for the VREF,
   // which will be set to external reference mode
-  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE,
-                                register_data, 2, HAL_MAX_DELAY);
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2,
+                                HAL_MAX_DELAY);
   if (ret != HAL_OK) {
     return ret;
   }
@@ -92,8 +93,8 @@ HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
 
   // Set control register, leaving everything at default except for the VREF,
   // which will be set to external reference mode
-  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE,
-                                register_data, 2, HAL_MAX_DELAY);
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, register_data, 2,
+                                HAL_MAX_DELAY);
   if (ret != HAL_OK) {
     return ret;
   }
@@ -102,7 +103,7 @@ HAL_StatusTypeDef ADC_configure(uint8_t reg_data) {
   // Send a start code
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
   return ret;
-  }
+}
 
 double ADC_readVoltage(void) {
   uint8_t code;
@@ -117,7 +118,8 @@ double ADC_readVoltage(void) {
   }
 
   // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
-  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)) {}
+  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)) {
+  }
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
   if (ret != HAL_OK) {
@@ -129,12 +131,12 @@ double ADC_readVoltage(void) {
   }
 
   // Combine the 3 bytes into a 24-bit value
-  int32_t temp = ((int32_t)rx_data[0] << 16) | ((int32_t)rx_data[1] << 8)
-                                             | ((int32_t)rx_data[2]);
+  int32_t temp = ((int32_t)rx_data[0] << 16) | ((int32_t)rx_data[1] << 8) |
+                 ((int32_t)rx_data[2]);
   // Check if the sign bit (24th bit) is set
   if (temp & 0x800000) {
-      // Extend the sign to 32 bits
-      temp |= 0xFF000000;
+    // Extend the sign to 32 bits
+    temp |= 0xFF000000;
   }
   reading = (double)temp;
 
@@ -163,7 +165,8 @@ double ADC_readCurrent(void) {
     return -1;
   }
   // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
-  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)) {}
+  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)) {
+  }
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
   if (ret != HAL_OK) {
@@ -174,8 +177,8 @@ double ADC_readCurrent(void) {
     return -1;
   }
 
-  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8)
-                                               | ((uint64_t)rx_data[2]);
+  uint64_t temp = ((uint64_t)rx_data[0] << 16) | ((uint64_t)rx_data[1] << 8) |
+                  ((uint64_t)rx_data[2]);
   reading = (double)temp;
 
   // Uncomment these lines if you wish to see the raw and shifted values
@@ -199,7 +202,7 @@ HAL_StatusTypeDef probeADS12(void) {
   return ret;
 }
 
-size_t ADC_measure(uint8_t *data) {
+size_t ADC_measure(uint8_t* data) {
   // get timestamp
   SysTime_t ts = SysTimeGet();
 

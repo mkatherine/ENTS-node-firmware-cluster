@@ -4,24 +4,23 @@
  ******************************************************************************
  * @file    sdi12.c
  * @author  Stephen Taylor
- * 
- * @brief   This library is designed to read measurements from a PHYTOS-31 
+ *
+ * @brief   This library is designed to read measurements from a PHYTOS-31
  *          sensor from METER.
  *          https://metergroup.com/products/phytos-31/
  * @date    4/18/2024
  ******************************************************************************
  */
 
+#include "stm32/lib/phytos31/include/phytos31.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "stm32/lib/phytos31/include/phytos31.h"
 #include "proto/c/include/transcoder.h"
 
-HAL_StatusTypeDef Phytos31Init() {
-  return ADC_init();
-}
+HAL_StatusTypeDef Phytos31Init() { return ADC_init(); }
 
 phytos_measurments Phytos31GetMeasurment() {
   phytos_measurments measurments;
@@ -40,7 +39,7 @@ size_t Phytos31_measure(uint8_t *data) {
 
   // encode measurement
   size_t data_len = EncodePhytos31Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
-                                           adc_voltage_float, 0.0, data);
+                                              adc_voltage_float, 0.0, data);
 
   // return number of bytes in serialized measurement
   return data_len;

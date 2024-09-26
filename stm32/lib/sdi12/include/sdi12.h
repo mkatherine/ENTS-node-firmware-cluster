@@ -21,11 +21,11 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "usart.h"
 #include "gpio.h"
 #include "lptim.h"
-#include "user_config.h"
 #include "tim.h"
+#include "usart.h"
+#include "user_config.h"
 
 /** Status codes for the Fram library*/
 typedef enum {
@@ -34,7 +34,6 @@ typedef enum {
   SDI12_TIMEOUT_ON_READ = -2,
   SDI12_PARSING_ERROR = -3,
 } SDI12Status;
-
 
 /* The returned values from a SDI12 get measurment command*/
 typedef struct {
@@ -84,22 +83,23 @@ SDI12Status SDI12SendCommand(const char *command, uint8_t size);
 ******************************************************************************
 */
 SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize,
-uint16_t timeoutMillis);
+                          uint16_t timeoutMillis);
 
 /**
 ******************************************************************************
 * @brief    This is a function to read a measurment from a particular sensor.
 *
 * @param    char const addr, the device address
-* @param    SDI12_Measure_TypeDef, a custom struct to store the measurment information returned from start measurment
+* @param    SDI12_Measure_TypeDef, a custom struct to store the measurment
+*information returned from start measurment
 * @param    char* the measurment data returned
 * @param    uint16_t timeoutMillis time out in milliseconds
 * @return   SDI12Status
 ******************************************************************************
 */
 SDI12Status SDI12GetMeasurment(uint8_t addr,
-SDI12_Measure_TypeDef *measurment_info,
-char *measurment_data, uint16_t timeoutMillis);
+                               SDI12_Measure_TypeDef *measurment_info,
+                               char *measurment_data, uint16_t timeoutMillis);
 
 #ifdef __cplusplus
 }

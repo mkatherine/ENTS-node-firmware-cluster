@@ -619,9 +619,13 @@ if __name__ == "__main__":
     # TODO Implement switching between sourcing voltage and current
     
     range_group = parser.add_argument_group("Range")
-    parser.add_argument("--start", type=float, default= 0., help="Start voltage in V")
-    parser.add_argument("--stop", type=float, default=3., help="End voltage in V")
-    parser.add_argument("--step", type=float, default=0.1, help="Step between voltages in V")
+    parser.add_argument("--startV", type=float, default= -2.0, help="Start value in voltage")
+    parser.add_argument("--stopV", type=float, default= 2.0, help="End value in voltage")
+    parser.add_argument("--stepV", type=float, default= 0.1, help="Step between voltages")
+
+    parser.add_argument("--startI", type=float, default= -0.0009, help="Start value in amps")
+    parser.add_argument("--stopI", type=float, default= 0.0009, help="End value in amps")
+    parser.add_argument("--stepI", type=float, default= -0.0001, help="Step between amps")
     
     source_group = parser.add_mutually_exclusive_group(required=True)
     source_group.add_argument("--smu_port", type=str, help="SMU serial port (if SMU is configured to serial)")
@@ -651,9 +655,9 @@ if __name__ == "__main__":
     }
 
     if args.source_mode == "voltage":
-        iterator = smu.vrange(args.start, args.stop, args.step)
+        iterator = smu.vrange(args.startV, args.stopV, args.stepV)
     elif args.source_mode == "current":
-        iterator = smu.irange(args.start, args.stop, args.step)
+        iterator = smu.irange(args.startI, args.stopI, args.stepI)
 
     for value in tqdm(iterator):
         time.sleep(5)

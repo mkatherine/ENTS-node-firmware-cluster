@@ -48,17 +48,18 @@ typedef enum {
   FRAM_BUFFER_EMPTY = -4,
 } FramStatus;
 
+/** Address size definition */
+typedef uint32_t FramAddr;
+
 /**
  * @brief Writes bytes to an address
- *
- *
  *
  * @param addr Address of write
  * @param data An array of data bytes.
  * @param len The number of bytes to be written.
  * @return See FramStatus
  */
-FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len);
+FramStatus FramWrite(FramAddr addr, const uint8_t *data, size_t len);
 
 /**
  * @brief    This function reads a dynamic number of bytes to FRAM.
@@ -68,15 +69,38 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len);
  * @param len Number of sequential bytes to read
  * @return See FramStatus
  */
-FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data);
+FramStatus FramRead(FramAddr addr, size_t len, uint8_t *data);
 
 /**
- * @brief This function reads the user configurable settings from non-volatile
- * memory.
+ * @brief Get the number of available bytes in FRAM
+ *
+ * @return Number of bytes
+ */
+FramAddr FramSize(void);
+
+/**
+ * @brief Get number of pages
+ *
+ * A page is defined as a space of memory requiring the change of address.
+ *
+ * @return Number of pages
+ */
+unsigned int FramPages(void);
+
+/**
+ * @brief Gets the size of a segment
+ *
+ * @return Number of bytes in each segment
+ */
+unsigned int FramSegmentSize(void);
+
+/**
+ * @brief This function reads the user configurable settings from
+ * non-volatile memory.
  *
  * @return configuration, an instance of the typedef struct
- * user_configurations.  Containing all the user defined settings to be stored
- * in non-volatile memory.
+ * user_configurations.  Containing all the user defined settings to be
+ * stored in non-volatile memory.
  */
 configuration ReadSettings(void);
 

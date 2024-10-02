@@ -15,9 +15,6 @@
  * address is stored in fram_max_addr that can be used for higher level
  * implementations.
  *
- * Currently user configuration template is provided by this library but will
- * moved in a future version.
- *
  * @date     11/17/2023
  */
 
@@ -34,19 +31,6 @@ extern "C" {
 #include "fram.h"
 #include "i2c.h"
 
-#ifndef FRAM_PAGES
-/** Number of pages on the fram chip */
-#define FRAM_PAGES 8
-#endif
-
-#ifndef FRAM_SEG_SIZE
-/** Size of each memory segment in bytes */
-#define FRAM_SEG_SIZE 256
-#endif
-
-/** Max writeable address */
-static const uint16_t fram_max_addr = (FRAM_SEG_SIZE * FRAM_PAGES) - 1;
-
 /**
  * @brief Writes bytes to an address
  *
@@ -55,7 +39,7 @@ static const uint16_t fram_max_addr = (FRAM_SEG_SIZE * FRAM_PAGES) - 1;
  * @param len The number of bytes to be written.
  * @return See FramStatus
  */
-FramStatus Fm24cl16bWrite(uint16_t addr, const uint8_t *data, uint8_t len);
+FramStatus Fm24cl16bWrite(FramAddr addr, const uint8_t *data, size_t len);
 
 /**
  * @brief    This function reads a dynamic number of bytes to FRAM.
@@ -65,7 +49,7 @@ FramStatus Fm24cl16bWrite(uint16_t addr, const uint8_t *data, uint8_t len);
  * @param len Number of sequential bytes to read
  * @return See FramStatus
  */
-FramStatus Fm24cl16bRead(uint16_t addr, uint8_t len, uint8_t *data);
+FramStatus Fm24cl16bRead(FramAddr addr, size_t len, uint8_t *data);
 
 #ifdef __cplusplus
 }

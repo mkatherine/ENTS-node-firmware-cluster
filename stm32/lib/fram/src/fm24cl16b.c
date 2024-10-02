@@ -10,6 +10,20 @@
  */
 #include "fm24cl16b.h"
 
+#include "fram_def.h"
+
+/** Number of pages on the chip */
+static const unsigned int fram_pages = 8;
+
+/** Size of each memory segment in bytes */
+static const unsigned int fram_seg_size = 256;
+
+const FramInterfaceType FramInterface = {.WritePtr = Fm24cl16bWrite,
+                                         .ReadPtr = Fm24cl16bRead,
+                                         .size = fram_pages * fram_seg_size,
+                                         .pages = fram_pages,
+                                         .seg_size = fram_seg_size};
+
 /** Timeout in seconds for the FRAM chip */
 const uint32_t fram_timeout = 100;
 
@@ -38,9 +52,9 @@ typedef struct {
  * @param addr Memory address
  * @return Matrix representation of address
  */
-FramAddress FramConvertAddrMem(uint16_t addr);
+FramAddress FramConvertAddrMem(FramAddr addr);
 
-FramStatus Fm24cl16bWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
+FramStatus Fm24cl16bWrite(FramAddr addr, const uint8_t *data, size_t len) {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
@@ -49,7 +63,7 @@ FramStatus Fm24cl16bWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
 
     // check for out of memory
     // pages are zero indexed
-    if (addr_mat.page > FRAM_PAGES - 1) {
+    if (addr_mat.page > fram_pages - 1) {
       return FRAM_OUT_OF_RANGE;
     }
 
@@ -74,7 +88,7 @@ FramStatus Fm24cl16bWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
   return FRAM_OK;
 }
 
-FramStatus Fm24cl16bRead(uint16_t addr, uint8_t len, uint8_t *data) {
+FramStatus Fm24cl16bRead(FramAddr addr, size_t len, uint8_t *data) {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
@@ -82,7 +96,7 @@ FramStatus Fm24cl16bRead(uint16_t addr, uint8_t len, uint8_t *data) {
     FramAddress addr_mat = FramConvertAddrMem(addr);
 
     // check for out of memory
-    if (addr_mat.page >= FRAM_PAGES) {
+    if (addr_mat.page >= fram_pages) {
       return FRAM_OUT_OF_RANGE;
     }
     // format the i2c address
@@ -105,11 +119,11 @@ FramStatus Fm24cl16bRead(uint16_t addr, uint8_t len, uint8_t *data) {
   return FRAM_OK;
 }
 
-FramAddress FramConvertAddrMem(uint16_t addr) {
+FramAddress FramConvertAddrMem(FramAddr addr) {
   // convert flat address space to matrix
   FramAddress addr_mat;
-  addr_mat.page = addr / FRAM_SEG_SIZE;
-  addr_mat.seg = addr % FRAM_SEG_SIZE;
+  addr_mat.page = addr / fram_seg_size;
+  addr_mat.seg = addr % fram_seg_size;
 
   return addr_mat;
 }

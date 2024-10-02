@@ -1,24 +1,31 @@
 #include "fram.h"
 
-#include "fm24cl16b.h"
+#include "fram_def.h"
 
 #define FRAM_FM24CL16B
 
-FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
 #ifdef FRAM_FM24CL16B
-  return Fm24cl16bWrite(addr, data, len);
+#include "fm24cl16b.h"
 #else
-  return FRAM_OK;
+#error No FRAM chip enabled
 #endif
+
+/** Interface definition for fram chips */
+extern FramInterfaceType FramInterface;
+
+FramStatus FramWrite(FramAddr addr, const uint8_t *data, size_t len) {
+  return FramInterface.WritePtr(addr, data, len);
 }
 
-FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data) {
-#ifdef FRAM_FM24CL16B
-  return Fm24cl16bRead(addr, len, data);
-#else
-  return FRAM_OK;
-#endif
+FramStatus FramRead(FramAddr addr, size_t len, uint8_t *data) {
+  return FramInterface.ReadPtr(addr, len, data);
 }
+
+FramAddr FramSize(void) { return FramInterface.size; }
+
+unsigned int FramPages(void) { return FramInterface.pages; }
+
+unsigned int FramSegmentSize(void) { return FramInterface.seg_size; }
 
 HAL_StatusTypeDef ConfigureSettings(configuration c) {
   HAL_StatusTypeDef status = HAL_OK;

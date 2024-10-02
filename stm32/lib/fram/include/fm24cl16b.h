@@ -21,8 +21,8 @@
  * @date     11/17/2023
  */
 
-#ifndef LIB_FRAM_INCLUDE_FRAM_H_
-#define LIB_FRAM_INCLUDE_FRAM_H_
+#ifndef LIB_FRAM_INCLUDE_FM24CL16B_H_
+#define LIB_FRAM_INCLUDE_FM24CL16B_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,7 +84,7 @@ static const uint16_t fram_max_addr = (FRAM_SEG_SIZE * FRAM_PAGES) - 1;
  * @param len The number of bytes to be written.
  * @return See FramStatus
  */
-FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len);
+FramStatus Fm24cl16bWrite(uint16_t addr, const uint8_t *data, uint8_t len);
 
 /**
  * @brief    This function reads a dynamic number of bytes to FRAM.
@@ -94,7 +94,7 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len);
  * @param len Number of sequential bytes to read
  * @return See FramStatus
  */
-FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data);
+FramStatus Fm24cl16bRead(uint16_t addr, uint8_t len, uint8_t *data);
 
 /**
  * @brief This function stores user configurable settings to non-volatile
@@ -125,4 +125,4 @@ configuration ReadSettings(void);
 }
 #endif
 
-#endif  // LIB_FRAM_INCLUDE_FRAM_H_
+#endif  // LIB_FRAM_INCLUDE_FM24CL16B_H_

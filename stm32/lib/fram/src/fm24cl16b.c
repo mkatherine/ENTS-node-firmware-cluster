@@ -8,7 +8,7 @@
  *
  * Copyright 2023 jLab, UCSC MIT License
  */
-#include "fram.h"
+#include "fm24cl16b.h"
 
 /** Timeout in seconds for the FRAM chip */
 const uint32_t fram_timeout = 100;
@@ -40,7 +40,7 @@ typedef struct {
  */
 FramAddress FramConvertAddrMem(uint16_t addr);
 
-FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
+FramStatus Fm24cl16bWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.
@@ -74,7 +74,7 @@ FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len) {
   return FRAM_OK;
 }
 
-FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data) {
+FramStatus Fm24cl16bRead(uint16_t addr, uint8_t len, uint8_t *data) {
   // Write byte array to memory
   // NOTE write is performed a single byte at a time due to address
   // configuration of the chip.

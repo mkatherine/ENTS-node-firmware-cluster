@@ -18,7 +18,7 @@ extern "C" {
 
 #include <stdint.h>
 
-#include "stm32wlxx_hal_def.h"
+#include "stm32wlxx_hal.h"
 
 #define USER_DATA_PAGE_ADDRESS 0x07
 #define CELL_ID_MEMORY_ADDRESS 0x00
@@ -49,19 +49,26 @@ typedef enum {
 } FramStatus;
 
 /**
- * @brief This function stores user configurable settings to non-volatile
- * memory.
+ * @brief Writes bytes to an address
  *
- * Specifically cell ID, logger ID, LoRaWAN gateway EUI, LoRaWAN application
- * EUI and end device EUI. As well as the logging and upload intervals.
  *
- * @param configuration an instance of the typedef struct user_configurations.
- * Containing all the user defined settings to be stored in non-volatile
- * memory.
  *
- * @return HAL_StatusTypeDef, status of the I2C function
+ * @param addr Address of write
+ * @param data An array of data bytes.
+ * @param len The number of bytes to be written.
+ * @return See FramStatus
  */
-HAL_StatusTypeDef ConfigureSettings(configuration c);
+FramStatus FramWrite(uint16_t addr, const uint8_t *data, uint8_t len);
+
+/**
+ * @brief    This function reads a dynamic number of bytes to FRAM.
+ *
+ * @param addr Address of read
+ * @param data Array to be read into
+ * @param len Number of sequential bytes to read
+ * @return See FramStatus
+ */
+FramStatus FramRead(uint16_t addr, uint8_t len, uint8_t *data);
 
 /**
  * @brief This function reads the user configurable settings from non-volatile

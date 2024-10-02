@@ -50,8 +50,6 @@ static const uint16_t fram_max_addr = (FRAM_SEG_SIZE * FRAM_PAGES) - 1;
 /**
  * @brief Writes bytes to an address
  *
- *
- *
  * @param addr Address of write
  * @param data An array of data bytes.
  * @param len The number of bytes to be written.

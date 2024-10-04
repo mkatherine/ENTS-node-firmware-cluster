@@ -1,3 +1,22 @@
+/**
+ * @file mb85rc1mt.h
+ * @author John Madden (jmadden173@pm.me)
+ * @brief
+ * @version 0.1
+ * @date 2024-10-03
+ *
+ * Fram driver for mb85rc1mt with support across multiple devices.
+ *
+ * Datasheet:
+ * https://www.fujitsu.com/uk/Images/MB85RC1MT.pdf
+ *
+ * TODO:
+ * - Add sleep functionality
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #ifndef LIB_FRAM_SRC_MB85RC1MT_H_
 #define LIB_FRAM_SRC_MB85RC1MT_H_
 

@@ -7,10 +7,10 @@
 #include "stm32wlxx_ll_i2c.h"
 
 /** Base address of chip */
-const static uint8_t g_base_addr = 0b10100000;
+static const uint8_t g_base_addr = 0b10100000;
 
 /** Timeout for i2c communication. Set to greater than wakeup time */
-const static uint32_t g_timeout = 1000;
+static const uint32_t g_timeout = 1000;
 
 const FramInterfaceType FramInterface = {.WritePtr = Mb85rc1mtWrite,
                                          .ReadPtr = Mb85rc1mtRead,
@@ -21,10 +21,8 @@ const FramInterfaceType FramInterface = {.WritePtr = Mb85rc1mtWrite,
 typedef struct {
   /** Device address */
   uint8_t dev;
-  /** Memory address high */
-  uint8_t high;
-  /** Memory address low */
-  uint8_t low;
+  /** Memory address */
+  uint16_t mem;
 } Mb85rc1mtAddress;
 
 /**
@@ -72,19 +70,14 @@ FramStatus Mb85rc1mtWrite(FramAddr addr, const uint8_t *data, size_t len) {
 
     for (int i = 0; i < write_len; i++) {
       // transmit data
-      hal_status = HAL_I2C_Mem_Write(
-          &hi2c2, i2c_addr.dev, (i2c_addr.high << 8) | i2c_addr.low,
-          I2C_MEMADD_SIZE_16BIT, data, len, g_timeout);
+      hal_status =
+          HAL_I2C_Mem_Write(&hi2c2, i2c_addr.dev, i2c_addr.mem,
+                            I2C_MEMADD_SIZE_16BIT, data, len, g_timeout);
       fram_status = ConvertStatus(hal_status);
       if (fram_status != FRAM_OK) {
         return fram_status;
       }
     }
-
-    /*
-    hal_status = HAL_I2C_Master_Transmit(&hi2c2, i2c_addr.dev, buffer,
-                                         buffer_len, g_timeout);
-                                    */
 
     // update address and length
     addr += write_len;
@@ -121,19 +114,11 @@ FramStatus Mb85rc1mtRead(FramAddr addr, size_t len, uint8_t *data) {
       read_len = len;
     }
 
-    // format memory address for tx
-    const size_t addr_buffer_len = 2;
-    uint8_t addr_buffer[addr_buffer_len];
-
-    addr_buffer[0] = i2c_addr.high;
-    addr_buffer[1] = i2c_addr.low;
-
     // transmit data
     HAL_StatusTypeDef hal_status = HAL_OK;
 
     // read from memory
-    hal_status = HAL_I2C_Mem_Read(&hi2c2, i2c_addr.dev | 1,
-                                  (i2c_addr.high << 8) | (i2c_addr.low),
+    hal_status = HAL_I2C_Mem_Read(&hi2c2, i2c_addr.dev | 1, i2c_addr.mem,
                                   I2C_MEMADD_SIZE_16BIT, data, len, g_timeout);
     fram_status = ConvertStatus(hal_status);
     if (fram_status != FRAM_OK) {
@@ -200,8 +185,7 @@ Mb85rc1mtAddress ConvertAddress(FramAddr addr) {
   // shift in 15 is to account to remove lower 16 bytes and have correct
   // position in the address before the r/w bit.
   new_addr.dev = g_base_addr | ((addr >> 15) & 0b1110);
-  new_addr.high = (addr >> 8) & 0xFF;
-  new_addr.low = addr & 0xFF;
+  new_addr.mem = addr & 0xFFFF;
 
   return new_addr;
 }

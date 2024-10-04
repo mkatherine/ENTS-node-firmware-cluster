@@ -131,7 +131,7 @@ int main(void) {
   MX_I2C2_Init();
 
   // wait for UART
-  for (int i = 0; i < 1000000; i++) {
+  for (int i = 0; i < 10000000; i++) {
     __NOP();
   }
 

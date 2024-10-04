@@ -1,3 +1,18 @@
+/**
+ * @file fram_def.h
+ * @author John Madden (jmadden173@pm.me)
+ * @brief
+ * @version 0.1
+ * @date 2024-10-03
+ *
+ * Fram interface definitions and helper functions. Supported fram chips
+ * implement read and write functions and expose @ref FramInterface type. See
+ * @ref fm24cl16b.h.
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #ifndef LIB_FRAM_SRC_FRAM_DEF_H_
 #define LIB_FRAM_SRC_FRAM_DEF_H_
 

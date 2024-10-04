@@ -27,6 +27,21 @@ typedef struct {
   unsigned int seg_size;
 } FramInterfaceType;
 
+/**
+ * @brief Converts HAL_StatusTypeDef to FramStatus
+ *
+ * @param status HAL status code
+ * @return Fram status code
+ */
+inline FramStatus ConvertStatus(HAL_StatusTypeDef status) {
+  switch (status) {
+    case HAL_OK:
+      return FRAM_OK;
+    default:
+      return FRAM_ERROR;
+  }
+}
+
 #ifdef __cplusplus
 }
 #endif

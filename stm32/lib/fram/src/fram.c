@@ -2,10 +2,13 @@
 
 #include "fram_def.h"
 
-#define FRAM_FM24CL16B
+// #define FRAM_FM24CL16B
+#define FRAM_MB85RC1MT
 
-#ifdef FRAM_FM24CL16B
+#if defined(FRAM_FM24CL16B)
 #include "fm24cl16b.h"
+#elif defined(FRAM_MB85RC1MT)
+#include "mb85rc1mt.h"
 #else
 #error No FRAM chip enabled
 #endif
@@ -14,14 +17,24 @@
 extern FramInterfaceType FramInterface;
 
 FramStatus FramWrite(FramAddr addr, const uint8_t *data, size_t len) {
+  // check size
+  if (addr + len >= FramSize()) {
+    return FRAM_OUT_OF_RANGE;
+  }
+
   return FramInterface.WritePtr(addr, data, len);
 }
 
 FramStatus FramRead(FramAddr addr, size_t len, uint8_t *data) {
+  // check size
+  if (addr + len >= FramSize()) {
+    return FRAM_OUT_OF_RANGE;
+  }
+
   return FramInterface.ReadPtr(addr, len, data);
 }
 
-FramAddr FramSize(void) { return FramInterface.size; }
+FramAddr FramSize(void) { return FramInterface.pages * FramInterface.seg_size; }
 
 unsigned int FramPages(void) { return FramInterface.pages; }
 

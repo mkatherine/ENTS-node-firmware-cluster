@@ -5,6 +5,14 @@
  * @version 0.1
  * @date 2024-10-02
  *
+ * Function calls for read/write ensures data does not exceed size of the
+ * buffers.
+ *
+ * TODO:
+ * - Add function for checking the device ID as a test. Export expected output
+ * in each library
+ * - Fix multiple pages test to be universal across boards
+ *
  * @copyright Copyright (c) 2024
  *
  */

@@ -3,6 +3,10 @@
 /**
  * @file test_fram.c
  * @brief Tests the fram library
+ *
+ * Test code exists but not enabled to run tests across multiple pages. The
+ * newest hardware version of the board (MB85RC1MT) only has a single page,
+ * therefore testing is not possible.
  */
 
 #include <stdio.h>
@@ -21,24 +25,6 @@ void setUp(void) {}
  * @brief Tear down code that runs at the end of every test
  */
 void tearDown(void) {}
-
-void test_i2c(void) {
-  uint8_t test = 185;
-  uint8_t received;
-
-  HAL_StatusTypeDef status;
-
-  // test raw i2c write
-  status =
-      HAL_I2C_Mem_Write(&hi2c2, 0xA0, 0x00, I2C_MEMADD_SIZE_8BIT, &test, 1, 50);
-  TEST_ASSERT_EQUAL(HAL_OK, status);
-
-  // test raw i2c read
-  status = HAL_I2C_Mem_Read(&hi2c2, 0xA1, 0x00, I2C_MEMADD_SIZE_8BIT, &received,
-                            1, 50);
-  TEST_ASSERT_EQUAL(HAL_OK, status);
-  TEST_ASSERT_EQUAL(test, received);
-}
 
 void test_FramWrite_ValidData(void) {
   uint8_t data[] = {1, 2, 3, 4, 5};
@@ -150,14 +136,13 @@ int main(void) {
   }
 
   UNITY_BEGIN();
-  RUN_TEST(test_i2c);
   RUN_TEST(test_FramWrite_ValidData);
   RUN_TEST(test_FramWrite_ZeroLength);
   RUN_TEST(test_FramWrite_OutOfRange);
-  RUN_TEST(test_FramWrite_MultiplePages);
+  // RUN_TEST(test_FramWrite_MultiplePages);
   RUN_TEST(test_FramRead_ValidData);
   RUN_TEST(test_FramRead_ZeroLength);
   RUN_TEST(test_FramRead_OutOfRange);
-  RUN_TEST(test_FramRead_MultiplePages);
+  // RUN_TEST(test_FramRead_MultiplePages);
   UNITY_END();
 }

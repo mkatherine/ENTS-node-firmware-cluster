@@ -1,6 +1,7 @@
 #include "communication.h"
 
-#include <stm32wlxx_hal_i2c.h>
+#include <stdlib.h>
+#include <stm32wlxx_hal.h>
 #include "i2c.h"
 
 /**
@@ -66,7 +67,7 @@ ControllerStatus ControllerTransmit(unsigned int timeout) {
   // create small buffer
   Buffer chunk = {};
   chunk.data = malloc(g_i2c_buffer_size);
-  chuck.size = g_i2c_buffer_size;
+  chunk.size = g_i2c_buffer_size;
   chunk.len = 0;
 
   // shallow copy tx
@@ -135,7 +136,7 @@ ControllerStatus ControllerReceive(unsigned int timeout) {
     // create small buffer
     Buffer chunk = {};
     chunk.data = malloc(g_i2c_buffer_size);
-    chuck.size = g_i2c_buffer_size;
+    chunk.size = g_i2c_buffer_size;
     chunk.len = 0;
 
     // copy reference to receive
@@ -200,3 +201,5 @@ ControllerStatus HALToControllerStatus(HAL_StatusTypeDef hal_status) {
 
   return CONTROLLER_SUCCESS;
 }
+
+void ControllerWakeupEsp32(void) {}

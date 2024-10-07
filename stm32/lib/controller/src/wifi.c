@@ -7,17 +7,17 @@ uint32_t ControllerWiFiInit(
   const char* ssid,
   const char* passwd,
   const char* url,
-  const char* port
+  const uint32_t port
 ) {
   // encode command
   tx.len = EncodeWiFiCommand(WiFiCommand_Type_CONNECT, ssid, passwd, url, port,
-                             0, 0, NULL, 0, tx.data, tx.size)
+                             0, 0, NULL, 0, tx.data, tx.size);
 
   // send transaction 
   ControllerTransaction(500);
 
   // check for errors
-  if (rx.len = 0) {
+  if (rx.len == 0) {
     return 0;
   }
 
@@ -37,13 +37,13 @@ int ControllerWiFiPost(
 ) {
   // encode command
   tx.len = EncodeWiFiCommand(WiFiCommand_Type_POST, NULL, NULL, NULL, 0, 0, 0,
-                             data, data_len)
+                             data, data_len, resp, resp_len);
 
   // send transaction
   ControllerTransaction(500);
 
   // check for errors
-  if (rx.len = 0) {
+  if (rx.len == 0) {
     return 0;
   }
   

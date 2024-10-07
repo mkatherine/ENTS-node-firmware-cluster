@@ -39,6 +39,8 @@
 #include "phytos31.h"
 #include "rtc.h"
 #include "sensors.h"
+
+#include "wifi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -104,24 +106,29 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_LoRaWAN_Init();
   MX_I2C2_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+  // initialize
   ADC_init();
-  MX_RTC_Init();
   SensorsInit();
-
-  // Debug message, gets printed after init code
-  APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
-
+  
   // configure sensors
   SensorsAdd(ADC_measure);
   //SensorsAdd(SDI12_Teros12Measure);
   //SensorsAdd(Phytos31_measure);
 
+  // initialize WiFi
+  ControllerInit();
+  WiFiInit();
 
+  // initialize LoRaWAN code
+  //MX_LoRaWAN_Init();
+
+
+  // I think this is already initialized
+  //MX_RTC_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */

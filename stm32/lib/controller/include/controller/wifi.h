@@ -29,7 +29,7 @@ uint32_t ControllerWiFiInit(
   const char* ssid,
   const char* passwd,
   const char* url,
-  const char* port
+  const uint32_t port 
 );
 
 /**

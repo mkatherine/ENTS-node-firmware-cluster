@@ -32,6 +32,12 @@ private:
 
 public:
   /**
+   * @brief Construct a new Dirtviz object
+   * 
+   */
+  Dirtviz(void);
+
+  /**
    * @brief Default constructor
    * 
    * Allows for setting of URL on initialization.

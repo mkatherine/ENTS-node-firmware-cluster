@@ -97,9 +97,9 @@ namespace ModuleHandler {
 
     typedef struct {
       /** Size of receive/request buffer */
-      static const size_t size = Esp32Command_size;
+      const size_t size = Esp32Command_size;
       /** Buffer to store data */
-      uint8_t data[size] = {};
+      uint8_t data[Esp32Command_size] = {};
       /** Length of data */
       size_t len = 0;
       /** Current index of buffer */

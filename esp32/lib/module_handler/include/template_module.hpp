@@ -62,7 +62,7 @@ namespace ModuleHandler {
      */
     void Reset(void);
 
-    private:
+    protected:
 
     /** Integer representing current state */
     int state = 0;

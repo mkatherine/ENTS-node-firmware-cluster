@@ -8,7 +8,9 @@
 #include <Arduino.h>
 #include "dirtviz.hpp"
 
-Dirtviz::Dirtviz(const char *url, const uint16_t &port) : url(nullptr), response(nullptr)
+Dirtviz::Dirtviz(void) : url(nullptr), response(nullptr) {}
+
+Dirtviz::Dirtviz(const char *url, const uint16_t &port)
 {
   // set parameters
   this->SetUrl(url);

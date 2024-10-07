@@ -12,6 +12,7 @@
 #ifndef ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_
 #define ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_
 
+#include <Arduino.h>
 #include <WiFi.h>
 
 #include "dirtviz.hpp"

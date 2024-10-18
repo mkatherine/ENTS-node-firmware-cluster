@@ -52,7 +52,7 @@ SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize, uint16_t timeoutMil
   HAL_StatusTypeDef ret;
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
   __HAL_UART_FLUSH_DRREGISTER(&huart2);
-  ret = HAL_UART_Receive(&huart2,(uint8_t *) buffer, bufferSize, HAL_MAX_DELAY);
+  ret = HAL_UART_Receive(&huart2,(uint8_t *) buffer, bufferSize, timeoutMillis);
   if (ret == HAL_OK){
     return SDI12_OK;
   } else if (ret == HAL_TIMEOUT) {

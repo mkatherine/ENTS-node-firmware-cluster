@@ -1,20 +1,4 @@
-/**
- * @file test_battery.c
- * @brief Prints out battery voltage levels
- *
- * In an infinite loop the battery voltage level is retrieved then outputted
- * over serial. The user should check if the voltage levels are expected. When
- * connected to USB the voltage should be ~5V. The battery voltage level should
- * be checked and compared to a multimeter measurement.
- *
- * @see battery.h
- *
- * @author John Madden <jmadden173@pm.me>
- * @date 2023-11-17
- */
-
 #include <stdio.h>
-
 #include "adc.h"
 #include "battery.h"
 #include "dma.h"
@@ -29,9 +13,16 @@
 #define DELAY 1000
 #endif
 
-void SystemClock_Config(void);
+void print(const char *format, ...) {
+    char buffer[128]; // Define a buffer to store the formatted string
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    HAL_UART_Transmit(&huart1, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+}
 
-/** Global variable for all return codes */
+void SystemClock_Config(void);
 HAL_StatusTypeDef rc;
 
 /**
@@ -39,71 +30,35 @@ HAL_StatusTypeDef rc;
  * @retval int
  */
 int main(void) {
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
-   */
   HAL_Init();
-
-  /* Configure the system clock */
   SystemClock_Config();
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_I2C2_Init();
+  MX_USART1_UART_Init();
+  SystemApp_Init();
 
-  // already called Enable the GPIOB clock
-  //__HAL_RCC_GPIOB_CLK_ENABLE();
-  
-  // GPIO Pin Configuration
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;    // Set as push-pull output
   GPIO_InitStruct.Pull = GPIO_NOPULL;            // No pull-up or pull-down
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;   // Low frequency for LED
-  
-  //HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-  // MX_DMA_Init();
-  // MX_ADC_Init();
-  // mspm
-  MX_I2C2_Init();
 
-  MX_USART1_UART_Init();
+  uint16_t read_addr, write_addr, buffer_len;
 
-  // User level initialization
-  // battery_init();
+  FramStatus status = FramBufferClear();
 
-  // Print the compilation time at startup
-  SystemApp_Init();
-  // APP_PRINTF("HELLO");
-  char info_str[128];
-  int info_len;
-  info_len = snprintf(
-      info_str, sizeof(info_str),
-      "Hello ");
-  HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
+  status = FramLoadBufferState(&read_addr, &write_addr, &buffer_len);
 
+  const uint8_t test_data[] = {0x11, 0x22, 0x33}; // Example data
+  for (int i = 0; i < 9; i++) {
+    status = FramPut(test_data, sizeof(test_data));
+  }
 
-  
-  const uint8_t somethingelse[] = {0x61,0x62,0x69};
-  uint8_t anyelse[sizeof(somethingelse)];
-  FramWrite(0, somethingelse, sizeof(somethingelse));
-  FramRead(0, sizeof(somethingelse), anyelse);
-  HAL_UART_Transmit(&huart1, (const uint8_t *)anyelse, sizeof(anyelse), 1000);
+  status = FramLoadBufferState(&read_addr, &write_addr, &buffer_len);
 
-  // Infinite loop
   while (1) {
-    // Print voltage level
     char buf[32];
-
-    // int buf_len = snprintf(buf, sizeof(buf), "Battery Voltage: %d mV\n",
-    //                        battery_voltage());
-    // HAL_UART_Transmit(&huart1, (const uint8_t *)buf, buf_len, 1000);
-
-    // Sleep
-    // HAL_Delay(DELAY);
-
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-    
-
-    // Delay for 500 milliseconds
     HAL_Delay(500);
   }
 
@@ -153,7 +108,6 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
-
 /* USER CODE END 4 */
 
 /**

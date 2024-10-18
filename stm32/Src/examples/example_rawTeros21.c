@@ -75,35 +75,47 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
   char success[] = "HAL_OK\n";
   char failure[] = "HAL_FAIL\n";
-  char buffer[20];
+  char buffer[5];
   uint8_t addr = '0';
   SDI12_Measure_TypeDef measurment_info;
-  HAL_StatusTypeDef returnCode;
+  //HAL_StatusTypeDef returnCode;
 
   // Set Up and transmit
-  char identify[] = "0M!"; //command to read water potential and temp
-  SDI12WakeSensors();
-  returnCode = HAL_UART_Transmit(&huart2, identify, sizeof(identify), HAL_MAX_DELAY);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
+  //char identify[] = "0M!"; //command to read water potential and temp
+ // SDI12WakeSensors();
+  //returnCode = HAL_UART_Transmit(&huart2, identify, sizeof(identify), HAL_MAX_DELAY);
+  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
 
   //Now recieve data
-  char recieveBuff[50];
-  __HAL_UART_FLUSH_DRREGISTER(&huart2);
-  returnCode = HAL_UART_Receive(&huart2, recieveBuff, sizeof(recieveBuff), 3000);
-  HAL_UART_Transmit(&huart1, recieveBuff, sizeof(recieveBuff), 1000);
+  //char recieveBuff[50];
+  //__HAL_UART_FLUSH_DRREGISTER(&huart2);
+  //returnCode = HAL_UART_Receive(&huart2, recieveBuff, sizeof(recieveBuff), 3000);
+  //HAL_UART_Transmit(&huart1, recieveBuff, sizeof(recieveBuff), 1000);
 
   // Infinite loop
   while (1)
   {
-    char identify[] = "0M!"; //command to read water potential and temp
-    SDI12WakeSensors();
-    returnCode = HAL_UART_Transmit(&huart2, identify, sizeof(identify), HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
+    //char identify[] = "0M!"; //command to read water potential and temp
+    //SDI12WakeSensors();
+    //returnCode = HAL_UART_Transmit(&huart2, identify, sizeof(identify), HAL_MAX_DELAY);
+    //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
 
     //Now recieve data
-    __HAL_UART_FLUSH_DRREGISTER(&huart2);
-    returnCode = HAL_UART_Receive(&huart2, recieveBuff, sizeof(recieveBuff), 3000);
-    HAL_UART_Transmit(&huart1, recieveBuff, sizeof(recieveBuff), 1000);
+    //__HAL_UART_FLUSH_DRREGISTER(&huart2);
+    //returnCode = HAL_UART_Receive(&huart2, recieveBuff, sizeof(recieveBuff), 3000);
+    //HAL_UART_Transmit(&huart1, recieveBuff, sizeof(recieveBuff), 1000);
+
+    // Print voltage level
+    char buf[32];
+    int buf_len = sprintf(buf, "0M!");
+
+
+    if (SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
+      HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
+      HAL_UART_Transmit(&huart1, buffer, 18, 100);
+    } else {
+      HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
+    };
 
     //Sleep
     for (int i = 0; i <= 1000000; i++)

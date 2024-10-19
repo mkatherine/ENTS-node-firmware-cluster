@@ -7,20 +7,12 @@
 #include "usart.h"
 #include "sys_app.h"
 #include "fram.h"
+#include "fifo.h"
 
 /** Delay between print statements */
 #ifndef DELAY
 #define DELAY 1000
 #endif
-
-void print(const char *format, ...) {
-    char buffer[128]; // Define a buffer to store the formatted string
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-    HAL_UART_Transmit(&huart1, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
-}
 
 void SystemClock_Config(void);
 HAL_StatusTypeDef rc;
@@ -36,6 +28,7 @@ int main(void) {
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   SystemApp_Init();
+  FIFO_Init();
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_PIN_5;
@@ -43,18 +36,33 @@ int main(void) {
   GPIO_InitStruct.Pull = GPIO_NOPULL;            // No pull-up or pull-down
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;   // Low frequency for LED
 
-  uint16_t read_addr, write_addr, buffer_len;
-
-  FramStatus status = FramBufferClear();
-
-  status = FramLoadBufferState(&read_addr, &write_addr, &buffer_len);
+  FramStatus status;
 
   const uint8_t test_data[] = {0x11, 0x22, 0x33}; // Example data
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 10; i++) {
     status = FramPut(test_data, sizeof(test_data));
   }
 
+  uint16_t read_addr, write_addr, buffer_len;
   status = FramLoadBufferState(&read_addr, &write_addr, &buffer_len);
+
+  uint8_t retrieved_data[sizeof(test_data)];
+  uint8_t retrieved_len;
+
+  // Visualizing actual data.
+  // while (FramBufferLen() > 0) {
+  //     status = FramGet(retrieved_data, &retrieved_len);
+  //     if (status == FRAM_OK) {
+  //         // Loop through retrieved_data and print each byte in hexadecimal format
+  //         print("Data length: %d\n", retrieved_len);
+  //         for (int i = 0; i < retrieved_len; i++) {
+  //             print("Data[%d]: 0x%02X\n", i, retrieved_data[i]);
+  //         }
+  //     } else {
+  //         // Handle error if needed
+  //         break; // Exit the loop if an error occurs
+  //     }
+  // }
 
   while (1) {
     char buf[32];

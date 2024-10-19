@@ -40,7 +40,7 @@ extern "C" {
 
 #ifndef FRAM_BUFFER_END
 /** Ending address of buffer */
-#define FRAM_BUFFER_END 1792
+#define FRAM_BUFFER_END 1770
 #endif /* FRAM_BUFFER_END */
 
 /** Addresses in FRAM for buffer state variables */
@@ -102,7 +102,7 @@ FramStatus FramBufferClear(void);
 FramStatus FramSaveBufferState(uint16_t read_addr, uint16_t write_addr, uint16_t buffer_len);
 
 /**
- * @brief Retrieves the buffer state (read address, write address, and buffer length)
+ * @brief Loads the buffer state (read address, write address, and buffer length)
  *        from FRAM.
  *
  * @param read_addr Pointer to store the retrieved read address.
@@ -110,7 +110,15 @@ FramStatus FramSaveBufferState(uint16_t read_addr, uint16_t write_addr, uint16_t
  * @param buffer_len Pointer to store the retrieved buffer length.
  * @return FramStatus, status of the FRAM operation.
  */
-FramStatus FramRetrieveBufferState(uint16_t *read_addr, uint16_t *write_addr, uint16_t *buffer_len);
+FramStatus FramLoadBufferState(uint16_t *read_addr, uint16_t *write_addr, uint16_t *buffer_len);
+
+/**
+ * @brief Initializes the FIFO buffer by loading the buffer state (read address, 
+ *        write address, and buffer length) from FRAM. If the state cannot be 
+ *        loaded or is invalid, it initializes the buffer with default values.
+ * @return FramStatus, status of the FRAM operation.
+ */
+FramStatus FIFO_Init(void);
 
 #ifdef __cplusplus
 }

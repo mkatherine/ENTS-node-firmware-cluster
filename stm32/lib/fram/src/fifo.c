@@ -9,13 +9,13 @@
  **/
 
 #include "fifo.h"
+#include "usart.h"
+#include "sys_app.h"
 
 // head and tail
-static uint16_t read_addr = FRAM_BUFFER_START;
-static uint16_t write_addr = FRAM_BUFFER_START;
-
-/** Number of measurements stored in buffer */
-static uint16_t buffer_len = 0;
+static uint16_t read_addr;
+static uint16_t write_addr;
+static uint16_t buffer_len;
 
 /**
  * @brief Updates circular buffer address based on number of bytes
@@ -126,6 +126,37 @@ FramStatus FramBufferClear(void) {
 
   return FRAM_OK;
 }
+
+void print(const char *format, ...) {
+    char buffer[128];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    HAL_UART_Transmit(&huart1, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+}
+
+FramStatus FIFO_Init(void) {
+    FramStatus status = FramLoadBufferState(&read_addr, &write_addr, &buffer_len); 
+    if (status != FRAM_OK) {
+        print("Failed to load FIFO state. FRAM Status: %d\n", status);
+        // If loading the buffer state fails, assume it's an empty state
+        read_addr = FRAM_BUFFER_START;
+        write_addr = FRAM_BUFFER_START;
+        buffer_len = 0;
+        FramSaveBufferState(read_addr, write_addr, buffer_len);
+        print("Initialized to empty buffer state.\n");
+        return FRAM_OK;
+    } else {
+        if (read_addr == FRAM_BUFFER_START && write_addr == FRAM_BUFFER_START && buffer_len == 0) {
+            print("Buffer is empty or freshly initialized.\n");
+        } else {
+            print("Buffer contains data. Ready to resume operations.\n");
+        }
+    }
+    return FRAM_OK;
+}
+
 
 FramStatus FramSaveBufferState(uint16_t read_addr, uint16_t write_addr, uint16_t buffer_len) {
     FramStatus status;

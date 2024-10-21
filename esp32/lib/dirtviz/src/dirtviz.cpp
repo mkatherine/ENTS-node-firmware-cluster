@@ -6,7 +6,7 @@
  */
 
 #include "dirtviz.hpp"
-
+#include <cstdio>
 #include <Arduino.h>
 
 Dirtviz::Dirtviz(const char *url, const uint16_t &port)

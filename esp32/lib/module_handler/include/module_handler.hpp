@@ -1,9 +1,18 @@
 /**
  * @file module_handler.hpp
  * @author John Madden (jmadden173@pm.me)
- * @brief 
+ * @brief Interface for controlling the esp32
  * @version 0.1
  * @date 2024-08-12
+ * 
+ * The @ref ModuleHandler class provides an interface for communication between
+ * a host mcu and a client mcu. Commands are encoded via protobuf to save
+ * bandwidth on the I2C interface. Every OnReceive call should be followed by an
+ * OnRequest call to retrieve status codes or data produced by the command.
+ * 
+ * Functional calls are tied to Arduino Wire library. For unit tests, the define
+ * UNIT_TEST creates a global buffer that can be used in place of real i2c
+ * communication.
  * 
  * @copyright Copyright (c) 2024
  * 

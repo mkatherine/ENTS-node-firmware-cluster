@@ -27,7 +27,8 @@ void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
 }
 
 size_t ModuleWiFi::OnRequest(uint8_t* buffer) {
-
+  // copy contents into request buffer
+  memcpy(buffer, this->request_buffer, this->request_buffer_len);
 }
 
 void ModuleWiFi::Connect(const Esp32Command& cmd) {
@@ -70,7 +71,7 @@ void ModuleWiFi::Post(const Esp32Command& cmd) {
 
   // get response data
   // TODO may need to pass pointer of a pointer
-  const uint8_t* resp = {};
+  uint8_t* resp = {};
   size_t resp_len = this->dirtviz.GetResponse(resp);
 
   // encode wifi command in buffer

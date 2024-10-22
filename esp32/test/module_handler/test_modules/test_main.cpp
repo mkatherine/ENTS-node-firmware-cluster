@@ -48,7 +48,7 @@ void TestRegister(void) {
 }
 
 void TestDeregister(void) {
-  module_handler.DeregisterModule(0);
+  module_handler.DeregisterModule(2);
 
   bool mod_exist = true;
 

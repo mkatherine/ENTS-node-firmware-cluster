@@ -5,6 +5,11 @@
  * @version 0.1
  * @date 2024-08-23
  * 
+ * The WiFi module support CONNECT and POST commands through OnReceive. The
+ * CONNECT command connects to a WiFi network and returns the timestamp from the
+ * server for time syncronization purposes. The POST requires sends a HTTP POST
+ * to the configured hub URL and returns the data from the HTTP response.
+ * 
  * @copyright Copyright (c) 2024
  * 
  */

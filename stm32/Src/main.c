@@ -124,7 +124,7 @@ int main(void)
   WiFiInit();
 
   // initialize LoRaWAN code
-  //MX_LoRaWAN_Init();
+  MX_LoRaWAN_Init();
 
 
   // I think this is already initialized

@@ -44,10 +44,10 @@ extern "C" {
 #endif /* FRAM_BUFFER_END */
 
 /** Addresses in FRAM for buffer state variables */
-#define FRAM_BUFFER_READ_ADDR    0x06F0  // 1776 (close to the end of buffer space)
-#define FRAM_BUFFER_WRITE_ADDR   0x06F2  // 1778
-#define FRAM_BUFFER_LEN_ADDR     0x06F4  // 1780
-#define FRAM_BUFFER_START 0x0000         // 0
+#define FRAM_BUFFER_READ_ADDR 0x06F0  // 1776 (close to the end of buffer space)
+#define FRAM_BUFFER_WRITE_ADDR 0x06F2  // 1778
+#define FRAM_BUFFER_LEN_ADDR 0x06F4    // 1780
+#define FRAM_BUFFER_START 0x0000       // 0
 
 #if FRAM_BUFFER_START > FRAM_BUFFER_END
 #error "Buffer end address must be greater than buffer start address"
@@ -91,30 +91,32 @@ uint16_t FramBufferLen(void);
 FramStatus FramBufferClear(void);
 
 /**
- * @brief Saves the buffer state (read address, write address, and buffer length)
- *        to FRAM.
+ * @brief Saves the buffer state (read address, write address, and buffer
+ * length) to FRAM.
  *
  * @param read_addr Current read address of the circular buffer.
  * @param write_addr Current write address of the circular buffer.
  * @param buffer_len Current length of the circular buffer.
  * @return FramStatus, status of the FRAM operation.
  */
-FramStatus FramSaveBufferState(uint16_t read_addr, uint16_t write_addr, uint16_t buffer_len);
+FramStatus FramSaveBufferState(uint16_t read_addr, uint16_t write_addr,
+                               uint16_t buffer_len);
 
 /**
- * @brief Loads the buffer state (read address, write address, and buffer length)
- *        from FRAM.
+ * @brief Loads the buffer state (read address, write address, and buffer
+ * length) from FRAM.
  *
  * @param read_addr Pointer to store the retrieved read address.
  * @param write_addr Pointer to store the retrieved write address.
  * @param buffer_len Pointer to store the retrieved buffer length.
  * @return FramStatus, status of the FRAM operation.
  */
-FramStatus FramLoadBufferState(uint16_t *read_addr, uint16_t *write_addr, uint16_t *buffer_len);
+FramStatus FramLoadBufferState(uint16_t *read_addr, uint16_t *write_addr,
+                               uint16_t *buffer_len);
 
 /**
- * @brief Initializes the FIFO buffer by loading the buffer state (read address, 
- *        write address, and buffer length) from FRAM. If the state cannot be 
+ * @brief Initializes the FIFO buffer by loading the buffer state (read address,
+ *        write address, and buffer length) from FRAM. If the state cannot be
  *        loaded or is invalid, it initializes the buffer with default values.
  * @return FramStatus, status of the FRAM operation.
  */

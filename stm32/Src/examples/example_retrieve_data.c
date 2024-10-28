@@ -1,13 +1,14 @@
 #include <stdio.h>
+
 #include "adc.h"
 #include "battery.h"
 #include "dma.h"
+#include "fifo.h"
+#include "fram.h"
 #include "gpio.h"
 #include "main.h"
-#include "usart.h"
 #include "sys_app.h"
-#include "fram.h"
-#include "fifo.h"
+#include "usart.h"
 
 /** Delay between print statements */
 #ifndef DELAY
@@ -32,13 +33,13 @@ int main(void) {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;    // Set as push-pull output
-  GPIO_InitStruct.Pull = GPIO_NOPULL;            // No pull-up or pull-down
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;   // Low frequency for LED
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;   // Set as push-pull output
+  GPIO_InitStruct.Pull = GPIO_NOPULL;           // No pull-up or pull-down
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;  // Low frequency for LED
 
   FramStatus status;
 
-  const uint8_t test_data[] = {0x11, 0x22, 0x33}; // Example data
+  const uint8_t test_data[] = {0x11, 0x22, 0x33};  // Example data
   for (int i = 0; i < 10; i++) {
     status = FramPut(test_data, sizeof(test_data));
   }
@@ -53,9 +54,9 @@ int main(void) {
   // while (FramBufferLen() > 0) {
   //     status = FramGet(retrieved_data, &retrieved_len);
   //     if (status == FRAM_OK) {
-  //         // Loop through retrieved_data and print each byte in hexadecimal format
-  //         print("Data length: %d\n", retrieved_len);
-  //         for (int i = 0; i < retrieved_len; i++) {
+  //         // Loop through retrieved_data and print each byte in hexadecimal
+  //         format print("Data length: %d\n", retrieved_len); for (int i = 0; i
+  //         < retrieved_len; i++) {
   //             print("Data[%d]: 0x%02X\n", i, retrieved_data[i]);
   //         }
   //     } else {
@@ -69,7 +70,6 @@ int main(void) {
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     HAL_Delay(500);
   }
-
 }
 
 /**

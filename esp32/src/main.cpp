@@ -6,64 +6,72 @@
  */
 
 #include <Arduino.h>
-#include <WiFi.h>
+#include <Wire.h>
+#include <ArduinoLog.h>
 
-#include "dirtviz.hpp"
+#include "module_handler.hpp"
+#include "modules/wifi.hpp"
 
-/** Baud rate for serial interface */
-#define SERIAL_BAUD 115200
+/** Target device address */
+static const uint8_t dev_addr = 0x20;
+/** Serial data pin */
+static const int sda_pin = 0;
+/** Serial clock pin */
+static const int scl_pin = 1;
+  
 
-const char ssid[] = "ResWiFi-Devices";
-const char pass[] = "RbRr2V7X3h288qScPg";
-
-Dirtviz api("dirtviz.jlab.ucsc.edu", 443);
-
-const char data[] = "Hello World";
-const size_t data_len = 12;
+// create wifi module
+static ModuleHandler::ModuleHandler mh;
 
 /**
- * @brief Initialization code run on startup
- * 
- * 
-*/
+ * @brief Callback for onReceive
+ *
+ * See Arduino wire library for reference
+ */
+void onReceive(int len) {
+  Log.traceln("Received message with length %d", len);
+  mh.OnReceive(len);
+}
+
+/**
+ * @brief Callback for onRequest
+ *
+ * See Arduino wire library for reference
+ */
+void onRequest() {
+  Log.traceln("Request made from host");
+  mh.OnRequest();
+}
+
+/** Startup code */
 void setup()
 {
   // Start serial interface
   Serial.begin(115200);
-  // Wait for serial connection
-  while (!Serial) { delay(100); }
 
-  Serial.print("SSID: ");
-  Serial.println(ssid);
-  Serial.print("Password: ");
-  Serial.println(pass);
-  Serial.print("Connecting");
+  // Create logging interfface
+  Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
-  // Connect to WiFi network
-  WiFi.begin(ssid, pass);
+  Log.noticeln("ents-node esp32 firmware, compiled at %s %s", __DATE__,
+      __TIME__);
 
-  // Wait for WiFi to connect
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
+  Log.traceln("Starting i2c interface...");
+
+  // create adn register the WiFi module
+  static ModuleWiFi wifi;
+  mh.RegisterModule(&wifi);
+
+  // start i2c interface
+  Wire.onReceive(onReceive);
+  Wire.onRequest(onRequest);
+  bool i2c_status = Wire.begin(dev_addr, sda_pin, scl_pin, 100000);
+
+  if (i2c_status) {
+    Log.traceln("Success!");
+  } else {
+    Log.traceln("Failed!");
   }
-
-  Serial.println("");
-  Serial.println("Connected!");
-  Serial.println(WiFi.localIP());
 }
 
-void loop()
-{
-  // Buffer to store response
-  static uint8_t resp[256];
-  static size_t resp_len;
-
-  // Send example measurement
-  resp_len = api.SendMeasurement((const uint8_t*) data, data_len);
-
-  // Print response
-  Serial.print("Response:");
-  Serial.println((char*) resp);
-}
+/** Loop code */
+void loop() {}

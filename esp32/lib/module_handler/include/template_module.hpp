@@ -56,6 +56,16 @@ namespace ModuleHandler {
     int State(void);
 
     /**
+     * @brief Get the message type associated with the module
+     *
+     * Full list of message types are available in generated protobuf code
+     * under *_tag.
+     *
+     * @return Integer fo type
+     */
+    int Type();
+
+    /**
      * @brief Resets the module to default state
      * 
      * The default state is 
@@ -66,6 +76,9 @@ namespace ModuleHandler {
 
     /** Integer representing current state */
     int state = 0;
+
+    /** Integer for message type */
+    int type = 0;
   };
 }
 

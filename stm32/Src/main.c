@@ -39,8 +39,10 @@
 #include "phytos31.h"
 #include "rtc.h"
 #include "sensors.h"
-
 #include "wifi.h"
+
+#include "controller/controller.h"
+#include "controller/wifi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,8 +112,14 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  // initialize
+
+  // initialize the app
+  SystemApp_Init();
+  
+  // init external adc
   ADC_init();
+
+  // initialize
   SensorsInit();
   
   // configure sensors
@@ -121,14 +129,14 @@ int main(void)
 
   // initialize WiFi
   ControllerInit();
+
+  // init either WiFi or LoRaWAN
+  //MX_LoRaWAN_Init();
   WiFiInit();
 
-  // initialize LoRaWAN code
-  MX_LoRaWAN_Init();
 
+  APP_LOG(TS_ON, VLEVEL_M, "Hello World!\r\n");
 
-  // I think this is already initialized
-  //MX_RTC_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */

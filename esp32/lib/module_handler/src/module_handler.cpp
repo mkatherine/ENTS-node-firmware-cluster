@@ -11,9 +11,10 @@ ModuleHandler::ModuleHandler::ModuleHandler() {}
 
 ModuleHandler::ModuleHandler::~ModuleHandler() {}
 
-void ModuleHandler::ModuleHandler::RegisterModule(int type, Module *module)
+void ModuleHandler::ModuleHandler::RegisterModule(Module *module)
 {
-  // add module to map
+  // add module to map based on type
+  int type = module->Type();
   this->req_map[type] = module;
 }
 

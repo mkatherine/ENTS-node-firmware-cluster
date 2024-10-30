@@ -1,6 +1,9 @@
 #include "modules/wifi.hpp"
 
-ModuleWiFi::ModuleWiFi(void) {}
+ModuleWiFi::ModuleWiFi(void) {
+  // set module type
+  type = Esp32Command_wifi_command_tag;
+}
 
 ModuleWiFi::~ModuleWiFi(void) {}
 

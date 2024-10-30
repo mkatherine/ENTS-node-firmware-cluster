@@ -36,8 +36,6 @@ void UploadEvent(void *context);
 void Upload(void);
 
 void WiFiInit(void) {
-  // initialize the app
-  SystemApp_Init();
 
   APP_LOG(TS_OFF, VLEVEL_M, "WiFi app starting\r\n");
 
@@ -48,14 +46,14 @@ void WiFiInit(void) {
   const char url[] = "https://httpbin.org/get";
   const uint32_t port = 443;
 
-  APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t");
+  APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t", ssid);
 
   // initialize 
   SysTime_t ts = {.Seconds = 0, .SubSeconds = 0};
   ts.Seconds = ControllerWiFiInit(ssid, passwd, url, port);
 
   APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
-  APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d", ts.Seconds);
+  APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
 
   // update clock
   SysTimeSet(ts);
@@ -63,14 +61,14 @@ void WiFiInit(void) {
   // start sensor measurements
   APP_LOG(TS_ON, VLEVEL_M, "Starting sensor measurements...\t");
   SensorsStart();
-  APP_LOG(TS_ON, VLEVEL_M, "Started!\r\n");
+  APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
 
   // setup upload task
   APP_LOG(TS_ON, VLEVEL_M, "Starting upload task...\t")
   UTIL_SEQ_RegTask((1 >> CFG_SEQ_Task_WiFiUpload), UTIL_SEQ_RFU, Upload);
   UTIL_TIMER_Create(&UploadTimer, UploadPeriod, UTIL_TIMER_PERIODIC, UploadEvent, NULL);
   UTIL_TIMER_Start(&UploadTimer);
-  APP_LOG(TS_ON, VLEVEL_M, "Started!\r\n");
+  APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
 }
 
 void UploadEvent(void *context) {

@@ -29,12 +29,6 @@ typedef struct {
   size_t len;
 } Buffer;
 
-/** @brief Buffer for ControllerTransmit */
-static Buffer tx = {};
-
-/** Buffer for ControllerReceive */
-static Buffer rx = {};
-
 /**
  * @brief Send bytes to esp32
  * 
@@ -55,6 +49,24 @@ ControllerStatus ControllerReceive(unsigned int timeout);
  * @param timeout Timeout duration in ms
  */
 ControllerStatus ControllerTransaction(unsigned int timeout);
+
+/**
+ * @brief Get reference to transmit buffer
+ *
+ * Buffers needs to first be initialized with ControllerInit().
+ *
+ * @return Pointer to transmit buffer
+ */
+Buffer* ControllerTx(void);
+
+/**
+ * @brief Get reference to receive buffer
+ *
+ * Buffers needs to first be initialized with ControllerInit().
+ *
+ * @return Pointer to receive buffer
+ */
+Buffer* ControllerRx(void);
 
 #ifdef __cplusplus
 }

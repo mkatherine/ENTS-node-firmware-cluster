@@ -9,21 +9,25 @@ uint32_t ControllerWiFiInit(
   const char* url,
   const uint32_t port
 ) {
+  // get reference to tx and rx buffers
+  Buffer* tx = ControllerTx();
+  Buffer* rx = ControllerRx();
+
   // encode command
-  tx.len = EncodeWiFiCommand(WiFiCommand_Type_CONNECT, ssid, passwd, url, port,
-                             0, 0, NULL, 0, tx.data, tx.size);
+  tx->len = EncodeWiFiCommand(WiFiCommand_Type_CONNECT, ssid, passwd, url, port,
+                             0, 0, NULL, 0, tx->data, tx->size);
 
   // send transaction 
   ControllerTransaction(500);
 
   // check for errors
-  if (rx.len == 0) {
+  if (rx->len == 0) {
     return 0;
   }
 
   // decode command
   Esp32Command cmd = Esp32Command_init_default;
-  DecodeEsp32Command(rx.data, rx.len);
+  DecodeEsp32Command(rx->data, rx->len);
 
   // return timestamp
   return cmd.command.wifi_command.ts;
@@ -35,21 +39,25 @@ int ControllerWiFiPost(
   uint8_t* resp,
   uint8_t* resp_len
 ) {
+  // get reference to tx and rx buffers
+  Buffer* tx = ControllerTx();
+  Buffer* rx = ControllerRx();
+
   // encode command
-  tx.len = EncodeWiFiCommand(WiFiCommand_Type_POST, NULL, NULL, NULL, 0, 0, 0,
+  tx->len = EncodeWiFiCommand(WiFiCommand_Type_POST, NULL, NULL, NULL, 0, 0, 0,
                              data, data_len, resp, resp_len);
 
   // send transaction
   ControllerTransaction(500);
 
   // check for errors
-  if (rx.len == 0) {
+  if (rx->len == 0) {
     return 0;
   }
   
   // decode command
   Esp32Command cmd = Esp32Command_init_default;
-  cmd = DecodeEsp32Command(rx.data, rx.len);
+  cmd = DecodeEsp32Command(rx->data, rx->len);
 
   // copy response
   memcpy(resp, cmd.command.wifi_command.resp.bytes, cmd.command.wifi_command.resp.size);

@@ -11,3 +11,7 @@ void ModuleHandler::Module::Reset(void) {
 int ModuleHandler::Module::State(void) {
   return this->state;
 }
+
+int ModuleHandler::Module::Type() {
+  return type;
+}

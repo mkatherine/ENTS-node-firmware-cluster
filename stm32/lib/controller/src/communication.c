@@ -24,7 +24,14 @@ static const int g_i2c_buffer_size = 32;
  * This is hardcoded on both devices but is variable in case of another device
  * using the same address.
  */
-static const uint8_t g_esp32_i2c_addr = 0x20;
+static const uint8_t g_esp32_i2c_addr = 0x20 << 1;
+
+
+/** @brief Buffer for ControllerTransmit */
+static Buffer tx = {0};
+
+/** Buffer for ControllerReceive */
+static Buffer rx = {0};
 
 /**
  * @brief Wakeup esp32 from deep sleep
@@ -65,7 +72,7 @@ ControllerStatus ControllerTransmit(unsigned int timeout) {
   }
 
   // create small buffer
-  Buffer chunk = {};
+  Buffer chunk = {0};
   chunk.data = malloc(g_i2c_buffer_size);
   chunk.size = g_i2c_buffer_size;
   chunk.len = 0;
@@ -77,15 +84,15 @@ ControllerStatus ControllerTransmit(unsigned int timeout) {
   bool done = false;
 
 
-  // handle typical case of data being larger than i2c buffer size
+  // handle data being larger than i2c buffer size
   do {
     // calculate number of bytes to cpy
     size_t num_bytes = 0;
     if (tx_idx.len > (chunk.size-1)) {
+      num_bytes = chunk.size-1;
+    } else {
       num_bytes = tx_idx.len;
       done = true;
-    } else {
-      num_bytes = chunk.size-1;
     }
 
     // first byte is flag
@@ -190,6 +197,14 @@ ControllerStatus ControllerReceive(unsigned int timeout) {
 ControllerStatus ControllerTransaction(unsigned int timeout) {
   ControllerTransmit(timeout);
   ControllerReceive(timeout);
+}
+
+Buffer* ControllerTx(void) {
+  return &tx;
+}
+
+Buffer* ControllerRx(void) {
+  return &rx;
 }
 
 ControllerStatus HALToControllerStatus(HAL_StatusTypeDef hal_status) {

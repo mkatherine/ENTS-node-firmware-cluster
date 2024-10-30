@@ -57,7 +57,7 @@ namespace ModuleHandler {
      * @param module Pointer to module object
      * @param type Message type
      */
-    void RegisterModule(int type, Module* module);
+    void RegisterModule(Module* module);
 
     /**
      * @brief Deregister a module

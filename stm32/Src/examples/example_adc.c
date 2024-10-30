@@ -119,6 +119,7 @@ int main(void)
 
 
   /* USER CODE BEGIN 2 */
+  //HAL_Delay(50);
   ADC_init();
   // int size = sprintf(fail_str, "Failed at ADC_init\n");
   // HAL_UART_Transmit(&huart1, (const uint8_t *) fail_str, size, 100);
@@ -139,15 +140,15 @@ int main(void)
     /* USER CODE END WHILE */    
 
     /* USER CODE BEGIN 3 */
-    voltage_reading = ADC_readVoltage();
-    reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
-    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
-
     current_reading = ADC_readCurrent();
     reading_len = sprintf(output2, "Current: %f\r\n", current_reading);
     HAL_UART_Transmit(&huart1, (const uint8_t *) output2, reading_len, HAL_MAX_DELAY);
 
-    HAL_Delay(1000); 
+    //HAL_Delay(1000); 
+    voltage_reading = ADC_readVoltage();
+    reading_len = sprintf(output, "Voltage: %f\r\n", voltage_reading);
+    HAL_UART_Transmit(&huart1, (const uint8_t *) output, reading_len, HAL_MAX_DELAY);
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }

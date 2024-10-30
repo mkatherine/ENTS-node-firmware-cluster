@@ -14,12 +14,12 @@
 
 #include <stm32wlxx_hal_gpio.h>
 
-#define CALIBRATION
+//#define CALIBRATION
 
-const double voltage_calibration_m = -0.00039367;
-const double voltage_calibration_b = -1.6887690619205245;
-const double current_calibration_m = -1.18844302e-10;
-const double current_calibration_b = 3.554079888291547e-05;
+const double voltage_calibration_m = -0.00039346;
+const double voltage_calibration_b = -0.5442246923562877;
+const double current_calibration_m = -1.187971e-10;
+const double current_calibration_b = 3.9018992737640816e-05;
 
 /**
  * @brief GPIO port for adc data ready line
@@ -105,11 +105,27 @@ double ADC_readVoltage(void){
   HAL_StatusTypeDef ret;
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
 
-  ret = ADC_configure(0x03);
+  // 0x01 is single shot 0x03 is continuous 
+  ret = ADC_configure(0x01 | 0b1100);
   if (ret != HAL_OK){
     return -1;
   }
-    
+  HAL_Delay(60);
+  /*
+  // Modification
+  uint8_t coderreg = 0b00100000; // read from configuration register 0
+  uint8_t rx_datarreg[1] = {0x00}; // rreg only returns 1 byte of data
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &coderreg, 1, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return -1;
+  }
+  ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_datarreg, 1, 1000);
+  if (ret != HAL_OK){
+    return -1;
+  }
+  // end of modification
+  */
+
   while(HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &code, 1, HAL_MAX_DELAY);
@@ -145,10 +161,26 @@ double ADC_readCurrent(void){
   HAL_StatusTypeDef ret;
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
 
-  ret = ADC_configure(0x23); //configure to read current
+  // 0x21 is single shot and 0x23 is continuos
+  ret = ADC_configure(0x21 | 0b1100); //configure to read current
   if (ret != HAL_OK){
     return -1;
   }
+  HAL_Delay(60);
+  /*
+  // Modification 
+  uint8_t coderreg = 0b00100000; // read from configuration register 0
+  uint8_t rx_datarreg[1] = {0x00}; // rreg only returns 1 byte of data
+  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &coderreg, 1, HAL_MAX_DELAY);
+  if (ret != HAL_OK){
+    return -1;
+  }
+  ret = HAL_I2C_Master_Receive(&hi2c2, ADS12_READ, rx_datarreg, 1, 1000);
+  if (ret != HAL_OK){
+    return -1;
+  }
+  // end of modification
+  */
     
   while(HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)); // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
   code = ADS12_READ_DATA_CODE;

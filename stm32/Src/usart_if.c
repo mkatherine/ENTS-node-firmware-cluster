@@ -230,8 +230,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
   /* USER CODE END HAL_UART_TxCpltCallback_2 */
 }
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+__attribute__((weak)) void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   /* USER CODE BEGIN HAL_UART_RxCpltCallback_1 */
 

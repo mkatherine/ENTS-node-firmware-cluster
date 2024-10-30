@@ -1,0 +1,3 @@
+UserConfiguration.WiFi_SSID:32
+UserConfiguration.WiFi_Password:64
+UserConfiguration.API_Endpoint_URL:256

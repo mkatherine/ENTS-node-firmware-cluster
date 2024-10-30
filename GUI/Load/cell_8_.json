@@ -1,0 +1,24 @@
+{
+    "Logger ID": 8,
+    "Cell ID": 8,
+    "Upload Method": "LoRa",
+    "Days": 8,
+    "Hours": 0,
+    "Minutes": 0,
+    "Seconds": 0,
+    "Enabled Sensors": {
+        "Voltage": true,
+        "Current": false,
+        "Teros12": false,
+        "Teros21": true,
+        "BME280": false
+    },
+    "Calibration V Slope": 6.0,
+    "Calibration V Offset": 8.0,
+    "Calibration I Slope": 6.0,
+    "Calibration I Offset": 8.0,
+    "WiFi SSID": "",
+    "WiFi Password": "",
+    "API Endpoint URL": "",
+    "API Port": 0
+}

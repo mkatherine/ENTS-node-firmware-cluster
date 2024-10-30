@@ -123,6 +123,44 @@ void TestDecodeResponseError(void)
 }
 
 /**
+ * Command used to generate the code for validating the output
+ *
+ * sps encode --c esp32command wifi --ssid Hello --passwd World --url "http://www.test.com/" --port 443 --rc 200 --ts 1600000 CONNECT
+ */
+void TestEncodeWiFi() {
+  uint8_t buffer[WiFiCommand_size];
+  size_t buffer_len;
+
+  buffer_len = EncodeWiFiCommand(
+      WiFiCommand_Type_CONNECT,
+      "Hello",
+      "World",
+      "http://www.test.com/",
+      443,
+      200,
+      1600000,
+      NULL,
+      0,
+      buffer,
+      sizeof(buffer)
+    );
+
+  uint8_t data[] = {0x1a, 0x2e, 0x12, 0x5, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x1a,
+    0x5, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x22, 0x14, 0x68, 0x74, 0x74, 0x70,
+    0x3a, 0x2f, 0x2f, 0x77, 0x77, 0x77, 0x2e, 0x74, 0x65, 0x73, 0x74, 0x2e,
+    0x63, 0x6f, 0x6d, 0x2f, 0x28, 0xc8, 0x1, 0x30, 0x80, 0xd4, 0x61, 0x40,
+    0xbb, 0x3};
+  size_t data_len = 48;
+
+  TEST_ASSERT_EQUAL(data_len, buffer_len);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(data, buffer, buffer_len);
+}
+
+void TestEncodeWiFiCommand() {
+
+}
+
+/**
   * @brief Entry point for protobuf test
   * @retval int
   */
@@ -151,6 +189,7 @@ int main(void)
   RUN_TEST(TestEncodePhytos31);
   RUN_TEST(TestDecodeResponseSuccess);
   RUN_TEST(TestDecodeResponseError);
+  RUN_TEST(TestEncodeWiFi);
 
   UNITY_END();
 }

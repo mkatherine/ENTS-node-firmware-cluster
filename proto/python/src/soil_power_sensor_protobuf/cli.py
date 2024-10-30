@@ -95,7 +95,7 @@ def create_encode_parser(subparsers):
         wifi_parser.add_argument('--url', type=str, default="", help="Endpoint url")
         wifi_parser.add_argument('--port', type=int, default=0, help="Endpoint port")
         wifi_parser.add_argument('--rc', type=int, default=0, help="Return code")
-        wifi_parser.add_argument('--ts', type=str, help="Timestamp")
+        wifi_parser.add_argument('--ts', type=int, help="Timestamp in unix epochs")
         wifi_parser.add_argument('--resp', type=str, default=b"", help="Serialized response message")
         wifi_parser.set_defaults(func=handle_encode_esp32command_wifi)
         
@@ -170,13 +170,6 @@ def handle_encode_esp32command_page(args):
     print_data(args, data)
     
 def handle_encode_esp32command_wifi(args):
-    # process timestamp string
-    if (args.ts):
-        ts = datetime.fromisoformat(args.ts)
-        ts = ts.timestamp()
-    else:
-        ts = 0
-    
     data = encode_esp32command(
         "wifi",
         _type=args.type.lower(),
@@ -185,7 +178,7 @@ def handle_encode_esp32command_wifi(args):
         url=args.url,
         port=args.port,
         rc=args.rc,
-        ts=ts,
+        ts=args.ts,
         resp=args.resp
     )
     print_data(args, data)

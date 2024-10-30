@@ -183,6 +183,7 @@ size_t EncodeWiFiCommand(
 ) {
   Esp32Command cmd = Esp32Command_init_default;
 
+  cmd.which_command = Esp32Command_wifi_command_tag;
   cmd.command.wifi_command.type = type;
   strcpy(cmd.command.wifi_command.ssid, ssid);
   strcpy(cmd.command.wifi_command.passwd, passwd);
@@ -201,7 +202,7 @@ size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer, size_t size)
   // create output stream
   pb_ostream_t ostream = pb_ostream_from_buffer(buffer, size);
   // encode message and check rc
-  bool status = pb_encode(&ostream, Measurement_fields, cmd);
+  bool status = pb_encode(&ostream, Esp32Command_fields, cmd);
   if (!status)
   {
     return -1;

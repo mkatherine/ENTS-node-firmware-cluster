@@ -106,7 +106,7 @@ double ADC_readVoltage(void){
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; // Why is this only 3 bytes?
 
   // 0x01 is single shot 0x03 is continuous 
-  ret = ADC_configure(0x01 | 0b1100);
+  ret = ADC_configure(0x01);
   if (ret != HAL_OK){
     return -1;
   }
@@ -162,7 +162,7 @@ double ADC_readCurrent(void){
   uint8_t rx_data[3] = {0x00, 0x00, 0x00}; 
 
   // 0x21 is single shot and 0x23 is continuos
-  ret = ADC_configure(0x21 | 0b1100); //configure to read current
+  ret = ADC_configure(0x21); //configure to read current
   if (ret != HAL_OK){
     return -1;
   }
@@ -204,7 +204,7 @@ double ADC_readCurrent(void){
 
 
   #ifndef CALIBRATION
-  //reading =  (CURRENT_SLOPE * reading) + CURRENT_B; // Calculated from linear regression
+  reading =  (current_calibration_m * reading) + current_calibration_b; // Calculated from linear regression
   #endif /* CALIBRATION */
 
   return reading;

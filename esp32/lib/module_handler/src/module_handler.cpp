@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <ArduinoLog.h>
 
 #include "transcoder.h"
 
@@ -24,6 +25,8 @@ void ModuleHandler::ModuleHandler::DeregisterModule(int type) {
 }
 
 void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
+  Log.traceln("ModuleHandler::OnReceive");
+
   if (this->receive_buffer.len + num_bytes > this->receive_buffer.size) {
     // TODO handle error
   }
@@ -38,10 +41,16 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
   #else
   // set continue flag to first byte
   bool msg_end = (bool) Wire.read();
+  Log.traceln("msg_end: %T", msg_end);
   #endif
 
   // get end of buffer
-  uint8_t* prev_end = this->receive_buffer.data + this->receive_buffer.len + 1;
+  uint8_t* prev_end = NULL; 
+  if (this->receive_buffer.len == 0) {
+    prev_end = this->receive_buffer.data;
+  } else {
+    prev_end = this->receive_buffer.data + this->receive_buffer.len + 1;
+  }
 
   // loop over available bytes in buffer
   for (uint8_t* end = prev_end; end < prev_end + num_bytes - 1; end++) {
@@ -60,17 +69,29 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
     *end = Wire.read();
     #endif
 
+    Log.traceln("Wire.read -> %X", *end);
+
     // increment length
     this->receive_buffer.len++;
   }
 
   // call module OnReceive
   if (msg_end) {
+    Log.traceln("Message done");
+    Log.traceln("Decoding message");
+    for (int i = 0; i < this->receive_buffer.len; i++) {
+      Log.traceln("receive_buffer[%d] = %X", i, this->receive_buffer.data[i]);
+    }
+
     // decode measurement
     Esp32Command cmd = DecodeEsp32Command(this->receive_buffer.data, this->receive_buffer.len);
 
+    Log.traceln("Forwarding message");
+    Log.traceln("cmd.which_command: %d", cmd.which_command);
+
     // store reference to module for future OnRequest calls
     this->last_module = this->req_map.at(cmd.which_command);
+
     // forward command to module
     this->last_module->OnReceive(cmd);
   }

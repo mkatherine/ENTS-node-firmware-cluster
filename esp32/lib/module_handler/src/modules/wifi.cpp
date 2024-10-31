@@ -1,5 +1,7 @@
 #include "modules/wifi.hpp"
 
+#include <ArduinoLog.h>
+
 ModuleWiFi::ModuleWiFi(void) {
   // set module type
   type = Esp32Command_wifi_command_tag;
@@ -8,6 +10,8 @@ ModuleWiFi::ModuleWiFi(void) {
 ModuleWiFi::~ModuleWiFi(void) {}
 
 void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
+  Log.traceln("ModuleWiFi::OnReceive");
+
   // check if WiFi command
   if (cmd.which_command != Esp32Command_wifi_command_tag) {
     return;
@@ -35,6 +39,12 @@ size_t ModuleWiFi::OnRequest(uint8_t* buffer) {
 }
 
 void ModuleWiFi::Connect(const Esp32Command& cmd) {
+  Log.traceln("ModuleWiFi::Connect");
+
+  Log.noticeln("Connecting to WiFI...");
+  Log.noticeln("ssid: %s", cmd.command.wifi_command.ssid);
+  Log.noticeln("passwd: %s", cmd.command.wifi_command.passwd);
+
   // connect to WiFi
   WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
 
@@ -43,21 +53,16 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   while (WiFi.status() != WL_CONNECTED) {
     // TODO implement lp sleep
     delay(500);
-    Serial.print(".");
 
     // wifi connect timeout
     if (millis() >= timeout) {
-      Serial.print("Could not connect to WiFi, SSID: ");
-      Serial.print(cmd.command.wifi_command.ssid);
-      Serial.print(", PASS: ");
-      Serial.println(cmd.command.wifi_command.passwd);
+      Log.errorln("Could not connect!");
     }
   }
 
   // print ip address
-  Serial.println("");
-  Serial.println("Connected!");
-  Serial.println(WiFi.localIP());
+  Log.noticeln("Connected!");
+  Log.noticeln("ip: %p", WiFi.localIP());
 
   // set url
   this->dirtviz.SetUrl(cmd.command.wifi_command.url);
@@ -67,6 +72,8 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
 }
 
 void ModuleWiFi::Post(const Esp32Command& cmd) {
+  Log.traceln("ModuleWiFI::Post");
+
   // send measurement
   const uint8_t* meas = cmd.command.wifi_command.resp.bytes;
   const size_t meas_len = cmd.command.wifi_command.resp.size;

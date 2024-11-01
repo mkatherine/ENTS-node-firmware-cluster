@@ -1,8 +1,10 @@
+// Copyright 2023 jLab, UCSC
+
 /**
  * @file    fifo.c
  * @author  Stephen Taylor
  * @date    11/17/2023
- * 
+ *
  * @see fifo.h
  **/
 
@@ -16,49 +18,46 @@ static uint16_t buffer_len = 0;
 
 /**
  * @brief Updates circular buffer address based on number of bytes
- * 
- * @param addr 
- * @param num_bytes 
+ *
+ * @param addr
+ * @param num_bytes
  */
 static inline void update_addr(uint16_t *addr, const uint16_t num_bytes) {
-  *addr = (*addr + num_bytes) % fram_buffer_size;
+  *addr = (*addr + num_bytes) % kFramBufferSize;
 }
 
 /**
  * @brief Get the remaining space in the buffer
- * 
+ *
  * Calculates the difference between the write and read address in a single
  * forward direction in the circular buffer. If they are equal then nothing has
  * been written.
- * 
+ *
  * @return Remaining space in bytes
  */
 static uint16_t get_remaining_space(void) {
   uint16_t space_used = 0;
   if (write_addr > read_addr) {
-    space_used = write_addr - read_addr;  
-  }
-  else if (write_addr < read_addr) {
-    space_used = fram_buffer_size - (read_addr - write_addr);
-  }
-  else {
+    space_used = write_addr - read_addr;
+  } else if (write_addr < read_addr) {
+    space_used = kFramBufferSize - (read_addr - write_addr);
+  } else {
     // if anything is stored in buffer than entire capacity is used
     // otherwise buffer is empty and all free space is available
     if (buffer_len > 0) {
-      space_used = fram_buffer_size;
-    }
-    else {
+      space_used = kFramBufferSize;
+    } else {
       space_used = 0;
     }
   }
 
-  uint16_t remaining_space = fram_buffer_size - space_used;
+  uint16_t remaining_space = kFramBufferSize - space_used;
   return remaining_space;
 }
 
 FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   // check remaining space
-  if (num_bytes+1 > get_remaining_space()) {
+  if (num_bytes + 1 > get_remaining_space()) {
     return FRAM_BUFFER_FULL;
   }
 
@@ -97,7 +96,6 @@ FramStatus FramGet(uint8_t *data, uint8_t *len) {
     return status;
   }
   update_addr(&read_addr, 1);
-  
 
   // Read data from FRAM circular buffer
   status = FramRead(read_addr, *len, data);
@@ -112,9 +110,7 @@ FramStatus FramGet(uint8_t *data, uint8_t *len) {
   return FRAM_OK;
 }
 
-uint16_t FramBufferLen(void) {
-  return buffer_len;
-}
+uint16_t FramBufferLen(void) { return buffer_len; }
 
 FramStatus FramBufferClear(void) {
   // Set read and write addresses to their default values

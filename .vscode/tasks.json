@@ -4,42 +4,61 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "doxygen",
+      "label": "Generate documentation",
       "type": "shell",
       "command": "doxygen Doxyfile"
     },
     {
-      "label": "Lint stm32",
+      "label": "Lint stm32/esp32",
       "type": "shell",
-      "command": "${command:python.interpreterPath}",
+      "command": "python",
       "args": [
         "-m",
         "cpplint",
         "--recursive",
-        "--root=stm32",
-        "--output=vs7",
-        "stm32/Inc",
-        "stm32/Src",
-        "stm32/test"
+        "stm32/Src/examples",
+        "stm32/lib",
+        "stm32/test",
+        "esp32/include",
+        "esp32/src",
+        "esp32/test",
+        "esp32/lib",
+        "proto/c/include/transcoder.h",
+        "proto/c/src/transcoder.c"
       ],
       "problemMatcher": []
     },
     {
-      "label": "Lint esp32",
+      "label": "Lint open file",
       "type": "shell",
-      "command": "${command:python.interpreterPath}",
+      "command": "python",
       "args": [
         "-m",
         "cpplint",
-        "--recursive",
-        "--root=esp32",
-        "--output=vs7",
-        "esp32/Inc",
-        "esp32/Src",
-        "esp32/test",
-        "esp32/lib"
+        "${file}"
       ],
       "problemMatcher": []
+    },
+    {
+      "label": "Format project",
+      "type": "shell",
+      "command": "clang-format",
+      "args": [
+        "--style=Google",
+        "-i",
+        "stm32/Src/examples/*.c",
+        "stm32/lib/**/*.h",
+        "stm32/lib/**/*.c",
+        "stm32/test/**/*.h",
+        "stm32/test/**/*.c",
+        "esp32/**/*.cpp",
+        "esp32/**/*.hpp",
+        "proto/c/include/transcoder.h",
+        "proto/c/src/transcoder.c"
+      ],
+      "problemMatcher": [
+        "$gcc"
+      ]
     }
   ]
 }

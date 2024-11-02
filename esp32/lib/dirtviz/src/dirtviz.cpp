@@ -5,8 +5,12 @@
  * @date 2023-11-29
 */
 
-#include <Arduino.h>
 #include "dirtviz.hpp"
+
+#include <Arduino.h>
+#include <ArduinoLog.h>
+#include <sstream>
+#include <iomanip>
 
 Dirtviz::Dirtviz(void) : url(nullptr), response(nullptr) {}
 
@@ -57,23 +61,51 @@ uint16_t Dirtviz::GetPort(void) const
   return this->port;
 }
 
-int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
-{
-  // WiFi client for connection with API
-  //WiFiClientSecure client;
+uint32_t Dirtviz::Check() const {
   WiFiClient client;
 
-  // buffer for making post requests
+  if (!client.connect(url, port)) {
+    return 0;
+  }
+  
+  client.println("GET /api/ HTTP/1.1");
+
+  // read response
+  std::string resp;
+  while (client.available()) {
+    resp += client.read();
+  }
+
+  // close connection
+  client.flush();
+  client.stop();
+  
+  HttpClient http_client(resp);
+
+  if (http_client.ResponseCode() == 200) {
+    Log.warningln("Api health check failed!");
+  }
+ 
+  std::string date_str = http_client.Header("date");
+  std::istringstream date_stream(date_str);
+  std::tm date = {0};
+  date_stream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");
+
+  std::time_t unix_epochs = std::mktime(&date);
+
+  return (uint32_t) unix_epochs;
+}
+
+int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
+{
+  WiFiClient client;
+
   char buffer[100];
-  Serial.print(this->url);
-  Serial.print(":");
-  Serial.print(this->port);
-  // try connection return negative length if error
-  //client.setInsecure();
-  //client.setCACert(rootCACertificate);
-  if (!client.connect(this->url, this->port))
+
+  // connect to server
+  if (!client.connect(url, port))
   {
-    Serial.println("Connection failure");
+    Log.errorln("Connection to %s:%d failed!", url, port);
     return -1;
   }
 

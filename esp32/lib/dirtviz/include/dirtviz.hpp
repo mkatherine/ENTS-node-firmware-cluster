@@ -14,22 +14,13 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
+#include "http.hpp"
+
 /**
  * @brief HTTP interface for Dirtviz API
 */
 class Dirtviz
 {
-private:
-  /** URL of API */
-  char *url = nullptr;
-
-  /** Port of API*/
-  uint16_t port;
-
-  /** Buffer for the HTTP response */
-  char *response = nullptr;
-
-
 public:
   /**
    * @brief Construct a new Dirtviz object
@@ -81,6 +72,13 @@ public:
   uint16_t GetPort(void) const;
 
   /**
+   * @brief Health check for API endpoint
+   *
+   * @return Timestamp in unix epchos
+   */
+  uint32_t Check() const;
+
+  /**
    * @brief Send serialized measurement to the API
    * 
    * The entire response is stored in a dynamically allocated buffer. Use
@@ -104,4 +102,22 @@ public:
    * @return Length of @p data
   */
   size_t GetResponse(const uint8_t *data) const;
+
+private:
+  /** URL of API */
+  char *url = nullptr;
+
+  /** Port of API*/
+  uint16_t port;
+
+  /** Buffer for the HTTP response */
+  char *response = nullptr;
+
+
+  /**
+   * @brief Starts connection with server
+   *
+   * @return Returns true if the connection succeeds, false if not
+   */
+  bool ClientConnect();
 };

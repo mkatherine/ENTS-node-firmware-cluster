@@ -18,6 +18,7 @@ firmware versions for a hardware version.
 - New sensors library to simplify future sensor integrations
 - Transmit buffer [#41](i41)
 - RTC time synchronization support through LoRaWAN [#48](i48)
+- Calibration support [#50](i50)
 
 ### Changed
 
@@ -29,6 +30,7 @@ firmware versions for a hardware version.
 
 [i41]: https://github.com/jlab-sensing/soil-power-sensor-firmware/issues/41
 [i48]: https://github.com/jlab-sensing/soil-power-sensor-firmware/issues/48
+[i50]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/50
 
 ## [2.1.0] - 2024-02-25
 

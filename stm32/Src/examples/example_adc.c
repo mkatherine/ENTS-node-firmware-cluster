@@ -25,8 +25,8 @@
 #include "dma.h"
 #include "gpio.h"
 #include "i2c.h"
-#include "usart.h"
 #include "sys_app.h"
+#include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -104,13 +104,13 @@ int main(void) {
   /*Initialize timer and RTC*/
   /*Have to be initilized in example files because LoRaWan cannot be initialized
    * like in main*/
-  //__HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-  //UTIL_TIMER_Init();
-  
+  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+  // UTIL_TIMER_Init();
+
   APP_PRINTF("example_adc, compiled on %s %s\r\n", __DATE__, __TIME__);
 
   /* USER CODE BEGIN 2 */
-  //HAL_Delay(50);
+  // HAL_Delay(50);
   ADC_init();
   // int size = sprintf(fail_str, "Failed at ADC_init\n");
   // HAL_UART_Transmit(&huart1, (const uint8_t *) fail_str, size, 100);

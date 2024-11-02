@@ -52,17 +52,6 @@ data = load_data(cfg, datafiles)
 #data = data[(data["V_in"] > -2000) & (data["V_in"] < 2000)]
 
 
-#%%
-#### Plot the SMU voltage and the raw SPS values to check for linearity ###
-plt.figure()
-#for i, _ in enumerate(data["V_in"].to_list()[10:20]):
-    #plt.scatter(data["V_in"].to_list()[i], data["V_sps"].to_list()[i], s=3, label = f"{i}")
-plt.scatter(data["V_in"], data["V_sps"], s=3)
-plt.title("Data visualization")
-plt.xlabel("Input (V)")
-plt.ylabel("ADC Raw")
-plt.legend()
-plt.show()
 
 #%%
 ### Fit the linear model ###

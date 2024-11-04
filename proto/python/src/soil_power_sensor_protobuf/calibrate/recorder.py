@@ -11,7 +11,6 @@ a range of output voltages on the Keithley and measure the voltage and current
 from both the SMU and the Soil Power Sensor (SPS).
 """
 
-
 import time
 import socket
 import serial
@@ -51,6 +50,7 @@ class SerialController:
 
         self.ser.close()
 
+
 class LANController:
     """Generic LAN controller that will open and close LAN connections"""
 
@@ -81,6 +81,7 @@ class LANController:
 
         self.sock.close()
 
+
 class SoilPowerSensorController(SerialController):
     """Controller used to read values from the SPS"""
 
@@ -105,17 +106,17 @@ class SoilPowerSensorController(SerialController):
         tuple[float, float
             voltage, current
         """
-         
-        self.ser.write(b"0") # send a command to the SPS to send a power measurment
+
+        self.ser.write(b"0")  # send a command to the SPS to send a power measurment
 
         # read a single byte for the length
         resp_len_bytes = self.ser.read()
-        
+
         resp_len = int.from_bytes(resp_len_bytes)
 
-        reply = self.ser.read(resp_len) # read said measurment
+        reply = self.ser.read(resp_len)  # read said measurment
 
-        meas_dict = decode_measurement(reply) # decode using protobuf
+        meas_dict = decode_measurement(reply)  # decode using protobuf
 
         voltage_value = meas_dict["data"]["voltage"]
         current_value = meas_dict["data"]["current"]
@@ -130,18 +131,17 @@ class SoilPowerSensorController(SerialController):
         RuntimeError
             Checks that SPS replies "ok" when sent "check"
         """
-        
-       
+
         # needed sleep to get write to work
         # possibly due to linux usb stack initialized or mcu waiting to startup
         time.sleep(1)
         self.ser.write(b"check\n")
-        
-        reply = self.ser.readline()
-        #reply = reply.decode()
-        #reply = reply.strip("\r\n")
 
-        if (reply != b'ok\n'):
+        reply = self.ser.readline()
+        # reply = reply.decode()
+        # reply = reply.strip("\r\n")
+
+        if reply != b"ok\n":
             raise RuntimeError(f"SPS check failed. Reply received: {reply}")
 
 
@@ -180,7 +180,6 @@ class SMUSerialController(SerialController):
             self.stop = stop
             self.step = step
 
-
         def __iter__(self):
             """Iterator
 
@@ -188,9 +187,8 @@ class SMUSerialController(SerialController):
             """
 
             self.v = None
-            self.ser.write(b':OUTP ON\n')
+            self.ser.write(b":OUTP ON\n")
             return self
-
 
         def __next__(self):
             """Next
@@ -208,20 +206,18 @@ class SMUSerialController(SerialController):
 
             v_next = self.v + self.step
 
-            if (v_next <= self.stop):
+            if v_next <= self.stop:
                 return self.set_voltage(v_next)
             else:
                 raise StopIteration
-
 
         def set_voltage(self, v):
             """Sets the voltage output"""
 
             self.v = v
             cmd = f":SOUR:VOLT:LEV {v}\n"
-            self.ser.write(bytes(cmd, 'ascii'))
+            self.ser.write(bytes(cmd, "ascii"))
             return self.v
-
 
     def __init__(self, port, source_mode):
         """Constructor
@@ -236,18 +232,17 @@ class SMUSerialController(SerialController):
 
         super().__init__(port)
         # Reset settings
-        self.ser.write(b'*RST\n')
+        self.ser.write(b"*RST\n")
         # Voltage source
-        self.ser.write(b':SOUR:FUNC VOLT\n')
-        self.ser.write(b':SOUR:VOLT:MODE FIXED\n')
+        self.ser.write(b":SOUR:FUNC VOLT\n")
+        self.ser.write(b":SOUR:VOLT:MODE FIXED\n")
         # 1mA compliance
-        self.ser.write(b':SENS:CURR:PROT 10e-3\n')
+        self.ser.write(b":SENS:CURR:PROT 10e-3\n")
         # Sensing functions
-        self.ser.write(b':SENS:CURR:RANGE:AUTO ON\n')
-        self.ser.write(b':SENS:FUNC:OFF:ALL\n')
+        self.ser.write(b":SENS:CURR:RANGE:AUTO ON\n")
+        self.ser.write(b":SENS:FUNC:OFF:ALL\n")
         self.ser.write(b':SENS:FUNC:ON "VOLT"\n')
         self.ser.write(b':SENS:FUNC:ON "CURR"\n')
-
 
     def __del__(self):
         """Destructor
@@ -255,8 +250,7 @@ class SMUSerialController(SerialController):
         Turns off output
         """
 
-        self.ser.write(b':OUTP OFF\n')
-
+        self.ser.write(b":OUTP OFF\n")
 
     def vrange(self, start, stop, step) -> VoltageIterator:
         """Gets iterator to range of voltages
@@ -273,7 +267,6 @@ class SMUSerialController(SerialController):
 
         return self.VoltageIterator(self.ser, start, stop, step)
 
-
     def get_voltage(self) -> float:
         """Measure voltage supplied to the SPS from SMU
 
@@ -283,12 +276,11 @@ class SMUSerialController(SerialController):
             Measured voltage
         """
 
-        self.ser.write(b':FORM:ELEM VOLT\n')
-        self.ser.write(b':READ?\n')
+        self.ser.write(b":FORM:ELEM VOLT\n")
+        self.ser.write(b":READ?\n")
         reply = self.ser.readline().decode()
         reply = reply.strip("\r")
         return float(reply)
-
 
     def get_current(self) -> float:
         """Measure current supplied to the SPS from SMU
@@ -299,12 +291,15 @@ class SMUSerialController(SerialController):
             Measured current
         """
 
-        self.ser.write(b':FORM:ELEM CURR\n') # replace with serial.write with socket.write commands, std library aviable, lots of example code
-        self.ser.write(b':READ?\n')
+        self.ser.write(
+            b":FORM:ELEM CURR\n"
+        )  # replace with serial.write with socket.write commands, std library aviable, lots of example code
+        self.ser.write(b":READ?\n")
         reply = self.ser.readline().decode()
         reply = reply.strip("\r")
         return float(reply)
-    
+
+
 class SMULANController(LANController):
     """Controller for the Keithley 2400 SMU used to supply known voltage to the
     SPS
@@ -340,7 +335,6 @@ class SMULANController(LANController):
             self.stop = stop
             self.step = step
 
-
         def __iter__(self):
             """Iterator
 
@@ -348,9 +342,8 @@ class SMULANController(LANController):
             """
 
             self.v = None
-            self.sock.sendall(b':OUTP ON\n')
+            self.sock.sendall(b":OUTP ON\n")
             return self
-
 
         def __next__(self):
             """Next
@@ -368,14 +361,14 @@ class SMULANController(LANController):
 
             v_next = self.v + self.step
 
-            if (v_next <= self.stop):
+            if v_next <= self.stop:
                 return self.set_voltage(v_next)
             else:
                 raise StopIteration
 
         def __len__(self):
             """Len
-            
+
             The number of measurements points
             """
             return int((self.stop - self.start) / self.step) + 1
@@ -385,9 +378,9 @@ class SMULANController(LANController):
 
             self.v = v
             cmd = f":SOUR:VOLT:LEV {v}\n"
-            self.sock.sendall(bytes(cmd, 'ascii'))
+            self.sock.sendall(bytes(cmd, "ascii"))
             return self.v
-        
+
     class CurrentIterator:
         """CurrentIterator Class
 
@@ -420,7 +413,7 @@ class SMULANController(LANController):
             """
 
             self.i = None
-            self.sock.sendall(b':OUTP ON\n')
+            self.sock.sendall(b":OUTP ON\n")
             return self
 
         def __next__(self):
@@ -437,14 +430,14 @@ class SMULANController(LANController):
             if self.i is None:
                 return self.set_current(self.start)
             i_next = self.i + self.step
-            if (i_next <= self.stop):
+            if i_next <= self.stop:
                 return self.set_current(i_next)
             else:
                 raise StopIteration
-            
+
         def __len__(self):
             """Len
-            
+
             The number of measurements points
             """
             return int((self.stop - self.start) / self.step) + 1
@@ -454,10 +447,8 @@ class SMULANController(LANController):
 
             self.i = i
             cmd = f":SOUR:CURR:LEV {i}\n"
-            self.sock.sendall(bytes(cmd, 'ascii'))
+            self.sock.sendall(bytes(cmd, "ascii"))
             return self.i
-        
-
 
     def __init__(self, host, port):
         """Constructor
@@ -477,34 +468,32 @@ class SMULANController(LANController):
     def setup_voltage(self):
         """Configures smu for sourcing voltage"""
 
-        self.sock.sendall(b'*RST\n')
+        self.sock.sendall(b"*RST\n")
         # Voltage source
-        self.sock.sendall(b':SOUR:FUNC VOLT\n')
-        self.sock.sendall(b':SOUR:VOLT:MODE FIXED\n')
+        self.sock.sendall(b":SOUR:FUNC VOLT\n")
+        self.sock.sendall(b":SOUR:VOLT:MODE FIXED\n")
         # 1mA compliance
-        self.sock.sendall(b':SENS:CURR:PROT 10e-3\n')
+        self.sock.sendall(b":SENS:CURR:PROT 10e-3\n")
         # Sensing functions
-        self.sock.sendall(b':SENS:CURR:RANGE:AUTO ON\n')
-        self.sock.sendall(b':SENS:FUNC:OFF:ALL\n')
+        self.sock.sendall(b":SENS:CURR:RANGE:AUTO ON\n")
+        self.sock.sendall(b":SENS:FUNC:OFF:ALL\n")
         self.sock.sendall(b':SENS:FUNC:ON "VOLT"\n')
         self.sock.sendall(b':SENS:FUNC:ON "CURR"\n')
 
     def setup_current(self):
         """Configured smu for sourcing current"""
 
-        self.sock.sendall(b'*RST\n')
+        self.sock.sendall(b"*RST\n")
         # Current source
-        self.sock.sendall(b':SOUR:FUNC CURR\n')
-        self.sock.sendall(b':SOUR:CURR:MODE FIXED\n')
+        self.sock.sendall(b":SOUR:FUNC CURR\n")
+        self.sock.sendall(b":SOUR:CURR:MODE FIXED\n")
         # 1V compliance
-        self.sock.sendall(b':SENSE:CURR:PROT 1\n')
+        self.sock.sendall(b":SENSE:CURR:PROT 1\n")
         # Sensing functions
-        self.sock.sendall(b':SENS:VOLT:RANGE:AUTO ON\n')
-        self.sock.sendall(b':SENS:FUNC:OFF:ALL\n')
+        self.sock.sendall(b":SENS:VOLT:RANGE:AUTO ON\n")
+        self.sock.sendall(b":SENS:FUNC:OFF:ALL\n")
         self.sock.sendall(b':SENS:FUNC:ON "CURR"\n')
         self.sock.sendall(b':SENS:FUNC:ON "VOLT"\n')
-
-
 
     def __del__(self):
         """Destructor
@@ -512,8 +501,7 @@ class SMULANController(LANController):
         Turns off output
         """
 
-        self.sock.sendall(b':OUTP OFF\n')
-
+        self.sock.sendall(b":OUTP OFF\n")
 
     def vrange(self, start, stop, step) -> VoltageIterator:
         """Gets iterator to range of voltages
@@ -530,8 +518,8 @@ class SMULANController(LANController):
 
         self.setup_voltage()
         return self.VoltageIterator(self.sock, start, stop, step)
-    
-    def irange(self, start, stop , step) -> CurrentIterator:
+
+    def irange(self, start, stop, step) -> CurrentIterator:
         """Gets iterator to range of currents
 
         Parameters
@@ -556,15 +544,14 @@ class SMULANController(LANController):
             Measured voltage
         """
 
-        self.sock.sendall(b':FORM:ELEM VOLT\n')
-        self.sock.sendall(b':READ?\n')
+        self.sock.sendall(b":FORM:ELEM VOLT\n")
+        self.sock.sendall(b":READ?\n")
         # receive response
         reply = self.sock.recv(256)
         # strip trailing \r\n characters
         reply = reply.strip()
         # convert to float and return
         return float(reply)
-
 
     def get_current(self) -> float:
         """Measure current supplied to the SPS from SMU
@@ -575,8 +562,10 @@ class SMULANController(LANController):
             Measured current
         """
 
-        self.sock.sendall(b':FORM:ELEM CURR\n') # replace with serial.write with socket.write commands, std library aviable, lots of example code
-        self.sock.sendall(b':READ?\n')
+        self.sock.sendall(
+            b":FORM:ELEM CURR\n"
+        )  # replace with serial.write with socket.write commands, std library aviable, lots of example code
+        self.sock.sendall(b":READ?\n")
         # receive response
         reply = self.sock.recv(256)
         # strip trailing \r\n characters
@@ -584,9 +573,9 @@ class SMULANController(LANController):
         # convert to float and return
         return float(reply)
 
+
 class Recorder:
-    def __init__(self, serialport : str, host : str, port : int, delay
-                 : int=1):
+    def __init__(self, serialport: str, host: str, port: int, delay: int = 1):
         """Recorder constructor
 
         Initializes the connection to smu and sps.
@@ -598,12 +587,13 @@ class Recorder:
             delay: Delay between smu step and power measurement in seconds
         """
 
-        self.sps = SoilPowerSensorController(serialport) 
+        self.sps = SoilPowerSensorController(serialport)
         self.smu = SMULANController(host, port)
         self.delay = delay
 
-    def record_voltage(self, start : float, stop : float, step : float,
-                       samples : int) -> dict[str, list]:
+    def record_voltage(
+        self, start: float, stop: float, step: float, samples: int
+    ) -> dict[str, list]:
         """Records voltage measurements from the smu and sps
 
         Input arguments given in volts units. Returned dictionary has keys for the
@@ -636,7 +626,7 @@ class Recorder:
             for _ in range(samples):
                 # expected
                 data["expected"].append(value)
-                #smu
+                # smu
                 data["actual"].append(self.smu.get_voltage())
                 # sps
                 sps_v, _ = self.sps.get_power()
@@ -644,8 +634,9 @@ class Recorder:
 
         return data
 
-    def record_current(self, start : float, stop : float, step : float,
-                       samples : int) -> dict[str, list]:
+    def record_current(
+        self, start: float, stop: float, step: float, samples: int
+    ) -> dict[str, list]:
         """Records current measurements from the smu and sps
 
         Input arguments given in amps units. Returned dictionary has keys for the

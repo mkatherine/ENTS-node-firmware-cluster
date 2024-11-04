@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 import numpy as np
 
-def plot_measurements(actual : list, meas : list, title : str = "",
-                      block : bool = False):
+
+def plot_measurements(actual: list, meas: list, title: str = "", block: bool = False):
     """Plot actual values vs measured values
 
     Args:
@@ -20,8 +20,8 @@ def plot_measurements(actual : list, meas : list, title : str = "",
     ax.set_title(f"Measurements: {title}")
     plt.show(block=block)
 
-def plot_calib(raw : list, pred : list, title : str = "",
-               block : bool = False):
+
+def plot_calib(raw: list, pred: list, title: str = "", block: bool = False):
     """Plot linear relationship between raw measured and calibrated measured
 
     Args:
@@ -38,8 +38,8 @@ def plot_calib(raw : list, pred : list, title : str = "",
     ax.set_title(f"Calibration: {title}")
     plt.show(block=block)
 
-def plot_residuals(pred : list, residuals : list, title : str = "",
-                   block : bool = False):
+
+def plot_residuals(pred: list, residuals: list, title: str = "", block: bool = False):
     """Plot residuals vs predicted measurements
 
     Residuals is the difference between predicted values and actual values.
@@ -60,8 +60,8 @@ def plot_residuals(pred : list, residuals : list, title : str = "",
     ax.legend()
     plt.show(block=block)
 
-def plot_residuals_hist(residuals : list, title : str = "",
-                        block : bool = False):
+
+def plot_residuals_hist(residuals: list, title: str = "", block: bool = False):
     """Plot a histogram of residual error
 
     Args:
@@ -71,7 +71,7 @@ def plot_residuals_hist(residuals : list, title : str = "",
     """
 
     mu, std = norm.fit(residuals)
-    normdist_x = np.linspace(mu - 3*std, mu + 3*std, 100)
+    normdist_x = np.linspace(mu - 3 * std, mu + 3 * std, 100)
     normdist_y = norm.pdf(normdist_x, mu, std)
 
     fig, ax = plt.subplots()

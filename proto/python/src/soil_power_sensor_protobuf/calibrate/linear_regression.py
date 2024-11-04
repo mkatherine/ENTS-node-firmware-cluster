@@ -1,9 +1,15 @@
 import numpy as np
 from sklearn import linear_model
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
+    mean_absolute_percentage_error,
+)
 from scipy.stats import norm
 
-def linear_regression(meas : list, actual : list):
+
+def linear_regression(meas: list, actual: list):
     """Performs linear regression between measured and actual values
 
     Args:
@@ -19,7 +25,8 @@ def linear_regression(meas : list, actual : list):
 
     return model
 
-def print_eval(pred : list, actual : list):
+
+def print_eval(pred: list, actual: list):
     """Prints various evaluation parameters of the model
 
     The following metrics are used:
@@ -44,6 +51,7 @@ def print_eval(pred : list, actual : list):
     mape = mean_absolute_percentage_error(actual, pred)
     print(f"Mean absolute percentage error: {mape:.4f}")
 
+
 def print_coef(model):
     """Print coefficients of a model
 
@@ -57,7 +65,8 @@ def print_coef(model):
     print(f"Slope: {slope}")
     print(f"Intercept: {inter}")
 
-def print_norm(residuals : list):
+
+def print_norm(residuals: list):
     """Print mean offset and standard deviation
 
     Args:

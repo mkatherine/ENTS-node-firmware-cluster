@@ -2,7 +2,9 @@
 
 Stephen Taylor 5/20/2024
 """
+
 import serial
+
 
 class SerialPing:
     """Simple serial ping utility"""
@@ -36,7 +38,7 @@ class SerialPing:
 
     def ping(self):
         """Ping the device and return the response"""
-        #pdb.set_trace()
+        # pdb.set_trace()
         self.ser.write(b"check\n")  # Send ping command
         response = self.ser.readline()  # Read response
         return response
@@ -44,6 +46,7 @@ class SerialPing:
     def close(self):
         """Close serial connection"""
         self.ser.close()
+
 
 # Example usage
 if __name__ == "__main__":

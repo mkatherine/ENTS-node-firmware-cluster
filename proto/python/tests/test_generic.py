@@ -10,8 +10,8 @@ correct dictionary format is returned.
 
 import unittest
 
-from soil_power_sensor_protobuf import encode_response, decode_measurement
-from soil_power_sensor_protobuf.soil_power_sensor_pb2 import (
+from soil_power_sensor_protobuf.proto import encode_response, decode_measurement
+from soil_power_sensor_protobuf.proto.soil_power_sensor_pb2 import (
     Measurement,
     Response,
     MeasurementMetadata,

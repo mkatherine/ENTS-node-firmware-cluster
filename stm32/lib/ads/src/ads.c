@@ -165,6 +165,9 @@ double ADC_readVoltage(void) {
   reading = (voltage_calibration_m * reading) + voltage_calibration_b;
 #endif /* CALIBRATION */
 
+  // tmp fix: convert mV to volts
+  reading /= 1000.0;
+
   return reading;
 }
 

@@ -51,6 +51,19 @@ class HttpClient {
     std::string Data();
 
   private:
+    /** Http version */
+    std::string version;
+
+    /** Http response code */
+    unsigned int code;
+
+    /** Map for requested headers */
+    std::map<std::string, std::string> headers;
+
+    /** Http data */
+    std::string data;
+
+    const std::string LINE_END = "\r\n";
     /**
      * @brief Decode status string
      *
@@ -72,19 +85,33 @@ class HttpClient {
      */
     void DecodeHeaders(std::string headers_str);
 
-    /** Http version */
-    std::string version;
+    /**
+     * @brief Remove leading spaces from a string
+     *
+     * @param str Input string
+     */
+    void RemoveLeadingSpace(std::string &str);
 
-    /** Http response code */
-    unsigned int code;
+    /**
+     * @brief Remove trailing spaces from a string
+     *
+     * @param str Input string
+     */
+    void RemoveTrailingSpace(std::string &str);
 
-    /** Map for requested headers */
-    std::map<std::string, std::string> headers;
+    /**
+     * @brief Remove leading and trailing spaces from the string
+     *
+     * @param str Input string
+     */
+    void ExtractText(std::string &str);
 
-    /** Http data */
-    std::string data;
-
-    const std::string LINE_END = "\r\n";
+    /**
+     * @brief Remove all spaces from string
+     *
+     * @param str Input string
+     */
+    void RemoveSpace(std::string &str);
 };
 
 #endif  // LIB_DIRTVIZ_INCLUDE_HTTP_H_

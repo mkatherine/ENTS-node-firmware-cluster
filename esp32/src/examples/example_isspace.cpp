@@ -22,7 +22,7 @@ void setup() {
   Log.traceln("Current locale: %s", std::setlocale(LC_ALL, NULL));
 
   for (unsigned char i=0; i < 127; i++) {
-    Log.traceln("isspace(%C) = %T", i, isspace(i));
+    Log.traceln("isspace(%C) = %T", i, (bool) isspace(i));
   }
 }
 

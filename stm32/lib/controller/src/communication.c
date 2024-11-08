@@ -62,15 +62,6 @@ ControllerStatus ControllerTransmit(unsigned int timeout) {
   // wakeup esp32
   ControllerWakeupEsp32();
 
-  // optimization if length is less than buffer size
-  if (tx.len < g_i2c_buffer_size-1) {
-    hal_status = HAL_I2C_Master_Transmit(&hi2c2, g_esp32_i2c_addr, tx.data, tx.len, timeout);
-    cont_status = HALToControllerStatus(hal_status);
-    if (cont_status != CONTROLLER_SUCCESS) {
-      return cont_status;
-    }
-  }
-
   // create small buffer
   Buffer chunk = {0};
   chunk.data = malloc(g_i2c_buffer_size);
@@ -82,7 +73,6 @@ ControllerStatus ControllerTransmit(unsigned int timeout) {
 
   // flag for final tx
   bool done = false;
-
 
   // handle data being larger than i2c buffer size
   do {

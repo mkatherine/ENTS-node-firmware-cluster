@@ -29,7 +29,7 @@ static ModuleHandler::ModuleHandler mh;
  * See Arduino wire library for reference
  */
 void onReceive(int len) {
-  Log.traceln("Received message with length %d", len);
+  Log.traceln("onReceive(%d)", len);
   mh.OnReceive(len);
 }
 
@@ -39,7 +39,7 @@ void onReceive(int len) {
  * See Arduino wire library for reference
  */
 void onRequest() {
-  Log.traceln("Request made from host");
+  Log.traceln("onRequest");
   mh.OnRequest();
 }
 

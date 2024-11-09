@@ -16,18 +16,18 @@ void ModuleHandler::ModuleHandler::RegisterModule(Module *module)
 {
   // add module to map based on type
   int type = module->Type();
-  this->req_map[type] = module;
+  req_map[type] = module;
 }
 
 void ModuleHandler::ModuleHandler::DeregisterModule(int type) {
   // remove module from map
-  this->req_map.erase(type);
+  req_map.erase(type);
 }
 
 void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
   Log.traceln("ModuleHandler::OnReceive");
 
-  if (this->receive_buffer.len + num_bytes > this->receive_buffer.size) {
+  if (receive_buffer.len + num_bytes > receive_buffer.size) {
     // TODO handle error
   }
 
@@ -46,10 +46,10 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
 
   // get end of buffer
   uint8_t* prev_end = NULL; 
-  if (this->receive_buffer.len == 0) {
-    prev_end = this->receive_buffer.data;
+  if (receive_buffer.len == 0) {
+    prev_end = receive_buffer.data;
   } else {
-    prev_end = this->receive_buffer.data + this->receive_buffer.len;
+    prev_end = receive_buffer.data + receive_buffer.len;
   }
 
   // loop over available bytes in buffer
@@ -72,19 +72,19 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
     Log.traceln("Wire.read -> %X", *end);
 
     // increment length
-    this->receive_buffer.len++;
+    receive_buffer.len++;
   }
 
   // call module OnReceive
   if (msg_end) {
     Log.traceln("Message done");
     Log.traceln("Decoding message");
-    for (int i = 0; i < this->receive_buffer.len; i++) {
-      Log.verboseln("receive_buffer[%d] = %X", i, this->receive_buffer.data[i]);
+    for (int i = 0; i < receive_buffer.len; i++) {
+      Log.verboseln("receive_buffer[%d] = %X", i, receive_buffer.data[i]);
     }
 
     // decode measurement
-    Esp32Command cmd = DecodeEsp32Command(this->receive_buffer.data, this->receive_buffer.len);
+    Esp32Command cmd = DecodeEsp32Command(receive_buffer.data, receive_buffer.len);
 
     Log.traceln("Forwarding message");
     Log.verboseln("cmd.which_command: %d", cmd.which_command);
@@ -101,25 +101,29 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
   Log.traceln("ModuleHandler::OnRequest");
 
   // only call module if nothing in buffer
-  if (this->request_buffer.len == 0) {
+  if (request_buffer.len == 0) {
     Log.traceln("Copy data into the request buffer");
     // forward request to last module received
-    this->request_buffer.len = this->last_module->OnRequest(this->request_buffer.data);
+    request_buffer.len = last_module->OnRequest(request_buffer.data);
+    Log.traceln("Done processing OnRequest");
   }
 
   // check if we should send length
-  if (this->send_length) {
-    Log.traceln("Sending length %d", this->request_buffer.len);
+  if (send_length) {
+    Log.traceln("Sending length %d", request_buffer.len);
 
     // send in little-endian
     uint8_t len_bytes[2] = {};
-    len_bytes[1] = (uint8_t) this->request_buffer.len & 0xFF;
-    len_bytes[0] = (uint8_t) ((this->request_buffer.len >> 8) & 0xFF);
+    len_bytes[1] = (uint8_t) request_buffer.len & 0xFF;
+    len_bytes[0] = (uint8_t) ((request_buffer.len >> 8) & 0xFF);
 
     Log.traceln("len_bytes = {%X, %X}", len_bytes[0], len_bytes[1]);
 
     // write to buffer
     Wire.write(len_bytes, sizeof(len_bytes));
+
+    // set flag that length was sent
+    send_length = false;
 
   // otherwise send data
   } else {
@@ -130,25 +134,28 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
     static const int wire_buffer_size = 32; 
 
     // get number of bytes remaining
-    size_t bytes_remaining = this->request_buffer.len - this->request_buffer.idx;
+    size_t bytes_remaining = request_buffer.len - request_buffer.idx;
     Log.traceln("Bytes remaining: %d", bytes_remaining);
 
-    for (int i = 0; i < this->request_buffer.len; i++) {
-      Log.verboseln("request_buffer[%d] = %X", this->request_buffer.len, this->request_buffer.data[i]);
+    for (int i = 0; i < request_buffer.len; i++) {
+      Log.verboseln("request_buffer[%d] = %X", request_buffer.len, request_buffer.data[i]);
     }
 
     // check if length is less than buffer size
-    if (bytes_remaining > wire_buffer_size-1) {
+    if (bytes_remaining < wire_buffer_size-1) {
       Log.traceln("Writing with finished flag");
 
       // write finished flag
       Wire.write(1);
       // write directly to i2c
-      Wire.write(this->request_buffer.data, this->request_buffer.len);
+      Wire.write(request_buffer.data, request_buffer.len);
 
       // reset to indicate flushed buffer
-      this->request_buffer.len = 0;
-      this->request_buffer.idx = 0;  
+      request_buffer.len = 0;
+      request_buffer.idx = 0;
+
+      // set flag to send length when complate
+      send_length = true;
     } else {
       Log.traceln("Writing with not finished flag");
 
@@ -156,22 +163,22 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
       Wire.write(0);
 
       // write block of data
-      uint8_t* end = this->request_buffer.data + this->request_buffer.idx;
+      uint8_t* end = request_buffer.data + request_buffer.idx;
       Wire.write(end, wire_buffer_size-1);
 
       // increment idx
-      this->request_buffer.idx += wire_buffer_size-1;
+      request_buffer.idx += wire_buffer_size-1;
     }
   }
 }
 
 ModuleHandler::Module* ModuleHandler::ModuleHandler::GetModule(int type) {
-  return this->req_map.at(type);
+  return req_map.at(type);
 }
 
 void ModuleHandler::ModuleHandler::ResetModules(void) {
   // call Reset() for all modules in req_map
-  for (auto& entry : this->req_map) {
+  for (auto& entry : req_map) {
     entry.second->Reset();
   }
 }

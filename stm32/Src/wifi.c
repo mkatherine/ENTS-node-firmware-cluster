@@ -43,8 +43,8 @@ void WiFiInit(void) {
   // TODO load configuration
   const char ssid[] = "HARE_Lab";
   const char* passwd = NULL;
-  const char url[] = "https://httpbin.org/get";
-  const uint32_t port = 443;
+  const char url[] = "dirtviz.jlab.ucsc.edu";
+  const uint32_t port = 80;
 
   APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t", ssid);
 

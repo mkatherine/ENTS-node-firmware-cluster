@@ -27,7 +27,7 @@ uint32_t ControllerWiFiInit(
 
   // decode command
   Esp32Command cmd = Esp32Command_init_default;
-  DecodeEsp32Command(rx->data, rx->len);
+  cmd = DecodeEsp32Command(rx->data, rx->len);
 
   // return timestamp
   return cmd.command.wifi_command.ts;

@@ -135,8 +135,6 @@ int main(void)
   WiFiInit();
 
 
-  APP_LOG(TS_ON, VLEVEL_M, "Hello World!\r\n");
-
   /* USER CODE END 2 */
 
   /* Infinite loop */

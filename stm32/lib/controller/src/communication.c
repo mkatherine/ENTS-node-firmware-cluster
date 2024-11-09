@@ -124,59 +124,52 @@ ControllerStatus ControllerReceive(unsigned int timeout) {
   // set number of bytes
   rx.len = len;
 
-  // optimization if length is less than buffer size
-  if (rx.len < g_i2c_buffer_size-1) {
-    hal_status = HAL_I2C_Master_Receive(&hi2c2, g_esp32_i2c_addr, rx.data, rx.len, timeout);
+  // create small buffer
+  Buffer chunk = {};
+  chunk.data = malloc(g_i2c_buffer_size);
+  chunk.size = g_i2c_buffer_size;
+  chunk.len = 0;
+
+  // copy reference to receive
+  Buffer rx_idx = rx;
+
+  bool done = false;
+
+  do {
+    // calculate number of bytes to receive
+    size_t num_bytes = 0;
+    if (rx_idx.len < (chunk.size-1)) {
+      num_bytes = rx_idx.len;
+      done = true;
+    } else {
+      num_bytes = chunk.size-1;
+    }
+    // add 1 for done flag
+    chunk.len = num_bytes+1;
+
+    // receive block of data
+    hal_status = HAL_I2C_Master_Receive(&hi2c2, g_esp32_i2c_addr, chunk.data, chunk.len, timeout);
     cont_status = HALToControllerStatus(hal_status);
-  // otherwise chunk receive
-  } else {
-    // create small buffer
-    Buffer chunk = {};
-    chunk.data = malloc(g_i2c_buffer_size);
-    chunk.size = g_i2c_buffer_size;
-    chunk.len = 0;
+    if (cont_status != CONTROLLER_SUCCESS) {
+      break;
+    }
 
-    // copy reference to receive
-    Buffer rx_idx = rx;
+    // check done flag
+    if (done != chunk.data[0]) {
+      cont_status = CONTROLLER_ERROR;
+      break;
+    }
 
-    bool done = false;
+    // copy data to rx
+    memcpy(rx_idx.data, chunk.data+1, num_bytes);
 
-    do {
-      // calculate number of bytes to receive
-      size_t num_bytes = 0;
-      if (rx_idx.len > (chunk.size-1)) {
-        num_bytes = rx_idx.len;
-        done = true;
-      } else {
-        num_bytes = chunk.size-1;
-      }
-      // add 1 for done flag
-      chunk.len = num_bytes+1;
-
-      // receive block of data
-      hal_status = HAL_I2C_Master_Receive(&hi2c2, g_esp32_i2c_addr, chunk.data, chunk.len, timeout);
-      cont_status = HALToControllerStatus(hal_status);
-      if (cont_status != CONTROLLER_SUCCESS) {
-        break;
-      }
-
-      // check done flag
-      if (done != chunk.data[0]) {
-        cont_status = CONTROLLER_ERROR;
-        break;
-      }
-
-      // copy data to rx
-      memcpy(rx_idx.data, chunk.data+1, num_bytes);
-
-      // increment idx
-      rx_idx.data += num_bytes;
-      rx_idx.len -= num_bytes;
-    } while (true);
-    
-    // free buffer space 
-    free(chunk.data);
-  }
+    // increment idx
+    rx_idx.data += num_bytes;
+    rx_idx.len -= num_bytes;
+  } while (!done);
+  
+  // free buffer space 
+  free(chunk.data);
 
   // unlock mutex
   g_controller_mutex_lock = false;

@@ -71,8 +71,8 @@ uint32_t Dirtviz::Check() const {
 
   Log.traceln("Sending GET request");
   client.println("GET /api/ HTTP/1.1");
-  client.println("Host: httpbin.org");
-  client.println("Connection: close");
+  client.println("Host: dirtviz.jlab.ucsc.edu");
+  client.println("User-Agent: curl/8.10.1");
   client.println();
   Log.traceln("Done!");
 
@@ -128,7 +128,7 @@ int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
   // send data
 
   // HTTP command, path, and version
-  client.println("POST / HTTP/1.1");
+  client.println("POST /api/ HTTP/1.1");
   // who we are posting to
   client.print("Host: ");
   client.print(this->url);

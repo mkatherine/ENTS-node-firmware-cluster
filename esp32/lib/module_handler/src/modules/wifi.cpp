@@ -88,9 +88,9 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
 
   request_buffer_len = EncodeWiFiCommand(
     WiFiCommand_Type_CONNECT,
-    nullptr,
-    nullptr,
-    nullptr,
+    "",
+    "",
+    "",
     0,
     0,
     ts,
@@ -99,6 +99,8 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
     request_buffer,
     sizeof(request_buffer)
   );
+
+  Log.traceln("Encoded wifi with length %d", request_buffer_len);
 }
 
 void ModuleWiFi::Post(const Esp32Command& cmd) {

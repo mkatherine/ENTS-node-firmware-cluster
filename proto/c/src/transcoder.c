@@ -191,7 +191,9 @@ size_t EncodeWiFiCommand(
   cmd.command.wifi_command.port = port;
   cmd.command.wifi_command.rc = rc;
   cmd.command.wifi_command.ts = ts;
-  memcpy(cmd.command.wifi_command.resp.bytes, resp, resp_len);
+  if (resp_len != 0) {
+    memcpy(cmd.command.wifi_command.resp.bytes, resp, resp_len);
+  }
   cmd.command.wifi_command.resp.size = resp_len;
 
   return EncodeEsp32Command(&cmd, buffer, size);

@@ -88,8 +88,6 @@ uint32_t Dirtviz::Check() const {
     resp += c;
   }
 
-  Log.traceln("resp:\r\n%s", resp.c_str());
-
   // close connection
   client.flush();
   client.stop();
@@ -101,8 +99,7 @@ uint32_t Dirtviz::Check() const {
     Log.warningln("Api health check failed! Reponse code: %d", http_code);
   }
  
-  std::string date_str = http_client.Header("date");
-  Log.traceln("Date str: %s", date_str.c_str());
+  std::string date_str = http_client.Header("Date");
   std::stringstream date_stream(date_str);
   std::tm date = {0};
   date_stream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");

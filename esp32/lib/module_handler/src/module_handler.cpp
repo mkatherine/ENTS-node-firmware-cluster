@@ -49,7 +49,7 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
   if (this->receive_buffer.len == 0) {
     prev_end = this->receive_buffer.data;
   } else {
-    prev_end = this->receive_buffer.data + this->receive_buffer.len + 1;
+    prev_end = this->receive_buffer.data + this->receive_buffer.len;
   }
 
   // loop over available bytes in buffer
@@ -80,65 +80,67 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
     Log.traceln("Message done");
     Log.traceln("Decoding message");
     for (int i = 0; i < this->receive_buffer.len; i++) {
-      Log.traceln("receive_buffer[%d] = %X", i, this->receive_buffer.data[i]);
+      Log.verboseln("receive_buffer[%d] = %X", i, this->receive_buffer.data[i]);
     }
 
     // decode measurement
     Esp32Command cmd = DecodeEsp32Command(this->receive_buffer.data, this->receive_buffer.len);
 
     Log.traceln("Forwarding message");
-    Log.traceln("cmd.which_command: %d", cmd.which_command);
+    Log.verboseln("cmd.which_command: %d", cmd.which_command);
 
     // store reference to module for future OnRequest calls
-    this->last_module = this->req_map.at(cmd.which_command);
+    last_module = req_map.at(cmd.which_command);
 
     // forward command to module
-    this->last_module->OnReceive(cmd);
+    last_module->OnReceive(cmd);
   }
 }
 
 void ModuleHandler::ModuleHandler::OnRequest(void) {
+  Log.traceln("ModuleHandler::OnRequest");
+
+  // only call module if nothing in buffer
+  if (this->request_buffer.len == 0) {
+    Log.traceln("Copy data into the request buffer");
+    // forward request to last module received
+    this->request_buffer.len = this->last_module->OnRequest(this->request_buffer.data);
+  }
+
   // check if we should send length
   if (this->send_length) {
+    Log.traceln("Sending length %d", this->request_buffer.len);
+
     // send in little-endian
     uint8_t len_bytes[2] = {};
     len_bytes[1] = (uint8_t) this->request_buffer.len & 0xFF;
     len_bytes[0] = (uint8_t) ((this->request_buffer.len >> 8) & 0xFF);
+
+    Log.traceln("len_bytes = {%X, %X}", len_bytes[0], len_bytes[1]);
 
     // write to buffer
     Wire.write(len_bytes, sizeof(len_bytes));
 
   // otherwise send data
   } else {
+    Log.traceln("Sending data");
     /** Buffer size for the Wire Arduino library. Determines the max number of
      * bytes that can be communicated. Varies between platforms but avr uses a
      * buffer size of 32. */
-    static const int wire_buffer_size = 32;
-  
-    // only call module if nothing in buffer
-    if (this->request_buffer.len == 0) {
-      // forward request to last module received
-      this->request_buffer.len = this->last_module->OnRequest(this->request_buffer.data);
-    }
-
-    // check if length is less than size
-    if (this->request_buffer.len > this->request_buffer.size) {
-      // TODO handle error
-    }
-
-    // optimization if length is less than buffer size
-    if (this->request_buffer.len < wire_buffer_size-1) {
-      // write finished flag
-      Wire.write(1);
-      // write data to i2c
-      Wire.write(this->request_buffer.data, this->request_buffer.len);
-    }
+    static const int wire_buffer_size = 32; 
 
     // get number of bytes remaining
     size_t bytes_remaining = this->request_buffer.len - this->request_buffer.idx;
+    Log.traceln("Bytes remaining: %d", bytes_remaining);
+
+    for (int i = 0; i < this->request_buffer.len; i++) {
+      Log.verboseln("request_buffer[%d] = %X", this->request_buffer.len, this->request_buffer.data[i]);
+    }
 
     // check if length is less than buffer size
     if (bytes_remaining > wire_buffer_size-1) {
+      Log.traceln("Writing with finished flag");
+
       // write finished flag
       Wire.write(1);
       // write directly to i2c
@@ -148,6 +150,8 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
       this->request_buffer.len = 0;
       this->request_buffer.idx = 0;  
     } else {
+      Log.traceln("Writing with not finished flag");
+
       // write unfinished flag
       Wire.write(0);
 

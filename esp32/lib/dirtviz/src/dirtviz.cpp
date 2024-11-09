@@ -62,19 +62,33 @@ uint16_t Dirtviz::GetPort(void) const
 }
 
 uint32_t Dirtviz::Check() const {
+  Log.traceln("Dirtviz::Check");
   WiFiClient client;
 
   if (!client.connect(url, port)) {
     return 0;
   }
-  
+
+  Log.traceln("Sending GET request");
   client.println("GET /api/ HTTP/1.1");
+  client.println("Host: httpbin.org");
+  client.println("Connection: close");
+  client.println();
+  Log.traceln("Done!");
+
+  while (!client.available()) {
+    Log.traceln("Delaying until available");
+    delay(10);
+  }
 
   // read response
   std::string resp;
   while (client.available()) {
-    resp += client.read();
+    char c = client.read();
+    resp += c;
   }
+
+  Log.traceln("resp:\r\n%s", resp.c_str());
 
   // close connection
   client.flush();
@@ -82,12 +96,14 @@ uint32_t Dirtviz::Check() const {
   
   HttpClient http_client(resp);
 
-  if (http_client.ResponseCode() == 200) {
-    Log.warningln("Api health check failed!");
+  unsigned int http_code = http_client.ResponseCode();
+  if (http_code != 200) {
+    Log.warningln("Api health check failed! Reponse code: %d", http_code);
   }
  
   std::string date_str = http_client.Header("date");
-  std::istringstream date_stream(date_str);
+  Log.traceln("Date str: %s", date_str.c_str());
+  std::stringstream date_stream(date_str);
   std::tm date = {0};
   date_stream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");
 

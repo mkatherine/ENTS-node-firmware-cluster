@@ -67,7 +67,7 @@ class ModuleWiFi: public ModuleHandler::Module {
   static const unsigned long connect_timeout_ms = 10000;
 
   /** Buffer for i2c requests */
-  uint8_t* request_buffer[WiFiCommand_size] = {};
+  uint8_t request_buffer[WiFiCommand_size] = {};
   size_t request_buffer_len = 0;
 };
 

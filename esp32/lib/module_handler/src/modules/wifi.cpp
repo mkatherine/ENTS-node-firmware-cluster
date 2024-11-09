@@ -17,8 +17,6 @@ void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
     return;
   }
 
-  Log.traceln("wifi_command.type = %d", cmd.command.wifi_command.type);
-
   // switch for command types
   switch (cmd.command.wifi_command.type)
   {
@@ -40,10 +38,8 @@ void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
 
 size_t ModuleWiFi::OnRequest(uint8_t* buffer) {
   Log.traceln("ModuleWiFi::OnRequest");
-
-  Log.traceln("WiFi request_buffer_len = %d", this->request_buffer_len);
-  // copy contents into request buffer
-  memcpy(buffer, this->request_buffer, this->request_buffer_len);
+  memcpy(buffer, request_buffer, request_buffer_len);
+  return request_buffer_len;
 }
 
 void ModuleWiFi::Connect(const Esp32Command& cmd) {
@@ -72,11 +68,6 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   Log.noticeln("Connected!");
   Log.noticeln("ip: %p", WiFi.localIP());
 
-  Log.traceln("api url(%d): %s:%d", sizeof(cmd.command.wifi_command.url), cmd.command.wifi_command.url, cmd.command.wifi_command.port);
-  for (int i = 0; i < sizeof(cmd.command.wifi_command.url); i++) {
-    Log.traceln("url[%d] = %C", i, cmd.command.wifi_command.url[i]);
-  }
-
   // set url
   dirtviz.SetUrl(cmd.command.wifi_command.url);
   dirtviz.SetPort(cmd.command.wifi_command.port);
@@ -84,7 +75,7 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   // TODO Add API status check
   Log.noticeln("Checking API endpoint");
   uint32_t ts = dirtviz.Check();
-  Log.noticeln("ts: %d", ts);
+  Log.noticeln("Current timestamp is %d", ts);
 
   request_buffer_len = EncodeWiFiCommand(
     WiFiCommand_Type_CONNECT,
@@ -99,8 +90,6 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
     request_buffer,
     sizeof(request_buffer)
   );
-
-  Log.traceln("Encoded wifi with length %d", request_buffer_len);
 }
 
 void ModuleWiFi::Post(const Esp32Command& cmd) {

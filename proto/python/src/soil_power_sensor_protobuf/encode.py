@@ -10,7 +10,7 @@ Each type of measurement has a corresponding encoding function as follows:
     Teros12Measurement -> encode_teros12_measurement()
 """
 
-from .soil_power_sensor_pb2 import Measurement, Response, UserConfiguration
+from .soil_power_sensor_pb2 import Measurement, Response, UserConfiguration, EnabledSensor, Uploadmethod
 
 
 def encode_response(success: bool = True) -> bytes:
@@ -181,8 +181,34 @@ def encode_user_configuration(
     user_config.cell_id = cell_id
     user_config.Upload_method = Upload_method
     user_config.Upload_interval = Upload_interval
+    # Convert Upload_method to enum
+    if Upload_method.lower() == "lora":
+        user_config.Upload_method = Uploadmethod.LoRa
+    elif Upload_method.lower() == "wifi":
+        user_config.Upload_method = Uploadmethod.WiFi
+    else:
+        raise ValueError("Invalid Upload_method: must be 'LoRa' or 'WiFi'")
+    
+    # Check for duplicates in Enabled_sensors
+    seen_sensors = set()
     for sensor in Enabled_sensors:
-        user_config.enabled_sensors.append(sensor)
+        if sensor in seen_sensors:
+            raise ValueError(f"Duplicate sensor found: {sensor}")
+        seen_sensors.add(sensor)
+        
+        # Append to enabled_sensors based on the enum mapping
+        if sensor.lower() == "voltage":
+            user_config.enabled_sensors.append(EnabledSensor.Voltage)
+        elif sensor.lower() == "current":
+            user_config.enabled_sensors.append(EnabledSensor.Current)
+        elif sensor.lower() == "teros12":
+            user_config.enabled_sensors.append(EnabledSensor.Teros12)
+        elif sensor.lower() == "teros21":
+            user_config.enabled_sensors.append(EnabledSensor.Teros21)
+        elif sensor.lower() == "bme280":
+            user_config.enabled_sensors.append(EnabledSensor.BME280)
+        else:
+            raise ValueError(f"Invalid EnabledSensor: {sensor}")
     user_config.Voltage_Slope = Voltage_Slope
     user_config.Voltage_Offset = Voltage_Offset
     user_config.Current_Slope = Current_Slope

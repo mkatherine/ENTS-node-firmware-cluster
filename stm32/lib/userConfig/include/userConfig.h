@@ -33,19 +33,56 @@ extern "C" {
 #include "transcoder.h"
 #include "string.h"
 #include "stm32_systime.h"
+#include "usart_if.h"
+#include "soil_power_sensor.pb.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
 
-#define RX_BUFFER_SIZE 254         // Maximum size of the received data buffer
-#define FRAM_START_ADDRESS 1792    // Starting address to write in FRAM
-#define USER_CONFIG_LEN_ADDR 2046    // Starting address to write in FRAM
+#define RX_BUFFER_SIZE UserConfiguration_size      // Maximum size of the received data buffer
+// #define RX_BUFFER_SIZE 431                            // Maximum size of the received data buffer
+#define FRAM_START_ADDRESS 1794                    // Starting address to write in FRAM
+#define USER_CONFIG_LEN_ADDR 1792                  // Starting address to write in FRAM
 
 typedef enum {
     USERCONFIG_OK,
-    USERCONFIG_FRAM_ERROR
+    USERCONFIG_FRAM_ERROR,
+    USERCONFIG_DECODE_ERROR
 } UserConfigStatus;
+
+// /* Enum definitions */
+// typedef enum _EnabledSensor {
+//     EnabledSensor_Voltage = 0,
+//     EnabledSensor_Current = 1,
+//     EnabledSensor_Teros12 = 2,
+//     EnabledSensor_Teros21 = 3,
+//     EnabledSensor_BME280 = 4
+// } EnabledSensor;
+
+// typedef enum _Uploadmethod {
+//     Uploadmethod_LoRa = 0,
+//     Uploadmethod_WiFi = 1
+// } Uploadmethod;
+// typedef struct _UserConfiguration {
+//     /* ********* Upload Settings ********* */
+//     uint32_t logger_id; /* id of the logging device */
+//     uint32_t cell_id; /* id of the cell measured */
+//     Uploadmethod Upload_method; /* indicates whether LoRa or WiFi is used */
+//     uint32_t Upload_interval; /* upload time in seconds */
+//     /* ********* Measurement Settings ********* */
+//     pb_size_t enabled_sensors_count;
+//     EnabledSensor enabled_sensors[5]; /* List of enabled sensors */
+//     double Voltage_Slope; /* Calibration slope for voltage */
+//     double Voltage_Offset; /* Calibration offset for voltage */
+//     double Current_Slope; /* Calibration slope for current */
+//     double Current_Offset; /* Calibration offset for current */
+//     /* ********* WiFi Settings ********* */
+//     char WiFi_SSID[33];
+//     char WiFi_Password[65];
+//     char API_Endpoint_URL[257];
+//     uint32_t API_Endpoint_Port;
+// } UserConfiguration;
 
 /**
  ******************************************************************************
@@ -117,6 +154,33 @@ UserConfigStatus UserConfig_WriteToFRAM(uint16_t fram_addr,
  */
 UserConfigStatus UserConfig_ReadFromFRAM(uint16_t fram_addr,
                                          uint16_t length, uint8_t *data);
+
+/**
+ ******************************************************************************
+ * @brief    Loads user configuration data from FRAM to RAM.
+ *
+ *           This function reads the stored user configuration data from FRAM,
+ *           decodes it, and loads it into RAM. The data will be stored in a 
+ *           static UserConfig structure.
+ *
+ * @param    void
+ * @return   UserConfigStatus - USERCONFIG_OK if successful, error code otherwise.
+ ******************************************************************************
+ */
+UserConfigStatus UserConfigLoad(void);
+
+/**
+ ******************************************************************************
+ * @brief    Gets a reference to the loaded user configuration data in RAM.
+ *
+ *           This function returns a pointer to the UserConfig structure in RAM,
+ *           allowing access to the loaded configuration without reading from FRAM.
+ *
+ * @param    void
+ * @return   const UserConfig* - Pointer to the loaded UserConfig structure.
+ ******************************************************************************
+ */
+const UserConfiguration* UserConfigGet(void);                      
 
 #ifdef __cplusplus
 }

@@ -111,7 +111,7 @@ size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer) {
 
 size_t EncodeUserConfiguration(UserConfiguration *config, uint8_t *buffer) {
     // create output stream
-    pb_ostream_t ostream = pb_ostream_from_buffer(buffer, 256);
+    pb_ostream_t ostream = pb_ostream_from_buffer(buffer, UserConfiguration_size);
     
     // Encode the UserConfiguration message and check if successful
     bool status = pb_encode(&ostream, UserConfiguration_fields, config);

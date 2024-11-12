@@ -30,6 +30,37 @@ Run the application by executing the following command:
 python user_config.py
 ```
 
+## Example JSON Configuration File
+
+The following is an example JSON file generated after saving or sending user configuration settings:
+
+```bash
+{
+    "Logger ID": 5,
+    "Cell ID": 5,
+    "Upload Method": "LoRa",
+    "Days": 5,
+    "Hours": 5,
+    "Minutes": 5,
+    "Seconds": 5,
+    "Enabled Sensors": {
+        "Voltage": true,
+        "Current": true,
+        "Teros12": true,
+        "Teros21": true,
+        "BME280": true
+    },
+    "Calibration V Slope": 5.0,
+    "Calibration V Offset": 5.0,
+    "Calibration I Slope": 5.0,
+    "Calibration I Offset": 5.0,
+    "WiFi SSID": "",
+    "WiFi Password": "",
+    "API Endpoint URL": "",
+    "API Port": 0
+}
+```
+
 ## Screenshots
 
 ### Application Screenshots

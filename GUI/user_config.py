@@ -409,7 +409,11 @@ class Ui_MainWindow(object):
                 print(encoded_data)
                 print("------------------------------------------")
             try:
-                config_path = os.path.join(os.path.dirname(__file__), 'Load', 'cell_' + str(cell_id) + '_.json')
+                 # Ensure the 'Load' directory exists
+                load_dir = os.path.join(os.path.dirname(__file__), 'Load')
+                os.makedirs(load_dir, exist_ok=True)
+                # Save configuration as JSON
+                config_path = os.path.join(load_dir, f'cell_{cell_id}_.json')
                 with open(config_path, 'w') as json_file:
                     json.dump(configuration, json_file,indent=4)
 

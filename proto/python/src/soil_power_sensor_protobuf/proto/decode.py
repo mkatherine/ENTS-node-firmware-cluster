@@ -1,5 +1,4 @@
-"""Module to decode soil power sensor messages
-"""
+"""Module to decode soil power sensor messages"""
 
 from google.protobuf.json_format import MessageToDict
 

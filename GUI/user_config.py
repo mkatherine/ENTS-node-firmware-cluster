@@ -23,7 +23,7 @@ import sys
 import serial
 import serial.tools.list_ports
 import re  # For validating URL input
-from soil_power_sensor_protobuf import encode_user_configuration, decode_user_configuration
+from soil_power_sensor_protobuf.proto import encode_user_configuration, decode_user_configuration
 
 
 class Ui_MainWindow(object):

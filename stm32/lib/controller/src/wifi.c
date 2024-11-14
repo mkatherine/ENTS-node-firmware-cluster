@@ -3,6 +3,9 @@
 #include "transcoder.h"
 #include "communication.h"
 
+/** Timeout for i2c communication with esp32 */
+unsigned int g_controller_i2c_timeout = 2000;
+
 uint32_t ControllerWiFiInit(
   const char* ssid,
   const char* passwd,
@@ -17,8 +20,9 @@ uint32_t ControllerWiFiInit(
   tx->len = EncodeWiFiCommand(WiFiCommand_Type_CONNECT, ssid, passwd, url, port,
                              0, 0, NULL, 0, tx->data, tx->size);
 
-  // send transaction 
-  ControllerTransaction(500);
+  // send transaction
+  // found that
+  ControllerTransaction(g_controller_i2c_timeout);
 
   // check for errors
   if (rx->len == 0) {

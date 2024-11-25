@@ -94,6 +94,10 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
 
     // forward command to module
     last_module->OnReceive(cmd);
+
+    // reset buffer
+    receive_buffer.len = 0;
+    receive_buffer.idx = 0;
   }
 }
 

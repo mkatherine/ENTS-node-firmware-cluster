@@ -49,7 +49,7 @@ int ControllerWiFiPost(
 
   // encode command
   tx->len = EncodeWiFiCommand(WiFiCommand_Type_POST, NULL, NULL, NULL, 0, 0, 0,
-                             data, data_len, resp, resp_len);
+                             data, data_len, tx->data, tx->size);
 
   // send transaction
   ControllerTransaction(500);

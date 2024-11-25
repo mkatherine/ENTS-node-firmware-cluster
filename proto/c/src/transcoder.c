@@ -185,9 +185,9 @@ size_t EncodeWiFiCommand(
 
   cmd.which_command = Esp32Command_wifi_command_tag;
   cmd.command.wifi_command.type = type;
-  strcpy(cmd.command.wifi_command.ssid, ssid);
-  strcpy(cmd.command.wifi_command.passwd, passwd);
-  strcpy(cmd.command.wifi_command.url, url);
+  if (ssid != NULL) { strcpy(cmd.command.wifi_command.ssid, ssid); }
+  if (passwd != NULL) {strcpy(cmd.command.wifi_command.passwd, passwd); }
+  if (url != NULL) { strcpy(cmd.command.wifi_command.url, url); }
   cmd.command.wifi_command.port = port;
   cmd.command.wifi_command.rc = rc;
   cmd.command.wifi_command.ts = ts;

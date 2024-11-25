@@ -4,7 +4,7 @@
 #include "communication.h"
 
 /** Timeout for i2c communication with esp32 */
-unsigned int g_controller_i2c_timeout = 2000;
+unsigned int g_controller_i2c_timeout = 10000;
 
 uint32_t ControllerWiFiInit(
   const char* ssid,

@@ -41,8 +41,8 @@ void WiFiInit(void) {
 
 
   // TODO load configuration
-  const char ssid[] = "HARE_Lab";
-  const char* passwd = NULL;
+  const char ssid[] = "Pink Flamingo";
+  const char* passwd = "ShrimpMakesFlamingosPink21";
   const char url[] = "dirtviz.jlab.ucsc.edu";
   const uint32_t port = 80;
 
@@ -65,7 +65,7 @@ void WiFiInit(void) {
 
   // setup upload task
   APP_LOG(TS_ON, VLEVEL_M, "Starting upload task...\t")
-  UTIL_SEQ_RegTask((1 >> CFG_SEQ_Task_WiFiUpload), UTIL_SEQ_RFU, Upload);
+  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_WiFiUpload), UTIL_SEQ_RFU, Upload);
   UTIL_TIMER_Create(&UploadTimer, UploadPeriod, UTIL_TIMER_PERIODIC, UploadEvent, NULL);
   UTIL_TIMER_Start(&UploadTimer);
   APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
@@ -80,10 +80,16 @@ void Upload(void) {
   size_t buffer_len = 0;
   uint8_t buffer[buffer_size];
 
+  // get buffer data
   FramStatus status = FramGet(buffer, &buffer_len);
   if (status != FRAM_OK) {
-    APP_LOG(TS_OFF, VLEVEL_M,
-            "Error getting data from fram buffer. FramStatus = %d", status);
+    if (status == FRAM_BUFFER_EMPTY) {
+      APP_LOG(TS_OFF, VLEVEL_M, "Buffer empty!\r\n")
+    } else {
+      APP_LOG(TS_OFF, VLEVEL_M,
+          "Error getting data from fram buffer. FramStatus = %d\r\n", status);
+    }
+    return;
   }
 
   // print buffer
@@ -100,5 +106,5 @@ void Upload(void) {
   size_t resp_len = 0;
   int http_code = 0;
   http_code = ControllerWiFiPost(buffer, buffer_len, resp, &resp_len);
-  APP_LOG(TS_OFF, VLEVEL_M, "%d", http_code);
+  APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
 }

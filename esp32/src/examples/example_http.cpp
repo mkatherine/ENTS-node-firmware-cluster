@@ -18,7 +18,7 @@ void setup() {
 
   Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
-  std::string resp = "HTTP/2 200\r\n"
+  std::string resp = "HTTP/2 200 OK\r\n"
   "content-type: application/json\r\n"
   "content-length: 59\r\n"
   "date: Fri, 01 Nov 2024 23:53:02 GMT\r\n"

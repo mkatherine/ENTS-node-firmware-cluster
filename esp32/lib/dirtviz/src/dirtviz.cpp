@@ -12,7 +12,7 @@
 #include <sstream>
 #include <iomanip>
 
-Dirtviz::Dirtviz(void) : url(nullptr), response(nullptr) {}
+Dirtviz::Dirtviz(void) : url(nullptr) {}
 
 Dirtviz::Dirtviz(const char *url, const uint16_t &port)
 {
@@ -25,7 +25,6 @@ Dirtviz::~Dirtviz()
 {
   // free memory
   free(this->url);
-  free(this->response);
 }
 
 void Dirtviz::SetUrl(const char *new_url)
@@ -70,12 +69,25 @@ uint32_t Dirtviz::Check() const {
   }
 
   Log.traceln("Sending GET request");
-  client.println("GET /api/ HTTP/1.1");
-  client.println("Host: dirtviz.jlab.ucsc.edu");
-  client.println("User-Agent: curl/8.10.1");
-  client.println();
+
+  // format request
+  std::ostringstream req;
+  req << "GET /api/ HTTP/1.1" << "\r\n";
+  req << "Host: " << url << "\r\n";
+  req << "User-Agent: curl/8.10.1" << "\r\n";
+  req << "\r\n";
+
+  // send full request to server
+  client.println(req.str().c_str());
+
+  //client.println("GET /api/ HTTP/1.1");
+  //client.println("Host: dirtviz.jlab.ucsc.edu");
+  //client.println("User-Agent: curl/8.10.1");
+  //client.println();
+
   Log.traceln("Done!");
 
+  // wait until there's bytes available
   while (!client.available()) {
     Log.traceln("Delaying until available");
     delay(10);
@@ -87,11 +99,12 @@ uint32_t Dirtviz::Check() const {
     char c = client.read();
     resp += c;
   }
-
+  
   // close connection
   client.flush();
-  client.stop();
-  
+  client.stop();  
+ 
+  // read string into an object
   HttpClient http_client(resp);
 
   unsigned int http_code = http_client.ResponseCode();
@@ -109,17 +122,16 @@ uint32_t Dirtviz::Check() const {
   return (uint32_t) unix_epochs;
 }
 
-int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
-{
+HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   WiFiClient client;
 
   char buffer[100];
 
   // connect to server
-  if (!client.connect(url, port))
-  {
+  if (!client.connect(url, port)) {
     Log.errorln("Connection to %s:%d failed!", url, port);
-    return -1;
+    HttpClient empty("");
+    return empty;
   }
 
   // send data
@@ -146,70 +158,28 @@ int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len)
     client.write(meas[idx]);
   }
 
+  // read response
+
+  // wait until there's bytes available
+  while (!client.available()) {
+    Log.traceln("Delaying until available");
+    delay(10);
+  }
 
   // read response
+  std::string resp;
+  while (client.available()) {
+    char c = client.read();
+    resp += c;
+  }
   
-  // get length of response
-  int resp_len = client.available();
-
-  // free memory before allocating to prevent leaks
-  free(this->response);
-  this->response = nullptr;
-
-  // allocate memory
-  this->response = (char *) realloc(this->response, resp_len + 1);
-
-  // copy into buffer
-  if (this->response != nullptr) {
-    // Ensure to read only available bytes and null-terminate the response
-    int bytesRead = 0;
-    while (client.available() && bytesRead < resp_len) {
-      this->response[bytesRead++] = client.read();
-    }
-    this->response[bytesRead] = '\0'; // Null-terminate the response
-  } else {
-    Serial.println("Null pointer failure");
-    return -1;
-  }
-  Serial.println(this->response);
-
-  // disconnect after message is sent
-  client.stop();
-
-
-  // find status code
-  int status_code;
-  if (sscanf(this->response, "%*s %d", &status_code) != 1)
-  {
-    Serial.println("Unable to parse status code");
-    return -1;
-  }
-
-  return status_code;  
+  // close connection
+  client.flush();
+  client.stop();  
+ 
+  // read string into an object
+  HttpClient http_client(resp);
+  
+  return http_client;
 }
 
-size_t Dirtviz::GetResponse(const uint8_t *data) const
-{
-  // find response length from header
-
-  // get pointer to start of line
-  const char *length_start = strstr(this->response, "Content-Length:");
-  if (length_start == nullptr)
-  {
-    return 0;
-  }
-
-  // parse the length
-  size_t data_len;
-  if (sscanf(length_start, "%*s %u", &data_len))
-  {
-    return 0;
-  }
-
-  // read binary data, look for double CRLF
-  data = (const uint8_t *) strstr(this->response, "\r\n\r\n");
-  data += 4;
-
-  // return the length of data
-  return data_len;
-}

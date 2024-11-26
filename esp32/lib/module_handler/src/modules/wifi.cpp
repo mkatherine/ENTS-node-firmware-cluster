@@ -2,6 +2,8 @@
 
 #include <ArduinoLog.h>
 
+#include "http.hpp"
+
 ModuleWiFi::ModuleWiFi(void) {
   // set module type
   type = Esp32Command_wifi_command_tag;
@@ -16,6 +18,8 @@ void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
   if (cmd.which_command != Esp32Command_wifi_command_tag) {
     return;
   }
+
+  Log.traceln("WiFiCommand type: %d", cmd.command.wifi_command.type);
 
   // switch for command types
   switch (cmd.command.wifi_command.type)
@@ -98,12 +102,12 @@ void ModuleWiFi::Post(const Esp32Command& cmd) {
   // send measurement
   const uint8_t* meas = cmd.command.wifi_command.resp.bytes;
   const size_t meas_len = cmd.command.wifi_command.resp.size;
-  int status_code = this->dirtviz.SendMeasurement(meas, meas_len);
 
-  // get response data
-  // TODO may need to pass pointer of a pointer
-  uint8_t* resp = {};
-  size_t resp_len = this->dirtviz.GetResponse(resp);
+  // send measurement
+  HttpClient resp_msg = this->dirtviz.SendMeasurement(meas, meas_len);
+  uint8_t* resp = (uint8_t*) resp_msg.Data().c_str();
+  size_t resp_len = resp_msg.Data().length();
+  unsigned int status_code = resp_msg.ResponseCode();
 
   // encode wifi command in buffer
   this->request_buffer_len = EncodeWiFiCommand(

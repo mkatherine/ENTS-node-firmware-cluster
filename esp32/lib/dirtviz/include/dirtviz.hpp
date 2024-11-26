@@ -81,27 +81,12 @@ public:
   /**
    * @brief Send serialized measurement to the API
    * 
-   * The entire response is stored in a dynamically allocated buffer. Use
-   * Dirtviz::GetResponse to get the binary response data.
-   * 
    * @param meas Pointer to serialized measurement data
    * @param meas_len Number of bytes in @p meas
    * 
-   * @return HTTP response code, -1 indicates an error in parsing
+   * @return Response from http server
   */
-  int SendMeasurement(const uint8_t *meas, size_t meas_len);
-
-  /**
-   * @brief Get binary data from response
-   * 
-   * A returned length of 0 indicates an error and the pointer @p data has not
-   * been modified.
-   * 
-   * @param data Pointer to response binary data
-   * 
-   * @return Length of @p data
-  */
-  size_t GetResponse(const uint8_t *data) const;
+  HttpClient SendMeasurement(const uint8_t *meas, size_t meas_len);
 
 private:
   /** URL of API */
@@ -109,10 +94,6 @@ private:
 
   /** Port of API*/
   uint16_t port;
-
-  /** Buffer for the HTTP response */
-  char *response = nullptr;
-
 
   /**
    * @brief Starts connection with server

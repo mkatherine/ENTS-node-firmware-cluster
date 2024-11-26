@@ -78,12 +78,7 @@ uint32_t Dirtviz::Check() const {
   req << "\r\n";
 
   // send full request to server
-  client.println(req.str().c_str());
-
-  //client.println("GET /api/ HTTP/1.1");
-  //client.println("Host: dirtviz.jlab.ucsc.edu");
-  //client.println("User-Agent: curl/8.10.1");
-  //client.println();
+  client.print(req.str().c_str());
 
   Log.traceln("Done!");
 
@@ -135,28 +130,23 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   }
 
   // send data
-
-  // HTTP command, path, and version
-  client.println("POST /api/ HTTP/1.1");
-  // who we are posting to
-  client.print("Host: ");
-  client.print(this->url);
-  client.print(":");
-  client.println(this->port);
-  // type of data
-  client.println("Content-Type: application/octet-stream");
-  // length of data (specific to application/octet-stream)
-  sprintf(buffer, "Content-Length: %d", meas_len);
-  client.println(buffer);
-  // close connection after data is sent
-  client.println("Connection: close");
-  // newline indicating end of headers
-  client.println();
-  // send data
-  for (int idx = 0; idx < meas_len; ++idx)
-  {
-    client.write(meas[idx]);
+  
+  // format request
+  // TODO fix hardcoded api path
+  std::ostringstream req;
+  req << "POST /api/sensor/ HTTP/1.1" << "\r\n";
+  req << "Host: " << url << "\r\n";
+  req << "User-Agent: curl/8.10.1" << "\r\n";
+  req << "Content-Type: application/octet-stream" << "\r\n";
+  req << "Content-Length: " << meas_len << "\r\n";
+  req << "Connection: close" << "\r\n";
+  req << "\r\n";
+  for (int idx = 0; idx < meas_len; idx++) {
+    req << (char) meas[idx];
   }
+
+  client.print(req.str().c_str());
+
 
   // read response
 

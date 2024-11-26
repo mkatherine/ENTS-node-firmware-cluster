@@ -52,6 +52,14 @@ void setup()
   // Create logging interfface
   Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
+  Log.verbose(R"(
+-------------------------------------------------------------------------------
+
+RESET!
+
+-------------------------------------------------------------------------------
+)");
+  
   Log.noticeln("ents-node esp32 firmware, compiled at %s %s", __DATE__,
       __TIME__);
 

@@ -41,16 +41,28 @@ void WiFiInit(void) {
 
 
   // TODO load configuration
-  const char ssid[] = "Pink Flamingo";
-  const char* passwd = "ShrimpMakesFlamingosPink21";
+  const char ssid[] = "HARE_Lab";
+  const char* passwd = "";
   const char url[] = "dirtviz.jlab.ucsc.edu";
   const uint32_t port = 80;
 
-  APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t", ssid);
 
-  // initialize 
-  SysTime_t ts = {.Seconds = 0, .SubSeconds = 0};
-  ts.Seconds = ControllerWiFiInit(ssid, passwd, url, port);
+  // initialize
+  unsigned int num_tries = 0;
+  SysTime_t ts = {.Seconds = -1, .SubSeconds = 0};
+  while (ts.Seconds == -1) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t", ssid);
+    ts.Seconds = ControllerWiFiInit(ssid, passwd, url, port);
+
+    if (ts.Seconds == -1) {
+      APP_LOG(TS_OFF, VLEVEL_M, "Attempt %d failed!\r\n", num_tries);
+    } else {
+      APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
+      APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
+    }
+
+    ++num_tries;
+  }
 
   APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
   APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);

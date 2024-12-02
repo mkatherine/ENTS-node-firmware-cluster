@@ -47,6 +47,9 @@ size_t ModuleWiFi::OnRequest(uint8_t* buffer) {
 }
 
 void ModuleWiFi::Connect(const Esp32Command& cmd) {
+  // timestamp
+  uint32_t ts = -1;
+
   Log.traceln("ModuleWiFi::Connect");
 
   Log.noticeln("Connecting to WiFI...");
@@ -54,32 +57,44 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   Log.noticeln("passwd: %s", cmd.command.wifi_command.passwd);
 
   // connect to WiFi
-  WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
+  // early return if SSID is not available
+  int status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
+  Log.noticeln("WiFi connection status: %d", status);
+
+  // flag if connected for future code
+  bool connected = false;
 
   // wait for WiFi to connect
-  unsigned long timeout = millis() + connect_timeout_ms;
-  while (WiFi.status() != WL_CONNECTED) {
+  while (1) {
     // TODO implement lp sleep
-    delay(500);
+    delay(1000);
+    Log.noticeln("Waiting for connection...");
 
-    // wifi connect timeout
-    if (millis() >= timeout) {
-      Log.errorln("Could not connect!");
+    status = WiFi.status();
+    Log.noticeln("wifi.begin: %d", status);
+    if (status == WL_CONNECTED) {
+      Log.noticeln("Connected with ip: %p", WiFi.localIP());
+      connected = true;
+      break;
+    } else if (status == WL_CONNECT_FAILED) {
+      Log.errorln("Connection failed!");
+      break;
+    } else if (status == WL_NO_SSID_AVAIL) {
+      Log.errorln("SSID not available!");
+      break;
     }
   }
 
-  // print ip address
-  Log.noticeln("Connected!");
-  Log.noticeln("ip: %p", WiFi.localIP());
+  if (connected) {
+    // set url
+    dirtviz.SetUrl(cmd.command.wifi_command.url);
+    dirtviz.SetPort(cmd.command.wifi_command.port);
 
-  // set url
-  dirtviz.SetUrl(cmd.command.wifi_command.url);
-  dirtviz.SetPort(cmd.command.wifi_command.port);
-
-  // TODO Add API status check
-  Log.noticeln("Checking API endpoint");
-  uint32_t ts = dirtviz.Check();
-  Log.noticeln("Current timestamp is %d", ts);
+    // TODO Add API status check
+    Log.noticeln("Checking API endpoint");
+    ts = dirtviz.Check();
+    Log.noticeln("Current timestamp is %d", ts);
+  }
 
   request_buffer_len = EncodeWiFiCommand(
     WiFiCommand_Type_CONNECT,
@@ -87,7 +102,7 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
     "",
     "",
     0,
-    0,
+    status,
     ts,
     nullptr,
     0,

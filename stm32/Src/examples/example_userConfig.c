@@ -15,21 +15,14 @@
  *
  ******************************************************************************
  */
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "adc.h"
-#include "ads.h"
-#include "app_lorawan.h"
-#include "dma.h"
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
-#include "i2c.h"
 #include "rtc.h"
-#include "sdi12.h"
-#include "stm32_timer.h"
-#include "sys_app.h"
-#include "usart.h"
+#include "userConfig.h"
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,19 +37,19 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-const int uart_timeout = 1000;
 
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+char uart_buf[512];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -91,7 +84,6 @@ int main(void) {
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
 
@@ -100,83 +92,83 @@ int main(void) {
    * like in main*/
   __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
   UTIL_TIMER_Init();
-
   /* USER CODE BEGIN 2 */
-  ADC_init();
+  // UserConfig_InterruptInit();  // Initialize UART for interrupt mode
 
-  /* USER CODE BEGIN 2 */
-  char controller_input[3];
-  char check_input[7];
-  char check_result[4];
-  char size_proto_string[4];
-  uint8_t encoded_measurment[256];
-  int size_check = snprintf(check_result, sizeof(check_result), "ok\n");
-  // status for HAL_UART_* functions
-  HAL_StatusTypeDef status = HAL_OK;
+  // Load user configuration from FRAM
+  if (UserConfigLoad() == USERCONFIG_OK) {
+    // Get a pointer to the loaded configuration
+    const UserConfiguration *config = UserConfigGet();
 
-  // block for host to send check command
-  status = HAL_UART_Receive(&huart1, (uint8_t *)check_input, 6, HAL_MAX_DELAY);
-  if (status != HAL_OK) {
-    Error_Handler();
-  }
+    // Print each member of the UserConfiguration
+    sprintf(uart_buf, "Logger ID: %lu\r\n", config->logger_id);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
 
-  // check for first chararcter in "check"
-  if (check_input[0] == 'c') {
-    status = HAL_UART_Transmit(
-        &huart1, (uint8_t *)check_result, size_check,
-        uart_timeout);  // send response to the 'check' command
-    if (status != HAL_OK) {
-      Error_Handler();
+    sprintf(uart_buf, "Cell ID: %lu\r\n", config->cell_id);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    if(config->Upload_method==0){
+      sprintf(uart_buf, "Upload Method: %u \"LoRa\"\r\n", config->Upload_method);
+      HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
     }
-  }
+    else{
+      sprintf(uart_buf, "Upload Method: %u \"WiFi\"\r\n", config->Upload_method);
+      HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+    }
 
+    sprintf(uart_buf, "Upload Interval: %lu\r\n", config->Upload_interval);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    for (int i = 0; i < config->enabled_sensors_count; i++) {
+        const char *sensor_name;
+        switch (config->enabled_sensors[i]) {
+            case 0: sensor_name = "Voltage"; break;
+            case 1: sensor_name = "Current"; break;
+            case 2: sensor_name = "Teros12"; break;
+            case 3: sensor_name = "Teros21"; break;
+            case 4: sensor_name = "BME280"; break;
+        }
+        sprintf(uart_buf, "Enabled Sensor %d: %s\r\n", i + 1, sensor_name);
+        HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+    }
+
+    sprintf(uart_buf, "Calibration V Slope: %f\r\n", config->Voltage_Slope);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    sprintf(uart_buf, "Calibration V Offset: %f\r\n", config->Voltage_Offset);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    sprintf(uart_buf, "Calibration I Slope: %f\r\n", config->Current_Slope);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    sprintf(uart_buf, "Calibration I Offset: %f\r\n", config->Current_Offset);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    sprintf(uart_buf, "WiFi SSID: %s\r\n", config->WiFi_SSID);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    sprintf(uart_buf, "WiFi Password: %s\r\n", config->WiFi_Password);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    sprintf(uart_buf, "API Endpoint URL: %s\r\n", config->API_Endpoint_URL);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+    sprintf(uart_buf, "API Port: %lu\r\n", config->API_Endpoint_Port);
+    HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
+  } else {
+    const char *error_msg = "Failed to load user configuration from FRAM.\r\n";
+    HAL_UART_Transmit(&huart1, (uint8_t *)error_msg, strlen(error_msg), HAL_MAX_DELAY);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
   while (1) {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
-
-    // block until receive request for measurement
-    status = HAL_UART_Receive(
-        &huart1, (uint8_t *)controller_input, 1,
-        HAL_MAX_DELAY);  // On every other iteration, send the encoded
-                         // measurment in response to the '0' command
-    if (status != HAL_OK) {
-      continue;
-    }
-
-    // check command input
-    if (controller_input[0] == '0') {
-      size_t measurement_size = ADC_measure(
-          encoded_measurment);  // Read the measurment, and store it's size in
-                                // measurement_size (size int 64)
-      if (measurement_size == -1) {
-        continue;
-      }
-
-      // send length
-      status = HAL_UART_Transmit(&huart1, (uint8_t *)&measurement_size, 1,
-                                 uart_timeout);
-      if (status != HAL_OK) {
-        continue;
-      }
-
-      // send data
-      status = HAL_UART_Transmit(&huart1, (uint8_t *)encoded_measurment,
-                                 measurement_size, uart_timeout);
-      if (status != HAL_OK) {
-        continue;
-      }
-    }
-
-    // delay between measurements
-    HAL_Delay(100);
-    /* USER CODE END 3 */
   }
+  /* USER CODE END 3 */
 }
 
 /**
@@ -203,14 +195,8 @@ void SystemClock_Config(void) {
   RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
-  RCC_OscInitStruct.PLL.PLLN = 42;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV4;
-  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
@@ -220,9 +206,9 @@ void SystemClock_Config(void) {
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3 | RCC_CLOCKTYPE_HCLK |
                                 RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 |
                                 RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV5;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
 

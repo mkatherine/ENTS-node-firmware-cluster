@@ -108,3 +108,30 @@ size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer) {
   // return number of bytes written
   return ostream.bytes_written;
 }
+
+size_t EncodeUserConfiguration(UserConfiguration *config, uint8_t *buffer) {
+    // create output stream
+    pb_ostream_t ostream = pb_ostream_from_buffer(buffer, UserConfiguration_size);
+    
+    // Encode the UserConfiguration message and check if successful
+    bool status = pb_encode(&ostream, UserConfiguration_fields, config);
+    if (!status) {
+        return -1;
+    }
+    
+    // Return the number of bytes written
+    return ostream.bytes_written;
+}
+
+int DecodeUserConfiguration(const uint8_t *data, const size_t len, UserConfiguration *config) {
+    // Create a protobuf input stream from the data buffer
+    pb_istream_t istream = pb_istream_from_buffer(data, len);
+    
+    // Decode the UserConfiguration message and check if successful
+    bool status = pb_decode(&istream, UserConfiguration_fields, config);
+    if (!status) {
+        return -1;  // Return -1 if there was a decoding error
+    }
+    
+    return 0;  // Return 0 on success
+}

@@ -104,6 +104,32 @@ size_t EncodePhytos31Measurement(uint32_t ts, uint32_t logger_id,
  */
 Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len);
 
+/**
+ * @brief Encodes user configuration data.
+ *
+ * This function serializes user configuration settings, including upload settings, 
+ * measurement settings, and WiFi settings, using protobuf and stores the result in a buffer.
+ * The serialized data length is returned, or -1 if an encoding error occurred.
+ *
+ * @param config User configuration to encode
+ * @param buffer Buffer to store serialized data
+ * @return Number of bytes in the buffer, or -1 on error
+ */
+size_t EncodeUserConfiguration(UserConfiguration *config, uint8_t *buffer);
+
+/**
+ * @brief Decodes user configuration data.
+ *
+ * This function deserializes a user configuration protobuf message from a buffer.
+ * The message length is specified, and a return value of -1 indicates a decoding error.
+ *
+ * @param data Serialized data buffer
+ * @param len Length of data buffer
+ * @param config Decoded user configuration output
+ * @return 0 on success, -1 on error
+ */
+int DecodeUserConfiguration(const uint8_t *data, const size_t len, UserConfiguration *config);
+
 #ifdef __cplusplus
 }
 #endif

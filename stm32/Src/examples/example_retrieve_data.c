@@ -34,12 +34,16 @@ HAL_StatusTypeDef rc;
 */
 
 int main(void) {
+
   HAL_Init();
   SystemClock_Config();
-  MX_GPIO_Init();
-  MX_I2C2_Init();
-  MX_USART1_UART_Init();
   SystemApp_Init();
+
+  MX_GPIO_Init();
+  MX_USART1_UART_Init();
+  MX_DMA_Init();
+  MX_I2C2_Init();
+  
   FIFO_Init();
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -61,7 +65,7 @@ int main(void) {
   uint8_t retrieved_data[sizeof(test_data)];
   uint8_t retrieved_len;
 
-  printf("Press the Restart button to add more data to FRAM...\n");
+  APP_PRINTF("Press the Restart button to add more data to FRAM...\n");
 
   // Visualizing actual data (commented out)
   // while (FramBufferLen() > 0) {
@@ -70,7 +74,7 @@ int main(void) {
   //         // Loop through retrieved_data and print each byte in hexadecimal
   //         format print("Data length: %d\n", retrieved_len); for (int i = 0; i
   //         < retrieved_len; i++) {
-  //             print("Data[%d]: 0x%02X\n", i, retrieved_data[i]);
+  //             APP_PRINTF("Data[%d]: 0x%02X\n", i, retrieved_data[i]);
   //         }
   //     } else {
   //         // Handle error if needed

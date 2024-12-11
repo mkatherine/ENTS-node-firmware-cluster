@@ -39,7 +39,7 @@ extern UART_HandleTypeDef huart1;
 /**
   * @brief buffer to receive 1 character
   */
-extern uint8_t charRx;
+static uint8_t charRx;
 
 /* USER CODE BEGIN EV */
 

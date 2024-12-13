@@ -10,7 +10,13 @@ Each type of measurement has a corresponding encoding function as follows:
     Teros12Measurement -> encode_teros12_measurement()
 """
 
-from .soil_power_sensor_pb2 import Measurement, Response, UserConfiguration, EnabledSensor, Uploadmethod
+from .soil_power_sensor_pb2 import (
+    Measurement,
+    Response,
+    UserConfiguration,
+    EnabledSensor,
+    Uploadmethod,
+)
 
 
 def encode_response(success: bool = True) -> bytes:
@@ -136,6 +142,7 @@ def encode_phytos31_measurement(
 
     return meas.SerializeToString()
 
+
 def encode_user_configuration(
     logger_id: int,
     cell_id: int,
@@ -149,11 +156,8 @@ def encode_user_configuration(
     WiFi_SSID: str,
     WiFi_Password: str,
     API_Endpoint_URL: str,
-    API_Endpoint_Port: int
+    API_Endpoint_Port: int,
 ) -> bytes:
-
-
-
     """Encodes a UserConfiguration message
 
     Args:
@@ -188,14 +192,14 @@ def encode_user_configuration(
         user_config.Upload_method = Uploadmethod.WiFi
     else:
         raise ValueError("Invalid Upload_method: must be 'LoRa' or 'WiFi'")
-    
+
     # Check for duplicates in Enabled_sensors
     seen_sensors = set()
     for sensor in Enabled_sensors:
         if sensor in seen_sensors:
             raise ValueError(f"Duplicate sensor found: {sensor}")
         seen_sensors.add(sensor)
-        
+
         # Append to enabled_sensors based on the enum mapping
         if sensor.lower() == "voltage":
             user_config.enabled_sensors.append(EnabledSensor.Voltage)
@@ -212,7 +216,7 @@ def encode_user_configuration(
     user_config.Voltage_Slope = Voltage_Slope
     user_config.Voltage_Offset = Voltage_Offset
     user_config.Current_Slope = Current_Slope
-    user_config.Current_Offset = Current_Offset    
+    user_config.Current_Offset = Current_Offset
     user_config.WiFi_SSID = WiFi_SSID
     user_config.WiFi_Password = WiFi_Password
     user_config.API_Endpoint_URL = API_Endpoint_URL

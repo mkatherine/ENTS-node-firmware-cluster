@@ -123,7 +123,8 @@ int main(void)
   SensorsInit();
   
   // configure sensors
-  SensorsAdd(ADC_measure);
+  SensorsAdd(SensorsMeasureTest);
+  //SensorsAdd(ADC_measure);
   //SensorsAdd(SDI12_Teros12Measure);
   //SensorsAdd(Phytos31_measure);
 

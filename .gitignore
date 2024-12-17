@@ -1,5 +1,7 @@
 # user-defined
 *.code-workspace
+**/.vscode/settings.json
+.mypy_cache
 
 # docs
 docs/html

@@ -84,8 +84,7 @@ size_t EncodePhytos31Measurement(uint32_t ts, uint32_t logger_id,
 size_t EncodeBME280Measurement(uint32_t ts, uint32_t logger_id,
                                uint32_t cell_id, uint32_t pressure,
                                int32_t temperature, uint32_t humidity,
-                               uint8_t *buffer)
-{
+                               uint8_t *buffer) {
   Measurement meas = Measurement_init_zero;
 
   meas.has_meta = true;
@@ -102,8 +101,7 @@ size_t EncodeBME280Measurement(uint32_t ts, uint32_t logger_id,
   return EncodeMeasurement(&meas, buffer);
 }
 
-Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len)
-{
+Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len) {
   Response resp;
 
   // create input buffer

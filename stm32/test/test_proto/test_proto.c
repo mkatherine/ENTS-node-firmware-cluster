@@ -215,8 +215,7 @@ void test_bme280(void) {
   TEST_ASSERT_EQUAL(10, bme280_decode.measurement.bme280.humidity);
 }
 
-void test_response(void)
-{
+void test_response(void) {
   Response response_encode = Response_init_zero;
   response_encode.resp = Response_ResponseType_SUCCESS;
 

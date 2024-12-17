@@ -92,27 +92,27 @@ size_t EncodePhytos31Measurement(uint32_t ts, uint32_t logger_id,
 
 /**
  * @brief Encodes a BME280 measurement
- * 
+ *
  * The timestamp is not able to encode timezones and is references from UTC+0.
  * The serialized data is stored in @p buffer with the number of bytes written
  * being returned by the function. A return value of -1 indicates an error in
  * encoding.
- * 
+ *
  * Below shows the relation between raw measurements taken from the device in
  * relation to real-world or si units.
- * 
+ *
  * Raw values
- * 
+ *
  * pressure: 98473
  * temperature: 2275
  * humidity: 43600
- * 
+ *
  * SI unit values
- * 
+ *
  * pressure: 9847.3 hPa
  * temperature: 22.75 C
  * humidity: 43.600 %
- * 
+ *
  * @param ts Timestamp
  * @param logger_id Logger Id
  * @param cell_id Cell Id

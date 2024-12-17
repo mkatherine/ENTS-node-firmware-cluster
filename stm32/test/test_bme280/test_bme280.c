@@ -1,53 +1,45 @@
 /**
  * @file test_template.c
  * @brief Tests for the BME280 environmental sensor
- * 
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2024-01-05
- * 
+ *
  * Before running the tests, a BME280 sensor should be connected to the device.
  * The tests look at initialization, reading each channel and formatting of
  * measurement data. Values are checked such that they appears within the
  * operating range of the sensor.
-*/
-
-#include <unity.h>
+ */
 
 #include <stdio.h>
-
-#include "main.h"
-#include "usart.h"
-#include "gpio.h"
-#include "i2c.h"
-#include "sys_app.h"
+#include <unity.h>
 
 #include "bme280_sensor.h"
-
+#include "gpio.h"
+#include "i2c.h"
+#include "main.h"
 #include "main_helper.h"
-
+#include "sys_app.h"
+#include "usart.h"
 
 void SystemClock_Config(void);
-  
 
 /**
  * @brief Setup code that runs at the start of every test
-*/
+ */
 void setUp(void) {}
 
 /**
  * @brief Tear down code that runs at the end of every test
-*/
+ */
 void tearDown(void) {}
 
-
-void test_init(void)
-{
+void test_init(void) {
   BME280Status status = BME280Init();
   TEST_ASSERT_EQUAL(BME280_STATUS_OK, status);
 }
 
-void test_measure_temperature(void)
-{
+void test_measure_temperature(void) {
   BME280Data data;
   BME280Status status = BME280MeasureAll(&data);
 
@@ -57,8 +49,7 @@ void test_measure_temperature(void)
   TEST_ASSERT_LESS_THAN(6500, data.temperature);
 }
 
-void test_measure_pressure(void)
-{
+void test_measure_pressure(void) {
   BME280Data data;
   BME280Status status = BME280MeasureAll(&data);
 
@@ -68,8 +59,7 @@ void test_measure_pressure(void)
   TEST_ASSERT_LESS_THAN(11000, data.temperature);
 }
 
-void test_measure_humidity(void)
-{
+void test_measure_humidity(void) {
   BME280Data data;
   BME280Status status = BME280MeasureAll(&data);
 
@@ -79,8 +69,7 @@ void test_measure_humidity(void)
   TEST_ASSERT_LESS_THAN(100000, data.temperature);
 }
 
-void test_measure(void)
-{
+void test_measure(void) {
   uint8_t buffer[256];
   size_t buffer_len = 0;
 
@@ -90,12 +79,12 @@ void test_measure(void)
 }
 
 /**
-  * @brief Entry point for protobuf test
-  * @retval int
-  */
-int main(void)
-{
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ * @brief Entry point for protobuf test
+ * @retval int
+ */
+int main(void) {
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* Configure the system clock */
@@ -110,7 +99,7 @@ int main(void)
 
   // wait for UART
   for (int i = 0; i < 1000000; i++) {
-      __NOP();
+    __NOP();
   }
 
   // Unit testing
@@ -125,4 +114,3 @@ int main(void)
 
   UNITY_END();
 }
-

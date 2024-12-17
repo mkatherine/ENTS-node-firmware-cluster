@@ -2,7 +2,7 @@
 *.code-workspace
 **/.vscode/settings.json
 .mypy_cache
-tags
+tags*
 
 # docs
 docs/html

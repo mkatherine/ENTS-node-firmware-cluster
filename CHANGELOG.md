@@ -8,6 +8,14 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
+## [Unreleased]
+
+### Added
+
+- Support for bme280 sensor [#136](i136)
+
+[i136]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/136
+
 ## [2.2.0] - 2024-12-13
 
 ### Added

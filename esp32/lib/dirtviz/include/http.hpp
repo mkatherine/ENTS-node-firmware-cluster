@@ -9,6 +9,13 @@ class HttpClient {
     /**
      * @brief Default constructor
      *
+     * Create an empty object
+     */
+    HttpClient();
+
+    /**
+     * @brief Default constructor
+     *
      * @param Http response string
      */
     HttpClient(const std::string &resp);
@@ -55,7 +62,7 @@ class HttpClient {
     std::string version;
 
     /** Http response code */
-    unsigned int code;
+    unsigned int code = 0;
 
     /** Map for requested headers */
     std::map<std::string, std::string> headers;

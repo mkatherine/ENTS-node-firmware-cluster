@@ -12,6 +12,9 @@
 #include <sstream>
 #include <iomanip>
 
+/** Timeout for http responses */
+unsigned int g_resp_timeout = 5000;
+
 Dirtviz::Dirtviz(void) : url(nullptr) {}
 
 Dirtviz::Dirtviz(const char *url, const uint16_t &port)
@@ -82,8 +85,15 @@ uint32_t Dirtviz::Check() const {
 
   Log.traceln("Done!");
 
-  // wait until there's bytes available
+  // wait until there's bytes available with timeout
+  unsigned int timeout = millis() + g_resp_timeout;
   while (!client.available()) {
+    // timeout
+    if (millis() > timeout) {
+      Log.noticeln("API Check timeout!");
+      return (uint32_t) -1;
+    }
+
     Log.traceln("Delaying until available");
     delay(10);
   }
@@ -122,6 +132,8 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
 
   char buffer[100];
 
+  Log.noticeln("WiFi status: %d", WiFi.status());
+
   // connect to server
   if (!client.connect(url, port)) {
     Log.errorln("Connection to %s:%d failed!", url, port);
@@ -150,11 +162,25 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
 
   // read response
 
-  // wait until there's bytes available
+  // wait until there's bytes available with timeout
+  unsigned int timeout = millis() + g_resp_timeout;
   while (!client.available()) {
+    // timeout
+    if (millis() >  timeout) {
+      Log.noticeln("Send measurement timeout!");
+      Log.noticeln("WiFi status: %d", WiFi.status());
+      HttpClient empty_resp;
+    
+      client.flush();
+      client.stop();
+
+      return empty_resp;
+    }
+
     Log.traceln("Delaying until available");
     delay(10);
   }
+
 
   // read response
   std::string resp;

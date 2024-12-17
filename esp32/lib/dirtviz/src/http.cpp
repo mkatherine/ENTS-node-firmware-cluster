@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <sstream>
 
+HttpClient::HttpClient() {}
+
 HttpClient::HttpClient(const std::string &resp) {
   // find indicies of data
   size_t header_start = resp.find(LINE_END);

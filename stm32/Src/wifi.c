@@ -64,9 +64,6 @@ void WiFiInit(void) {
     ++num_tries;
   }
 
-  APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
-  APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
-
   // update clock
   SysTimeSet(ts);
 
@@ -119,4 +116,10 @@ void Upload(void) {
   int http_code = 0;
   http_code = ControllerWiFiPost(buffer, buffer_len, resp, &resp_len);
   APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
+
+  if (http_code == 0) {
+    APP_LOG(TS_ON, VLEVEL_M, "Error with WiFi connection!\r\n");
+    //APP_LOG(TS_ON, VLEVEL_M, "Attempting to reconnect...\r\n");
+    //WiFiInit();
+  }
 }

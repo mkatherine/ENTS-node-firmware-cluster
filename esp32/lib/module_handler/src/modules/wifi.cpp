@@ -114,6 +114,28 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
 void ModuleWiFi::Post(const Esp32Command& cmd) {
   Log.traceln("ModuleWiFI::Post");
 
+  // check if connected to WiFi connected
+  if (WiFi.status() != WL_CONNECTED) {
+    Log.errorln("Not connected to WiFi!");
+
+    // encode with return code 0 to indicate error
+    this->request_buffer_len = EncodeWiFiCommand(
+      WiFiCommand_Type_POST,
+      nullptr,
+      nullptr,
+      nullptr,
+      0,
+      0,
+      0,
+      nullptr,
+      0,
+      request_buffer,
+      sizeof(request_buffer)
+    );
+
+    return;
+  }
+
   // send measurement
   const uint8_t* meas = cmd.command.wifi_command.resp.bytes;
   const size_t meas_len = cmd.command.wifi_command.resp.size;
@@ -123,6 +145,8 @@ void ModuleWiFi::Post(const Esp32Command& cmd) {
   uint8_t* resp = (uint8_t*) resp_msg.Data().c_str();
   size_t resp_len = resp_msg.Data().length();
   unsigned int status_code = resp_msg.ResponseCode();
+
+  Log.noticeln("Resp length: %d", resp_len);
 
   // encode wifi command in buffer
   this->request_buffer_len = EncodeWiFiCommand(

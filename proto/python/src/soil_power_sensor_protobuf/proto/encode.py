@@ -144,24 +144,30 @@ def encode_phytos31_measurement(
     return meas.SerializeToString()
 
 
-def encode_bme280_measurement(ts: int, cell_id: int, logger_id: int,
-                              pressure: int, temperature: int, humidity: int):
+def encode_bme280_measurement(
+    ts: int,
+    cell_id: int,
+    logger_id: int,
+    pressure: int,
+    temperature: int,
+    humidity: int,
+):
     """Encodes a BME280Measurement within the Measurement message
 
     The following raw values correspond to the following SI units
-    
+
     *Raw*
-  
+
     pressure: 98473
     temperature: 2275
     humidity: 43600
-    
+
     *SI Units*
-    
+
     pressure: 9847.3 hPa
     temperature: 22.75 C
     humidity: 43.600 %
-   
+
     Args:
         ts: Timestamp in unix epochs
         cell_id: Cell Id from Dirtviz
@@ -169,23 +175,23 @@ def encode_bme280_measurement(ts: int, cell_id: int, logger_id: int,
         pressure: Ambient pressure
         temperature: Ambient temperature
         humidity: Relative humidity
-    
+
     Returns:
-        Serialized BME280 Measurement 
+        Serialized BME280 Measurement
     """
-    
+
     meas = Measurement()
-    
+
     # metadata
     meas.meta.ts = ts
     meas.meta.cell_id = cell_id
     meas.meta.logger_id = logger_id
-    
+
     # bme280
     meas.bme280.pressure = pressure
     meas.bme280.temperature = temperature
     meas.bme280.humidity = humidity
-    
+
     return meas.SerializeToString()
 
 

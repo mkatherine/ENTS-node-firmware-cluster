@@ -119,7 +119,7 @@ class TestDecode(unittest.TestCase):
         meas.bme280.temperature = 2275
         meas.bme280.humidity = 43600
 
-        # serialize 
+        # serialize
         meas_str = meas.SerializeToString()
 
         # decode
@@ -134,7 +134,7 @@ class TestDecode(unittest.TestCase):
         self.assertEqual(int, meas_dict["data_type"]["temperature"])
         self.assertEqual(43600, meas_dict["data"]["humidity"])
         self.assertEqual(int, meas_dict["data_type"]["humidity"])
-        
+
         # decode
         meas_dict = decode_measurement(data=meas_str, raw=False)
 

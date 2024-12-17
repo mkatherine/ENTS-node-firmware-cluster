@@ -27,7 +27,7 @@ def decode_response(data: bytes):
     return resp.resp
 
 
-def decode_measurement(data: bytes, raw : bool=True) -> dict:
+def decode_measurement(data: bytes, raw: bool = True) -> dict:
     """Decodes a Measurement message
 
     The data is decoded into a flat dictionary with the measurement type.
@@ -35,7 +35,7 @@ def decode_measurement(data: bytes, raw : bool=True) -> dict:
     Args:
         data: Byte array of Measurement message.
         raw: Flag to return raw or adjusted measurements
-   
+
     Returns:
         Flat dictionary of values from the meta field, measurement field, and
         the key "type" to indicate the type of measurement.
@@ -66,15 +66,15 @@ def decode_measurement(data: bytes, raw : bool=True) -> dict:
 
     # store measurement data
     meta_dict["data"] = measurement_dict
-    
+
     # process raw
     if not raw:
         # convert measurements to hPa, C, and %
         if meta_dict["type"] == "bme280":
-            meta_dict["data"]["pressure"] /= 10.
-            meta_dict["data"]["temperature"] /= 100.
-            meta_dict["data"]["humidity"] /= 1000.
- 
+            meta_dict["data"]["pressure"] /= 10.0
+            meta_dict["data"]["temperature"] /= 100.0
+            meta_dict["data"]["humidity"] /= 1000.0
+
     # store measurement type
     meta_dict["data_type"] = {}
     for key, value in measurement_dict.items():

@@ -124,5 +124,5 @@ To run the package tests, create a virtual environment, install as an editable p
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
-python -m unittest discover tests
+python -m unittest
 ```

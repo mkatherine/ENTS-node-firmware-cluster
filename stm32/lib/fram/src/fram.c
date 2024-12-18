@@ -16,7 +16,7 @@ const FramInterfaceType FramInterface = {.WritePtr = Fm24cl16bWrite,
 #include "mb85rc1mt.h"
 const FramInterfaceType FramInterface = {.WritePtr = Mb85rc1mtWrite,
                                          .ReadPtr = Mb85rc1mtRead,
-                                         .size = mb85rc1mt_size };
+                                         .size = mb85rc1mt_size};
 #else
 #error No FRAM chip enabled
 #endif

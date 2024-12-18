@@ -48,7 +48,7 @@ FramStatus Fm24cl16bWrite(FramAddr addr, const uint8_t *data, size_t len);
  * @param len Number of sequential bytes to read
  * @return See FramStatus
  */
-FramStatus Fm24cl16bRead(FramAddr addr, size_t len, uint8_t *data);  
+FramStatus Fm24cl16bRead(FramAddr addr, size_t len, uint8_t *data);
 
 #ifdef __cplusplus
 }

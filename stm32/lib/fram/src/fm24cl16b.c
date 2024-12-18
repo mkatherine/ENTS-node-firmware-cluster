@@ -11,10 +11,11 @@
 #include "fm24cl16b.h"
 
 #include <stdint.h>
+
 #include "i2c.h"
 #include "stm32wlxx_hal_i2c.h"
 
-  /** Number of pages on the chip */
+/** Number of pages on the chip */
 static const unsigned int fram_pages = 8;
 
 /** Size of each memory segment in bytes */

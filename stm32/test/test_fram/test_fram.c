@@ -57,7 +57,7 @@ void test_FramWrite_All(void) {
   uint8_t data[] = {1, 2, 3, 4, 5};
   FramAddr addr = 0x00;
 
-  while (addr+sizeof(data) < FramSize()) {
+  while (addr + sizeof(data) < FramSize()) {
     FramStatus status = FramWrite(addr, data, sizeof(data));
     TEST_ASSERT_EQUAL(FRAM_OK, status);
     addr += sizeof(data);
@@ -104,19 +104,18 @@ void test_FramRead_OutOfRange(void) {
   TEST_ASSERT_EQUAL(FRAM_OUT_OF_RANGE, status);
 }
 
-
 void test_FramRead_All(void) {
   FramAddr addr = 0x00;
 
   uint8_t write_data[] = {1, 2, 3, 4, 5};
 
-  while (addr+sizeof(write_data) < FramSize()) {
+  while (addr + sizeof(write_data) < FramSize()) {
     FramWrite(addr, write_data, sizeof(write_data));
     addr += sizeof(write_data);
   }
 
   uint8_t read_data[5];
-  while (addr+sizeof(read_data) < FramSize()) {
+  while (addr + sizeof(read_data) < FramSize()) {
     FramStatus status = FramRead(addr, sizeof(read_data), read_data);
     TEST_ASSERT_EQUAL(FRAM_OK, status);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(write_data, read_data, 5);

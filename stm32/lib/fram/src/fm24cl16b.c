@@ -10,31 +10,27 @@
  */
 #include "fm24cl16b.h"
 
-#include "fram_def.h"
+#include <stdint.h>
+#include "i2c.h"
+#include "stm32wlxx_hal_i2c.h"
 
-/** Number of pages on the chip */
+  /** Number of pages on the chip */
 static const unsigned int fram_pages = 8;
 
 /** Size of each memory segment in bytes */
 static const unsigned int fram_seg_size = 256;
 
-const FramInterfaceType FramInterface = {.WritePtr = Fm24cl16bWrite,
-                                         .ReadPtr = Fm24cl16bRead,
-                                         .size = fram_pages * fram_seg_size,
-                                         .pages = fram_pages,
-                                         .seg_size = fram_seg_size};
-
 /** Timeout in seconds for the FRAM chip */
-const uint32_t fram_timeout = 100;
+static const uint32_t fram_timeout = 100;
 
 /** Device I2C address */
-const uint16_t fram_i2c_addr = 0b10100000;
+static const uint16_t fram_i2c_addr = 0b10100000;
 
 /** Device address mask for read */
-const uint16_t fram_read_mask = 0b1;
+static const uint16_t fram_read_mask = 0b1;
 
 /** Device address mask for write */
-const uint16_t fram_write_mask = 0b0;
+static const uint16_t fram_write_mask = 0b0;
 
 /** Matrix representation of memory */
 typedef struct {

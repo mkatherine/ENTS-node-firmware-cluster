@@ -36,10 +36,6 @@ typedef struct {
   FramReadPtrType ReadPtr;
   /** Size of FRAM */
   FramAddr size;
-  /** Number of pages */
-  unsigned int pages;
-  /** Size of segments */
-  unsigned int seg_size;
 } FramInterfaceType;
 
 /**

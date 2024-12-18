@@ -25,11 +25,10 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include <stdio.h>
+#include <fram.h>
 
-#include "fram.h"
-#include "i2c.h"
+/** Size of chip in bytes */
+static const unsigned int fm24cl16b_size = 2048;
 
 /**
  * @brief Writes bytes to an address
@@ -49,7 +48,7 @@ FramStatus Fm24cl16bWrite(FramAddr addr, const uint8_t *data, size_t len);
  * @param len Number of sequential bytes to read
  * @return See FramStatus
  */
-FramStatus Fm24cl16bRead(FramAddr addr, size_t len, uint8_t *data);
+FramStatus Fm24cl16bRead(FramAddr addr, size_t len, uint8_t *data);  
 
 #ifdef __cplusplus
 }

@@ -12,10 +12,11 @@ static const uint8_t g_base_addr = 0b10100000;
 /** Timeout for i2c communication. Set to greater than wakeup time */
 static const uint32_t g_timeout = 1000;
 
-const FramInterfaceType FramInterface = {.WritePtr = Mb85rc1mtWrite,
-                                         .ReadPtr = Mb85rc1mtRead,
-                                         .pages = 1,
-                                         .seg_size = 1 << 17};
+/** Number of pages on the chip */
+static const int mb85rc1mt_pages = 1;
+
+/** Size of each memory segment in bytes */
+static const int mb85rc1mt_seg_size = 1 << 17;
 
 /** Representation of memory address */
 typedef struct {
@@ -62,8 +63,8 @@ FramStatus Mb85rc1mtWrite(FramAddr addr, const uint8_t *data, size_t len) {
 
     // number of bytes that can be written without changing address
     size_t write_len = 0;
-    if ((size_t)addr + len > FramInterface.seg_size) {
-      write_len = FramInterface.seg_size - addr;
+    if ((size_t)addr + len > mb85rc1mt_seg_size) {
+      write_len = mb85rc1mt_seg_size - addr;
     } else {
       write_len = len;
     }
@@ -108,8 +109,8 @@ FramStatus Mb85rc1mtRead(FramAddr addr, size_t len, uint8_t *data) {
     }
 
     size_t read_len = 0;
-    if ((size_t)addr + len > FramInterface.seg_size) {
-      read_len = FramInterface.seg_size - addr;
+    if ((size_t)addr + len > mb85rc1mt_seg_size) {
+      read_len = mb85rc1mt_seg_size - addr;
     } else {
       read_len = len;
     }

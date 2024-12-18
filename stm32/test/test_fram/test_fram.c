@@ -53,14 +53,15 @@ void test_FramWrite_ZeroLength(void) {
   TEST_ASSERT_EQUAL(FRAM_OK, status);
 }
 
-void test_FramWrite_MultiplePages(void) {
+void test_FramWrite_All(void) {
   uint8_t data[] = {1, 2, 3, 4, 5};
-  // right below the segment size
-  FramAddr addr = FramSegmentSize() - 1;
+  FramAddr addr = 0x00;
 
-  FramStatus status = FramWrite(addr, data, sizeof(data));
-
-  TEST_ASSERT_EQUAL(FRAM_OK, status);
+  while (addr+sizeof(data) < FramSize()) {
+    FramStatus status = FramWrite(addr, data, sizeof(data));
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+    addr += sizeof(data);
+  }
 }
 
 void test_FramRead_Status(void) {
@@ -103,18 +104,24 @@ void test_FramRead_OutOfRange(void) {
   TEST_ASSERT_EQUAL(FRAM_OUT_OF_RANGE, status);
 }
 
-void test_FramRead_MultiplePages(void) {
-  // right below the segment size
-  FramAddr addr = FramSegmentSize() - 1;
+
+void test_FramRead_All(void) {
+  FramAddr addr = 0x00;
 
   uint8_t write_data[] = {1, 2, 3, 4, 5};
-  FramWrite(addr, write_data, sizeof(write_data));
+
+  while (addr+sizeof(write_data) < FramSize()) {
+    FramWrite(addr, write_data, sizeof(write_data));
+    addr += sizeof(write_data);
+  }
 
   uint8_t read_data[5];
-  FramStatus status = FramRead(addr, sizeof(read_data), read_data);
-
-  TEST_ASSERT_EQUAL(FRAM_OK, status);
-  TEST_ASSERT_EQUAL_UINT8_ARRAY(write_data, read_data, 5);
+  while (addr+sizeof(read_data) < FramSize()) {
+    FramStatus status = FramRead(addr, sizeof(read_data), read_data);
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(write_data, read_data, 5);
+    addr += sizeof(read_data);
+  }
 }
 
 /**
@@ -139,10 +146,10 @@ int main(void) {
   RUN_TEST(test_FramWrite_ValidData);
   RUN_TEST(test_FramWrite_ZeroLength);
   RUN_TEST(test_FramWrite_OutOfRange);
-  // RUN_TEST(test_FramWrite_MultiplePages);
+  RUN_TEST(test_FramWrite_All);
   RUN_TEST(test_FramRead_ValidData);
   RUN_TEST(test_FramRead_ZeroLength);
   RUN_TEST(test_FramRead_OutOfRange);
-  // RUN_TEST(test_FramRead_MultiplePages);
+  RUN_TEST(test_FramRead_All);
   UNITY_END();
 }

@@ -3,18 +3,23 @@
 #include "fram_def.h"
 
 // #define FRAM_FM24CL16B
-#define FRAM_MB85RC1MT
+// #define FRAM_MB85RC1MT
 
-#if defined(FRAM_FM24CL16B)
+#if defined(FRAM_FM24CL16B) && defined(FRAM_MB85RC1MT)
+#error Only one FRAM chip can be enabled
+#elif defined(FRAM_FM24CL16B)
 #include "fm24cl16b.h"
+const FramInterfaceType FramInterface = {.WritePtr = Fm24cl16bWrite,
+                                         .ReadPtr = Fm24cl16bRead,
+                                         .size = fm24cl16b_size};
 #elif defined(FRAM_MB85RC1MT)
 #include "mb85rc1mt.h"
+const FramInterfaceType FramInterface = {.WritePtr = Mb85rc1mtWrite,
+                                         .ReadPtr = Mb85rc1mtRead,
+                                         .size = mb85rc1mt_size };
 #else
 #error No FRAM chip enabled
 #endif
-
-/** Interface definition for fram chips */
-extern FramInterfaceType FramInterface;
 
 FramStatus FramWrite(FramAddr addr, const uint8_t *data, size_t len) {
   // check size
@@ -34,11 +39,7 @@ FramStatus FramRead(FramAddr addr, size_t len, uint8_t *data) {
   return FramInterface.ReadPtr(addr, len, data);
 }
 
-FramAddr FramSize(void) { return FramInterface.pages * FramInterface.seg_size; }
-
-unsigned int FramPages(void) { return FramInterface.pages; }
-
-unsigned int FramSegmentSize(void) { return FramInterface.seg_size; }
+FramAddr FramSize(void) { return FramInterface.size; }
 
 HAL_StatusTypeDef ConfigureSettings(configuration c) {
   HAL_StatusTypeDef status = HAL_OK;

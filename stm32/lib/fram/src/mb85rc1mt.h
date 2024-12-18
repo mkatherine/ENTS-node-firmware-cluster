@@ -29,6 +29,9 @@ extern "C" {
 
 #include "fram.h"
 
+/** Size of chip in bytes */
+static const int mb85rc1mt_size = 1 << 17;
+
 /**
  * @brief Writes bytes to an address
  *

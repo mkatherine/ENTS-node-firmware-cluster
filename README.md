@@ -1,6 +1,6 @@
 [![Build stm32](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/stm32.yaml/badge.svg)](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/stm32.yaml) [![Build esp32](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/esp32.yaml/badge.svg)](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/esp32.yaml) [![Doxygen](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/docs.yaml/badge.svg)](https://github.com/jlab-sensing/ents-node-firmware/actions/workflows/docs.yaml)
 
-# Environmental NeTworked Sensor (ENTS) Node Firmware
+# Environmental NeTworked Sensor (ENTS) Node Firmware Developer Guide
 
 Firmware repository for STM32 and ESP32 microcontrollers on the ENTS-node board along with supporting libraries. This repository acts as the central hub for all repositories related to the project.
 
@@ -41,7 +41,7 @@ The following is the list of the software used for developing the firmware. The 
 | [protobuf](https://protobuf.dev/) | `25.2` | No |
 | Make | `4.4.1` | No |
 
-## Flashing firmware to microcontrollers
+## Getting Started: Flashing firmware to microcontrollers
 
 The Wio-E5 (stm32 based) and the esp32 have different methods of flashing but both use the [PlatformIO](pio) system. The VSCode extension is the most intuitive to use with setup instructions available [here](https://platformio.org/install/ide?install=vscode) and quick start guide available [here](https://docs.platformio.org/en/latest/integration/ide/vscode.html#quick-start). There is also a CLI interface that is similar to the `Make` build system with installation instructions varying depending on you OS. The [quick start guide](https://docs.platformio.org/en/latest/core/quickstart.html#process-project) is a good reference for common commands.
 

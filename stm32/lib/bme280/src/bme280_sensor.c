@@ -69,7 +69,7 @@ BME280Status BME280Init(void) {
   }
 
   /* Always set the power mode after setting the configuration */
-  rslt = bme280_set_sensor_mode(BME280_POWERMODE_NORMAL, &dev);
+  rslt = bme280_set_sensor_mode(BME280_POWERMODE_FORCED, &dev);
   if (rslt != BME280_OK) {
     return rslt;
   }
@@ -86,7 +86,14 @@ BME280Status BME280Init(void) {
 BME280Status BME280MeasureAll(BME280Data *data) {
   int8_t rslt = BME280_E_NULL_PTR;
   uint8_t status_reg;
+ 
+  // trigger measurement
+  rslt = bme280_set_sensor_mode(BME280_POWERMODE_FORCED, &dev);
+  if (rslt != BME280_OK) {
+    return rslt;
+  }
 
+  // check the status
   rslt = bme280_get_regs(BME280_REG_STATUS, &status_reg, 1, &dev);
   if (rslt != BME280_OK) {
     return rslt;

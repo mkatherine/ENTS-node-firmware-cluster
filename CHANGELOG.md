@@ -10,10 +10,17 @@ firmware versions for a hardware version.
 
 ## [Unreleased]
 
-- Support for MB85RC1MT fram chip [#136](i136)
-- Support for bme280 sensor [#136](i136)
+### Added
 
-[i136](https://github.com/jlab-sensing/ENTS-node-firmware/issues/136)
+- Support for bme280 sensor [#87](i87), [#99](i99)
+- Support for MB85RC1MT fram chip [#136](i136)
+
+### Changed
+
+- Measurement mode of bme280 to forced [#99](i99)
+
+[i87]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/87
+[i99]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/99
 [i136]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/136
 
 ## [2.2.0] - 2024-12-13

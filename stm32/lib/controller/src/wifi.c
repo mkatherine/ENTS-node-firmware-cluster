@@ -51,8 +51,11 @@ int ControllerWiFiPost(
   tx->len = EncodeWiFiCommand(WiFiCommand_Type_POST, NULL, NULL, NULL, 0, 0, 0,
                              data, data_len, tx->data, tx->size);
 
-  // send transaction
-  ControllerTransaction(500);
+  // retry transmition until success
+  ControllerStatus status = CONTROLLER_SUCCESS;
+  do {
+    status = ControllerTransaction(g_controller_i2c_timeout);
+  } while (status != CONTROLLER_SUCCESS);
 
   // check for errors
   if (rx->len == 0) {
@@ -62,11 +65,17 @@ int ControllerWiFiPost(
   // decode command
   Esp32Command cmd = Esp32Command_init_default;
   cmd = DecodeEsp32Command(rx->data, rx->len);
+  
+  // return code from esp32
+  int rc = 0;
 
   // copy response
-  memcpy(resp, cmd.command.wifi_command.resp.bytes, cmd.command.wifi_command.resp.size);
   *resp_len = cmd.command.wifi_command.resp.size;
+  if (*resp_len > 0) {
+    memcpy(resp, cmd.command.wifi_command.resp.bytes, cmd.command.wifi_command.resp.size);
+    rc = cmd.command.wifi_command.rc;
+  }
 
   // return http code
-  return cmd.command.wifi_command.rc;
+  return rc;
 }

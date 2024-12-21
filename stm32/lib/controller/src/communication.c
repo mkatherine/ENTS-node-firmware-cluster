@@ -117,6 +117,9 @@ ControllerStatus ControllerReceive(unsigned int timeout) {
   // receive number of incoming bytes
   uint8_t len_bytes[2] = {};
   hal_status = HAL_I2C_Master_Receive(&hi2c2, g_esp32_i2c_addr, len_bytes, sizeof(len_bytes), timeout);
+  if (hal_status != HAL_OK) {
+    return HALToControllerStatus(hal_status);
+  }
 
   // convert 2 byte array to 16-bit int 
   uint16_t len = (((uint16_t) len_bytes[0]) << 8) | ((uint16_t) len_bytes[1]);
@@ -178,8 +181,18 @@ ControllerStatus ControllerReceive(unsigned int timeout) {
 }
 
 ControllerStatus ControllerTransaction(unsigned int timeout) {
-  ControllerTransmit(timeout);
-  ControllerReceive(timeout);
+  // status code
+  ControllerStatus status = CONTROLLER_SUCCESS;
+
+  // transmit, stop early if error
+  status = ControllerTransmit(timeout);
+  if (status != CONTROLLER_SUCCESS) {
+    return status;
+  }
+  
+  // Receive
+  status = ControllerReceive(timeout);
+  return status;
 }
 
 Buffer* ControllerTx(void) {

@@ -52,6 +52,11 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
 
   Log.traceln("ModuleWiFi::Connect");
 
+  //  print the mac address
+  uint8_t mac[6];
+  WiFi.macAddress(mac);
+  Log.noticeln("MAC: %x:%x:%x:%x:%x:%x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
   Log.noticeln("Connecting to WiFI...");
   Log.noticeln("ssid: %s", cmd.command.wifi_command.ssid);
   Log.noticeln("passwd: %s", cmd.command.wifi_command.passwd);
@@ -60,6 +65,7 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   // early return if SSID is not available
   int status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
   Log.noticeln("WiFi connection status: %d", status);
+  
 
   // flag if connected for future code
   bool connected = false;
@@ -83,7 +89,7 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
       Log.errorln("SSID not available!");
       break;
     }
-  }
+  } 
 
   if (connected) {
     // set url

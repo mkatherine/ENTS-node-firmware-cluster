@@ -41,8 +41,8 @@ void WiFiInit(void) {
 
 
   // TODO load configuration
-  const char ssid[] = "HARE_Lab";
-  const char* passwd = "";
+  const char ssid[] = "UCSC-Devices";
+  const char* passwd = "hqWeRfvsn7eLd7MPrW";
   const char url[] = "dirtviz.jlab.ucsc.edu";
   const uint32_t port = 80;
 

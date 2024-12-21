@@ -110,6 +110,7 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
     // forward request to last module received
     request_buffer.len = last_module->OnRequest(request_buffer.data);
     Log.traceln("Done processing OnRequest");
+    Log.traceln("Buffer length: %d", request_buffer.len);
   }
 
   // check if we should send length
@@ -125,6 +126,9 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
 
     // write to buffer
     Wire.write(len_bytes, sizeof(len_bytes));
+
+    Log.traceln("Successfully sent length");
+    Log.traceln("send_length = %T", send_length);
 
     // set flag that length was sent
     send_length = false;

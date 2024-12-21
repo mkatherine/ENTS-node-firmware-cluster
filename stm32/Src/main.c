@@ -113,6 +113,7 @@ int main(void)
   ADC_init();
   MX_RTC_Init();
   SensorsInit();
+  FIFO_Init()
 
   // Debug message, gets printed after init code
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);

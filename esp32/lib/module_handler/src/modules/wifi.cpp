@@ -124,14 +124,14 @@ void ModuleWiFi::Post(const Esp32Command& cmd) {
   if (WiFi.status() != WL_CONNECTED) {
     Log.errorln("Not connected to WiFi!");
 
-    // encode with return code 0 to indicate error
+    // encode with return code 1 to indicate WiFi connection error
     this->request_buffer_len = EncodeWiFiCommand(
       WiFiCommand_Type_POST,
       nullptr,
       nullptr,
       nullptr,
       0,
-      0,
+      1,
       0,
       nullptr,
       0,

@@ -24,60 +24,37 @@ static UTIL_TIMER_Time_t UploadPeriod = 10000;
 /**
  * @brief Function call for upload event
  * 
- * @param context Timer context
+ * @param context Timer context.
  */
 void UploadEvent(void *context);
 
 /**
  * @brief Upload data to hub
  * 
- * Posts data to configured url 
+ * Posts data to configured url.
  */
 void Upload(void);
 
-void WiFiInit(void) {
+/**
+ * @brief Connect to WiFi
+ *
+ * Connects to WiFi network and sets the system time. Code will block and
+ * reattempt connection until successful.
+ */
+void Connect(void);
 
+/**
+ * @brief Setup upload timer
+ * 
+ * Start sensor measurements and setup upload task/timer.
+ */
+void StartUploads(void);
+
+void WiFiInit(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "WiFi app starting\r\n");
 
-
-  // TODO load configuration
-  const char ssid[] = "UCSC-Devices";
-  const char* passwd = "hqWeRfvsn7eLd7MPrW";
-  const char url[] = "dirtviz.jlab.ucsc.edu";
-  const uint32_t port = 80;
-
-
-  // initialize
-  unsigned int num_tries = 0;
-  SysTime_t ts = {.Seconds = -1, .SubSeconds = 0};
-  while (ts.Seconds == -1) {
-    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t", ssid);
-    ts.Seconds = ControllerWiFiInit(ssid, passwd, url, port);
-
-    if (ts.Seconds == -1) {
-      APP_LOG(TS_OFF, VLEVEL_M, "Attempt %d failed!\r\n", num_tries);
-    } else {
-      APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
-      APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
-    }
-
-    ++num_tries;
-  }
-
-  // update clock
-  SysTimeSet(ts);
-
-  // start sensor measurements
-  APP_LOG(TS_ON, VLEVEL_M, "Starting sensor measurements...\t");
-  SensorsStart();
-  APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
-
-  // setup upload task
-  APP_LOG(TS_ON, VLEVEL_M, "Starting upload task...\t")
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_WiFiUpload), UTIL_SEQ_RFU, Upload);
-  UTIL_TIMER_Create(&UploadTimer, UploadPeriod, UTIL_TIMER_PERIODIC, UploadEvent, NULL);
-  UTIL_TIMER_Start(&UploadTimer);
-  APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
+  Connect();
+  StartUploads();
 }
 
 void UploadEvent(void *context) {
@@ -110,16 +87,70 @@ void Upload(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
 
   // posts data to website
-  APP_LOG(TS_ON, VLEVEL_M, "Uploading data...\t");
-  uint8_t resp[256];
-  size_t resp_len = 0;
   int http_code = 0;
-  http_code = ControllerWiFiPost(buffer, buffer_len, resp, &resp_len);
-  APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
+  do {
+    APP_LOG(TS_ON, VLEVEL_M, "Uploading data...\t");
+    uint8_t resp[256];
+    size_t resp_len = 0;
+    http_code = ControllerWiFiPost(buffer, buffer_len, resp, &resp_len);
+    APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
+    
+    // retry if general error
+    if (http_code == 0) {
+      APP_LOG(TS_ON, VLEVEL_M, "Error with WiFi connection!\r\n");
+      APP_LOG(TS_ON, VLEVEL_M, "Retrying in 5 seconds...\r\n");
 
-  if (http_code == 0) {
-    APP_LOG(TS_ON, VLEVEL_M, "Error with WiFi connection!\r\n");
-    //APP_LOG(TS_ON, VLEVEL_M, "Attempting to reconnect...\r\n");
-    //WiFiInit();
+      HAL_Delay(5000);
+    }
+    // reconnect if connection error
+    else if (http_code == 1) {
+      Connect();
+    }
+  } while (http_code == 0);
+}
+
+void Connect(void) {
+  // TODO load configuration
+  const char ssid[] = "UCSC-Devices";
+  const char* passwd = "hqWeRfvsn7eLd7MPrW";
+  const char url[] = "dirtviz.jlab.ucsc.edu";
+  const uint32_t port = 80;
+
+
+  // initialize
+  unsigned int num_tries = 0;
+  SysTime_t ts = {.Seconds = -1, .SubSeconds = 0};
+  while (ts.Seconds == -1) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t", ssid);
+    ts.Seconds = ControllerWiFiInit(ssid, passwd, url, port);
+
+    if (ts.Seconds == -1) {
+      APP_LOG(TS_OFF, VLEVEL_M, "Attempt %d failed!\r\n", num_tries);
+      APP_LOG(TS_OFF, VLEVEL_M, "Retrying in 5 seconds...\r\n");
+      HAL_Delay(5000);
+    } else {
+      APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
+      APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
+    }
+
+
+    ++num_tries;
   }
+
+  // update clock
+  SysTimeSet(ts);
+}
+
+void StartUploads(void) {
+  // start sensor measurements
+  APP_LOG(TS_ON, VLEVEL_M, "Starting sensor measurements...\t");
+  SensorsStart();
+  APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
+
+  // setup upload task
+  APP_LOG(TS_ON, VLEVEL_M, "Starting upload task...\t")
+  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_WiFiUpload), UTIL_SEQ_RFU, Upload);
+  UTIL_TIMER_Create(&UploadTimer, UploadPeriod, UTIL_TIMER_PERIODIC, UploadEvent, NULL);
+  UTIL_TIMER_Start(&UploadTimer);
+  APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
 }

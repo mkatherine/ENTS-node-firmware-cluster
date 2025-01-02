@@ -102,7 +102,10 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO Project
+      - name: Login to account
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
+        run: pio account login
+
+      - name: Build PlatformIO Project
         run: pio remote test -e tests -i test_sdi12 -i test_battery -r 

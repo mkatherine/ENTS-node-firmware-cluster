@@ -104,14 +104,17 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_LoRaWAN_Init();
   MX_I2C2_Init();
+  SystemApp_Init();
+  // UserConfig_ProcessDataPolling();
+  MX_LoRaWAN_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
   MX_RTC_Init();
   SensorsInit();
+  UserConfig_InitAdvanceTrace();
 
   // Debug message, gets printed after init code
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);

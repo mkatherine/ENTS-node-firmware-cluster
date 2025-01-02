@@ -35,15 +35,14 @@ extern "C" {
 #include "stm32_systime.h"
 #include "usart_if.h"
 #include "soil_power_sensor.pb.h"
+#include "stm32_adv_trace.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-
-#define RX_BUFFER_SIZE UserConfiguration_size      // Maximum size of the received data buffer
-// #define RX_BUFFER_SIZE 431                            // Maximum size of the received data buffer
-#define FRAM_START_ADDRESS 1794                    // Starting address to write in FRAM
-#define USER_CONFIG_LEN_ADDR 1792                  // Starting address to write in FRAM
+#define RX_BUFFER_SIZE UserConfiguration_size      // Maximum size of the received data buffer (from protobuf definition).
+#define USER_CONFIG_START_ADDRESS 1794             // Starting address for user config data in FRAM.
+#define USER_CONFIG_LEN_ADDR 1792                  // Address for storing the user config data length in FRAM.
 
 typedef enum {
     USERCONFIG_OK,
@@ -51,50 +50,47 @@ typedef enum {
     USERCONFIG_DECODE_ERROR
 } UserConfigStatus;
 
-// /* Enum definitions */
-// typedef enum _EnabledSensor {
-//     EnabledSensor_Voltage = 0,
-//     EnabledSensor_Current = 1,
-//     EnabledSensor_Teros12 = 2,
-//     EnabledSensor_Teros21 = 3,
-//     EnabledSensor_BME280 = 4
-// } EnabledSensor;
-
-// typedef enum _Uploadmethod {
-//     Uploadmethod_LoRa = 0,
-//     Uploadmethod_WiFi = 1
-// } Uploadmethod;
-// typedef struct _UserConfiguration {
-//     /* ********* Upload Settings ********* */
-//     uint32_t logger_id; /* id of the logging device */
-//     uint32_t cell_id; /* id of the cell measured */
-//     Uploadmethod Upload_method; /* indicates whether LoRa or WiFi is used */
-//     uint32_t Upload_interval; /* upload time in seconds */
-//     /* ********* Measurement Settings ********* */
-//     pb_size_t enabled_sensors_count;
-//     EnabledSensor enabled_sensors[5]; /* List of enabled sensors */
-//     double Voltage_Slope; /* Calibration slope for voltage */
-//     double Voltage_Offset; /* Calibration offset for voltage */
-//     double Current_Slope; /* Calibration slope for current */
-//     double Current_Offset; /* Calibration offset for current */
-//     /* ********* WiFi Settings ********* */
-//     char WiFi_SSID[33];
-//     char WiFi_Password[65];
-//     char API_Endpoint_URL[257];
-//     uint32_t API_Endpoint_Port;
-// } UserConfiguration;
 
 /**
  ******************************************************************************
  * @brief    Initializes user configuration settings.
  * 
- *           This function sets up the UART receive interrupt.
+ *           This function Initializes Advanced Trace for interrupt-based 
+ *           UART reception.
  *
  * @param    void
  * @return   void
  ******************************************************************************
  */
-void UserConfig_InterruptInit(void);
+void UserConfig_InitAdvanceTrace(void);
+
+/**
+ ******************************************************************************
+ * @brief    UART interrupt callback function.
+ *
+ *           This function Handles incoming data based on RQFlag.
+ *
+ * @param    pData Pointer to the received data byte.
+ * @param    Size  Size of the received data (should be 1).
+ * @param    Error UART error status.
+ * @return   void
+ ******************************************************************************
+ */
+void UserConfig_RxCallback(uint8_t *pData, uint16_t Size, uint8_t Error);
+
+/**
+ ******************************************************************************
+ * @brief    Handles received user configuration data via UART interrupt.
+ *
+ *           This function is called when user configuration data is received
+ *           via UART interrupt. It processes and stores the data into FRAM for
+ *           further use.
+ *
+ * @param    void
+ * @return   void
+ ******************************************************************************
+ */
+void UserConfig_InterruptHandler(void);
 
 /**
  ******************************************************************************
@@ -111,17 +107,17 @@ void UserConfig_ProcessDataPolling(void);
 
 /**
  ******************************************************************************
- * @brief    Handles received user configuration data via UART interrupt.
+ * @brief    Sends current userconfig data via UART interrupt.
  *
- *           This function is called when user configuration data is received
- *           via UART interrupt. It processes and stores the data into FRAM for
- *           further use.
+ *           This function is called when the user want to see the current
+ *           configurations on the GUI. It gets the current encoded data
+ *           from the FRAM and send it via UART to be shown on the GUI.
  *
  * @param    void
- * @return   void
+ * @return   UserConfigStatus - USERCONFIG_OK if successful, error code otherwise.
  ******************************************************************************
  */
-void UserConfig_ReceiveInterruptHandler(void);
+UserConfigStatus UserConfig_SendCurrentUserConfig(void);
 
 /**
  ******************************************************************************

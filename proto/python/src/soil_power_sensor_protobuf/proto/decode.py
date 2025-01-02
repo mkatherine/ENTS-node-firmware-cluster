@@ -93,6 +93,6 @@ def decode_user_configuration(data: bytes) -> dict:
     if user_config.cell_id == 0 or user_config.logger_id == 0:
         raise KeyError("User configuration missing required fields")
 
-    user_config_dict = MessageToDict(user_config)
+    user_config_dict = MessageToDict(user_config, including_default_value_fields=True)
 
     return user_config_dict

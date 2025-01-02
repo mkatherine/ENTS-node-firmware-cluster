@@ -39,7 +39,7 @@ extern UART_HandleTypeDef huart1;
 /**
   * @brief buffer to receive 1 character
   */
-extern uint8_t charRx;
+uint8_t charRx;
 
 /* USER CODE BEGIN EV */
 
@@ -230,21 +230,20 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
   /* USER CODE END HAL_UART_TxCpltCallback_2 */
 }
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   /* USER CODE BEGIN HAL_UART_RxCpltCallback_1 */
-    if (huart->Instance == USART1) {
-        UserConfig_ReceiveInterruptHandler();
-    }
+
   /* USER CODE END HAL_UART_RxCpltCallback_1 */
-  // if (huart->Instance == USART1)
-  // {
-  //   if ((NULL != RxCpltCallback) && (HAL_UART_ERROR_NONE == huart->ErrorCode))
-  //   {
-  //     RxCpltCallback(&charRx, 1, 0);
-  //   }
-  //   HAL_UART_Receive_IT(huart, &charRx, 1);
-  // }
+  if (huart->Instance == USART1)
+  {
+    if ((NULL != RxCpltCallback) && (HAL_UART_ERROR_NONE == huart->ErrorCode))
+    {
+      RxCpltCallback(&charRx, 1, 0);
+    }
+    HAL_UART_Receive_IT(huart, &charRx, 1);
+  }
   /* USER CODE BEGIN HAL_UART_RxCpltCallback_2 */
 
   /* USER CODE END HAL_UART_RxCpltCallback_2 */

@@ -19,8 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 #include "rtc.h"
-#include "userConfig.h"
-#include "sys_app.h"
+#include "usart.h"
+#include "stm32_systime.h"
+#include "stm32_adv_trace.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -44,13 +46,43 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+
+void RxCallback(uint8_t *pData, uint16_t Size, uint8_t Error) {
+    if (Error == 0 && Size == 1) {
+        char receivedChar = *pData;
+        uint8_t sendACK = 'A';
+        uint8_t sendNACK = 'N';
+
+        // Process the received character
+        if (receivedChar == 1) {
+            // Send ACK to the sender
+            HAL_UART_Transmit(&huart1, &sendACK, 1, HAL_MAX_DELAY);
+        } else {
+            // Send NACK to the sender
+            HAL_UART_Transmit(&huart1, &sendNACK, 1, HAL_MAX_DELAY);
+        }
+
+        // Start receiving the next character
+        UTIL_ADV_TRACE_StartRxProcess(RxCallback);
+    } else {
+        // re-initialize the receive process
+        UTIL_ADV_TRACE_StartRxProcess(RxCallback);
+    }
+}
+
+void InitAdvanceTrace() {
+    // Configure Advance Trace module
+    UTIL_ADV_TRACE_Init();
+
+    // callback function
+    UTIL_ADV_TRACE_StartRxProcess(RxCallback);
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -91,26 +123,25 @@ int main(void) {
   /*Initialize timer and RTC*/
   /*Have to be initilized in example files because LoRaWan cannot be initialized
    * like in main*/
-  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-  // UTIL_TIMER_Init();
-  SystemApp_Init();
+  __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+  UTIL_TIMER_Init();
   /* USER CODE BEGIN 2 */
   // UserConfig_InterruptInit();  // Initialize UART for interrupt mode
+
+    // sprintf(uart_buf, "API Port: %lu\r\n", config->API_Endpoint_Port);
+    // HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
+
   /* USER CODE END 2 */
-  // uint8_t length_buf;
-  // UserConfig_ProcessDataPolling();
-  UserConfig_InitAdvanceTrace();
+  InitAdvanceTrace();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
     /* USER CODE END WHILE */
-    // if (HAL_UART_Receive(&huart1, length_buf, 1, HAL_MAX_DELAY) == HAL_OK) {
-    //     UserConfig_SendCurrentUserConfig();
-    // }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
+
 /**
  * @brief System Clock Configuration
  * @retval None

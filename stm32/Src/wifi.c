@@ -95,15 +95,11 @@ void Upload(void) {
     http_code = ControllerWiFiPost(buffer, buffer_len, resp, &resp_len);
     APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
     
-    // retry if general error
-    if (http_code == 0) {
+    // reconnect and retry if general error
+    if (http_code != 200) {
       APP_LOG(TS_ON, VLEVEL_M, "Error with WiFi connection!\r\n");
-      APP_LOG(TS_ON, VLEVEL_M, "Retrying in 5 seconds...\r\n");
-
-      HAL_Delay(5000);
-    }
-    // reconnect if connection error
-    else if (http_code == 1) {
+      APP_LOG(TS_ON, VLEVEL_M, "Attempting Reconnect\t");
+      
       Connect();
     }
   } while (http_code == 0);

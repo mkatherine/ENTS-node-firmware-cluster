@@ -11,9 +11,13 @@
 #include <ArduinoLog.h>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 /** Timeout for http responses */
 unsigned int g_resp_timeout = 5000;
+
+/** Max size of HTTP POST request */
+const size_t g_request_size = 512;
 
 Dirtviz::Dirtviz(void) : url(nullptr) {}
 
@@ -81,7 +85,8 @@ uint32_t Dirtviz::Check() const {
   req << "\r\n";
 
   // send full request to server
-  client.print(req.str().c_str());
+  int bytes_written = client.write(req.str().c_str());
+  Log.traceln("Wrote %d bytes", bytes_written);
 
   Log.traceln("Done!");
 
@@ -94,8 +99,8 @@ uint32_t Dirtviz::Check() const {
       return (uint32_t) -1;
     }
 
-    Log.traceln("Delaying until available");
-    delay(10);
+    //Log.traceln("Delaying until available");
+    delay(100);
   }
 
   // read response
@@ -137,28 +142,35 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   // connect to server
   if (!client.connect(url, port)) {
     Log.errorln("Connection to %s:%d failed!", url, port);
-    HttpClient empty("");
+    HttpClient empty;
     return empty;
   }
 
   // send data
   
+  
   // format request
   // TODO fix hardcoded api path
-  std::ostringstream req;
-  req << "POST /api/sensor/ HTTP/1.1" << "\r\n";
-  req << "Host: " << url << "\r\n";
-  req << "User-Agent: curl/8.10.1" << "\r\n";
-  req << "Content-Type: application/octet-stream" << "\r\n";
-  req << "Content-Length: " << meas_len << "\r\n";
-  req << "Connection: close" << "\r\n";
-  req << "\r\n";
-  for (int idx = 0; idx < meas_len; idx++) {
-    req << (char) meas[idx];
-  }
+  std::ostringstream headers;
+  headers << "POST /api/sensor/ HTTP/1.1" << "\r\n";
+  headers << "Host: " << url << "\r\n";
+  headers << "User-Agent: curl/8.10.1" << "\r\n";
+  headers << "Content-Type: application/octet-stream" << "\r\n";
+  headers << "Content-Length: " << meas_len << "\r\n";
+  headers << "Connection: close" << "\r\n";
+  headers << "\r\n";
 
-  client.print(req.str().c_str());
+  // copy stream to string
+  std::string headers_str = headers.str();
 
+  // copy data into request array
+  std::vector<char> request;
+  std::copy(headers_str.begin(), headers_str.end(), std::back_inserter(request));
+  std::copy(meas, meas + meas_len, std::back_inserter(request));
+
+  Log.traceln("Length of request: %d", request.size());
+  int bytes_written = client.write(request.data(), request.size());
+  Log.traceln("Wrote %d bytes", bytes_written);
 
   // read response
 
@@ -177,8 +189,8 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
       return empty_resp;
     }
 
-    Log.traceln("Delaying until available");
-    delay(10);
+    //Log.traceln("Delaying until available");
+    delay(100);
   }
 
 

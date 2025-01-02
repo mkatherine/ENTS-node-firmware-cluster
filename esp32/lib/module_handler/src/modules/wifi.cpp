@@ -63,6 +63,7 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
 
   // connect to WiFi
   // early return if SSID is not available
+  WiFi.disconnect();
   int status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
   Log.noticeln("WiFi connection status: %d", status);
   

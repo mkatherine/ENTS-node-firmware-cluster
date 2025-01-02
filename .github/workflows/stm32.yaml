@@ -83,6 +83,8 @@ jobs:
     concurrency:
       group: remote-test
     needs: build
+    env:
+      protobuf_library: SoilPowerSensorProtocalBuffer-${{ github.sha }}.tar.gz
     steps:
       - uses: actions/checkout@v4
 
@@ -100,7 +102,23 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO Project
+      - name: Pack protobuf package
+        run: pio pkg pack -o ${{ env.protobuf_library }} proto/c
+
+      - name: Upload package artifact
+        id: upload-protobuf-package
+        uses: actions/upload-artifact@v4
+        with:
+          name: protobuf-library
+          path: ${{ env.protobuf_library }}
+          retention-days: 1
+
+      - name: Replace protobuf package reference
+        env:
+          lib_url: ${{ steps.upload-protobuf-package.outputs.artifact_url }}
+        run: sed -i 's|\(Soil Power Sensor Protocal Buffer\).*|\1=${{ env.lib_url }}|' stm32/platformio.ini
+
+      - name: Run unit tests
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
         run: pio remote test -e tests -r

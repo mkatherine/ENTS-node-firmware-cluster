@@ -1,9 +1,7 @@
+---
 name: Build stm32
 
-on:
-  workflow_dispatch:
-  push:
-  pull_request:
+on: [workflow_dispatch, push, pull_request_target, pull_request]
 
 defaults:
   run:
@@ -31,12 +29,12 @@ jobs:
 
       - name: Build PlatformIO Project
         run: pio run
-      
+
       - uses: actions/upload-artifact@v4
         with:
           name: build
           path: stm32/.pio/build
-  
+
   static:
     runs-on: ubuntu-latest
     steps:
@@ -58,7 +56,7 @@ jobs:
 
       - name: Run static code analysis
         run: pio check
-  
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -83,7 +81,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     concurrency:
-      group: remote-test 
+      group: remote-test
     needs: build
     steps:
       - uses: actions/checkout@v4
@@ -91,21 +89,18 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.13'
+          cache: 'pip'
 
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Login to account
+      - name: Build PlatformIO Project
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
-        run: pio account login
-
-      - name: Build PlatformIO Project
-        run: pio remote test -e tests -i test_sdi12 -i test_battery -r 
+        run: pio remote test -e tests -r

@@ -10,7 +10,6 @@
  * Copyright [2024] <Ahmed Hassan Falah>
  */
 
-
 /* Includes ------------------------------------------------------------------*/
 #include "userConfig.h"
 
@@ -91,12 +90,12 @@ void UserConfig_InterruptHandler(void) {
     static uint16_t index = 0;
     static bool length_received = false;
 
-    if (!length_received) {
-        length_buf[index++] = charRx;
-        if (index == 2) {
-            data_length = (length_buf[0] << 8) | length_buf[1];
-            index = 0;
-            length_received = true;
+  if (!length_received) {
+    length_buf[index++] = charRx;
+    if (index == 2) {
+      data_length = (length_buf[0] << 8) | length_buf[1];
+      index = 0;
+      length_received = true;
 
             if (data_length > RX_BUFFER_SIZE) {
                 uint8_t error_msg[] = "Data too large";
@@ -141,8 +140,8 @@ void UserConfig_InterruptHandler(void) {
 
 // Processes incoming user configuration data via UART using polling.
 void UserConfig_ProcessDataPolling(void) {
-    uint8_t length_buf[2];      // Buffer to store received data length in bytes
-    uint16_t data_length = 0;   // Length received data
+  uint8_t length_buf[2];     // Buffer to store received data length in bytes
+  uint16_t data_length = 0;  // Length received data
 
     // Poll to receive the length of the encoded data (2 bytes)
     if (HAL_UART_Receive(&huart1, length_buf, 2, 30000) == HAL_OK) {
@@ -178,47 +177,47 @@ void UserConfig_ProcessDataPolling(void) {
 }
 
 // Write data to FRAM
-UserConfigStatus UserConfig_WriteToFRAM(uint16_t fram_addr,
-                                        uint8_t *data, uint16_t length) {
-    FramStatus status = FramWrite(fram_addr, data, length);
-    return (status == FRAM_OK) ? USERCONFIG_OK : USERCONFIG_FRAM_ERROR;
+UserConfigStatus UserConfig_WriteToFRAM(uint16_t fram_addr, uint8_t *data,
+                                        uint16_t length) {
+  FramStatus status = FramWrite(fram_addr, data, length);
+  return (status == FRAM_OK) ? USERCONFIG_OK : USERCONFIG_FRAM_ERROR;
 }
 
 // Read data from FRAM
-UserConfigStatus UserConfig_ReadFromFRAM(uint16_t fram_addr,
-                                         uint16_t length, uint8_t *data) {
-    FramStatus status = FramRead(fram_addr, length, data);
-    return (status == FRAM_OK) ? USERCONFIG_OK : USERCONFIG_FRAM_ERROR;
+UserConfigStatus UserConfig_ReadFromFRAM(uint16_t fram_addr, uint16_t length,
+                                         uint8_t *data) {
+  FramStatus status = FramRead(fram_addr, length, data);
+  return (status == FRAM_OK) ? USERCONFIG_OK : USERCONFIG_FRAM_ERROR;
 }
 
 // Load user configuration data from FRAM to RAM
 UserConfigStatus UserConfigLoad(void) {
-    uint16_t data_length = 0;
-    uint8_t length_buf[2];
+  uint16_t data_length = 0;
+  uint8_t length_buf[2];
 
-    // Read the length of the user configuration data from FRAM
-    if (UserConfig_ReadFromFRAM(USER_CONFIG_LEN_ADDR, 2, length_buf) != USERCONFIG_OK) {
-        return USERCONFIG_FRAM_ERROR;
-    }
+  // Read the length of the user configuration data from FRAM
+  if (UserConfig_ReadFromFRAM(USER_CONFIG_LEN_ADDR, 2, length_buf) !=
+      USERCONFIG_OK) {
+    return USERCONFIG_FRAM_ERROR;
+  }
 
-    // Convert length bytes to integer
-    data_length = (length_buf[0] << 8) | length_buf[1];
+  // Convert length bytes to integer
+  data_length = (length_buf[0] << 8) | length_buf[1];
 
     // Read the encoded configuration data from FRAM into RX_Buffer
     if (UserConfig_ReadFromFRAM(USER_CONFIG_START_ADDRESS, data_length, RX_Buffer) != USERCONFIG_OK) {
         return USERCONFIG_FRAM_ERROR;
     }
 
-    // Decode the user configuration from RX_Buffer into loadedConfig struct
-    if (DecodeUserConfiguration(RX_Buffer, data_length, &loadedConfig) != USERCONFIG_OK) {
-        // Return an error if decoding fails
-        return USERCONFIG_DECODE_ERROR;
-    }
+  // Decode the user configuration from RX_Buffer into loadedConfig struct
+  if (DecodeUserConfiguration(RX_Buffer, data_length, &loadedConfig) !=
+      USERCONFIG_OK) {
+    // Return an error if decoding fails
+    return USERCONFIG_DECODE_ERROR;
+  }
 
-    return USERCONFIG_OK;  // Return success if decoding is successful
+  return USERCONFIG_OK;  // Return success if decoding is successful
 }
 
 // Get a reference to the loaded user configuration data in RAM.
-const UserConfiguration* UserConfigGet(void) {
-    return &loadedConfig;
-}
+const UserConfiguration *UserConfigGet(void) { return &loadedConfig; }

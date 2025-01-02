@@ -8,7 +8,7 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
-## [Unreleased]
+## [2.2.0] - 2024-12-13
 
 ### Added
 
@@ -19,6 +19,7 @@ firmware versions for a hardware version.
 - Transmit buffer [#41](i41)
 - RTC time synchronization support through LoRaWAN [#48](i48)
 - Calibration support [#50](i50)
+- Minimum working example for configuration GUI
 
 ### Changed
 

@@ -3,19 +3,19 @@
  * @file    userConfig.c
  * @author  Ahmed Hassan Falah
  * @brief   Soil Power Sensor userConfig library
- *          This file provides functions for managing user configuration data 
- *          via UART communication and storage in FRAM. It includes functions 
- *          for handling UART interrupts for receiving data, writing and 
+ *          This file provides functions for managing user configuration data
+ *          via UART communication and storage in FRAM. It includes functions
+ *          for handling UART interrupts for receiving data, writing and
  *          reading data from FRAM, and sending acknowledgment messages.
- * 
+ *
  * @details
- *          - The library initializes UART for interrupt-based receiving and 
+ *          - The library initializes UART for interrupt-based receiving and
  *            handles incoming data in an interrupt service routine.
- *          - It supports both interrupt-driven and polling methods for receiving 
- *            data.
- *          - The received data length is stored alongside the encoded data in 
+ *          - It supports both interrupt-driven and polling methods for
+ *receiving data.
+ *          - The received data length is stored alongside the encoded data in
  *            FRAM to facilitate data retrieval upon startup.
- * 
+ *
  * @date    10/13/2024
  ******************************************************************************
  * copyright [2024] <Ahmed Hassan Falah>
@@ -45,9 +45,9 @@ extern "C" {
 #define USER_CONFIG_LEN_ADDR 1792                  // Address for storing the user config data length in FRAM.
 
 typedef enum {
-    USERCONFIG_OK,
-    USERCONFIG_FRAM_ERROR,
-    USERCONFIG_DECODE_ERROR
+  USERCONFIG_OK,
+  USERCONFIG_FRAM_ERROR,
+  USERCONFIG_DECODE_ERROR
 } UserConfigStatus;
 
 
@@ -94,9 +94,10 @@ void UserConfig_InterruptHandler(void);
 
 /**
  ******************************************************************************
- * @brief    Processes incoming user configuration data via UART in polling mode.
+ * @brief    Processes incoming user configuration data via UART in polling
+ *mode.
  *
- *           This function checks for incoming user configuration data over UART 
+ *           This function checks for incoming user configuration data over UART
  *           in polling mode and processes it as needed.
  *
  * @param    void
@@ -123,44 +124,47 @@ UserConfigStatus UserConfig_SendCurrentUserConfig(void);
  ******************************************************************************
  * @brief    Writes user configuration data to FRAM.
  *
- *           This function writes a specified amount of user configuration data 
+ *           This function writes a specified amount of user configuration data
  *           to the FRAM memory starting at a specified address.
  *
  * @param    fram_addr  Starting address in FRAM to write data.
  * @param    data       Pointer to the data to be written.
  * @param    length     Length of the data to be written.
- * @return   UserConfigStatus - USERCONFIG_OK if successful, error code otherwise.
+ * @return   UserConfigStatus - USERCONFIG_OK if successful, error code
+ *otherwise.
  ******************************************************************************
  */
-UserConfigStatus UserConfig_WriteToFRAM(uint16_t fram_addr,
-                                        uint8_t *data, uint16_t length);
+UserConfigStatus UserConfig_WriteToFRAM(uint16_t fram_addr, uint8_t *data,
+                                        uint16_t length);
 
 /**
  ******************************************************************************
  * @brief    Reads user configuration data from FRAM.
  *
- *           This function reads a specified amount of user configuration data 
+ *           This function reads a specified amount of user configuration data
  *           from the FRAM memory starting at a specified address.
  *
  * @param    fram_addr  Starting address in FRAM to read data from.
  * @param    length     Length of the data to be read.
  * @param    data       Pointer to the buffer to store the read data.
- * @return   UserConfigStatus - USERCONFIG_OK if successful, error code otherwise.
+ * @return   UserConfigStatus - USERCONFIG_OK if successful, error code
+ *otherwise.
  ******************************************************************************
  */
-UserConfigStatus UserConfig_ReadFromFRAM(uint16_t fram_addr,
-                                         uint16_t length, uint8_t *data);
+UserConfigStatus UserConfig_ReadFromFRAM(uint16_t fram_addr, uint16_t length,
+                                         uint8_t *data);
 
 /**
  ******************************************************************************
  * @brief    Loads user configuration data from FRAM to RAM.
  *
  *           This function reads the stored user configuration data from FRAM,
- *           decodes it, and loads it into RAM. The data will be stored in a 
+ *           decodes it, and loads it into RAM. The data will be stored in a
  *           static UserConfig structure.
  *
  * @param    void
- * @return   UserConfigStatus - USERCONFIG_OK if successful, error code otherwise.
+ * @return   UserConfigStatus - USERCONFIG_OK if successful, error code
+ *otherwise.
  ******************************************************************************
  */
 UserConfigStatus UserConfigLoad(void);
@@ -170,13 +174,14 @@ UserConfigStatus UserConfigLoad(void);
  * @brief    Gets a reference to the loaded user configuration data in RAM.
  *
  *           This function returns a pointer to the UserConfig structure in RAM,
- *           allowing access to the loaded configuration without reading from FRAM.
+ *           allowing access to the loaded configuration without reading from
+ *FRAM.
  *
  * @param    void
  * @return   const UserConfig* - Pointer to the loaded UserConfig structure.
  ******************************************************************************
  */
-const UserConfiguration* UserConfigGet(void);                      
+const UserConfiguration *UserConfigGet(void);
 
 #ifdef __cplusplus
 }

@@ -113,6 +113,7 @@ jobs:
         with:
           name: protobuf-library
           path: ${{ env.protobuf_library }}
+          compression-level: 0
           retention-days: 1
 
       - name: Replace protobuf package reference

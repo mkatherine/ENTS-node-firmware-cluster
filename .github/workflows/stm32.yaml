@@ -87,7 +87,7 @@ jobs:
     needs: build
     env:
       bucket_url: https://ents-remote-tests-protobuf-lib.s3.us-west-2.amazonaws.com
-      protobuf_library: ents-protobuf-lib-${{ github.sha }}.tar.gz
+      protobuf_lib: ents-protobuf-lib-${{ github.sha }}.tar.gz
     steps:
       - uses: actions/checkout@v4
 

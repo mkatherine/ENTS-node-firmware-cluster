@@ -19,16 +19,14 @@ from .calibrate.plots import (
     plot_residuals_hist,
 )
 
-from .encode import encode_power_measurement, encode_phytos31_measurement, encode_teros12_measurement, encode_response
-from .decode import decode_measurement, decode_response
-from .esp32 import encode_esp32command, decode_esp32command
+from .proto.encode import encode_power_measurement, encode_phytos31_measurement, encode_teros12_measurement, encode_response
+from .proto.decode import decode_measurement, decode_response
+from .proto.esp32 import encode_esp32command, decode_esp32command
 
 def entry():
     """Command line interface entry point"""
     
-    parser = argparse.ArgumentParser(
-        prog="Environmental NeTworked Sensor (ents) Utility "
-    )
+    parser = argparse.ArgumentParser()
     
     subparsers = parser.add_subparsers(help="Ents Utilities")
     

@@ -17,15 +17,15 @@ from soil_power_sensor_protobuf.proto import (
     encode_esp32command,
     decode_esp32command,
 )
+
 from soil_power_sensor_protobuf.proto.soil_power_sensor_pb2 import (
     Measurement,
     Response,
     MeasurementMetadata,
     Esp32Command,
+    PageCommand,
+    TestCommand
 )
-
-from soil_power_sensor_protobuf.esp32 import PageCommand, TestCommand
-
 
 class TestEncode(unittest.TestCase):
     def test_success(self):

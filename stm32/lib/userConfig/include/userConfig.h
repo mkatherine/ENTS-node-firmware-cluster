@@ -28,21 +28,24 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include "usart.h"
 #include "fram.h"
 #include "transcoder.h"
-#include "string.h"
 #include "stm32_systime.h"
 #include "usart_if.h"
 #include "soil_power_sensor.pb.h"
 #include "stm32_adv_trace.h"
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
 
-#define RX_BUFFER_SIZE UserConfiguration_size      // Maximum size of the received data buffer (from protobuf definition).
-#define USER_CONFIG_START_ADDRESS 1794             // Starting address for user config data in FRAM.
-#define USER_CONFIG_LEN_ADDR 1792                  // Address for storing the user config data length in FRAM.
+// Maximum size of the received data buffer (from protobuf definition).
+#define RX_BUFFER_SIZE UserConfiguration_size
+// Starting address for user config data in FRAM.
+#define USER_CONFIG_START_ADDRESS 1794
+// Address for storing the user config data length in FRAM.
+#define USER_CONFIG_LEN_ADDR 1792
 
 typedef enum {
   USERCONFIG_OK,

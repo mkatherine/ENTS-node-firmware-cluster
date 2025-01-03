@@ -104,16 +104,12 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Pack protobuf package
-        run: pio pkg pack -o ${{ env.protobuf_library }} proto/c
-
       - name: Upload package artifact
         id: upload-protobuf-package
         uses: actions/upload-artifact@v4
         with:
           name: protobuf-library
-          path: ${{ env.protobuf_library }}
-          compression-level: 0
+          path: proto/c
           retention-days: 1
 
       - name: Replace protobuf package reference

@@ -116,7 +116,7 @@ jobs:
       - name: Replace protobuf package reference
         env:
           lib_url: ${{ steps.upload-protobuf-package.outputs.artifact_url }}
-        run: sed -i 's|\(Soil Power Sensor Protocal Buffer\).*|\1=${{ env.lib_url }}|' stm32/platformio.ini
+        run: sed -i 's|\(Soil Power Sensor Protocal Buffer=\).*|\1${{ env.lib_url }}|' stm32/platformio.ini
 
       - name: Run unit tests
         env:

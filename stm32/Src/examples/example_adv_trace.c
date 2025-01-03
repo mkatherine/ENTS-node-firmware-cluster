@@ -128,9 +128,9 @@ int main(void) {
   /* USER CODE BEGIN 2 */
   // UserConfig_InterruptInit();  // Initialize UART for interrupt mode
 
-    // sprintf(uart_buf, "API Port: %lu\r\n", config->API_Endpoint_Port);
-    // HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf), HAL_MAX_DELAY);
-
+  // sprintf(uart_buf, "API Port: %lu\r\n", config->API_Endpoint_Port);
+  /*HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf,
+   strlen(uart_buf), HAL_MAX_DELAY); */
   /* USER CODE END 2 */
   InitAdvanceTrace();
   /* Infinite loop */

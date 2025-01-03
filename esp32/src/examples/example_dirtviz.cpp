@@ -1,6 +1,6 @@
 /**
  * @brief Example of using dirtviz library
- * 
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-30
  */
@@ -23,15 +23,16 @@ const size_t data_len = 21;
 
 /**
  * @brief Initialization code run on startup
- * 
- * 
-*/
-void setup()
-{
+ *
+ *
+ */
+void setup() {
   // Start serial interface
   Serial.begin(115200);
   // Wait for serial connection
-  while (!Serial) { delay(100); }
+  while (!Serial) {
+    delay(100);
+  }
 
   Serial.print("SSID: ");
   Serial.println(ssid);
@@ -43,8 +44,7 @@ void setup()
   WiFi.begin(ssid, pass);
 
   // Wait for WiFi to connect
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -54,15 +54,14 @@ void setup()
   Serial.println(WiFi.localIP());
 }
 
-void loop()
-{
+void loop() {
   int resp_code;
 
   const uint8_t *resp_data;
   size_t resp_data_len;
 
   // Send example measurement
-  resp_code = api.SendMeasurement((const uint8_t*) data, data_len);
+  resp_code = api.SendMeasurement((const uint8_t *)data, data_len);
   Serial.print("Response Code: ");
   Serial.println(resp_code);
 

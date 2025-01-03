@@ -3,9 +3,8 @@ name: Build stm32
 
 on: [workflow_dispatch, push, pull_request_target, pull_request]
 
-defaults:
-  run:
-    working-directory: ./stm32
+env:
+  python_version: '3.13'
 
 jobs:
   build:
@@ -22,7 +21,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: ${{ env.python_version }}
 
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
@@ -49,12 +48,13 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: ${{ env.python_version }}
 
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
       - name: Run static code analysis
+        working-directory: ./stm32
         run: pio check
 
   lint:
@@ -70,12 +70,13 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: ${{ env.python_version }}
 
       - name: Install cpplint
         run: pip install --upgrade cpplint==1.6.1
 
       - name: Run linter
+        working-directory: ./stm32
         run: cpplint --recursive lib Src/examples test
 
   test:
@@ -91,13 +92,13 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: |
+            ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: ${{ env.python_version }}
 
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
@@ -119,6 +120,7 @@ jobs:
         run: sed -i 's|\(Soil Power Sensor Protocal Buffer=\).*|\1${{ env.lib_url }}|' stm32/platformio.ini
 
       - name: Run unit tests
+        working-directory: ./stm32
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
         run: pio remote test -e tests -r

@@ -105,14 +105,17 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_LoRaWAN_Init();
   MX_I2C2_Init();
+  SystemApp_Init();
+  // UserConfig_ProcessDataPolling();
+  MX_LoRaWAN_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
   MX_RTC_Init();
   SensorsInit();
+  UserConfig_InitAdvanceTrace();
   FIFO_Init();
 
   // Debug message, gets printed after init code

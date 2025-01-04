@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import json
 import os
 import sys
+import time
 import serial
 import serial.tools.list_ports
 import re  # For validating URL input
@@ -263,32 +264,39 @@ class Ui_MainWindow(object):
         lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         lineEdit.setPlaceholderText(placeholder)
         return lineEdit
-
+    
     def setupSaveAndLoadButtons(self):
         """
         @brief Creates and configures the save and load buttons.
         """
-        # Create a horizontal layout for the buttons
-        button_layout = QtWidgets.QHBoxLayout()
+        # Create a grid layout for precise placement
+        button_layout = QtWidgets.QGridLayout()
 
-        # Load button (aligned left)
+        # Load button
         self.loadButton = QtWidgets.QPushButton("Load", self.centralwidget)
         self.loadButton.setFixedSize(100, 30)
         self.loadButton.clicked.connect(self.loadConfiguration)
-        button_layout.addWidget(self.loadButton)
+        button_layout.addWidget(self.loadButton, 1, 0)  # Row 0, Column 0
 
-        # Save button (in the middle)
+        # Save button
         self.saveButton = QtWidgets.QPushButton("Save", self.centralwidget)
         self.saveButton.setFixedSize(100, 30)
         self.saveButton.clicked.connect(self.saveConfiguration)
-        button_layout.addWidget(self.saveButton)
+        button_layout.addWidget(self.saveButton, 1, 1)  # Row 0, Column 1
 
-        # Save Configuration button (aligned right)
+        # Send Configuration button
         self.saveConfigurationButton = QtWidgets.QPushButton("Send Configuration", self.centralwidget)
         self.saveConfigurationButton.setFixedSize(300, 30)
         self.saveConfigurationButton.clicked.connect(lambda: self.saveConfiguration(flag="send"))
-        button_layout.addWidget(self.saveConfigurationButton)
+        button_layout.addWidget(self.saveConfigurationButton, 1, 2)  # Row 0, Column 2
 
+        # Load current Configuration button
+        self.loadCurrentConfigButton = QtWidgets.QPushButton("Load current Configuration", self.centralwidget)
+        self.loadCurrentConfigButton.setFixedSize(300, 30)
+        self.loadCurrentConfigButton.clicked.connect(lambda: self.loadConfiguration(flag="loadCurrent"))
+        button_layout.addWidget(self.loadCurrentConfigButton, 0, 2)  # Row 1, Column 2
+
+        # Add the grid layout to the main layout
         self.layout.addLayout(button_layout)
 
     def saveConfiguration(self, flag:str):
@@ -431,15 +439,81 @@ class Ui_MainWindow(object):
             # Show error message if validation fails
             QtWidgets.QMessageBox.critical(self.centralwidget, "Error", str(e))
 
-    def loadConfiguration(self):
+    def loadConfiguration(self, flag:str):
         """
         @brief Loads configuration from a selected JSON file and fills the input fields.
         """
-        # Open a file dialog to select the JSON file
-        options = QtWidgets.QFileDialog.Options()
-        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.centralwidget, "Select Configuration File", "", "JSON Files (*.json)", options=options
-        )
+        # Load current configuration in STM32 and display it on the GUI
+        if flag == "loadCurrent":
+            success,encoded_data = self.receiveFromUART()
+            if not success:
+                return
+            decoded_data = decode_user_configuration(encoded_data)
+            print(decoded_data)
+            
+            # Update GUI elements with decoded data
+            self.lineEdit_Logger_ID.setText(str(decoded_data['loggerId']))
+            self.lineEdit_Cell_ID.setText(str(decoded_data['cellId']))
+            self.comboBox_Upload_Method.setCurrentText(decoded_data['UploadMethod'])
+
+            # Calculate upload interval and update GUI fields
+            upload_interval = decoded_data['UploadInterval']
+            days = upload_interval // 86400
+            remaining_seconds = upload_interval % 86400
+            hours = remaining_seconds // 3600
+            remaining_seconds %= 3600
+            minutes = remaining_seconds // 60
+            seconds = remaining_seconds % 60
+            self.lineEdit_Days.setText(str(days))
+            self.lineEdit_Hours.setText(str(hours))
+            self.lineEdit_Minutes.setText(str(minutes))
+            self.lineEdit_Seconds.setText(str(seconds))
+
+            # Update sensor checkboxes
+            self.checkBox_Voltage.setChecked(False)
+            self.checkBox_Current.setChecked(False)
+            self.checkBox_Teros12.setChecked(False)
+            self.checkBox_Teros21.setChecked(False)
+            self.checkBox_BME280.setChecked(False)
+            for sensor in decoded_data['enabledSensors']:
+                if sensor == 'Voltage':
+                    self.checkBox_Voltage.setChecked(True)
+                elif sensor == 'Current':
+                    self.checkBox_Current.setChecked(True)
+                elif sensor == 'Teros12':
+                    self.checkBox_Teros12.setChecked(True)
+                elif sensor == 'Teros21':
+                    self.checkBox_Teros21.setChecked(True)
+                elif sensor == 'BME280':
+                    self.checkBox_BME280.setChecked(True)
+            # Fill calibration fields
+            self.lineEdit_V_Slope.setText(str(decoded_data['VoltageSlope']))
+            self.lineEdit_V_Offset.setText(str(decoded_data['VoltageOffset']))
+            self.lineEdit_I_Slope.setText(str(decoded_data['CurrentSlope']))
+            self.lineEdit_I_Offset.setText(str(decoded_data['CurrentOffset']))
+
+            # Fill WiFi settings if upload method is WiFi
+            if decoded_data['UploadMethod'] == 'WiFi':
+                self.lineEdit_WiFi_SSID.setText(decoded_data['WiFiSSID'])
+                self.lineEdit_WiFi_Password.setText(decoded_data['WiFiPassword'])
+                self.lineEdit_API_Endpoint_URL.setText(decoded_data['APIEndpointURL'])
+                self.lineEdit_API_Port.setText(str(decoded_data['APIEndpointPort']))
+            else:
+                # Clear WiFi fields if upload method is not WiFi
+                self.lineEdit_WiFi_SSID.clear()
+                self.lineEdit_WiFi_Password.clear()
+                self.lineEdit_API_Endpoint_URL.clear()
+                self.lineEdit_API_Port.clear()
+
+            QtWidgets.QMessageBox.information(self.centralwidget, "Success", "Configuration loaded successfully From FRAM.")
+            return
+        # Load configuration from JSON file
+        else:
+            # Open a file dialog to select the JSON file
+            options = QtWidgets.QFileDialog.Options()
+            file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+                self.centralwidget, "Select Configuration File", "", "JSON Files (*.json)", options=options
+            )
 
         if file_path:
             try:
@@ -516,16 +590,19 @@ class Ui_MainWindow(object):
             port_name = selected_port.split(' ')[0]
 
             # Open the serial port
-            ser = serial.Serial(port=port_name, baudrate=115200, timeout=2)
+            ser = serial.Serial(port=port_name, baudrate=115200, timeout=20)
+            # Step 0: Send 1 indicating sending new config to be stored
+            ser.flush()
+            ser.write(bytes([1]))
+            print(f"Sending: {bytes([1])}")
             # Step 1: Send the length of the encoded data (2 bytes)
             data_length = len(encoded_data)
             ser.write(data_length.to_bytes(2, byteorder='big'))  # Send length as 2-byte big-endian integer
-
             # Step 2: Send the encoded data
             ser.write(encoded_data)
             print("________________________________________________________________________")
             print(f"length: {data_length}")
-            print(f"Sent: {encoded_data}")
+            print(f"{encoded_data}")
 
             # Step 3: Wait for acknowledgment ("ACK")
             ack = ser.read(3)  # Read 3 bytes (assuming "ACK" is 3 bytes)
@@ -559,6 +636,67 @@ class Ui_MainWindow(object):
         except serial.SerialException as e:
             QtWidgets.QMessageBox.critical(self.centralwidget, "UART Error", f"Failed to send data: {e}")
             return False
+
+        finally:
+            if ser is not None:
+                ser.close()
+
+    def receiveFromUART(self):   
+        """
+        @brief Receives the current encoded configuration data via UART.
+
+        @param void.
+        @return (success, data): A tuple containing success status and decoded data or an error message.
+        """
+        ser = None
+        try:
+            # List available ports with descriptions
+            ports = serial.tools.list_ports.comports()
+            available_ports = [f"{port.device} - {port.description}" for port in ports]
+
+            if not available_ports:
+                QtWidgets.QMessageBox.critical(self.centralwidget, "Error", "No serial ports available.")
+                return False, "No serial ports available."
+
+            # Ask the user to select a port
+            selected_port, ok = QInputDialog.getItem(self.centralwidget, "Select Port", "Available Serial Ports:", available_ports, 0, False)
+
+            if not ok or not selected_port:
+                QtWidgets.QMessageBox.critical(self.centralwidget, "Error", "No port selected.")
+                return False, "No port selected."
+
+            # Extract the port name
+            port_name = selected_port.split(' ')[0]
+
+            # Open the serial port
+            ser = serial.Serial(port=port_name, baudrate=115200, timeout=2)
+            # Step 0: Send 2 indicating loading the current configurations from the FRAM
+            ser.write(bytes([2]))
+            print(f"Sending: {bytes([2])}")
+            # Step 1: Wait for acknowledgment ("ACK")
+            ack = ser.read(3)  # Read 3 bytes (assuming "ACK" is 3 bytes)
+            print(ack)
+            if ack == b'ACK':
+                QtWidgets.QMessageBox.information(self.centralwidget, "Success", "Received ACK from STM32")
+            else:
+                QtWidgets.QMessageBox.critical(self.centralwidget, "UART Error", "No acknowledgment received")
+                return False, "No acknowledgment received from STM32."
+
+            # Step 2: After ACK, read data from STM32
+            received_data_length = int.from_bytes(ser.read(2), byteorder='big')  # Read the length of received data
+            print("________________________________________________________________________")
+            print(f"length: {received_data_length}")
+            print("________________________________________________________________________")
+            print("________________________________________________________________________")
+
+            received_data = ser.read(received_data_length)  # Read the received data based on the length
+            print(f"Received from STM32: {received_data}")
+            print("________________________________________________________________________")
+            return True,received_data
+
+        except serial.SerialException as e:
+            QtWidgets.QMessageBox.critical(self.centralwidget, "UART Error", f"Failed to send data: {e}")
+            return False, f"Failed to send or receive data: {e}"
 
         finally:
             if ser is not None:
@@ -620,10 +758,13 @@ class Ui_MainWindow(object):
         except ValueError:
             raise ValueError(f"{name} must be a floating-point number.")
 
-if __name__ == "__main__":
+def main():
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    main()

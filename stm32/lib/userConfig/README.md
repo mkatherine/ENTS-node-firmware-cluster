@@ -8,20 +8,21 @@
 
 ## Overview
 
-The `userConfig` library initializes UART for interrupt-based data reception and handles incoming user configuration data. It writes and reads this data to and from the FRAM memory. The data length is stored alongside the encoded data in FRAM for easy retrieval.
+The `userConfig` library initializes UART for interrupt-based data reception and handles incoming user configuration data. It writes and reads this data to and from the FRAM memory. The data length is stored alongside the encoded data in FRAM for easy retrieval. Additionally, it supports sending the current configuration stored in FRAM back to the GUI.
 
 ## Features
 
 - **UART Data Reception:** Uses interrupt-driven and polling methods to receive configuration data.
 - **FRAM Data Storage:** Saves encoded configuration data in FRAM, along with its length.
 - **Acknowledgment Messages:** Sends acknowledgment (`ACK`) to indicate successful data receipt.
+- **Send Current Configuration:** Allows the STM32 to transmit the current configuration stored in FRAM back to the GUI.
 - **Data Verification:** Ensures received data fits within the RX buffer, with error messaging if exceeded.
 
 ## Code Flow Diagram
 
 ![STM32 Code Flow](../../../images/STM32_flow_diagram.png)
 
-The diagram illustrates the flow of code, from UART data reception to FRAM storage and acknowledgment transmission. It shows how the data is processed, validated, and stored in FRAM.
+The diagram illustrates the flow of code, from UART data reception to FRAM storage and acknowledgment transmission, and sending the current configuration. It shows how the data is processed, validated, and stored in FRAM.
 
 ## FRAM Memory Usage
 
@@ -48,13 +49,19 @@ To send and write user configuration data to FRAM, flash the `example_gui.c` fil
 pio run -e example_gui -t upload
 ```
 
-After uploading successfully, run the GUI application by entering:
+After uploading successfully, run the `GUI application` (Refer to the [GUI README](../../../proto/python/src/soil_power_sensor_protobuf/config/README.md) for detailed instructions on opening the GUI).
 
-```bash
-python user_config.py
-```
+Then enter your preferred configuration settings in the GUI. When sent successfully, the STM32 will respond with acknowledgment (ACK), confirming the data receipt. If the data saved in FRAM matches the data sent, a confirmation message will pop up indicating success.
 
-Enter your preferred configuration settings in the GUI. When sent successfully, the STM32 will respond with acknowledgment (ACK), confirming the data receipt. If the data saved in FRAM matches the data sent, a confirmation message will pop up indicating success.
+## Sending Current Configuration to the GUI
+
+To retrieve and send the current configuration stored in FRAM back to the GUI:
+
+1- Open the GUI application ([GUI README](../../../proto/python/src/soil_power_sensor_protobuf/config/README.md)).
+
+2- Click the "Load Current Configuration" button in the GUI.
+
+3- The STM32 will read the stored configuration from FRAM and send it to the GUI over UART. The fields in the GUI will populate with the retrieved values.
 
 ## Loading and Reading User Configuration from FRAM
 

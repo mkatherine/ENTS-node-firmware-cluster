@@ -19,7 +19,7 @@ classifiers = [
 dependencies = [
   'matplotlib',
   'pandas',
-  'protobuf~=4.21.1',
+  'protobuf>=5.0.0',
   'pyserial',
   'scikit-learn',
   'tqdm',

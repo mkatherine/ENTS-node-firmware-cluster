@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usart_if.h"
-
+#include "userConfig.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */

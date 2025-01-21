@@ -1,14 +1,14 @@
 /**
- * @file battery.c 
- * 
+ * @file battery.c
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-16
-*/
-
-#include "main.h"
-#include "adc.h"
+ */
 
 #include "battery.h"
+
+#include "adc.h"
+#include "main.h"
 
 /** Voltage reference in mV */
 #define VOLTAGE_REF 3300
@@ -24,23 +24,21 @@
 /** Private variable that stores battery voltage */
 volatile uint32_t adc_reading = 0;
 
-HAL_StatusTypeDef battery_init(void)
-{
+HAL_StatusTypeDef battery_init(void) {
   // Calibrate and start conversion process
   rc = HAL_ADCEx_Calibration_Start(&hadc);
   if (rc != HAL_OK) Error_Handler();
 
   // Start continuous measurements
-  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *) &adc_reading, 1);
+  rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *)&adc_reading, 1);
   if (rc != HAL_OK) Error_Handler();
 
   return rc;
 }
 
-unsigned int battery_voltage(void)
-{
+unsigned int battery_voltage(void) {
   // Adjust to real voltage value
-  unsigned int voltage = (unsigned int) adc_reading << 1;
+  unsigned int voltage = (unsigned int)adc_reading << 1;
   voltage *= VOLTAGE_REF;
   voltage /= FULL_SCALE;
 

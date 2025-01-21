@@ -37,6 +37,7 @@
 #include "ads.h"
 #include "sdi12.h"
 #include "phytos31.h"
+#include "bme280_sensor.h"
 #include "rtc.h"
 #include "sensors.h"
 /* USER CODE END Includes */
@@ -63,7 +64,7 @@
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -104,14 +105,18 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_LoRaWAN_Init();
   MX_I2C2_Init();
+  SystemApp_Init();
+  // UserConfig_ProcessDataPolling();
+  MX_LoRaWAN_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
   MX_RTC_Init();
   SensorsInit();
+  UserConfig_InitAdvanceTrace();
+  FIFO_Init();
 
   // Debug message, gets printed after init code
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
@@ -120,6 +125,10 @@ int main(void)
   SensorsAdd(ADC_measure);
   //SensorsAdd(SDI12_Teros12Measure);
   //SensorsAdd(Phytos31_measure);
+  
+  //BME280Init();
+  //SensorsAdd(BME280Measure); 
+
 
 
   /* USER CODE END 2 */
@@ -220,7 +229,8 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+   * example: printf("Wrong parameters value: file %s on line %d\r\n", file, line)
+   */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

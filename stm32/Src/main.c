@@ -109,7 +109,8 @@ int main(void)
   MX_I2C2_Init(); 
   SystemApp_Init();
 
-  UserConfigLoad(); 
+  UserConfigLoad();
+  UserConfigPrint();
 
   MX_LoRaWAN_Init();
 

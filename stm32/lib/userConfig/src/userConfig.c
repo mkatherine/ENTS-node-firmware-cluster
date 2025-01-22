@@ -13,6 +13,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "userConfig.h"
 
+#include "sys_app.h"
+
 // Stores each byte received via UART interrupt.
 static uint8_t charRx;
 // Receive buffer for encoded configuration data.
@@ -246,3 +248,57 @@ UserConfigStatus UserConfigLoad(void) {
 
 // Get a reference to the loaded user configuration data in RAM.
 const UserConfiguration *UserConfigGet(void) { return &loadedConfig; }
+
+void UserConfigPrint(void) {
+    const UserConfiguration* config = UserConfigGet();
+
+    // Print each member of the UserConfiguration
+    APP_PRINTF("Logger ID: %u\r\n", config->logger_id);
+    APP_PRINTF("Cell ID: %u\r\n", config->cell_id);
+
+    if (config->Upload_method == 0) {
+      APP_PRINTF("Upload Method: %u \"LoRa\"\r\n", config->Upload_method);
+    } else {
+      APP_PRINTF("Upload Method: %u \"WiFi\"\r\n", config->Upload_method);
+    }
+
+    APP_PRINTF("Upload Interval: %u\r\n", config->Upload_interval);
+
+    for (int i = 0; i < config->enabled_sensors_count; i++) {
+      const char *sensor_name;
+      switch (config->enabled_sensors[i]) {
+        case 0:
+          sensor_name = "Voltage";
+          break;
+        case 1:
+          sensor_name = "Current";
+          break;
+        case 2:
+          sensor_name = "Teros12";
+          break;
+        case 3:
+          sensor_name = "Teros21";
+          break;
+        case 4:
+          sensor_name = "BME280";
+          break;
+      }
+      APP_PRINTF("Enabled Sensor %d: %s\r\n", i + 1, sensor_name);
+    }
+
+    APP_PRINTF("Calibration V Slope: %x\r\n", config->Voltage_Slope);
+
+    APP_PRINTF("Calibration V Offset: %x\r\n", config->Voltage_Offset);
+
+    APP_PRINTF("Calibration I Slope: %x\r\n", config->Current_Slope);
+
+    APP_PRINTF("Calibration I Offset: %x\r\n", config->Current_Offset);
+
+    APP_PRINTF("WiFi SSID: %s\r\n", config->WiFi_SSID);
+
+    APP_PRINTF("WiFi Password: %s\r\n", config->WiFi_Password);
+
+    APP_PRINTF("API Endpoint URL: %s\r\n", config->API_Endpoint_URL);
+
+    APP_PRINTF("API Port: %u\r\n", config->API_Endpoint_Port);
+}

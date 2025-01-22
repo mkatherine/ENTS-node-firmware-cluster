@@ -106,11 +106,11 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  MX_I2C2_Init();
+  MX_I2C2_Init(); 
+  SystemApp_Init();
 
   UserConfigLoad(); 
 
-  SystemApp_Init();
   MX_LoRaWAN_Init();
 
   // required for SDI-12

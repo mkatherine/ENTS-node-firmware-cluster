@@ -326,7 +326,11 @@ void LoRaWAN_Init(void)
   // load the upload interval
   const UserConfiguration *cfg = UserConfigGet();
   // convert interval to ms
-  TxPeriodicity = cfg->Upload_interval * 1000;
+  TxPeriodicity = (cfg->Upload_interval * 1000);
+  // divide by number of sensors
+  TxPeriodicity /= cfg->enabled_sensors_count;
+  // divide by 2 to keep upload buffer empty for failed uploads
+  TxPeriodicity /= 2;
   /* USER CODE END LoRaWAN_Init_1 */
 
   UTIL_TIMER_Create(&StopJoinTimer, JOIN_TIME, UTIL_TIMER_ONESHOT, OnStopJoinTimerEvent, NULL);

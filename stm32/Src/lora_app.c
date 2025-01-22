@@ -41,6 +41,7 @@
 #include "sdi12.h"
 #include "rtc.h"
 #include "sensors.h"
+#include "userConfig.h"
 
 #include <time.h>
 /* USER CODE END Includes */
@@ -286,6 +287,8 @@ static UTIL_TIMER_Object_t TxTimer;
 
 /**
   * @brief Tx Timer period
+  *
+  * Gets overwritten in init function from user configuration
   */
 static UTIL_TIMER_Time_t TxPeriodicity = APP_TX_DUTYCYCLE;
 
@@ -320,7 +323,10 @@ void LoRaWAN_Init(void)
   /* USER CODE END LoRaWAN_Init_LV */
 
   /* USER CODE BEGIN LoRaWAN_Init_1 */
-
+  // load the upload interval
+  const UserConfiguration *cfg = UserConfigGet();
+  // convert interval to ms
+  TxPeriodicity = cfg->Upload_interval * 1000;
   /* USER CODE END LoRaWAN_Init_1 */
 
   UTIL_TIMER_Create(&StopJoinTimer, JOIN_TIME, UTIL_TIMER_ONESHOT, OnStopJoinTimerEvent, NULL);

@@ -40,6 +40,7 @@
 #include "bme280_sensor.h"
 #include "rtc.h"
 #include "sensors.h"
+#include "userConfig.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -106,31 +107,51 @@ int main(void)
   MX_ADC_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
+
+  UserConfigLoad(); 
+
   SystemApp_Init();
-  // UserConfig_ProcessDataPolling();
   MX_LoRaWAN_Init();
+
+  // required for SDI-12
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   ADC_init();
-  MX_RTC_Init();
+  //MX_RTC_Init();
   SensorsInit();
+
+  // initialize the user config interrupt
   UserConfig_InitAdvanceTrace();
-  FIFO_Init();
+
+  // alternative blocking polling method
+  //UserConfig_ProcessDataPolling();
+
+  // currently not functional
+  //FIFO_Init();
 
   // Debug message, gets printed after init code
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
 
-  // configure sensors
-  SensorsAdd(ADC_measure);
-  //SensorsAdd(SDI12_Teros12Measure);
-  //SensorsAdd(Phytos31_measure);
+  // get the current user config
+  const UserConfiguration* cfg = UserConfigGet();
   
-  //BME280Init();
-  //SensorsAdd(BME280Measure); 
 
-
-
+  // configure enabled sensors
+  for (int i=0; i < cfg->enabled_sensors_count; i++) {
+    EnabledSensor sensor = cfg->enabled_sensors[i];
+    if (sensor == EnabledSensor_Voltage || sensor == EnabledSensor_Current) {
+      SensorsAdd(ADC_measure);
+    } else if (sensor == EnabledSensor_Teros12) {
+      //SensorsAdd(SDI12_Teros12Measure);
+    } else if (sensor == EnabledSensor_Teros21) {
+      //SensorsAdd(SDI12_Teros21Measure);
+    } else if (sensor == EnabledSensor_BME280) {
+      BME280Init();
+      SensorsAdd(BME280Measure);
+    }
+  }
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */

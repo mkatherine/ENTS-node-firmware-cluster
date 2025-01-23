@@ -46,6 +46,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI); add this back when the rtc is integrated, hopefully this will fix the issue, and than you can remove the nops in SDI12_WakeSensors
@@ -75,54 +76,36 @@ int main(void)
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
   char success[] = "HAL_OK\n";
   char failure[] = "HAL_FAIL\n";
-  char buffer[5];
+  // NOTE Must be a 18 char buffer
+  char buffer[18] = {};
   uint8_t addr = '0';
   SDI12_Measure_TypeDef measurment_info;
   //HAL_StatusTypeDef returnCode;
 
-  // Set Up and transmit
-  //char identify[] = "0M!"; //command to read water potential and temp
- // SDI12WakeSensors();
-  //returnCode = HAL_UART_Transmit(&huart2, identify, sizeof(identify), HAL_MAX_DELAY);
-  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
-
-  //Now recieve data
-  //char recieveBuff[50];
-  //__HAL_UART_FLUSH_DRREGISTER(&huart2);
-  //returnCode = HAL_UART_Receive(&huart2, recieveBuff, sizeof(recieveBuff), 3000);
-  //HAL_UART_Transmit(&huart1, recieveBuff, sizeof(recieveBuff), 1000);
-
   // Infinite loop
   while (1)
   {
-    //char identify[] = "0M!"; //command to read water potential and temp
-    //SDI12WakeSensors();
-    //returnCode = HAL_UART_Transmit(&huart2, identify, sizeof(identify), HAL_MAX_DELAY);
-    //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
-
-    //Now recieve data
-    //__HAL_UART_FLUSH_DRREGISTER(&huart2);
-    //returnCode = HAL_UART_Receive(&huart2, recieveBuff, sizeof(recieveBuff), 3000);
-    //HAL_UART_Transmit(&huart1, recieveBuff, sizeof(recieveBuff), 1000);
-
-    // Print voltage level
-    char buf[32];
-    int buf_len = sprintf(buf, "0M!");
-
-
+    SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000);
+    APP_PRINTF("test: %s\n", buffer);
+    //HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), 100);
+  
+    /*
     if (SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
       HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
       HAL_UART_Transmit(&huart1, buffer, 18, 100);
     } else {
       HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
     };
+    */
+
+    // clear buffer
+    memset(buffer, 0, sizeof(buffer));
 
     //Sleep
     for (int i = 0; i <= 1000000; i++)
     {
       asm("nop");
     };
-    //HAL_Delay(DELAY);
   }
 }
 

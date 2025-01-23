@@ -99,33 +99,44 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
                                SDI12_Measure_TypeDef *measurment_info,
                                char *measurment_data, uint16_t timeoutMillis) {
   // Command to request measurement ("0!\r\n" for example)
-  char reqMeas[30];
-  // Command to send the data
-  char sendData[30];
+  char reqMeas[4];
+
+  // Command for device to send the data
+  char sendData[5];
+
   SDI12Status ret;
+
+  //
+  // Sends the measurement request and recieves the immediate response
+  //
 
   // Construct a command to request a measurment
   uint8_t size = snprintf(reqMeas, sizeof(reqMeas), "%cM!", addr);
 
-  char buffer[7];
+  char meas_resp_buffer[REQUEST_MEASURMENT_RESPONSE_SIZE];
   // Request a measurment and read the response
   SDI12SendCommand(reqMeas, size);
-  ret = SDI12ReadData(buffer, REQUEST_MEASURMENT_RESPONSE_SIZE, timeoutMillis);
+  ret = SDI12ReadData(meas_resp_buffer,
+      REQUEST_MEASURMENT_RESPONSE_SIZE, timeoutMillis);
   if (ret != SDI12_OK) {
     return ret;
   }
-
-  // Construct a command to send the data
-  size = snprintf(sendData, sizeof(sendData), "%cD0!", addr);
+  
   // Check if the addresses match from the response above.
   // The response from a teros is the same every
   // time so we're going to leave it for now
-  ret = ParseMeasurementResponse(buffer, addr, measurment_info);
-
+  ret = ParseMeasurementResponse(meas_resp_buffer,
+      addr, measurment_info);
+  
   if (ret != SDI12_OK) {
     return ret;
   }
 
+
+  // Construct a command to send the data
+  size = snprintf(sendData, sizeof(sendData), "%cD0!", addr);
+
+  // optimization
   if (measurment_info->Time == 0) {  // If data is ready now
     SDI12SendCommand(sendData, size);
     // hard coded for a teros measurment response size
@@ -133,20 +144,44 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
     return ret;
   }
 
+
+  //
+  // Blocks until the sensor sends the service request, noted by a "a\r\n"
+  //
+
+  char service_request_resp[SERVICE_REQUEST_SIZE];
+
   // Read the service request, wait's for one to arrive
-  ret = SDI12ReadData(buffer, SERVICE_REQUEST_SIZE, timeoutMillis);
+  ret = SDI12ReadData(service_request_resp, SERVICE_REQUEST_SIZE, timeoutMillis);
   if (ret != SDI12_OK) {
     return ret;
   }
 
   // make sure the service request is correct
-  ret = ParseServiceRequest(buffer, measurment_info->Address);
+  ret = ParseServiceRequest(service_request_resp, measurment_info->Address);
   if (ret != SDI12_OK) {
     return ret;
   }
 
+  //
+  // Send request for data and receive data from device
+  //
+
   SDI12SendCommand(sendData, size);
   ret = SDI12ReadData(measurment_data, MEASURMENT_DATA_SIZE, timeoutMillis);
+
+  if ((ret == SDI12_OK) || (ret == SDI12_TIMEOUT_ON_READ)) {
+    // remove trailing characters after \r\n
+    char* end = strstr(measurment_data, "\r\n");
+
+    if (!end) {
+      return SDI12_ERROR;
+    }
+
+    *end = '\0';
+
+    return SDI12_OK;
+  }
   // IT IS VERY IMPORTANT THAT THE AMOUNT OF DATA EXPECTED
   // TO BE READ (bufferSize) MATCH WHAT IS SENT EXACTLY.
   // Or maybe slightly smaller, but any greater causes the program to hang

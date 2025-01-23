@@ -113,10 +113,13 @@ int main(void)
     status = Teros21GetMeasurement('0', &data);
 
     APP_PRINTF("Status code: %d\r\n", status);
-    APP_PRINTF("Water potential: %f, Temperature: %f\r\n", data.matric_pot, data.temp);
+
+    char print_buffer[256];
+    snprintf(print_buffer, sizeof(print_buffer), "Water potential: %f, Temperature: %f\r\n", data.matric_pot, data.temp);
+    APP_PRINTF("%s", print_buffer);
 
     //Sleep
-    for (int i = 0; i <= 1000000; i++)
+    for (int i = 0; i <= 4000000; i++)
     {
       asm("nop");
     };

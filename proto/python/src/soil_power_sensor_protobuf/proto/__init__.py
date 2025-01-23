@@ -3,6 +3,7 @@ from .encode import (
     encode_power_measurement,
     encode_teros12_measurement,
     encode_phytos31_measurement,
+    encode_teros21_measurement,
     encode_user_configuration,
 )
 
@@ -13,6 +14,7 @@ __all__ = [
     "encode_power_measurement",
     "encode_teros12_measurement",
     "encode_phytos31_measurement",
+    "encode_teros21_measurement",
     "decode_response",
     "decode_measurement",
     "encode_user_configuration",

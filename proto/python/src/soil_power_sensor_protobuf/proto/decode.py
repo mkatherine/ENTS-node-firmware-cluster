@@ -51,14 +51,14 @@ def decode_measurement(data: bytes, raw: bool = True) -> dict:
     # convert meta into dict
     if not meas.HasField("meta"):
         raise KeyError("Measurement missing metadata")
-    meta_dict = MessageToDict(meas.meta, including_default_value_fields=True)
+    meta_dict = MessageToDict(meas.meta)
 
     # decode measurement
     if not meas.HasField("measurement"):
         raise KeyError("Measurement missing data")
     measurement_type = meas.WhichOneof("measurement")
     measurement_dict = MessageToDict(
-        getattr(meas, measurement_type), including_default_value_fields=True
+        getattr(meas, measurement_type),
     )
 
     # store measurement type
@@ -101,6 +101,6 @@ def decode_user_configuration(data: bytes) -> dict:
     if user_config.cell_id == 0 or user_config.logger_id == 0:
         raise KeyError("User configuration missing required fields")
 
-    user_config_dict = MessageToDict(user_config, including_default_value_fields=True)
+    user_config_dict = MessageToDict(user_config)
 
     return user_config_dict

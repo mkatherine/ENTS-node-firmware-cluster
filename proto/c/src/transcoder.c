@@ -101,6 +101,23 @@ size_t EncodeBME280Measurement(uint32_t ts, uint32_t logger_id,
   return EncodeMeasurement(&meas, buffer);
 }
 
+size_t EncodeTeros21Measurement(uint32_t ts, uint32_t logger_id,
+    uint32_t cell_id, double matric_pot, double temp, uint8_t *buffer) {
+  Measurement meas = Measurement_init_zero;
+
+  meas.has_meta = true;
+
+  meas.meta.ts = ts;
+  meas.meta.logger_id = logger_id;
+  meas.meta.cell_id = cell_id;
+
+  meas.which_measurement = Measurement_teros21_tag;
+  meas.measurement.teros21.matric_pot = matric_pot;
+  meas.measurement.teros21.temp = temp;
+
+  return EncodeMeasurement(&meas, buffer);
+}
+
 Response_ResponseType DecodeResponse(const uint8_t *data, const size_t len) {
   Response resp;
 

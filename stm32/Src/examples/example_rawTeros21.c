@@ -84,16 +84,18 @@ int main(void)
   // Infinite loop
   while (1)
   {
-    //SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000);
-    //APP_PRINTF("test: %s\n", buffer);
-    //HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), 100);
-    
+    SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000);
+    APP_PRINTF("test: %s\n", buffer);
+    HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), 100);
+
+    /*
     Teros21Data data = {};
     SDI12Status status = SDI12_OK;
     status = Teros21GetMeasurement('0', &data);
 
     APP_PRINTF("Status code: %d\r\n", status);
     APP_PRINTF("Water potential: %f, Temperature: %f\r\n", data.matric_pot, data.temp);
+    */
   
     /*
     if (SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){

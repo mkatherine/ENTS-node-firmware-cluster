@@ -74,6 +74,8 @@
 
 /* USER CODE END 0 */
 
+void SystemClock_Config(void);
+
 /**
   * @brief  The application entry point.
   * @retval int

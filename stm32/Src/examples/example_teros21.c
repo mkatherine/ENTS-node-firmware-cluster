@@ -30,12 +30,9 @@
 
 #include "sys_app.h"
 #include <stdlib.h>
-#include <stdbool.h>
 
-#include "ads.h"
 #include "sdi12.h"
-#include "rtc.h"
-#include "phytos31.h"
+#include "teros21.h"
 
 /* USER CODE END Includes */
 
@@ -98,54 +95,25 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART1_UART_Init();
+  MX_USART2_UART_Init();
   MX_I2C2_Init();
 
-  /*Initialize timer and RTC*/
-  /*Have to be initilized in example files because LoRaWan cannot be initialized like in main*/
-  //__HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-  //UTIL_TIMER_Init();
-
   SystemApp_Init();
-
-  //TIMER_IF_Init();
   /* USER CODE BEGIN 2 */
 
   // Print the compilation time at startup
-  char info_str[100];
-  int info_len;
-  info_len = sprintf(
-      info_str,
-      "Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n",
-      __DATE__, __TIME__);
-  HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
-  char success[] = "HAL_OK\n";
-  char failure[] = "HAL_FAIL\n";
-  char buffer[20];
-  uint8_t addr = '0';
-  SDI12_Measure_TypeDef measurment_info;
-    
-
-  /* USER CODE END 2 */
-  char test[100];
-  int print;
-  print = sprintf(test, "Getting measurement\n");
-  HAL_UART_Transmit(&huart1, (const uint8_t *)test, print, 1000);
+  APP_LOG(TS_OFF, VLEVEL_M, "Example teros21, compiled on %s %s\r\n", __DATE__, __TIME__);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // Print voltage level
-    char buf[32];
-    int buf_len = sprintf(buf, "0M!");
-    
+    Teros21Data data = {};
+    SDI12Status status = SDI12_OK;
+    status = Teros21GetMeasurement('0', &data);
 
-    if (SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){
-      HAL_UART_Transmit(&huart1, (const uint8_t *) success, 7, 100);
-      HAL_UART_Transmit(&huart1, buffer, 18, 100);
-    } else {
-      HAL_UART_Transmit(&huart1, (const uint8_t *) failure, 10, 100);
-    };
+    APP_PRINTF("Status code: %d\r\n", status);
+    APP_PRINTF("Water potential: %f, Temperature: %f\r\n", data.matric_pot, data.temp);
 
     //Sleep
     for (int i = 0; i <= 1000000; i++)

@@ -1,10 +1,11 @@
 /**
- * @file test_battery.c
- * @brief Prints out battery voltage levels
+ * @file example-rawTeros21
+ * @brief Calls low level SDI12 functions to interface with TEROs21 sensor
  * 
- * In an infinite loop the battery voltage level is retrieved then outputted over serial. The user should check if the voltage levels are expected. When connected to USB the voltage should be ~5V. The battery voltage level should be checked and compared to a multimeter measurement.
+ * Uses low level SDI12 functions to get raw measurement strings from the
+ * Teros21 sensor and prints the result over UART.
  * 
- * @see battery.h
+ * @see sdi12.c
  * 
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-17
@@ -15,17 +16,15 @@
 #include "usart.h"
 #include "gpio.h"
 #include "lptim.h"
-#include "sdi12.h"
 #include "stm32_timer.h"
 #include "rtc.h"
 #include "sys_app.h"
 
 #include <stdio.h>
 
-/** Delay between print statements */
-#ifndef DELAY
-#define DELAY 1000
-#endif
+#include "sdi12.h"
+#include "teros21.h"
+
 
 void SystemClock_Config(void);
 
@@ -85,9 +84,16 @@ int main(void)
   // Infinite loop
   while (1)
   {
-    SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000);
-    APP_PRINTF("test: %s\n", buffer);
+    //SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000);
+    //APP_PRINTF("test: %s\n", buffer);
     //HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), 100);
+    
+    Teros21Data data = {};
+    SDI12Status status = SDI12_OK;
+    status = Teros21GetMeasurement('0', &data);
+
+    APP_PRINTF("Status code: %d\r\n", status);
+    APP_PRINTF("Water potential: %f, Temperature: %f\r\n", data.matric_pot, data.temp);
   
     /*
     if (SDI12GetMeasurment(addr, &measurment_info,  buffer, 3000) == HAL_OK){

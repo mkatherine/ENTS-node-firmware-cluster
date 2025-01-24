@@ -25,7 +25,6 @@ extern "C" {
 #include "lptim.h"
 #include "tim.h"
 #include "usart.h"
-#include "user_config.h"
 
 /** Status codes for the Fram library*/
 typedef enum {

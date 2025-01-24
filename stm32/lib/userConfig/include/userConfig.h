@@ -32,13 +32,14 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "usart.h"
+
 #include "fram.h"
-#include "transcoder.h"
-#include "stm32_systime.h"
-#include "usart_if.h"
 #include "soil_power_sensor.pb.h"
 #include "stm32_adv_trace.h"
+#include "stm32_systime.h"
+#include "transcoder.h"
+#include "usart.h"
+#include "usart_if.h"
 
 // Maximum size of the received data buffer (from protobuf definition).
 #define RX_BUFFER_SIZE UserConfiguration_size
@@ -53,12 +54,11 @@ typedef enum {
   USERCONFIG_DECODE_ERROR
 } UserConfigStatus;
 
-
 /**
  ******************************************************************************
  * @brief    Initializes user configuration settings.
- * 
- *           This function Initializes Advanced Trace for interrupt-based 
+ *
+ *           This function Initializes Advanced Trace for interrupt-based
  *           UART reception.
  *
  * @param    void
@@ -118,7 +118,8 @@ void UserConfig_ProcessDataPolling(void);
  *           from the FRAM and send it via UART to be shown on the GUI.
  *
  * @param    void
- * @return   UserConfigStatus - USERCONFIG_OK if successful, error code otherwise.
+ * @return   UserConfigStatus - USERCONFIG_OK if successful, error code
+ *otherwise.
  ******************************************************************************
  */
 UserConfigStatus UserConfig_SendCurrentUserConfig(void);

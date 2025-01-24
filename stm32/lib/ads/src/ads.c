@@ -20,10 +20,10 @@
 // #define CALIBRATION
 
 // default sane calibration
-static double voltage_calibration_m = -0.00039346;
-static double voltage_calibration_b = -0.5442246923562877;
-static double current_calibration_m = -1.187971e-10;
-static double current_calibration_b = 3.9018992737640816e-05;
+static double voltage_calibration_m = 0.0; 
+static double voltage_calibration_b = 0.0; 
+static double current_calibration_m = 0.0; 
+static double current_calibration_b = 0.0; 
 
 /**
  * @brief GPIO port for adc data ready line

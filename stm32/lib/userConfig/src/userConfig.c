@@ -286,13 +286,19 @@ void UserConfigPrint(void) {
       APP_PRINTF("Enabled Sensor %d: %s\r\n", i + 1, sensor_name);
     }
 
-    APP_PRINTF("Calibration V Slope: %x\r\n", config->Voltage_Slope);
+    char float_str[100];
 
-    APP_PRINTF("Calibration V Offset: %x\r\n", config->Voltage_Offset);
+    snprintf(float_str, sizeof(float_str), "%e", config->Voltage_Slope);
+    APP_PRINTF("Calibration V Slope: %s\r\n", float_str);
 
-    APP_PRINTF("Calibration I Slope: %x\r\n", config->Current_Slope);
+    snprintf(float_str, sizeof(float_str), "%e", config->Voltage_Offset);
+    APP_PRINTF("Calibration V Offset: %s\r\n", float_str);
 
-    APP_PRINTF("Calibration I Offset: %x\r\n", config->Current_Offset);
+    snprintf(float_str, sizeof(float_str), "%e", config->Current_Slope);
+    APP_PRINTF("Calibration I Slope: %s\r\n", float_str);
+
+    snprintf(float_str, sizeof(float_str), "%e", config->Current_Offset);
+    APP_PRINTF("Calibration I Offset: %s\r\n", float_str);
 
     APP_PRINTF("WiFi SSID: %s\r\n", config->WiFi_SSID);
 

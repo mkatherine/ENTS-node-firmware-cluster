@@ -155,17 +155,22 @@ int main(void)
   // configure enabled sensors
   for (int i=0; i < cfg->enabled_sensors_count; i++) {
     EnabledSensor sensor = cfg->enabled_sensors[i];
-    if (sensor == EnabledSensor_Voltage || sensor == EnabledSensor_Current) {
+    if ((sensor == EnabledSensor_Voltage) || (sensor == EnabledSensor_Current)) {
       SensorsAdd(ADC_measure);
-    } else if (sensor == EnabledSensor_Teros12) {
+      APP_LOG(TS_ON, VLEVEL_M, "ADS Enabled!\n");
+    }
+    if (sensor == EnabledSensor_Teros12) {
+      APP_LOG(TS_ON, VLEVEL_M, "Teros12 not implemented!\n");
       //SensorsAdd(SDI12_Teros12Measure);
-    } else if (sensor == EnabledSensor_Teros21) {
-      //SensorsAdd(SDI12_Teros21Measure);
-    } else if (sensor == EnabledSensor_BME280) {
+    }
+    if (sensor == EnabledSensor_BME280) {
       BME280Init();
       SensorsAdd(BME280Measure);
-    } else if (sensor == EnabledSensor_Teros21) {
+      APP_LOG(TS_ON, VLEVEL_M, "BME280 Enabled!\n");
+    }
+    if (sensor == EnabledSensor_Teros21) {
       SensorsAdd(Teros21Measure);
+      APP_LOG(TS_ON, VLEVEL_M, "Teros21 Enabled!\n");
     }
   }
   

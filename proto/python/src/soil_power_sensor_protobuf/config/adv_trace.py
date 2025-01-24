@@ -4,8 +4,10 @@
 @author Ahmed Hassan Falah
 @date 2024-10-12
 """
+
 import serial
 import serial.tools.list_ports
+
 
 def sendToUART():
     """
@@ -19,18 +21,22 @@ def sendToUART():
         data = bytes([1])
         print(f"Sending: {data}")
         ser.write(data)
-        print("________________________________________________________________________")
+        print(
+            "________________________________________________________________________"
+        )
         print(f"{data}")
 
         # Read acknowledgment (1 byte)
         ack = ser.read(1)
         print(f"Received from STM32: {ack}")
-        print("________________________________________________________________________")
+        print(
+            "________________________________________________________________________"
+        )
 
         # Check acknowledgment
-        if ack == b'A':
+        if ack == b"A":
             print("Success")
-        elif ack == b'N':
+        elif ack == b"N":
             print("Error NACK")
             return False
         else:
@@ -44,6 +50,7 @@ def sendToUART():
     finally:
         if ser is not None:
             ser.close()
+
 
 if __name__ == "__main__":
     sendToUART()

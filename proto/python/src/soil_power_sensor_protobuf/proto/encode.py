@@ -195,6 +195,27 @@ def encode_bme280_measurement(
     return meas.SerializeToString()
 
 
+def encode_teros21_measurement(
+    ts: int,
+    logger_id: int,
+    cell_id: int,
+    matric_pot: float,
+    temp: float,
+) -> bytes:
+
+    meas = Measurement()
+
+    # metadata
+    meas.meta.ts = ts
+    meas.meta.cell_id = cell_id
+    meas.meta.logger_id = logger_id
+
+    meas.teros21.matric_pot = matric_pot
+    meas.teros21.temp = temp
+
+    return meas.SerializeToString()
+
+
 def encode_user_configuration(
     logger_id: int,
     cell_id: int,

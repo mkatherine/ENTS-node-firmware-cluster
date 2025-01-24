@@ -112,7 +112,18 @@ int main(void)
   MX_I2C2_Init(); 
   SystemApp_Init();
 
-  UserConfigLoad();
+  if (UserConfigLoad() != USERCONFIG_OK) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Error loading user configuration!\n");
+    APP_LOG(TS_OFF, VLEVEL_M, "Waiting for new configuration...\n");
+
+    // TODO implement status code with LED
+
+    // Wait for new configuration
+    //UserConfig_ProcessDataPolling();
+    UserConfig_InitAdvanceTrace();
+    while (1);
+  }
+
   UserConfigPrint();
 
   MX_LoRaWAN_Init();

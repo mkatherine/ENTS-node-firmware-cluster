@@ -15,6 +15,7 @@ firmware versions for a hardware version.
 - Support for bme280 sensor [#87](i87), [#99](i99)
 - Support for MB85RC1MT fram chip [#136](i136)
 - Support for Teros21 sensor [#75](i75)
+- Integrated GUI with sensor/measurement configuration [#170](i170)
 
 ### Changed
 
@@ -24,6 +25,7 @@ firmware versions for a hardware version.
 [i87]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/87
 [i99]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/99
 [i136]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/136
+[i170]: https://github.com/jlab-sensing/ENTS-node-firmware/pull/170
 
 ## [2.2.0] - 2024-12-13
 

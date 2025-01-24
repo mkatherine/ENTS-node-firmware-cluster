@@ -225,6 +225,11 @@ UserConfigStatus UserConfigLoad(void) {
   // Convert length bytes to integer
   data_length = (length_buf[0] << 8) | length_buf[1];
 
+  // check the length for errors
+  if (data_length > UserConfiguration_size) {
+    return USERCONFIG_FRAM_ERROR;
+  }
+
   // Read the encoded configuration data from FRAM into RX_Buffer
   if (UserConfig_ReadFromFRAM(USER_CONFIG_START_ADDRESS, data_length,
                               RX_Buffer) != USERCONFIG_OK) {

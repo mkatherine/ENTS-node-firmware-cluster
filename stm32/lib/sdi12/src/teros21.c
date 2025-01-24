@@ -1,6 +1,7 @@
 #include "teros21.h"
 
 #include "stm32_systime.h"
+#include "userConfig.h"
 
 SDI12Status Teros21ParseMeasurement(const char *buffer, Teros21Data *data) {
   char addr = 0;
@@ -56,8 +57,9 @@ size_t Teros21Measure(uint8_t *data) {
     return -1;
   }
 
-  size_t data_len =
-      EncodeTeros21Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
+  const UserConfiguration* cfg = UserConfigGet();
+
+  size_t data_len = EncodeTeros21Measurement(ts.Seconds, cfg->logger_id, cfg->cell_id,
                                sens_data.matric_pot, sens_data.temp, data);
 
   return data_len;

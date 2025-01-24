@@ -19,8 +19,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 #include "rtc.h"
-#include "userConfig.h"
 #include "sys_app.h"
+#include "userConfig.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 

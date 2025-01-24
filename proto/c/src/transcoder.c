@@ -102,7 +102,8 @@ size_t EncodeBME280Measurement(uint32_t ts, uint32_t logger_id,
 }
 
 size_t EncodeTeros21Measurement(uint32_t ts, uint32_t logger_id,
-    uint32_t cell_id, double matric_pot, double temp, uint8_t *buffer) {
+                                uint32_t cell_id, double matric_pot,
+                                double temp, uint8_t *buffer) {
   Measurement meas = Measurement_init_zero;
 
   meas.has_meta = true;

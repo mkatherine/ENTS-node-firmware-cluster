@@ -2,7 +2,7 @@
 
 #include "stm32_systime.h"
 
-SDI12Status Teros21ParseMeasurement(const char* buffer, Teros21Data *data) {
+SDI12Status Teros21ParseMeasurement(const char *buffer, Teros21Data *data) {
   char addr = 0;
   float matric_pot = 0.;
   float temp = 0.;
@@ -31,7 +31,7 @@ SDI12Status Teros21GetMeasurement(char addr, Teros21Data *data) {
   // get measurement string
   // Measured 130ms experimentally, set to 200 ms to be safe
   SDI12_Measure_TypeDef measurment_info;
-  status = SDI12GetMeasurment((uint8_t) addr, &measurment_info, buffer, 1000);
+  status = SDI12GetMeasurment((uint8_t)addr, &measurment_info, buffer, 1000);
   if (status != SDI12_OK) {
     return status;
   }
@@ -46,7 +46,6 @@ SDI12Status Teros21GetMeasurement(char addr, Teros21Data *data) {
   return status;
 }
 
-
 size_t Teros21Measure(uint8_t *data) {
   // get timestamp
   SysTime_t ts = SysTimeGet();
@@ -57,8 +56,9 @@ size_t Teros21Measure(uint8_t *data) {
     return -1;
   }
 
-  size_t data_len = EncodeTeros21Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
-                                            sens_data.matric_pot, sens_data.temp, data);
+  size_t data_len =
+      EncodeTeros21Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
+                               sens_data.matric_pot, sens_data.temp, data);
 
   return data_len;
 }

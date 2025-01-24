@@ -59,7 +59,7 @@ SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize,
   HAL_StatusTypeDef ret;
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);  // Set to RX mode
   __HAL_UART_FLUSH_DRREGISTER(&huart2);
-  ret = HAL_UART_Receive(&huart2,(uint8_t *) buffer, bufferSize, timeoutMillis);
+  ret = HAL_UART_Receive(&huart2, (uint8_t *)buffer, bufferSize, timeoutMillis);
   if (ret == HAL_OK) {
     return SDI12_OK;
   } else if (ret == HAL_TIMEOUT) {
@@ -116,22 +116,20 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
   char meas_resp_buffer[REQUEST_MEASURMENT_RESPONSE_SIZE];
   // Request a measurment and read the response
   SDI12SendCommand(reqMeas, size);
-  ret = SDI12ReadData(meas_resp_buffer,
-      REQUEST_MEASURMENT_RESPONSE_SIZE, timeoutMillis);
-  if (ret != SDI12_OK) {
-    return ret;
-  }
-  
-  // Check if the addresses match from the response above.
-  // The response from a teros is the same every
-  // time so we're going to leave it for now
-  ret = ParseMeasurementResponse(meas_resp_buffer,
-      addr, measurment_info);
-  
+  ret = SDI12ReadData(meas_resp_buffer, REQUEST_MEASURMENT_RESPONSE_SIZE,
+                      timeoutMillis);
   if (ret != SDI12_OK) {
     return ret;
   }
 
+  // Check if the addresses match from the response above.
+  // The response from a teros is the same every
+  // time so we're going to leave it for now
+  ret = ParseMeasurementResponse(meas_resp_buffer, addr, measurment_info);
+
+  if (ret != SDI12_OK) {
+    return ret;
+  }
 
   // Construct a command to send the data
   size = snprintf(sendData, sizeof(sendData), "%cD0!", addr);
@@ -144,7 +142,6 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
     return ret;
   }
 
-
   //
   // Blocks until the sensor sends the service request, noted by a "a\r\n"
   //
@@ -152,7 +149,8 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
   char service_request_resp[SERVICE_REQUEST_SIZE];
 
   // Read the service request, wait's for one to arrive
-  ret = SDI12ReadData(service_request_resp, SERVICE_REQUEST_SIZE, timeoutMillis);
+  ret =
+      SDI12ReadData(service_request_resp, SERVICE_REQUEST_SIZE, timeoutMillis);
   if (ret != SDI12_OK) {
     return ret;
   }
@@ -172,7 +170,7 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
 
   if ((ret == SDI12_OK) || (ret == SDI12_TIMEOUT_ON_READ)) {
     // remove trailing characters after \r\n
-    char* end = strstr(measurment_data, "\r\n");
+    char *end = strstr(measurment_data, "\r\n");
 
     if (!end) {
       return SDI12_ERROR;

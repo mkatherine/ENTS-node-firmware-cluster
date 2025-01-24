@@ -37,8 +37,10 @@ size_t Phytos31_measure(uint8_t *data) {
   measurment = Phytos31GetMeasurment();
   double adc_voltage_float = measurment.phytos31_raw / 1000.;
 
+  const UserConfiguration* cfg = UserConfigGet();
+
   // encode measurement
-  size_t data_len = EncodePhytos31Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
+  size_t data_len = EncodePhytos31Measurement(ts.Seconds, cfg->logger_id, cfg->cell_id,
                                               adc_voltage_float, 0.0, data);
 
   // return number of bytes in serialized measurement

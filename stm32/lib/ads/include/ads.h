@@ -23,7 +23,6 @@ extern "C" {
 #include "timestamp.h"
 #include "transcoder.h"
 #include "usart.h"
-#include "user_config.h"
 
 #define ADS12_WRITE 0x80
 #define ADS12_READ 0x81

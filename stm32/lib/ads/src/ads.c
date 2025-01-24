@@ -15,12 +15,15 @@
 
 #include <stm32wlxx_hal_gpio.h>
 
+#include "userConfig.h"
+
 // #define CALIBRATION
 
-const double voltage_calibration_m = -0.00039346;
-const double voltage_calibration_b = -0.5442246923562877;
-const double current_calibration_m = -1.187971e-10;
-const double current_calibration_b = 3.9018992737640816e-05;
+// default sane calibration
+static double voltage_calibration_m = 0.0; 
+static double voltage_calibration_b = 0.0; 
+static double current_calibration_m = 0.0; 
+static double current_calibration_b = 0.0; 
 
 /**
  * @brief GPIO port for adc data ready line
@@ -50,6 +53,14 @@ int HAL_status(HAL_StatusTypeDef ret) {
 }
 
 HAL_StatusTypeDef ADC_init(void) {
+  const UserConfiguration* cfg = UserConfigGet();
+
+  // read calibration values
+  voltage_calibration_m = cfg->Voltage_Slope;
+  voltage_calibration_b = cfg->Voltage_Offset;
+  current_calibration_m = cfg->Current_Slope;
+  current_calibration_b = cfg->Current_Offset;
+
   uint8_t code = ADS12_RESET_CODE;
   uint8_t register_data[2] = {0x40, 0x03};
   HAL_StatusTypeDef ret;
@@ -242,9 +253,12 @@ size_t ADC_measure(uint8_t* data) {
   double adc_voltage = ADC_readVoltage();
   double adc_current = ADC_readCurrent();
 
+  const UserConfiguration* cfg = UserConfigGet();
+
   // encode measurement
-  size_t data_len = EncodePowerMeasurement(ts.Seconds, LOGGER_ID, CELL_ID,
-                                           adc_voltage, adc_current, data);
+  size_t data_len = EncodePowerMeasurement(ts.Seconds, cfg->logger_id,
+                                           cfg->cell_id, adc_voltage,
+                                           adc_current, data);
 
   // return number of bytes in serialized measurement
   return data_len;

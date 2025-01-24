@@ -17,12 +17,21 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include "adc.h"
+#include "app_lorawan.h"
+#include "dma.h"
 #include "gpio.h"
-#include "rtc.h"
-#include "sys_app.h"
-#include "userConfig.h"
+#include "i2c.h"
+#include "usart.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "sdi12.h"
+#include "sys_app.h"
+#include "teros21.h"
 
 /* USER CODE END Includes */
 
@@ -50,14 +59,12 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
-
 /**
  * @brief  The application entry point.
  * @retval int
@@ -85,32 +92,41 @@ int main(void) {
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
+  MX_USART2_UART_Init();
   MX_I2C2_Init();
 
-  /*Initialize timer and RTC*/
-  /*Have to be initilized in example files because LoRaWan cannot be initialized
-   * like in main*/
-  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-  // UTIL_TIMER_Init();
   SystemApp_Init();
   /* USER CODE BEGIN 2 */
-  // UserConfig_InterruptInit();  // Initialize UART for interrupt mode
-  /* USER CODE END 2 */
-  // uint8_t length_buf;
-  // UserConfig_ProcessDataPolling();
-  UserConfig_InitAdvanceTrace();
+
+  // Print the compilation time at startup
+  APP_LOG(TS_OFF, VLEVEL_M, "Example teros21, compiled on %s %s\r\n", __DATE__,
+          __TIME__);
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    /* USER CODE END WHILE */
-    // if (HAL_UART_Receive(&huart1, length_buf, 1, HAL_MAX_DELAY) == HAL_OK) {
-    //     UserConfig_SendCurrentUserConfig();
-    // }
-    /* USER CODE BEGIN 3 */
+    Teros21Data data = {};
+    SDI12Status status = SDI12_OK;
+    status = Teros21GetMeasurement('0', &data);
+
+    APP_PRINTF("Status code: %d\r\n", status);
+
+    char print_buffer[256];
+    snprintf(print_buffer, sizeof(print_buffer),
+             "Water potential: %f, Temperature: %f\r\n", data.matric_pot,
+             data.temp);
+    APP_PRINTF("%s", print_buffer);
+
+    // Sleep
+    for (int i = 0; i <= 4000000; i++) {
+      asm("nop");
+    };
+    // HAL_Delay(DELAY);
   }
-  /* USER CODE END 3 */
 }
+
 /**
  * @brief System Clock Configuration
  * @retval None
@@ -135,8 +151,14 @@ void SystemClock_Config(void) {
   RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
+  RCC_OscInitStruct.PLL.PLLN = 42;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
@@ -146,9 +168,9 @@ void SystemClock_Config(void) {
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3 | RCC_CLOCKTYPE_HCLK |
                                 RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 |
                                 RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV5;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV1;
 
@@ -169,8 +191,7 @@ void SystemClock_Config(void) {
 void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
-  int error_len =
-      snprintf(error, sizeof(error), "Error!  HAL Status: %d\n", rc);
+  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

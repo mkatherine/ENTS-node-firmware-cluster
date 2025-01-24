@@ -6,6 +6,7 @@
  */
 
 #include "dirtviz.hpp"
+
 #include <Arduino.h>
 
 #include <cstdio>

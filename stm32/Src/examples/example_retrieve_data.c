@@ -53,8 +53,8 @@ int main(void) {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;  // Set as push-pull output
-  GPIO_InitStruct.Pull = GPIO_NOPULL;          // No pull-up or pull-down
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;   // Set as push-pull output
+  GPIO_InitStruct.Pull = GPIO_NOPULL;           // No pull-up or pull-down
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;  // Low frequency for LED
 
   FramStatus status;

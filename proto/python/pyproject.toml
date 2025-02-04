@@ -23,6 +23,7 @@ dependencies = [
   'pyserial',
   'scikit-learn',
   'tqdm',
+  'PyQt5',
 ]
 
 [project.scripts]

@@ -37,6 +37,9 @@ extern "C" {
 #define LOGGING_INTERVAL_IN_SECONDS_MEMORY_ADDRESS 0x27
 #define UPLOAD_INTERVAL_IN_MINUTES_MEMORY_ADDRESS 0x29
 
+#define DUMP_FRAM_HEX 0
+#define DUMP_FRAM_DECIMAL 1
+
 typedef struct user_configurations {
   uint64_t cell_ID;
   uint64_t logger_ID;
@@ -111,6 +114,17 @@ unsigned int FramSegmentSize(void);
  * stored in non-volatile memory.
  */
 configuration ReadSettings(void);
+
+// 
+/**
+ * @brief This function reads the entirety of non-volatile memory and
+ * prints it. Only call FramDump() with input arg linesize=16.
+ * 
+ * @param linesize Number of columns to display
+ * @param displayformat DUMP_FRAM_HEX or DUMP_FRAM_DECIMAL
+ * @return see FramStatus
+ */
+FramStatus FramDump(uint32_t linesize, uint8_t displayformat);
 
 #ifdef __cplusplus
 }

@@ -82,7 +82,7 @@ FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes)
   FramStatus status;
 
   // write single byte length to buffer
-  status = FramWrite(write_addr, (uint8_t*)&num_bytes, 1);
+  status = FramWrite(write_addr, (uint8_t *)&num_bytes, 1);
   if (status != FRAM_OK)
   {
     return status;

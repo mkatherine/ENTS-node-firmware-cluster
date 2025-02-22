@@ -21,7 +21,8 @@
 #define LIB_FRAM_INCLUDE_FRAM_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <stdint.h>
@@ -40,94 +41,96 @@ extern "C" {
 #define DUMP_FRAM_HEX 0
 #define DUMP_FRAM_DECIMAL 1
 
-typedef struct user_configurations {
-  uint64_t cell_ID;
-  uint64_t logger_ID;
-  uint64_t gateway_EUI;
-  uint64_t application_EUI;
-  uint64_t end_device_EUI;
-  uint16_t logging_interval;
-  uint16_t upload_interval;
-} configuration;
+  typedef struct user_configurations
+  {
+    uint64_t cell_ID;
+    uint64_t logger_ID;
+    uint64_t gateway_EUI;
+    uint64_t application_EUI;
+    uint64_t end_device_EUI;
+    uint16_t logging_interval;
+    uint16_t upload_interval;
+  } configuration;
 
-/** Status codes for the Fram library*/
-typedef enum {
-  FRAM_OK = 0,
-  FRAM_ERROR = -1,
-  FRAM_OUT_OF_RANGE = -2,
-  FRAM_BUFFER_FULL = -3,
-  FRAM_BUFFER_EMPTY = -4,
-} FramStatus;
+  /** Status codes for the Fram library*/
+  typedef enum
+  {
+    FRAM_OK = 0,
+    FRAM_ERROR = -1,
+    FRAM_OUT_OF_RANGE = -2,
+    FRAM_BUFFER_FULL = -3,
+    FRAM_BUFFER_EMPTY = -4,
+  } FramStatus;
 
-/** Address size definition */
-typedef uint32_t FramAddr;
+  /** Address size definition */
+  typedef uint32_t FramAddr;
 
-/**
- * @brief Writes bytes to an address
- *
- * @param addr Address of write
- * @param data An array of data bytes.
- * @param len The number of bytes to be written.
- * @return See FramStatus
- */
-FramStatus FramWrite(FramAddr addr, const uint8_t *data, size_t len);
+  /**
+   * @brief Writes bytes to an address
+   *
+   * @param addr Address of write
+   * @param data An array of data bytes.
+   * @param len The number of bytes to be written.
+   * @return See FramStatus
+   */
+  FramStatus FramWrite(FramAddr addr, const uint8_t *data, size_t len);
 
-/**
- * @brief    This function reads a dynamic number of bytes to FRAM.
- *
- * @param addr Address of read
- * @param data Array to be read into
- * @param len Number of sequential bytes to read
- * @return See FramStatus
- */
-FramStatus FramRead(FramAddr addr, size_t len, uint8_t *data);
+  /**
+   * @brief    This function reads a dynamic number of bytes to FRAM.
+   *
+   * @param addr Address of read
+   * @param data Array to be read into
+   * @param len Number of sequential bytes to read
+   * @return See FramStatus
+   */
+  FramStatus FramRead(FramAddr addr, size_t len, uint8_t *data);
 
-/**
- * @brief Get the number of available bytes in FRAM
- *
- * @return Number of bytes
- */
-FramAddr FramSize(void);
+  /**
+   * @brief Get the number of available bytes in FRAM
+   *
+   * @return Number of bytes
+   */
+  FramAddr FramSize(void);
 
-/**
- * @brief Get number of pages
- *
- * A page is defined as a space of memory requiring the change of address.
- *
- * @return Number of pages
- */
-unsigned int FramPages(void);
+  /**
+   * @brief Get number of pages
+   *
+   * A page is defined as a space of memory requiring the change of address.
+   *
+   * @return Number of pages
+   */
+  unsigned int FramPages(void);
 
-/**
- * @brief Gets the size of a segment
- *
- * @return Number of bytes in each segment
- */
-unsigned int FramSegmentSize(void);
+  /**
+   * @brief Gets the size of a segment
+   *
+   * @return Number of bytes in each segment
+   */
+  unsigned int FramSegmentSize(void);
 
-/**
- * @brief This function reads the user configurable settings from
- * non-volatile memory.
- *
- * @return configuration, an instance of the typedef struct
- * user_configurations.  Containing all the user defined settings to be
- * stored in non-volatile memory.
- */
-configuration ReadSettings(void);
+  /**
+   * @brief This function reads the user configurable settings from
+   * non-volatile memory.
+   *
+   * @return configuration, an instance of the typedef struct
+   * user_configurations.  Containing all the user defined settings to be
+   * stored in non-volatile memory.
+   */
+  configuration ReadSettings(void);
 
-// 
-/**
- * @brief This function reads the entirety of non-volatile memory and
- * prints it. Only call FramDump() with input arg linesize=16.
- * 
- * @param linesize Number of columns to display
- * @param displayformat DUMP_FRAM_HEX or DUMP_FRAM_DECIMAL
- * @return see FramStatus
- */
-FramStatus FramDump(uint32_t linesize, uint8_t displayformat);
+  //
+  /**
+   * @brief This function reads the entirety of non-volatile memory and
+   * prints it. Only call FramDump() with input arg linesize=16.
+   *
+   * @param linesize Number of columns to display
+   * @param displayformat DUMP_FRAM_HEX or DUMP_FRAM_DECIMAL
+   * @return see FramStatus
+   */
+  FramStatus FramDump(uint32_t linesize, uint8_t displayformat);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // LIB_FRAM_INCLUDE_FRAM_H_
+#endif // LIB_FRAM_INCLUDE_FRAM_H_

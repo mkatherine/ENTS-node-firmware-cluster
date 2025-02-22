@@ -276,7 +276,8 @@ void test_FramBuffer_Wraparound(void)
   TEST_ASSERT_EQUAL(FRAM_OK, status);
 
   // test that the data was successfully retrieved across the wraparound
-  for (int i = 0; i < block_size; i++){
+  for (int i = 0; i < block_size; i++)
+  {
     TEST_ASSERT_EQUAL(buffer[i], junk_data[i]);
   }
 
@@ -368,7 +369,7 @@ int main(void)
   RUN_TEST(test_FramGet_Sequential);
   RUN_TEST(test_FramGet_Sequential_BufferFull);
   RUN_TEST(test_FramBuffer_Wraparound);
-  /* RUN_TEST(test_LoadSaveBufferState);*/
+  RUN_TEST(test_LoadSaveBufferState);
   UNITY_END();
   /* USER CODE END 3 */
 }

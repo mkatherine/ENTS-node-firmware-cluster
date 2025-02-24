@@ -26,7 +26,7 @@ extern "C"
 #endif
 
 #include <stdint.h>
-
+#include "sys_app.h"
 #include "stm32wlxx_hal.h"
 
 #define USER_DATA_PAGE_ADDRESS 0x07
@@ -38,8 +38,10 @@ extern "C"
 #define LOGGING_INTERVAL_IN_SECONDS_MEMORY_ADDRESS 0x27
 #define UPLOAD_INTERVAL_IN_MINUTES_MEMORY_ADDRESS 0x29
 
-#define DUMP_FRAM_HEX 0
-#define DUMP_FRAM_DECIMAL 1
+#define DUMP_FRAM_DISPLAY_HEX 0
+#define DUMP_FRAM_DISPLAY_DECIMAL 1
+#define DUMP_FRAM_OMIT_NONE 0
+#define DUMP_FRAM_OMIT_JUNK 1
 
   typedef struct user_configurations
   {
@@ -123,11 +125,15 @@ extern "C"
    * @brief This function reads the entirety of non-volatile memory and
    * prints it. Only call FramDump() with input arg linesize=16.
    *
-   * @param linesize Number of columns to display
-   * @param displayformat DUMP_FRAM_HEX or DUMP_FRAM_DECIMAL
+   * @param linesize Number of columns to display. Powers of 2 are recommended.
+   * @param displayformat DUMP_FRAM_DISPLAY_HEX or DUMP_FRAM_DISPLAY_DECIMAL
+   * @param omitjunk DUMP_FRAM_OMIT_NONE to print all memory in the specified range or DUMP_FRAM_OMIT_JUNK to omit lines that do not hold useful data
+   * @param printdelay_ms Delay between printing lines in milliseconds (ms). Recommended value 50 ms.
+   * @param startaddress Memory address to start the dump at (inclusive). The linesize aligned memory address will be used.
+   * @param endaddress Memory address to end the dump at (inclusive).
    * @return see FramStatus
    */
-  FramStatus FramDump(uint32_t linesize, uint8_t displayformat);
+  FramStatus FramDump(uint16_t linesize, uint8_t displayformat, uint8_t omitjunk, uint8_t printdelay_ms, uint16_t startaddress, uint16_t endaddress);
 
 #ifdef __cplusplus
 }

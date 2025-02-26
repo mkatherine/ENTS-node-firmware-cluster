@@ -28,7 +28,7 @@ phytos_measurments Phytos31GetMeasurment() {
   return measurments;
 }
 
-size_t Phytos31_measure(uint8_t *data) {
+size_t Phytos31_measure(uint8_t* data) {
   // get timestamp
   SysTime_t ts = SysTimeGet();
   phytos_measurments measurment;
@@ -40,8 +40,8 @@ size_t Phytos31_measure(uint8_t *data) {
   const UserConfiguration* cfg = UserConfigGet();
 
   // encode measurement
-  size_t data_len = EncodePhytos31Measurement(ts.Seconds, cfg->logger_id, cfg->cell_id,
-                                              adc_voltage_float, 0.0, data);
+  size_t data_len = EncodePhytos31Measurement(
+      ts.Seconds, cfg->logger_id, cfg->cell_id, adc_voltage_float, 0.0, data);
 
   // return number of bytes in serialized measurement
   return data_len;

@@ -250,61 +250,61 @@ UserConfigStatus UserConfigLoad(void) {
 const UserConfiguration *UserConfigGet(void) { return &loadedConfig; }
 
 void UserConfigPrint(void) {
-    const UserConfiguration* config = UserConfigGet();
+  const UserConfiguration *config = UserConfigGet();
 
-    // Print each member of the UserConfiguration
-    APP_PRINTF("Logger ID: %u\r\n", config->logger_id);
-    APP_PRINTF("Cell ID: %u\r\n", config->cell_id);
+  // Print each member of the UserConfiguration
+  APP_PRINTF("Logger ID: %u\r\n", config->logger_id);
+  APP_PRINTF("Cell ID: %u\r\n", config->cell_id);
 
-    if (config->Upload_method == 0) {
-      APP_PRINTF("Upload Method: %u \"LoRa\"\r\n", config->Upload_method);
-    } else {
-      APP_PRINTF("Upload Method: %u \"WiFi\"\r\n", config->Upload_method);
+  if (config->Upload_method == 0) {
+    APP_PRINTF("Upload Method: %u \"LoRa\"\r\n", config->Upload_method);
+  } else {
+    APP_PRINTF("Upload Method: %u \"WiFi\"\r\n", config->Upload_method);
+  }
+
+  APP_PRINTF("Upload Interval: %u\r\n", config->Upload_interval);
+
+  for (int i = 0; i < config->enabled_sensors_count; i++) {
+    const char *sensor_name;
+    switch (config->enabled_sensors[i]) {
+      case 0:
+        sensor_name = "Voltage";
+        break;
+      case 1:
+        sensor_name = "Current";
+        break;
+      case 2:
+        sensor_name = "Teros12";
+        break;
+      case 3:
+        sensor_name = "Teros21";
+        break;
+      case 4:
+        sensor_name = "BME280";
+        break;
     }
+    APP_PRINTF("Enabled Sensor %d: %s\r\n", i + 1, sensor_name);
+  }
 
-    APP_PRINTF("Upload Interval: %u\r\n", config->Upload_interval);
+  char float_str[100];
 
-    for (int i = 0; i < config->enabled_sensors_count; i++) {
-      const char *sensor_name;
-      switch (config->enabled_sensors[i]) {
-        case 0:
-          sensor_name = "Voltage";
-          break;
-        case 1:
-          sensor_name = "Current";
-          break;
-        case 2:
-          sensor_name = "Teros12";
-          break;
-        case 3:
-          sensor_name = "Teros21";
-          break;
-        case 4:
-          sensor_name = "BME280";
-          break;
-      }
-      APP_PRINTF("Enabled Sensor %d: %s\r\n", i + 1, sensor_name);
-    }
+  snprintf(float_str, sizeof(float_str), "%e", config->Voltage_Slope);
+  APP_PRINTF("Calibration V Slope: %s\r\n", float_str);
 
-    char float_str[100];
+  snprintf(float_str, sizeof(float_str), "%e", config->Voltage_Offset);
+  APP_PRINTF("Calibration V Offset: %s\r\n", float_str);
 
-    snprintf(float_str, sizeof(float_str), "%e", config->Voltage_Slope);
-    APP_PRINTF("Calibration V Slope: %s\r\n", float_str);
+  snprintf(float_str, sizeof(float_str), "%e", config->Current_Slope);
+  APP_PRINTF("Calibration I Slope: %s\r\n", float_str);
 
-    snprintf(float_str, sizeof(float_str), "%e", config->Voltage_Offset);
-    APP_PRINTF("Calibration V Offset: %s\r\n", float_str);
+  snprintf(float_str, sizeof(float_str), "%e", config->Current_Offset);
+  APP_PRINTF("Calibration I Offset: %s\r\n", float_str);
 
-    snprintf(float_str, sizeof(float_str), "%e", config->Current_Slope);
-    APP_PRINTF("Calibration I Slope: %s\r\n", float_str);
+  APP_PRINTF("WiFi SSID: %s\r\n", config->WiFi_SSID);
 
-    snprintf(float_str, sizeof(float_str), "%e", config->Current_Offset);
-    APP_PRINTF("Calibration I Offset: %s\r\n", float_str);
+  APP_PRINTF("WiFi Password: %s\r\n", config->WiFi_Password);
 
-    APP_PRINTF("WiFi SSID: %s\r\n", config->WiFi_SSID);
+  APP_PRINTF("API Endpoint URL: %s\r\n", config->API_Endpoint_URL);
 
-    APP_PRINTF("WiFi Password: %s\r\n", config->WiFi_Password);
-
-    APP_PRINTF("API Endpoint URL: %s\r\n", config->API_Endpoint_URL);
-
-    APP_PRINTF("API Port: %u\r\n", config->API_Endpoint_Port);
+  APP_PRINTF("API Port: %u\r\n", config->API_Endpoint_Port);
 }

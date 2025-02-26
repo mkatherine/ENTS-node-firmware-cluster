@@ -1,81 +1,23 @@
-/* USER CODE BEGIN Header */
-/**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2023 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "adc.h"
 #include "app_lorawan.h"
 #include "dma.h"
 #include "gpio.h"
 #include "i2c.h"
-#include "usart.h"
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "sdi12.h"
 #include "sys_app.h"
 #include "teros21.h"
+#include "usart.h"
 
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
-/* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 /**
  * @brief  The application entry point.
  * @retval int
  */
 int main(void) {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick.
    */
   HAL_Init();
@@ -122,7 +64,7 @@ int main(void) {
     // Sleep
     for (int i = 0; i <= 4000000; i++) {
       asm("nop");
-    };
+    }
     // HAL_Delay(DELAY);
   }
 }
@@ -191,7 +133,8 @@ void SystemClock_Config(void) {
 void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
-  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  int error_len =
+      snprintf(error, sizeof(error), "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

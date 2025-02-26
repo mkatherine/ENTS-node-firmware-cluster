@@ -20,10 +20,10 @@
 // #define CALIBRATION
 
 // default sane calibration
-static double voltage_calibration_m = 0.0; 
-static double voltage_calibration_b = 0.0; 
-static double current_calibration_m = 0.0; 
-static double current_calibration_b = 0.0; 
+static double voltage_calibration_m = 0.0;
+static double voltage_calibration_b = 0.0;
+static double current_calibration_m = 0.0;
+static double current_calibration_b = 0.0;
 
 /**
  * @brief GPIO port for adc data ready line
@@ -256,9 +256,8 @@ size_t ADC_measure(uint8_t* data) {
   const UserConfiguration* cfg = UserConfigGet();
 
   // encode measurement
-  size_t data_len = EncodePowerMeasurement(ts.Seconds, cfg->logger_id,
-                                           cfg->cell_id, adc_voltage,
-                                           adc_current, data);
+  size_t data_len = EncodePowerMeasurement(
+      ts.Seconds, cfg->logger_id, cfg->cell_id, adc_voltage, adc_current, data);
 
   // return number of bytes in serialized measurement
   return data_len;

@@ -129,20 +129,13 @@ int main(void)
 
   UserConfigPrint();
 
-  MX_LoRaWAN_Init();
-
   // required for SDI-12
-  MX_USART2_UART_Init();
-  MX_TIM1_Init();
+  //MX_USART2_UART_Init();
+  //MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-  // initialize the app
-  SystemApp_Init();
-  
   // init external adc
-  ADC_init();
   //MX_RTC_Init();
-  SensorsInit();
 
   // initialize the user config interrupt
   UserConfig_InitAdvanceTrace();
@@ -165,24 +158,30 @@ int main(void)
   //BME280Init();
   //SensorsAdd(BME280Measure); 
 
-
   // initialize WiFi
   ControllerInit();
 
-  // init either WiFi or LoRaWAN
-  // TODO add configuration for upload method
-  //MX_LoRaWAN_Init();
-  WiFiInit();
-
-
   // get the current user config
   const UserConfiguration* cfg = UserConfigGet();
- 
+  
+  // init either WiFi or LoRaWAN
+  if (cfg->Upload_method == Uploadmethod_LoRa) {
+    MX_LoRaWAN_Init();
+  } else if (cfg->Upload_method == Uploadmethod_WiFi) {
+    WiFiInit();
+  } else {
+    APP_LOG(TS_ON, VLEVEL_M, "Invalid upload method!\n");
+    while (1);
+  } 
+
+  // init senors interface
+  SensorsInit();
 
   // configure enabled sensors
   for (int i=0; i < cfg->enabled_sensors_count; i++) {
     EnabledSensor sensor = cfg->enabled_sensors[i];
     if ((sensor == EnabledSensor_Voltage) || (sensor == EnabledSensor_Current)) {
+      ADC_init();
       SensorsAdd(ADC_measure);
       APP_LOG(TS_ON, VLEVEL_M, "ADS Enabled!\n");
     }
@@ -199,6 +198,7 @@ int main(void)
       SensorsAdd(Teros21Measure);
       APP_LOG(TS_ON, VLEVEL_M, "Teros21 Enabled!\n");
     }
+    // TODO add support for dummy sensor
   }
   
   /* USER CODE END 2 */

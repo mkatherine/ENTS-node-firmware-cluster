@@ -164,16 +164,6 @@ int main(void)
   // get the current user config
   const UserConfiguration* cfg = UserConfigGet();
   
-  // init either WiFi or LoRaWAN
-  if (cfg->Upload_method == Uploadmethod_LoRa) {
-    MX_LoRaWAN_Init();
-  } else if (cfg->Upload_method == Uploadmethod_WiFi) {
-    WiFiInit();
-  } else {
-    APP_LOG(TS_ON, VLEVEL_M, "Invalid upload method!\n");
-    while (1);
-  } 
-
   // init senors interface
   SensorsInit();
 
@@ -200,6 +190,16 @@ int main(void)
     }
     // TODO add support for dummy sensor
   }
+  
+  // init either WiFi or LoRaWAN
+  if (cfg->Upload_method == Uploadmethod_LoRa) {
+    MX_LoRaWAN_Init();
+  } else if (cfg->Upload_method == Uploadmethod_WiFi) {
+    WiFiInit();
+  } else {
+    APP_LOG(TS_ON, VLEVEL_M, "Invalid upload method!\n");
+    while (1);
+  } 
   
   /* USER CODE END 2 */
 

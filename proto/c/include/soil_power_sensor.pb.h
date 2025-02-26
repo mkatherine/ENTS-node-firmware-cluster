@@ -487,11 +487,8 @@ extern const pb_msgdesc_t UserConfiguration_msg;
 #define Response_size                            2
 #define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          Esp32Command_size
 #define Teros12Measurement_size                  33
-<<<<<<< HEAD
-#define TestCommand_size                         13
-=======
 #define Teros21Measurement_size                  18
->>>>>>> main
+#define TestCommand_size                         13
 #define UserConfiguration_size                   238
 #define WiFiCommand_size                         604
 

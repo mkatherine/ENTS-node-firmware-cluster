@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 #include "rtc.h"
+#include "sys_app.h"
 #include "userConfig.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -90,17 +91,22 @@ int main(void) {
   /*Initialize timer and RTC*/
   /*Have to be initilized in example files because LoRaWan cannot be initialized
    * like in main*/
-  __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-  UTIL_TIMER_Init();
+  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
+  // UTIL_TIMER_Init();
+  SystemApp_Init();
   /* USER CODE BEGIN 2 */
-  UserConfig_InterruptInit();  // Initialize UART for interrupt mode
+  // UserConfig_InterruptInit();  // Initialize UART for interrupt mode
   /* USER CODE END 2 */
-
+  // uint8_t length_buf;
+  // UserConfig_ProcessDataPolling();
+  UserConfig_InitAdvanceTrace();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
     /* USER CODE END WHILE */
-    // UserConfig_ProcessDataPolling();
+    // if (HAL_UART_Receive(&huart1, length_buf, 1, HAL_MAX_DELAY) == HAL_OK) {
+    //     UserConfig_SendCurrentUserConfig();
+    // }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

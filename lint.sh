@@ -1,6 +1,7 @@
 #!/bin/sh
 
-python -m cpplint --recursive \
+# lint c code
+python -m cpplint --recursive --quiet \
   stm32/Src/examples \
   stm32/lib \
   stm32/test \
@@ -10,3 +11,6 @@ python -m cpplint --recursive \
   esp32/lib \
   proto/c/include/transcoder.h \
   proto/c/src/transcoder.c
+
+# lint python code
+ruff check proto/python

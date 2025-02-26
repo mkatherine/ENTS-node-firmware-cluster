@@ -44,12 +44,28 @@ message Teros12Measurement {
   uint32 ec = 5;
 }
 
+message Teros21Measurement {
+  // Matric potential of soil in kPa
+  double matric_pot = 1;
+  // temperature in celcius
+  double temp = 2;
+}
+
 /* Phytos measurement */
 message Phytos31Measurement {
   // raw adc voltage
   double voltage = 1;
   // calibrated leaf wetness
   double leaf_wetness = 2;
+}
+
+message BME280Measurement {
+  // pressure
+  uint32 pressure = 1;
+  // temperature
+  int32 temperature = 2;
+  // humidity
+  uint32 humidity = 3;
 }
 
 /* Top level measurement message */
@@ -62,6 +78,8 @@ message Measurement {
     PowerMeasurement power = 2;
     Teros12Measurement teros12 = 3;
     Phytos31Measurement phytos31 = 4;
+    BME280Measurement bme280 = 5;
+    Teros21Measurement teros21 = 6;
   }
 }
 

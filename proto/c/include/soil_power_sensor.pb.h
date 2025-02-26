@@ -63,6 +63,13 @@ typedef struct _Teros12Measurement {
     uint32_t ec;
 } Teros12Measurement;
 
+typedef struct _Teros21Measurement {
+    /* Matric potential of soil in kPa */
+    double matric_pot;
+    /* temperature in celcius */
+    double temp;
+} Teros21Measurement;
+
 /* Phytos measurement */
 typedef struct _Phytos31Measurement {
     /* raw adc voltage */
@@ -70,6 +77,15 @@ typedef struct _Phytos31Measurement {
     /* calibrated leaf wetness */
     double leaf_wetness;
 } Phytos31Measurement;
+
+typedef struct _BME280Measurement {
+    /* pressure */
+    uint32_t pressure;
+    /* temperature */
+    int32_t temperature;
+    /* humidity */
+    uint32_t humidity;
+} BME280Measurement;
 
 /* Top level measurement message */
 typedef struct _Measurement {
@@ -81,6 +97,8 @@ typedef struct _Measurement {
         PowerMeasurement power;
         Teros12Measurement teros12;
         Phytos31Measurement phytos31;
+        BME280Measurement bme280;
+        Teros21Measurement teros21;
     } measurement;
 } Measurement;
 
@@ -133,6 +151,8 @@ extern "C" {
 
 
 
+
+
 #define Response_resp_ENUMTYPE Response_ResponseType
 
 #define UserConfiguration_Upload_method_ENUMTYPE Uploadmethod
@@ -143,14 +163,18 @@ extern "C" {
 #define MeasurementMetadata_init_default         {0, 0, 0}
 #define PowerMeasurement_init_default            {0, 0}
 #define Teros12Measurement_init_default          {0, 0, 0, 0}
+#define Teros21Measurement_init_default          {0, 0}
 #define Phytos31Measurement_init_default         {0, 0}
+#define BME280Measurement_init_default           {0, 0, 0}
 #define Measurement_init_default                 {false, MeasurementMetadata_init_default, 0, {PowerMeasurement_init_default}}
 #define Response_init_default                    {_Response_ResponseType_MIN}
 #define UserConfiguration_init_default           {0, 0, _Uploadmethod_MIN, 0, 0, {_EnabledSensor_MIN, _EnabledSensor_MIN, _EnabledSensor_MIN, _EnabledSensor_MIN, _EnabledSensor_MIN}, 0, 0, 0, 0, "", "", "", 0}
 #define MeasurementMetadata_init_zero            {0, 0, 0}
 #define PowerMeasurement_init_zero               {0, 0}
 #define Teros12Measurement_init_zero             {0, 0, 0, 0}
+#define Teros21Measurement_init_zero             {0, 0}
 #define Phytos31Measurement_init_zero            {0, 0}
+#define BME280Measurement_init_zero              {0, 0, 0}
 #define Measurement_init_zero                    {false, MeasurementMetadata_init_zero, 0, {PowerMeasurement_init_zero}}
 #define Response_init_zero                       {_Response_ResponseType_MIN}
 #define UserConfiguration_init_zero              {0, 0, _Uploadmethod_MIN, 0, 0, {_EnabledSensor_MIN, _EnabledSensor_MIN, _EnabledSensor_MIN, _EnabledSensor_MIN, _EnabledSensor_MIN}, 0, 0, 0, 0, "", "", "", 0}
@@ -165,12 +189,19 @@ extern "C" {
 #define Teros12Measurement_vwc_adj_tag           3
 #define Teros12Measurement_temp_tag              4
 #define Teros12Measurement_ec_tag                5
+#define Teros21Measurement_matric_pot_tag        1
+#define Teros21Measurement_temp_tag              2
 #define Phytos31Measurement_voltage_tag          1
 #define Phytos31Measurement_leaf_wetness_tag     2
+#define BME280Measurement_pressure_tag           1
+#define BME280Measurement_temperature_tag        2
+#define BME280Measurement_humidity_tag           3
 #define Measurement_meta_tag                     1
 #define Measurement_power_tag                    2
 #define Measurement_teros12_tag                  3
 #define Measurement_phytos31_tag                 4
+#define Measurement_bme280_tag                   5
+#define Measurement_teros21_tag                  6
 #define Response_resp_tag                        1
 #define UserConfiguration_logger_id_tag          1
 #define UserConfiguration_cell_id_tag            2
@@ -208,23 +239,40 @@ X(a, STATIC,   SINGULAR, UINT32,   ec,                5)
 #define Teros12Measurement_CALLBACK NULL
 #define Teros12Measurement_DEFAULT NULL
 
+#define Teros21Measurement_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, DOUBLE,   matric_pot,        1) \
+X(a, STATIC,   SINGULAR, DOUBLE,   temp,              2)
+#define Teros21Measurement_CALLBACK NULL
+#define Teros21Measurement_DEFAULT NULL
+
 #define Phytos31Measurement_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, DOUBLE,   voltage,           1) \
 X(a, STATIC,   SINGULAR, DOUBLE,   leaf_wetness,      2)
 #define Phytos31Measurement_CALLBACK NULL
 #define Phytos31Measurement_DEFAULT NULL
 
+#define BME280Measurement_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   pressure,          1) \
+X(a, STATIC,   SINGULAR, INT32,    temperature,       2) \
+X(a, STATIC,   SINGULAR, UINT32,   humidity,          3)
+#define BME280Measurement_CALLBACK NULL
+#define BME280Measurement_DEFAULT NULL
+
 #define Measurement_FIELDLIST(X, a) \
 X(a, STATIC,   OPTIONAL, MESSAGE,  meta,              1) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,power,measurement.power),   2) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,teros12,measurement.teros12),   3) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,phytos31,measurement.phytos31),   4)
+X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,phytos31,measurement.phytos31),   4) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,bme280,measurement.bme280),   5) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (measurement,teros21,measurement.teros21),   6)
 #define Measurement_CALLBACK NULL
 #define Measurement_DEFAULT NULL
 #define Measurement_meta_MSGTYPE MeasurementMetadata
 #define Measurement_measurement_power_MSGTYPE PowerMeasurement
 #define Measurement_measurement_teros12_MSGTYPE Teros12Measurement
 #define Measurement_measurement_phytos31_MSGTYPE Phytos31Measurement
+#define Measurement_measurement_bme280_MSGTYPE BME280Measurement
+#define Measurement_measurement_teros21_MSGTYPE Teros21Measurement
 
 #define Response_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UENUM,    resp,              1)
@@ -251,7 +299,9 @@ X(a, STATIC,   SINGULAR, UINT32,   API_Endpoint_Port,  13)
 extern const pb_msgdesc_t MeasurementMetadata_msg;
 extern const pb_msgdesc_t PowerMeasurement_msg;
 extern const pb_msgdesc_t Teros12Measurement_msg;
+extern const pb_msgdesc_t Teros21Measurement_msg;
 extern const pb_msgdesc_t Phytos31Measurement_msg;
+extern const pb_msgdesc_t BME280Measurement_msg;
 extern const pb_msgdesc_t Measurement_msg;
 extern const pb_msgdesc_t Response_msg;
 extern const pb_msgdesc_t UserConfiguration_msg;
@@ -260,12 +310,15 @@ extern const pb_msgdesc_t UserConfiguration_msg;
 #define MeasurementMetadata_fields &MeasurementMetadata_msg
 #define PowerMeasurement_fields &PowerMeasurement_msg
 #define Teros12Measurement_fields &Teros12Measurement_msg
+#define Teros21Measurement_fields &Teros21Measurement_msg
 #define Phytos31Measurement_fields &Phytos31Measurement_msg
+#define BME280Measurement_fields &BME280Measurement_msg
 #define Measurement_fields &Measurement_msg
 #define Response_fields &Response_msg
 #define UserConfiguration_fields &UserConfiguration_msg
 
 /* Maximum encoded size of messages (where known) */
+#define BME280Measurement_size                   23
 #define MeasurementMetadata_size                 18
 #define Measurement_size                         55
 #define Phytos31Measurement_size                 18
@@ -273,6 +326,7 @@ extern const pb_msgdesc_t UserConfiguration_msg;
 #define Response_size                            2
 #define SOIL_POWER_SENSOR_PB_H_MAX_SIZE          UserConfiguration_size
 #define Teros12Measurement_size                  33
+#define Teros21Measurement_size                  18
 #define UserConfiguration_size                   238
 
 #ifdef __cplusplus

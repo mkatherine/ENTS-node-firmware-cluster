@@ -15,7 +15,13 @@ PB_BIND(PowerMeasurement, PowerMeasurement, AUTO)
 PB_BIND(Teros12Measurement, Teros12Measurement, AUTO)
 
 
+PB_BIND(Teros21Measurement, Teros21Measurement, AUTO)
+
+
 PB_BIND(Phytos31Measurement, Phytos31Measurement, AUTO)
+
+
+PB_BIND(BME280Measurement, BME280Measurement, AUTO)
 
 
 PB_BIND(Measurement, Measurement, AUTO)

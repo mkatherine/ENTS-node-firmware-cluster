@@ -31,6 +31,8 @@
 
 #include "sensors.h"
 
+#include "userConfig.h"
+
 /** Array for holding function callbacks */
 static SensorsPrototypeMeasure callback_arr[MAX_SENSORS];
 
@@ -42,7 +44,7 @@ static const uint8_t kBufferSize = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
 /** Periodic timer for querying sensors */
 static UTIL_TIMER_Object_t MeasureTimer;
 
-static const uint32_t measure_period = MEASUREMENT_PERIOD;
+static uint32_t measure_period = MEASUREMENT_PERIOD;
 
 /**
  * @brief Measures sensors and adds to tx buffer
@@ -60,6 +62,11 @@ void SensorsMeasure(void);
 void SensorsRun(void);
 
 void SensorsInit(void) {
+  // set upload interval
+  const UserConfiguration* cfg = UserConfigGet();
+  // convert to ms
+  measure_period = cfg->Upload_interval * 1000;
+
   // registers the task
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_Measurement), UTIL_SEQ_RFU,
                    SensorsMeasure);

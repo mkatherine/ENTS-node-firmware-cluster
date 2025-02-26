@@ -96,6 +96,39 @@ void TestEncodePhytos31(void) {
   TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
 }
 
+void TestEncodeBME280(void) {
+  uint8_t buffer[256];
+  size_t buffer_len;
+
+  buffer_len =
+      EncodeBME280Measurement(1436079600, 7, 4, 98473, 2275, 43600, buffer);
+
+  uint8_t data[] = {0xa,  0xa,  0x8,  0x4,  0x10, 0x7,  0x18, 0xf0, 0xab,
+                    0xe3, 0xac, 0x5,  0x2a, 0xb,  0x8,  0xa9, 0x81, 0x6,
+                    0x10, 0xe3, 0x11, 0x18, 0xd0, 0xd4, 0x2};
+  size_t data_len = 25;
+
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(data, buffer, buffer_len);
+  TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
+}
+
+void TestEncodeTeros21(void) {
+  uint8_t buffer[256];
+  size_t buffer_len;
+
+  buffer_len =
+      EncodeTeros21Measurement(1737671549, 51, 12, 134.5, 22.4, buffer);
+
+  uint8_t data[] = {0xa,  0xa,  0x8,  0xc,  0x10, 0x33, 0x18, 0xfd,
+                    0x86, 0xcb, 0xbc, 0x6,  0x32, 0x12, 0x9,  0x0,
+                    0x0,  0x0,  0x0,  0x0,  0xd0, 0x60, 0x40, 0x11,
+                    0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x36, 0x40};
+  size_t data_len = 32;
+
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(data, buffer, buffer_len);
+  TEST_ASSERT_EQUAL_INT(data_len, buffer_len);
+}
+
 void TestDecodeResponseSuccess(void) {
   uint8_t data[] = {};
   size_t data_len = 0;
@@ -141,6 +174,8 @@ int main(void) {
   RUN_TEST(TestEncodePower);
   RUN_TEST(TestEncodeTeros12);
   RUN_TEST(TestEncodePhytos31);
+  RUN_TEST(TestEncodeBME280);
+  RUN_TEST(TestEncodeTeros21);
   RUN_TEST(TestDecodeResponseSuccess);
   RUN_TEST(TestDecodeResponseError);
 

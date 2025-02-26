@@ -41,6 +41,16 @@ The following is the list of the software used for developing the firmware. The 
 | [protobuf](https://protobuf.dev/) | `25.2` | No |
 | Make | `4.4.1` | No |
 
+## First Time Setup
+
+The following is a list of steps that should be complated on a newly assembled board to flash this repos firmware for the first time. Assembly instructions are located in the top level README of [ENTS-node-hardware](https://github.com/jlab-sensing/ENTS-node-hardware).
+
+[ ] Clear the bootloader the stm32. (See [stm32/README.md](stm32/README.md) for instructions)
+[ ] Run unit tests on the stm32. (See [stm32/README.md](stm32/README.md) for instructions)
+[ ] Flash `stm32` environment firmware to the stm32. (See [stm32/README.md](stm32/README.md) for instructions)
+[ ] Flash the `release` firmware to the esp32. (See [esp32/README.md](esp32/README.md) for instructions)
+[ ] Calibrate the analog measurement channels. (See TBD for instructions)
+
 ## Getting Started: Flashing firmware to microcontrollers
 
 The Wio-E5 (stm32 based) and the esp32 have different methods of flashing but both use the [PlatformIO](pio) system. The VSCode extension is the most intuitive to use with setup instructions available [here](https://platformio.org/install/ide?install=vscode) and quick start guide available [here](https://docs.platformio.org/en/latest/integration/ide/vscode.html#quick-start). There is also a CLI interface that is similar to the `Make` build system with installation instructions varying depending on you OS. The [quick start guide](https://docs.platformio.org/en/latest/core/quickstart.html#process-project) is a good reference for common commands.

@@ -3,7 +3,6 @@
 #include "sys_app.h"
 #include "stm32_systime.h"
 #include "bme280_common.h"
-#include "user_config.h"
 #include "transcoder.h"
 
 /**
@@ -139,8 +138,10 @@ size_t BME280Measure(uint8_t *data) {
     return -1;
   }
 
+  const UserConfiguration* cfg = UserConfigGet();
+
   // encode measurement
-  size_t data_len = EncodeBME280Measurement(ts.Seconds, LOGGER_ID, CELL_ID,
+  size_t data_len = EncodeBME280Measurement(ts.Seconds, cfg->logger_id, cfg->cell_id,
                                             sens_data.pressure,
                                             sens_data.temperature,
                                             sens_data.humidity, data);

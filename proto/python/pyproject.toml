@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "soil-power-sensor-protobuf"
-version = "2.2.2"
+version = "2.3.0"
 authors = [
   { name="John Madden", email="jmadden173@pm.me" },
 ]
@@ -23,10 +23,14 @@ dependencies = [
   'pyserial',
   'scikit-learn',
   'tqdm',
+  'PyQt5',
 ]
 
 [project.scripts]
 ents = "soil_power_sensor_protobuf.cli:entry"
+
+[project.gui-scripts]
+gui = "soil_power_sensor_protobuf.config.user_config:main"
 
 [project.urls]
 Homepage = "https://github.com/jlab-sensing/soil-power-sensor-firmware"

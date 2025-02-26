@@ -8,22 +8,38 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
-## [Unreleased]
+## [Unreleased] - TBD
+
+- WiFi upload method [#46](i46)
+
+[i46]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/46
+
+## [2.3.0] - 2025-02-26
+
+Code used for March of the ENTS experiment. Release includes support for the
+bme280, larger fram chip, teros21, and integration with a desktop GUI for
+device configuration. The experiment revelated multiple bugs that will be fixed
+in future releases including the following:
+
+- Circular buffer overwriting user config [#174](https://github.com/jlab-sensing/ENTS-node-firmware/issues/174)
+- Support for Teros12 functionality (got lost in merges) [#172](https://github.com/jlab-sensing/ENTS-node-firmware/issues/172)
 
 ### Added
 
 - Support for bme280 sensor [#87](i87), [#99](i99)
 - Support for MB85RC1MT fram chip [#136](i136)
-- WiFi upload method [#46](i46)
+- Support for Teros21 sensor [#75](i75)
+- Integrated GUI with sensor/measurement configuration [#170](i170)
 
 ### Changed
 
 - Measurement mode of bme280 to forced [#99](i99)
 
-[i46]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/46
+[i75]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/75
 [i87]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/87
 [i99]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/99
 [i136]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/136
+[i170]: https://github.com/jlab-sensing/ENTS-node-firmware/pull/170
 
 ## [2.2.0] - 2024-12-13
 

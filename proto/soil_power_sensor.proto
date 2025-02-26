@@ -44,6 +44,13 @@ message Teros12Measurement {
   uint32 ec = 5;
 }
 
+message Teros21Measurement {
+  // Matric potential of soil in kPa
+  double matric_pot = 1;
+  // temperature in celcius
+  double temp = 2;
+}
+
 /* Phytos measurement */
 message Phytos31Measurement {
   // raw adc voltage
@@ -72,6 +79,7 @@ message Measurement {
     Teros12Measurement teros12 = 3;
     Phytos31Measurement phytos31 = 4;
     BME280Measurement bme280 = 5;
+    Teros21Measurement teros21 = 6;
   }
 }
 

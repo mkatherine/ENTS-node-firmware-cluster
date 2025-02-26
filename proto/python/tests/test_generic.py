@@ -157,6 +157,27 @@ class TestDecode(unittest.TestCase):
         self.assertAlmostEqual(43.600, meas_dict["data"]["humidity"])
         self.assertEqual(float, meas_dict["data_type"]["humidity"])
 
+    def test_teros21(self):
+        meas = Measurement()
+        meas.meta.CopyFrom(self.meta)
+
+        meas.teros21.matric_pot = 101.23
+        meas.teros21.temp = 22.50
+
+        # serialize
+        meas_str = meas.SerializeToString()
+
+        # decode
+        meas_dict = decode_measurement(data=meas_str)
+
+        # check dict
+        self.assertEqual("teros21", meas_dict["type"])
+        self.check_meta(meas_dict)
+        self.assertAlmostEqual(101.23, meas_dict["data"]["matricPot"])
+        self.assertEqual(float, meas_dict["data_type"]["matricPot"])
+        self.assertAlmostEqual(22.50, meas_dict["data"]["temp"])
+        self.assertEqual(float, meas_dict["data_type"]["temp"])
+
     def test_missing_meta(self):
         """Test that error is raised when meta is not set"""
 

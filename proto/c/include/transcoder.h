@@ -183,35 +183,13 @@ size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
 /**
  * @brief Encodes a WiFiCommand
  * 
- * If a field is not used, set to its default value to save space.
- * 
- * @param type Command type
- * @param ssid WiFi SSID
- * @param passwd WiFi Password
- * @param url API endpoint url (limited to 256 characters)
- * @param port API endpoint port
- * @param rc Return code
- * @param ts Timestamp
- * @param resp Serialized response
- * @param resp_len Length of @p resp
+ * @param wifi_cmd Command containing the data
  * @param buffer Buffer to store serialized measurement
  * @param size Size of buffer
  * 
  * @return Number of bytes in @p buffer
  */
-size_t EncodeWiFiCommand(
-  WiFiCommand_Type type,
-  const char* ssid,
-  const char* passwd,
-  const char* url,
-  uint32_t port,
-  uint32_t rc,
-  uint32_t ts,
-  const uint8_t* resp,
-  size_t resp_len,
-  uint8_t* buffer,
-  size_t size
-);
+size_t EncodeWiFiCommand(const WiFiCommand *wifi_cmd, uint8_t *buffer, size_t size);
 
 /**
  * @brief Encodes user configuration data.

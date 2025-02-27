@@ -16,9 +16,15 @@ uint32_t ControllerWiFiInit(
   Buffer* tx = ControllerTx();
   Buffer* rx = ControllerRx();
 
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_CONNECT;
+  strncpy(wifi_cmd.ssid, ssid, sizeof(wifi_cmd.ssid));
+  strncpy(wifi_cmd.passwd, passwd, sizeof(wifi_cmd.passwd));
+  strncpy(wifi_cmd.url, url, sizeof(wifi_cmd.url));
+  wifi_cmd.port = port;
+
   // encode command
-  tx->len = EncodeWiFiCommand(WiFiCommand_Type_CONNECT, ssid, passwd, url, port,
-                             0, 0, NULL, 0, tx->data, tx->size);
+  tx->len = EncodeWiFiCommand(&wifi_cmd, tx->data, tx->size);
 
   // send transaction
   ControllerStatus status = CONTROLLER_SUCCESS;
@@ -53,9 +59,13 @@ int ControllerWiFiPost(
   Buffer* tx = ControllerTx();
   Buffer* rx = ControllerRx();
 
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_POST;
+  memcpy(wifi_cmd.resp.bytes, data, data_len);
+  wifi_cmd.resp.size = data_len;
+
   // encode command
-  tx->len = EncodeWiFiCommand(WiFiCommand_Type_POST, NULL, NULL, NULL, 0, 0, 0,
-                             data, data_len, tx->data, tx->size);
+  tx->len = EncodeWiFiCommand(&wifi_cmd, tx->data, tx->size);
 
   // return if communication fails
   ControllerStatus status = CONTROLLER_SUCCESS;

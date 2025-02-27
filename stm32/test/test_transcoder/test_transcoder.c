@@ -156,19 +156,21 @@ void TestEncodeWiFi() {
   uint8_t buffer[WiFiCommand_size];
   size_t buffer_len;
 
-  buffer_len = EncodeWiFiCommand(
-      WiFiCommand_Type_CONNECT,
-      "Hello",
-      "World",
-      "http://www.test.com/",
-      443,
-      200,
-      1600000,
-      NULL,
-      0,
-      buffer,
-      sizeof(buffer)
-    );
+  char hello[] = "Hello";
+  char world[] = "World";
+  char url[] = "http://www.test.com/";
+
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_CONNECT;
+  strncpy(wifi_cmd.ssid, hello, sizeof(wifi_cmd.ssid));
+  strncpy(wifi_cmd.passwd, world, sizeof(wifi_cmd.passwd));
+  strncpy(wifi_cmd.url, url, sizeof(wifi_cmd.url));
+  wifi_cmd.port = 443;
+  wifi_cmd.rc = 200;
+  wifi_cmd.ts = 1600000;
+  // WiFiCommand.resp is left NULL
+
+  buffer_len = EncodeWiFiCommand(&wifi_cmd, buffer, sizeof(buffer));
 
   uint8_t data[] = {0x1a, 0x2e, 0x12, 0x5, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x1a,
     0x5, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x22, 0x14, 0x68, 0x74, 0x74, 0x70,

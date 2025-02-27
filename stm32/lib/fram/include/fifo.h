@@ -25,8 +25,7 @@
 #define LIB_FRAM_INCLUDE_FIFO_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stdio.h>
@@ -48,77 +47,77 @@ extern "C"
 #error "Buffer end address must be greater than buffer start address"
 #endif
 
-    /** Amount of bytes that can be stored in the buffer*/
-    static const uint16_t kFramBufferSize = FRAM_BUFFER_END - FRAM_BUFFER_START + 1;
+/** Amount of bytes that can be stored in the buffer*/
+static const uint16_t kFramBufferSize = FRAM_BUFFER_END - FRAM_BUFFER_START + 1;
 
-    /**
-     * @brief Puts a measurement into the circular buffer
-     *
-     * @param    data An array of data bytes.
-     * @param    num_bytes The number of bytes to be written.
-     * @return   See FramStatus
-     */
-    FramStatus FramPut(const uint8_t *data, uint16_t num_bytes);
+/**
+ * @brief Puts a measurement into the circular buffer
+ *
+ * @param    data An array of data bytes.
+ * @param    num_bytes The number of bytes to be written.
+ * @return   See FramStatus
+ */
+FramStatus FramPut(const uint8_t *data, uint16_t num_bytes);
 
-    /**
-     * @brief    Reads a measurement from the queue
-     *
-     *
-     * @param    data Array to be read into
-     * @param    len Length of data
-     * @return   See FramStatus
-     */
-    FramStatus FramGet(uint8_t *data, uint8_t *len);
+/**
+ * @brief    Reads a measurement from the queue
+ *
+ *
+ * @param    data Array to be read into
+ * @param    len Length of data
+ * @return   See FramStatus
+ */
+FramStatus FramGet(uint8_t *data, uint8_t *len);
 
-    /**
-     * @brief Get the current number of measurements stored in the buffer
-     *
-     * @return Number of measurements
-     */
-    uint16_t FramBufferLen(void);
+/**
+ * @brief Get the current number of measurements stored in the buffer
+ *
+ * @return Number of measurements
+ */
+uint16_t FramBufferLen(void);
 
-    /**
-     * @brief Clears the buffer
-     *
-     * Read and write addresses are set to their default values allowing for the
-     * buffer to be overwritten.
-     */
-    FramStatus FramBufferClear(void);
+/**
+ * @brief Clears the buffer
+ *
+ * Read and write addresses are set to their default values allowing for the
+ * buffer to be overwritten.
+ */
+FramStatus FramBufferClear(void);
 
-    /**
-     * @brief Saves the buffer state (read address, write address, and buffer
-     * length) to FRAM.
-     *
-     * @param read_addr Current read address of the circular buffer.
-     * @param write_addr Current write address of the circular buffer.
-     * @param buffer_len Current length of the circular buffer.
-     * @return FramStatus, status of the FRAM operation.
-     */
-    FramStatus FramSaveBufferState(uint16_t read_addr, uint16_t write_addr,
-                                   uint16_t buffer_len);
+/**
+ * @brief Saves the buffer state (read address, write address, and buffer
+ * length) to FRAM.
+ *
+ * @param read_addr Current read address of the circular buffer.
+ * @param write_addr Current write address of the circular buffer.
+ * @param buffer_len Current length of the circular buffer.
+ * @return FramStatus, status of the FRAM operation.
+ */
+FramStatus FramSaveBufferState(uint16_t read_addr, uint16_t write_addr,
+                               uint16_t buffer_len);
 
-    /**
-     * @brief Loads the buffer state (read address, write address, and buffer
-     * length) from FRAM.
-     *
-     * @param read_addr Pointer to store the retrieved read address.
-     * @param write_addr Pointer to store the retrieved write address.
-     * @param buffer_len Pointer to store the retrieved buffer length.
-     * @return FramStatus, status of the FRAM operation.
-     */
-    FramStatus FramLoadBufferState(uint16_t *read_addr, uint16_t *write_addr,
-                                   uint16_t *buffer_len);
+/**
+ * @brief Loads the buffer state (read address, write address, and buffer
+ * length) from FRAM.
+ *
+ * @param read_addr Pointer to store the retrieved read address.
+ * @param write_addr Pointer to store the retrieved write address.
+ * @param buffer_len Pointer to store the retrieved buffer length.
+ * @return FramStatus, status of the FRAM operation.
+ */
+FramStatus FramLoadBufferState(uint16_t *read_addr, uint16_t *write_addr,
+                               uint16_t *buffer_len);
 
-    /**
-     * @brief Initializes the FIFO buffer by loading the buffer state (read address,
-     *        write address, and buffer length) from FRAM. If the state cannot be
-     *        loaded or is invalid, it initializes the buffer with default values.
-     * @return FramStatus, status of the FRAM operation.
-     */
-    FramStatus FIFO_Init(void);
+/**
+ * @brief Initializes the FIFO buffer by loading the buffer state (read address,
+ *        write address, and buffer length) from FRAM. If the state cannot be
+ *        loaded or is invalid, it initializes the buffer with default values.
+ * @return FramStatus, status of the FRAM operation.
+ */
+FramStatus FIFO_Init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // LIB_FRAM_INCLUDE_FIFO_H_
+#endif  // LIB_FRAM_INCLUDE_FIFO_H_

@@ -18,8 +18,7 @@ void setUp(void) { FramBufferClear(); }
 
 void tearDown(void) {}
 
-void test_FramPut_ValidData(void)
-{
+void test_FramPut_ValidData(void) {
   uint8_t data[] = {1, 2, 3, 4, 5};
 
   FramStatus status = FramPut(data, sizeof(data));
@@ -28,8 +27,7 @@ void test_FramPut_ValidData(void)
   TEST_ASSERT_EQUAL(1, FramBufferLen());
 }
 
-void test_FramPut_BufferFull(void)
-{
+void test_FramPut_BufferFull(void) {
   // Data size is larger than the buffer size
   const uint16_t kFullBufferSize = kFramBufferSize + 1;
   uint8_t data[kFullBufferSize];
@@ -39,37 +37,32 @@ void test_FramPut_BufferFull(void)
   TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
 }
 
-void test_FramPut_Sequential(void)
-{
+void test_FramPut_Sequential(void) {
   const int niters = 20;
 
   // starting values
   uint8_t data[10] = {0, 1, 2, 3, 4};
 
   // write 100 times, therefore 1100 bytes (data + len)
-  for (int i = 0; i < niters; i++)
-  {
+  for (int i = 0; i < niters; i++) {
     FramStatus status = FramPut(data, sizeof(data));
     TEST_ASSERT_EQUAL(FRAM_OK, status);
 
     // increment index of data
-    for (int j = 0; j < sizeof(data); j++)
-    {
+    for (int j = 0; j < sizeof(data); j++) {
       data[j]++;
     }
   }
 }
 
-void test_FramPut_Sequential_BufferFull(void)
-{
+void test_FramPut_Sequential_BufferFull(void) {
   // starting values
   uint8_t data[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
   const int niters = kFramBufferSize / (sizeof(data) + 1);
 
   // write 100 times, therefore 1100 bytes (data + len)
-  for (int i = 0; i < niters; i++)
-  {
+  for (int i = 0; i < niters; i++) {
     FramStatus status_zero = FramPut(data, sizeof(data));
     TEST_ASSERT_EQUAL(FRAM_OK, status_zero);
   }
@@ -78,8 +71,7 @@ void test_FramPut_Sequential_BufferFull(void)
   TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status_full);
 }
 
-void test_FramGet_BufferEmpty(void)
-{
+void test_FramGet_BufferEmpty(void) {
   uint8_t data[kFramBufferSize];
   uint8_t data_len;
 
@@ -88,8 +80,7 @@ void test_FramGet_BufferEmpty(void)
   TEST_ASSERT_EQUAL(FRAM_BUFFER_EMPTY, status);
 }
 
-void test_FramGet_ValidData(void)
-{
+void test_FramGet_ValidData(void) {
   uint8_t put_data[] = {1, 2, 3, 4, 5};
   FramPut(put_data, sizeof(put_data));
 
@@ -101,37 +92,32 @@ void test_FramGet_ValidData(void)
   TEST_ASSERT_EQUAL_UINT8_ARRAY(put_data, get_data, sizeof(put_data));
 }
 
-void test_FramGet_Sequential(void)
-{
+void test_FramGet_Sequential(void) {
   const int niters = 20;
 
   // starting values
   uint8_t put_data[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
   // write 100 times, therefore 1100 bytes (data+len)
-  for (int i = 0; i < niters; i++)
-  {
+  for (int i = 0; i < niters; i++) {
     FramPut(put_data, sizeof(put_data));
 
     // increment index of data
-    for (int j = 0; j < sizeof(put_data); j++)
-    {
+    for (int j = 0; j < sizeof(put_data); j++) {
       put_data[j]++;
     }
   }
 
   // reset put_data to starting values
   // was unsure about the behavior of memcpy
-  for (int i = 0; i < sizeof(put_data); i++)
-  {
+  for (int i = 0; i < sizeof(put_data); i++) {
     put_data[i] = i;
   }
 
   uint8_t get_data[10] = {0};
 
   // read back all the data
-  for (int i = 0; i < niters; i++)
-  {
+  for (int i = 0; i < niters; i++) {
     uint8_t get_data_len = 0;
     FramStatus status_get = FramGet(get_data, &get_data_len);
 
@@ -140,15 +126,13 @@ void test_FramGet_Sequential(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(put_data, get_data, sizeof(put_data));
 
     // increment index of data
-    for (int j = 0; j < sizeof(put_data); j++)
-    {
+    for (int j = 0; j < sizeof(put_data); j++) {
       put_data[j]++;
     }
   }
 }
 
-void test_FramGet_Sequential_BufferFull(void)
-{
+void test_FramGet_Sequential_BufferFull(void) {
   FramStatus status = FRAM_OK;
 
   // starting values
@@ -157,14 +141,12 @@ void test_FramGet_Sequential_BufferFull(void)
   const int niters = (kFramBufferSize / (sizeof(data) + 1));
 
   // write 100 times, therefore 1100 bytes (data + len)
-  for (int i = 0; i < niters; i++)
-  {
+  for (int i = 0; i < niters; i++) {
     status = FramPut(data, sizeof(data));
     TEST_ASSERT_EQUAL(FRAM_OK, status);
 
     // increment data
-    for (int j = 0; j < sizeof(data); j++)
-    {
+    for (int j = 0; j < sizeof(data); j++) {
       data[j] += sizeof(data);
     }
   }
@@ -173,15 +155,13 @@ void test_FramGet_Sequential_BufferFull(void)
   status = FramPut(data, sizeof(data));
   TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
   // reset data
-  for (int i = 0; i < sizeof(data); i++)
-  {
+  for (int i = 0; i < sizeof(data); i++) {
     data[i] = i;
   }
 
   uint8_t get_data[sizeof(data)] = {0};
 
-  for (int i = 0; i < niters; i++)
-  {
+  for (int i = 0; i < niters; i++) {
     uint8_t get_data_len = 0;
     status = FramGet(get_data, &get_data_len);
 
@@ -190,15 +170,13 @@ void test_FramGet_Sequential_BufferFull(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(data, get_data, sizeof(data));
 
     // increment data
-    for (int j = 0; j < sizeof(data); j++)
-    {
+    for (int j = 0; j < sizeof(data); j++) {
       data[j] += sizeof(data);
     }
   }
 }
 
-void test_FramBufferLen(void)
-{
+void test_FramBufferLen(void) {
   // Assuming that the buffer length is initially 0
   TEST_ASSERT_EQUAL(0, FramBufferLen());
 
@@ -210,8 +188,7 @@ void test_FramBufferLen(void)
   TEST_ASSERT_EQUAL(1, FramBufferLen());
 }
 
-void test_FramBufferClear(void)
-{
+void test_FramBufferClear(void) {
   // Put some data into the buffer
   uint8_t data[] = {1, 2, 3, 4, 5};
   FramStatus status = FramPut(data, sizeof(data));
@@ -226,16 +203,17 @@ void test_FramBufferClear(void)
   TEST_ASSERT_EQUAL(0, FramBufferLen());
 }
 
-void test_FramBuffer_Wraparound(void)
-{
+void test_FramBuffer_Wraparound(void) {
   // checks for errors when read addr > write addr
   FramStatus status;
 
-  // Set the memory after the FIFO buffer to a unique character to check OOB memory write
+  // Set the memory after the FIFO buffer to a unique character to check OOB
+  // memory write
   uint8_t oob_before = 0;
   uint8_t oob_after = 0;
   const uint8_t oob_check = 0xFF;
-  status = FramRead(FRAM_BUFFER_END + 1, 1, &oob_before); // to be restored afterwards
+  status = FramRead(FRAM_BUFFER_END + 1, 1,
+                    &oob_before);  // to be restored afterwards
   TEST_ASSERT_EQUAL(FRAM_OK, status);
   status = FramWrite(FRAM_BUFFER_END + 1, &oob_check, 1);
   TEST_ASSERT_EQUAL(FRAM_OK, status);
@@ -243,8 +221,7 @@ void test_FramBuffer_Wraparound(void)
   // write block size to handle length
   // block_size+1 must not be a factor of the FIFO's space
   uint8_t block_size = 70;
-  while (kFramBufferSize % (block_size + 1) == 0)
-  {
+  while (kFramBufferSize % (block_size + 1) == 0) {
     block_size += 1;
   }
 
@@ -254,8 +231,7 @@ void test_FramBuffer_Wraparound(void)
   TEST_ASSERT_NOT_EQUAL(block_size + 1, oob_check);
 
   uint8_t junk_data[256];
-  for (int i = 0; i < 256; i++)
-  {
+  for (int i = 0; i < 256; i++) {
     junk_data[i] = i;
   }
 
@@ -263,20 +239,18 @@ void test_FramBuffer_Wraparound(void)
   uint8_t buffer_length;
 
   // move write to before the end of physical memory in FRAM
-  // if the assigned FRAM memory is [0, 1769], then a block_size of 16 (+1 length byte) means
-  // that the 104th block starts at 1768 and must wrap around.
-  // read 0, write 1768
+  // if the assigned FRAM memory is [0, 1769], then a block_size of 16 (+1
+  // length byte) means that the 104th block starts at 1768 and must wrap
+  // around. read 0, write 1768
   status = FRAM_OK;
-  while (status != FRAM_BUFFER_FULL)
-  {
+  while (status != FRAM_BUFFER_FULL) {
     TEST_ASSERT_EQUAL(FRAM_OK, status);
     status = FramPut(junk_data, block_size);
   }
 
   // advance read all the way to the end to make room for the wraparound
   // read 1768, write 1768
-  while (FramBufferLen() != 0)
-  {
+  while (FramBufferLen() != 0) {
     status = FramGet(buffer, &buffer_length);
     TEST_ASSERT_EQUAL(FRAM_OK, status);
   }
@@ -299,23 +273,21 @@ void test_FramBuffer_Wraparound(void)
   status = FramRead(FRAM_BUFFER_END + 1, 1, &oob_after);
   TEST_ASSERT_EQUAL(FRAM_OK, status);
   TEST_ASSERT_EQUAL(oob_after, oob_check);
-  status = FramWrite(FRAM_BUFFER_END + 1, &oob_before, 1); // restore
+  status = FramWrite(FRAM_BUFFER_END + 1, &oob_before, 1);  // restore
   TEST_ASSERT_EQUAL(FRAM_OK, status);
 
   // status = FramPut(zeros, block_size);
   // TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
 }
 
-void test_LoadSaveBufferState(void)
-{
+void test_LoadSaveBufferState(void) {
   // Clear the buffer and check initial state
   FramStatus status = FramBufferClear();
   TEST_ASSERT_EQUAL(FRAM_OK, status);
 
   // Add some data
   const uint8_t test_data[] = {0x11, 0x22, 0x33};
-  for (int i = 0; i < 10; i++)
-  {
+  for (int i = 0; i < 10; i++) {
     // note that FramPut() calls FramSaveBufferState()
     status = FramPut(test_data, sizeof(test_data));
     TEST_ASSERT_EQUAL(FRAM_OK, status);
@@ -334,8 +306,7 @@ void test_LoadSaveBufferState(void)
 
   uint8_t retrieved_data[sizeof(test_data)];
   uint8_t retrieved_len;
-  for (int i = 0; i < 10; i++)
-  {
+  for (int i = 0; i < 10; i++) {
     status = FramGet(retrieved_data, &retrieved_len);
     TEST_ASSERT_EQUAL(FRAM_OK, status);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(test_data, retrieved_data, sizeof(test_data));
@@ -346,8 +317,7 @@ void test_LoadSaveBufferState(void)
  * @brief  The application entry point.
  * @retval int
  */
-int main(void)
-{
+int main(void) {
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface
@@ -371,8 +341,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // wait for UART
-  for (int i = 0; i < 1000000; i++)
-  {
+  for (int i = 0; i < 1000000; i++) {
     __NOP();
   }
 

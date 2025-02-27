@@ -63,7 +63,7 @@ static uint16_t get_remaining_space(void) {
 
 FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   // check remaining space
-  if (num_bytes + 1 > get_remaining_space()) {
+  if (num_bytes > get_remaining_space()) {
     return FRAM_BUFFER_FULL;
   }
 
@@ -77,11 +77,29 @@ FramStatus FramPut(const uint8_t *data, const uint16_t num_bytes) {
   update_addr(&write_addr, 1);
 
   // Write data to FRAM circular buffer
-  status = FramWrite(write_addr, data, num_bytes);
-  if (status != FRAM_OK) {
-    return status;
+  // if the data must wraparound, then make two writes
+  if (write_addr + num_bytes > (FRAM_BUFFER_END + 1)) {
+    // write up to the buffer end
+    uint8_t num_bytes_first_half = (FRAM_BUFFER_END + 1) - write_addr;
+    status = FramWrite(write_addr, data, num_bytes_first_half);
+    if (status != FRAM_OK) {
+      return status;
+    }
+    update_addr(&write_addr, num_bytes_first_half);
+    // write from the buffer start
+    status = FramWrite(write_addr, data + num_bytes_first_half,
+                       num_bytes - num_bytes_first_half);
+    if (status != FRAM_OK) {
+      return status;
+    }
+    update_addr(&write_addr, num_bytes - num_bytes_first_half);
+  } else {
+    status = FramWrite(write_addr, data, num_bytes);
+    if (status != FRAM_OK) {
+      return status;
+    }
+    update_addr(&write_addr, num_bytes);
   }
-  update_addr(&write_addr, num_bytes);
 
   // increment buffer length
   ++buffer_len;
@@ -105,11 +123,28 @@ FramStatus FramGet(uint8_t *data, uint8_t *len) {
   update_addr(&read_addr, 1);
 
   // Read data from FRAM circular buffer
-  status = FramRead(read_addr, *len, data);
-  if (status != FRAM_OK) {
-    return status;
+  // if the data must wraparound, then make two reads
+  if (read_addr + *len > (FRAM_BUFFER_END + 1)) {
+    // read up to the buffer end
+    uint8_t len_first_half = (FRAM_BUFFER_END + 1) - read_addr;
+    status = FramRead(read_addr, len_first_half, data);
+    if (status != FRAM_OK) {
+      return status;
+    }
+    update_addr(&read_addr, len_first_half);
+    // read from the buffer start
+    status = FramRead(read_addr, *len - len_first_half, data + len_first_half);
+    if (status != FRAM_OK) {
+      return status;
+    }
+    update_addr(&read_addr, *len - len_first_half);
+  } else {
+    status = FramRead(read_addr, *len, data);
+    if (status != FRAM_OK) {
+      return status;
+    }
+    update_addr(&read_addr, *len);
   }
-  update_addr(&read_addr, *len);
 
   // Decrement buffer length
   --buffer_len;
@@ -137,12 +172,8 @@ FramStatus FIFO_Init(void) {
   if (status != FRAM_OK) {
     // APP_PRINTF("Failed to load FIFO state. FRAM Status: %d\n", status);
     // If loading the buffer state fails, assume it's an empty state
-    read_addr = FRAM_BUFFER_START;
-    write_addr = FRAM_BUFFER_START;
-    buffer_len = 0;
-    FramSaveBufferState(read_addr, write_addr, buffer_len);
     // APP_PRINTF("Initialized to empty buffer state.\n");
-    return FRAM_OK;
+    return FramBufferClear();
   } else {
     if (read_addr == FRAM_BUFFER_START && write_addr == FRAM_BUFFER_START &&
         buffer_len == 0) {

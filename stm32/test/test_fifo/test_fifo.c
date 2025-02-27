@@ -207,38 +207,77 @@ void test_FramBuffer_Wraparound(void) {
   // checks for errors when read addr > write addr
   FramStatus status;
 
+  // Set the memory after the FIFO buffer to a unique character to check OOB
+  // memory write
+  uint8_t oob_before = 0;
+  uint8_t oob_after = 0;
+  const uint8_t oob_check = 0xFF;
+  status = FramRead(FRAM_BUFFER_END + 1, 1,
+                    &oob_before);  // to be restored afterwards
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+  status = FramWrite(FRAM_BUFFER_END + 1, &oob_check, 1);
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+
   // write block size to handle length
-  const uint8_t block_size = 255;
-
-  // number of bytes to get halfway on the address space
-  const uint16_t half_num_bytes = kFramBufferSize / 2;
-
-  const uint8_t zeros[kFramBufferSize];
-
-  uint8_t buffer[sizeof(zeros)];
-
-  // move write to roughly halfway point
-  for (int i = 0; i < (half_num_bytes / block_size); i++) {
-    status = FramPut(zeros, block_size);
-    TEST_ASSERT_EQUAL(FRAM_OK, status);
+  // block_size+1 must not be a factor of the FIFO's space
+  uint8_t block_size = 70;
+  while (kFramBufferSize % (block_size + 1) == 0) {
+    block_size += 1;
   }
 
+  // oob_check is reserved as a special character for determining
+  // if data was written out of bounds
+  TEST_ASSERT_NOT_EQUAL(block_size, oob_check);
+  TEST_ASSERT_NOT_EQUAL(block_size + 1, oob_check);
+
+  uint8_t junk_data[256];
+  for (int i = 0; i < 256; i++) {
+    junk_data[i] = i;
+  }
+
+  uint8_t buffer[256];
+  uint8_t buffer_length;
+
+  // move write to before the end of physical memory in FRAM
+  // if the assigned FRAM memory is [0, 1769], then a block_size of 16 (+1
+  // length byte) means that the 104th block starts at 1768 and must wrap
+  // around. read 0, write 1768
+  status = FRAM_OK;
+  while (status != FRAM_BUFFER_FULL) {
+    TEST_ASSERT_EQUAL(FRAM_OK, status);
+    status = FramPut(junk_data, block_size);
+  }
+
+  // advance read all the way to the end to make room for the wraparound
+  // read 1768, write 1768
   while (FramBufferLen() != 0) {
-    // move read head
-    uint8_t data_read_len;
-    status = FramGet(buffer, &data_read_len);
+    status = FramGet(buffer, &buffer_length);
     TEST_ASSERT_EQUAL(FRAM_OK, status);
   }
 
-  for (int i = 0; i < (kFramBufferSize / block_size); i++) {
-    // wrap round write head to just behind read
-    // -1 is to account for the length byte
-    status = FramPut(zeros, block_size);
-    TEST_ASSERT_EQUAL(FRAM_OK, status);
-  }
+  // write one block for the wraparound
+  // read 1768, write 1768 + 17 = 14
+  // [{68} 69 70 0 1 2 3 4 5 6 7 8 9 10 11 12 13] 14
+  status = FramPut(junk_data, block_size);
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
 
-  status = FramPut(zeros, block_size);
-  TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
+  // observe the wraparound
+  // read 14, write 14
+  status = FramGet(buffer, &buffer_length);
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+
+  // test that the data was successfully retrieved across the wraparound
+  TEST_ASSERT_EQUAL_UINT8_ARRAY(buffer, junk_data, block_size);
+
+  // test that no data was written out of bounds
+  status = FramRead(FRAM_BUFFER_END + 1, 1, &oob_after);
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+  TEST_ASSERT_EQUAL(oob_after, oob_check);
+  status = FramWrite(FRAM_BUFFER_END + 1, &oob_before, 1);  // restore
+  TEST_ASSERT_EQUAL(FRAM_OK, status);
+
+  // status = FramPut(zeros, block_size);
+  // TEST_ASSERT_EQUAL(FRAM_BUFFER_FULL, status);
 }
 
 void test_LoadSaveBufferState(void) {

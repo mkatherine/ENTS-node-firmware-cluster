@@ -8,13 +8,25 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
-## [Unreleased] - TBD
+## [Unreleased] - TDB
+
+### Added
 
 - WiFi upload method [#46](i46)
 
+### Changed
+
+- Fixed issue with buffer addressing [#174](i174)
+
 [i46]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/46
+[i174]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/174
 
 ## [2.3.0] - 2025-02-26
+
+Code used for March of the ENTS experiment. Release includes support for the
+bme280, larger fram chip, teros21, and integration with a desktop GUI for
+device configuration. The experiment revelated multiple bugs that will be fixed
+in future releases including the following:
 
 Code used for March of the ENTS experiment. Release includes support for the
 bme280, larger fram chip, teros21, and integration with a desktop GUI for

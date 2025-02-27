@@ -34,13 +34,13 @@ extern "C" {
 #include "i2c.h"
 
 #ifndef FRAM_BUFFER_START
-/** Starting address of buffer */
+/** Starting address of buffer, which is INCLUSIVE */
 #define FRAM_BUFFER_START 0
 #endif /* FRAM_BUFFER_START */
 
 #ifndef FRAM_BUFFER_END
-/** Ending address of buffer */
-#define FRAM_BUFFER_END 1770
+/** Ending address of buffer, which is INCLUSIVE */
+#define FRAM_BUFFER_END 1769
 #endif /* FRAM_BUFFER_END */
 
 #if FRAM_BUFFER_START > FRAM_BUFFER_END
@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 /** Amount of bytes that can be stored in the buffer*/
-static const uint16_t kFramBufferSize = FRAM_BUFFER_END - FRAM_BUFFER_START;
+static const uint16_t kFramBufferSize = FRAM_BUFFER_END - FRAM_BUFFER_START + 1;
 
 /**
  * @brief Puts a measurement into the circular buffer

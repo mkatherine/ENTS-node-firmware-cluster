@@ -8,6 +8,14 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
+## [Unreleased] - TDB
+
+### Changed
+
+- Fixed issue with buffer addressing [#174](i174)
+
+[i174]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/174
+
 ## [2.3.0] - 2025-02-26
 
 Code used for March of the ENTS experiment. Release includes support for the

@@ -44,7 +44,7 @@ def sendToUART():
             return False
 
     except serial.SerialException as e:
-        print("UART Error")
+        print(f"UART Error: {e}")
         return False
 
     finally:

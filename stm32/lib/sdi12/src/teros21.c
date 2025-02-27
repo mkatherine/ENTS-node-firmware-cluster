@@ -57,9 +57,10 @@ size_t Teros21Measure(uint8_t *data) {
     return -1;
   }
 
-  const UserConfiguration* cfg = UserConfigGet();
+  const UserConfiguration *cfg = UserConfigGet();
 
-  size_t data_len = EncodeTeros21Measurement(ts.Seconds, cfg->logger_id, cfg->cell_id,
+  size_t data_len =
+      EncodeTeros21Measurement(ts.Seconds, cfg->logger_id, cfg->cell_id,
                                sens_data.matric_pot, sens_data.temp, data);
 
   return data_len;

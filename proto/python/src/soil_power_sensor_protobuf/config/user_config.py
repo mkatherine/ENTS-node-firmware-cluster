@@ -17,11 +17,10 @@ Key features:
 """
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QInputDialog
 import json
 import os
 import sys
-import time
 import serial
 import serial.tools.list_ports
 import re  # For validating URL input

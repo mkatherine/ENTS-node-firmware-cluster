@@ -46,29 +46,16 @@ int main(void) {
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
-  // __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI); add this back
-  // when the rtc is integrated, hopefully this will fix the issue, and than you
-  // can remove the nops in SDI12_WakeSensors MX_RTC_Init();
-
-  /* Ensure that MSI is wake-up system clock */
-  //__HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-
-  /*Initialize timer and RTC*/
-  // UTIL_TIMER_Init();
 
   SystemApp_Init();
-
-  // HAL_TIM_OnePulse_MspInit(&htim1);
-  // __HAL_RCC_TIM1_CLK_ENABLE();
-  // HAL_TIM_OnePulse_Init(&htim1, TIM_OPMODE_SINGLE);
 
   // User level initialization
 
   // Print the compilation time at startup
   char info_str[128];
   int info_len;
-  info_len = sprintf(
-      info_str,
+  info_len = snprintf(
+      info_str, sizeof(info_str),
       "Soil Power Sensor Wio-E5 firmware, test: %s, compiled on %s %s\n",
       __FILE__, __DATE__, __TIME__);
   HAL_UART_Transmit(&huart1, (const uint8_t *)info_str, info_len, 1000);
@@ -111,7 +98,7 @@ int main(void) {
     // Sleep
     for (int i = 0; i <= 1000000; i++) {
       asm("nop");
-    };
+    }
   }
 }
 
@@ -180,7 +167,8 @@ void Error_Handler(void) {
 
   /* USER CODE BEGIN Error_Handler_Debug */
   char error[30];
-  int error_len = sprintf(error, "Error!  HAL Status: %d\n", rc);
+  int error_len =
+      snprintf(error, sizeof(error), "Error!  HAL Status: %d\n", rc);
   HAL_UART_Transmit(&huart1, (const uint8_t *)error, error_len, 1000);
 
   /* User can add his own implementation to report the HAL error return state */

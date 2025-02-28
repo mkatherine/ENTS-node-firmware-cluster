@@ -58,7 +58,7 @@ def decode_measurement(data: bytes, raw: bool = True) -> dict:
         raise KeyError("Measurement missing data")
     measurement_type = meas.WhichOneof("measurement")
     measurement_dict = MessageToDict(
-        getattr(meas, measurement_type),
+        getattr(meas, measurement_type)
     )
 
     # store measurement type

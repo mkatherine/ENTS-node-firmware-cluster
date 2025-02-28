@@ -129,10 +129,8 @@ void Connect(void) {
   //const char ssid[] = "UCSC-Devices";
   //const char* passwd = "hqWeRfvsn7eLd7MPrW";
   
-  //const char ssid[] = "HARE_Lab";
-  //const char* passwd = "";
-  //const char url[] = "dirtviz.jlab.ucsc.edu";
-  //const uint32_t port = 80;
+  const char ssid[] = "HARE_Lab";
+  const char* passwd = "";
 
 
   // initialize
@@ -141,8 +139,10 @@ void Connect(void) {
   uint8_t wifi_status = 0;
 
   while (wifi_status != 3) {
-    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...", cfg->WiFi_SSID);
-    wifi_status = ControllerWiFiInit(cfg->WiFi_SSID, cfg->WiFi_Password);
+    //APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...", cfg->WiFi_SSID);
+    //wifi_status = ControllerWiFiInit(cfg->WiFi_SSID, cfg->WiFi_Password);
+    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...", ssid);
+    wifi_status = ControllerWiFiInit(ssid, passwd);
 
     if (wifi_status == 3) {
       APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
@@ -176,14 +176,17 @@ void TimeSync(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "Syncing time...\t");
   ts.Seconds = ControllerWiFiTime();
   SysTimeSet(ts);
-  APP_LOG(TS_OFF, VLEVEL_M, "Done!");
+  APP_LOG(TS_OFF, VLEVEL_M, "Done!\r\n");
   APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
 }
 
 void Check(void) {
   const UserConfiguration* cfg = UserConfigGet();
+  
+  const char url[] = "dirtviz.jlab.ucsc.edu";
+  const uint32_t port = 80;
 
   APP_LOG(TS_ON, VLEVEL_M, "Checking API health...\t");
-  unsigned int http_code = ControllerWiFiCheck(cfg->API_Endpoint_URL, cfg->API_Endpoint_Port);
+  unsigned int http_code = ControllerWiFiCheck(url, port);
   APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
 }

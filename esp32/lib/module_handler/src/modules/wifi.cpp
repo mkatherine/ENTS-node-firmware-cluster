@@ -78,14 +78,36 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   Log.noticeln("ssid: %s", cmd.command.wifi_command.ssid);
   Log.noticeln("passwd: %s", cmd.command.wifi_command.passwd);
 
+  WiFi.setHostname("esp32");
+
+  // TODO fix
+  // flag to switch between connecting and checking
+  static bool conn_started = false;
+
   // connect to WiFi
   //WiFi.disconnect();
   int status; 
-  status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
+
+  if (!conn_started) {
+    status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
+    conn_started = true;
+  } else {
+    status = WiFi.status();
+  }
+
   Log.noticeln("WiFi connection status: %d", status);
   
   if (status == WL_CONNECTED) {
-    Log.noticeln("Connected with ip: %p", WiFi.localIP());
+    Log.noticeln("IP Address: %p", WiFi.localIP());
+    Log.noticeln("Gateway IP: %p", WiFi.gatewayIP());
+    Log.noticeln("Subnet Mask: %p", WiFi.subnetMask());
+    Log.noticeln("DNS: %p", WiFi.dnsIP());
+
+    // reconfigure DNS
+    WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), IPAddress(1,1,1,1));
+    
+    Log.noticeln("New DNS: %p", WiFi.dnsIP());
+
     // start timeclient
     timeClient->begin();
   } else if (status == WL_CONNECT_FAILED) {
@@ -178,9 +200,12 @@ void ModuleWiFi::Time(const Esp32Command& cmd) {
   wifi_cmd.type = WiFiCommand_Type_TIME;
 
   // update NTP server url
+  /*
   if (cmd.command.wifi_command.url != NULL) {
+    Log.traceln("Upating pool name to: %s", cmd.command.wifi_command.url);
     timeClient->setPoolServerName(cmd.command.wifi_command.url);
   }
+  */
   
   // check if connected to WiFi connected
   uint8_t wifi_status = WiFi.status();
@@ -190,7 +215,7 @@ void ModuleWiFi::Time(const Esp32Command& cmd) {
     wifi_cmd.ts = 0;
   } else {
     // force update
-    if (timeClient->forceUpdate()) {
+    if (timeClient->update()) {
       wifi_cmd.ts = timeClient->getEpochTime();
       Log.traceln("Current timestamp: %d", wifi_cmd.ts);
     } else {

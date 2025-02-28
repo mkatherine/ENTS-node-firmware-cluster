@@ -14,7 +14,7 @@
 #include <vector>
 
 /** Timeout for http responses */
-unsigned int g_resp_timeout = 5000;
+unsigned int g_resp_timeout = 1000;
 
 /** Max size of HTTP POST request */
 const size_t g_request_size = 512;

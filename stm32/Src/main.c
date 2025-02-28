@@ -173,20 +173,20 @@ int main(void)
     if ((sensor == EnabledSensor_Voltage) || (sensor == EnabledSensor_Current)) {
       ADC_init();
       SensorsAdd(ADC_measure);
-      APP_LOG(TS_ON, VLEVEL_M, "ADS Enabled!\n");
+      APP_LOG(TS_OFF, VLEVEL_M, "ADS Enabled!\n");
     }
     if (sensor == EnabledSensor_Teros12) {
-      APP_LOG(TS_ON, VLEVEL_M, "Teros12 not implemented!\n");
+      APP_LOG(TS_OFF, VLEVEL_M, "Teros12 not implemented!\n");
       //SensorsAdd(SDI12_Teros12Measure);
     }
     if (sensor == EnabledSensor_BME280) {
       BME280Init();
       SensorsAdd(BME280Measure);
-      APP_LOG(TS_ON, VLEVEL_M, "BME280 Enabled!\n");
+      APP_LOG(TS_OFF, VLEVEL_M, "BME280 Enabled!\n");
     }
     if (sensor == EnabledSensor_Teros21) {
       SensorsAdd(Teros21Measure);
-      APP_LOG(TS_ON, VLEVEL_M, "Teros21 Enabled!\n");
+      APP_LOG(TS_OFF, VLEVEL_M, "Teros21 Enabled!\n");
     }
     // TODO add support for dummy sensor
   }
@@ -198,7 +198,7 @@ int main(void)
     WiFiInit();
   } else {
     APP_LOG(TS_ON, VLEVEL_M, "Invalid upload method!\n");
-    while (1);
+    Error_Handler();
   } 
   
   /* USER CODE END 2 */

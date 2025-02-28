@@ -20,7 +20,9 @@ extern "C" {
 
 /**
  * @brief Initialize WiFi uploading method
- * 
+ *
+ * Connect to WiFi network, sync time, check API health, and start upload
+ * timer.
  */
 void WiFiInit(void);
 

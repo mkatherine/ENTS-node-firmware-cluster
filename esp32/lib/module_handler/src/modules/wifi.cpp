@@ -7,9 +7,15 @@
 ModuleWiFi::ModuleWiFi(void) {
   // set module type
   type = Esp32Command_wifi_command_tag;
+
+  // create ntp client
+  timeClient = new NTPClient(ntpUDP);
 }
 
-ModuleWiFi::~ModuleWiFi(void) {}
+ModuleWiFi::~ModuleWiFi(void) {
+  // delete timeClient
+  delete timeClient;
+}
 
 void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
   Log.traceln("ModuleWiFi::OnReceive");
@@ -33,6 +39,16 @@ void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
     Log.traceln("Calling POST");
     Post(cmd);
     break;
+
+  case WiFiCommand_Type_CHECK:
+    Log.traceln("Calling CHECK");
+    Check(cmd);
+    break;
+
+  case WiFiCommand_Type_TIME:
+    Log.traceln("Calling TIME");
+    Time(cmd);
+    break;
   
   default:
     Log.warningln("wifi command type not found!");
@@ -47,8 +63,9 @@ size_t ModuleWiFi::OnRequest(uint8_t* buffer) {
 }
 
 void ModuleWiFi::Connect(const Esp32Command& cmd) {
-  // timestamp
-  uint32_t ts = -1;
+  // init return command
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_CONNECT;
 
   Log.traceln("ModuleWiFi::Connect");
 
@@ -62,110 +79,128 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   Log.noticeln("passwd: %s", cmd.command.wifi_command.passwd);
 
   // connect to WiFi
-  // early return if SSID is not available
-  WiFi.disconnect();
-  int status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
+  //WiFi.disconnect();
+  int status; 
+  status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
   Log.noticeln("WiFi connection status: %d", status);
   
-
-  // flag if connected for future code
-  bool connected = false;
-
-  // wait for WiFi to connect
-  while (1) {
-    // TODO implement lp sleep
-    delay(1000);
-    Log.noticeln("Waiting for connection...");
-
-    status = WiFi.status();
-    Log.noticeln("wifi.begin: %d", status);
-    if (status == WL_CONNECTED) {
-      Log.noticeln("Connected with ip: %p", WiFi.localIP());
-      connected = true;
-      break;
-    } else if (status == WL_CONNECT_FAILED) {
-      Log.errorln("Connection failed!");
-      break;
-    } else if (status == WL_NO_SSID_AVAIL) {
-      Log.errorln("SSID not available!");
-      break;
-    }
-  } 
-
-  if (connected) {
-    // set url
-    dirtviz.SetUrl(cmd.command.wifi_command.url);
-    dirtviz.SetPort(cmd.command.wifi_command.port);
-
-    // TODO Add API status check
-    Log.noticeln("Checking API endpoint");
-    ts = dirtviz.Check();
-    Log.noticeln("Current timestamp is %d", ts);
+  if (status == WL_CONNECTED) {
+    Log.noticeln("Connected with ip: %p", WiFi.localIP());
+    // start timeclient
+    timeClient->begin();
+  } else if (status == WL_CONNECT_FAILED) {
+    Log.errorln("Connection failed!");
+  } else if (status == WL_NO_SSID_AVAIL) {
+    Log.errorln("SSID not available!");
   }
 
-  request_buffer_len = EncodeWiFiCommand(
-    WiFiCommand_Type_CONNECT,
-    "",
-    "",
-    "",
-    0,
-    status,
-    ts,
-    nullptr,
-    0,
-    request_buffer,
-    sizeof(request_buffer)
-  );
+  // set status
+  wifi_cmd.rc = status;
+
+  request_buffer_len = EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
 }
 
 void ModuleWiFi::Post(const Esp32Command& cmd) {
+  // init return WiFi command
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_POST;
+
   Log.traceln("ModuleWiFI::Post");
 
   // check if connected to WiFi connected
   if (WiFi.status() != WL_CONNECTED) {
     Log.errorln("Not connected to WiFi!");
 
-    // encode with return code 1 to indicate WiFi connection error
-    this->request_buffer_len = EncodeWiFiCommand(
-      WiFiCommand_Type_POST,
-      nullptr,
-      nullptr,
-      nullptr,
-      0,
-      1,
-      0,
-      nullptr,
-      0,
-      request_buffer,
-      sizeof(request_buffer)
-    );
+    wifi_cmd.rc = 1;
+  } else {
+    // send measurement
+    const uint8_t* meas = cmd.command.wifi_command.resp.bytes;
+    const size_t meas_len = cmd.command.wifi_command.resp.size;
 
-    return;
+    // send measurement
+    HttpClient resp_msg = this->dirtviz.SendMeasurement(meas, meas_len);
+    uint8_t* resp = (uint8_t*) resp_msg.Data().c_str();
+    size_t resp_len = resp_msg.Data().length();
+    unsigned int status_code = resp_msg.ResponseCode();
+
+    Log.noticeln("Resp length: %d", resp_len);
+
+    // save status code and response
+    wifi_cmd.rc = status_code;
+    if (resp_len > 0) {
+      wifi_cmd.resp.size = resp_len;
+      memcpy(wifi_cmd.resp.bytes, resp, resp_len);
+    }
   }
-
-  // send measurement
-  const uint8_t* meas = cmd.command.wifi_command.resp.bytes;
-  const size_t meas_len = cmd.command.wifi_command.resp.size;
-
-  // send measurement
-  HttpClient resp_msg = this->dirtviz.SendMeasurement(meas, meas_len);
-  uint8_t* resp = (uint8_t*) resp_msg.Data().c_str();
-  size_t resp_len = resp_msg.Data().length();
-  unsigned int status_code = resp_msg.ResponseCode();
-
-  Log.noticeln("Resp length: %d", resp_len);
 
   // encode wifi command in buffer
   this->request_buffer_len = EncodeWiFiCommand(
-    WiFiCommand_Type_POST,
-    nullptr,
-    nullptr,
-    nullptr,
-    0,
-    status_code,
-    0,
-    resp,
-    resp_len,
+    &wifi_cmd,
+    request_buffer,
+    sizeof(request_buffer)
+  );
+}
+
+void ModuleWiFi::Check(const Esp32Command& cmd) {
+  Log.traceln("ModuleWiFi::Check");
+
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_CHECK;
+
+  // check if connected to WiFi connected
+  uint8_t wifi_status = WiFi.status();
+  if (wifi_status != WL_CONNECTED) {
+    Log.errorln("Not connected to WiFi!");
+
+    wifi_cmd.rc = wifi_status;
+  } else {
+    // set url
+    dirtviz.SetUrl(cmd.command.wifi_command.url);
+    dirtviz.SetPort(cmd.command.wifi_command.port);
+
+    // TODO Add API status check
+    Log.notice("Checking API endpoint...\t");
+    wifi_cmd.rc = dirtviz.Check();
+    Log.noticeln("%d", wifi_cmd.rc);
+  }
+
+  request_buffer_len = EncodeWiFiCommand(
+    &wifi_cmd,
+    request_buffer,
+    sizeof(request_buffer)
+  );
+}
+
+void ModuleWiFi::Time(const Esp32Command& cmd) {
+  Log.traceln("ModuleWiFi::Time");
+
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_TIME;
+
+  // update NTP server url
+  if (cmd.command.wifi_command.url != NULL) {
+    timeClient->setPoolServerName(cmd.command.wifi_command.url);
+  }
+  
+  // check if connected to WiFi connected
+  uint8_t wifi_status = WiFi.status();
+  if (wifi_status != WL_CONNECTED) {
+    Log.errorln("Not connected to WiFi!");
+
+    wifi_cmd.ts = 0;
+  } else {
+    // force update
+    if (timeClient->forceUpdate()) {
+      wifi_cmd.ts = timeClient->getEpochTime();
+      Log.traceln("Current timestamp: %d", wifi_cmd.ts);
+    } else {
+      Log.traceln("Failed to get time from NTP server!");
+      wifi_cmd.ts = 0;
+    }
+  }
+
+  request_buffer_len = EncodeWiFiCommand(
+    &wifi_cmd,
     request_buffer,
     sizeof(request_buffer)
   );

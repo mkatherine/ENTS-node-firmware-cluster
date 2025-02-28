@@ -8,6 +8,7 @@
 #include "stm32_timer.h"
 #include "fifo.h"
 #include "controller/wifi.h"
+#include "userConfig.h"
 
 /**
  * @brief Timer for uploads
@@ -44,6 +45,16 @@ void Upload(void);
 void Connect(void);
 
 /**
+ * @brief Timesync with NTP server
+ */
+void TimeSync(void);
+
+/**
+ * @brief Check API health
+ */
+void Check(void);
+
+/**
  * @brief Setup upload timer
  * 
  * Start sensor measurements and setup upload task/timer.
@@ -53,7 +64,13 @@ void StartUploads(void);
 void WiFiInit(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "WiFi app starting\r\n");
 
+  // connect to WiFi
   Connect();
+  // sync with NTP server
+  TimeSync();
+  // API health check
+  Check();
+  // start timers for uploading
   StartUploads();
 }
 
@@ -106,37 +123,37 @@ void Upload(void) {
 }
 
 void Connect(void) {
-  // TODO load configuration
+  //  load configurations
+  const UserConfiguration* cfg = UserConfigGet();
+
   //const char ssid[] = "UCSC-Devices";
   //const char* passwd = "hqWeRfvsn7eLd7MPrW";
-  const char ssid[] = "HARE_Lab";
-  const char* passwd = "";
-  const char url[] = "dirtviz.jlab.ucsc.edu";
-  const uint32_t port = 80;
+  
+  //const char ssid[] = "HARE_Lab";
+  //const char* passwd = "";
+  //const char url[] = "dirtviz.jlab.ucsc.edu";
+  //const uint32_t port = 80;
 
 
   // initialize
   unsigned int num_tries = 0;
-  SysTime_t ts = {.Seconds = -1, .SubSeconds = 0};
-  while (ts.Seconds == -1) {
-    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...\t", ssid);
-    ts.Seconds = ControllerWiFiInit(ssid, passwd, url, port);
 
-    if (ts.Seconds == -1) {
-      APP_LOG(TS_OFF, VLEVEL_M, "Attempt %d failed!\r\n", num_tries);
-      APP_LOG(TS_OFF, VLEVEL_M, "Retrying in 5 seconds...\r\n");
-      HAL_Delay(5000);
-    } else {
+  uint8_t wifi_status = 0;
+
+  while (wifi_status != 3) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...", cfg->WiFi_SSID);
+    wifi_status = ControllerWiFiInit(cfg->WiFi_SSID, cfg->WiFi_Password);
+
+    if (wifi_status == 3) {
       APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
-      APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
+    } else {
+      APP_LOG(TS_OFF, VLEVEL_M, "Attempt %d failed!\r\n", num_tries);
+      APP_LOG(TS_OFF, VLEVEL_M, "Retrying in 10 seconds...\r\n");
+      HAL_Delay(10000);
     }
-
 
     ++num_tries;
   }
-
-  // update clock
-  SysTimeSet(ts);
 }
 
 void StartUploads(void) {
@@ -151,4 +168,22 @@ void StartUploads(void) {
   UTIL_TIMER_Create(&UploadTimer, UploadPeriod, UTIL_TIMER_PERIODIC, UploadEvent, NULL);
   UTIL_TIMER_Start(&UploadTimer);
   APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
+}
+
+void TimeSync(void) {
+  SysTime_t ts = {.Seconds = -1, .SubSeconds = 0};
+
+  APP_LOG(TS_OFF, VLEVEL_M, "Syncing time...\t");
+  ts.Seconds = ControllerWiFiTime();
+  SysTimeSet(ts);
+  APP_LOG(TS_OFF, VLEVEL_M, "Done!");
+  APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
+}
+
+void Check(void) {
+  const UserConfiguration* cfg = UserConfigGet();
+
+  APP_LOG(TS_ON, VLEVEL_M, "Checking API health...\t");
+  unsigned int http_code = ControllerWiFiCheck(cfg->API_Endpoint_URL, cfg->API_Endpoint_Port);
+  APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
 }

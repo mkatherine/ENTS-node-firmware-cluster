@@ -11,25 +11,42 @@ extern "C" {
 /**
  * @brief Initialize WiFi settings on the esp32
  * 
- * The following happens within a single i2c transaction. WiFi SSID, password,
- * endpoint url, endpoint port are transmitted to the esp32. Success or failure
- * is determined by the return code. The timestamp from a NTP server is
- * obtained for clock syncronization.
- * 
- * The function blocks until WiFi is connected and retries until success.
+ * Connect to a WiFi network with the given SSID and password. This function
+ * should be used in a polling configuration to continually check if the esp32
+ * has connected to the WiFi network. The first call initializes the connection
+ * and subsequent calls check the connection status.
+ *
+ * The return code is from Arduino WiFi.begin() with available at the following link:
+ * https://github.com/arduino-libraries/WiFi/blob/e0e655793d73bfe5c8616bf753c3662dcdf98ad9/src/utility/wl_definitions.h#L59
  * 
  * @param ssid WiFi SSID
  * @param passwd WiFi Password
- * @param url API endpoint url (limited to 256 characters)
- * @param port API endpoint port
  * 
+ * @return WiFi status code
+ */
+uint8_t ControllerWiFiInit(
+  const char* ssid,
+  const char* passwd
+);
+
+/**
+ * @brief Get the current time from the NTP server
+ *
  * @return Timestamp indicated by the NTP server
  */
-uint32_t ControllerWiFiInit(
-  const char* ssid,
-  const char* passwd,
+uint32_t ControllerWiFiTime(void);
+
+/**
+ * @brief Checks WiFi connection status by querying API status
+ 
+ * @param url API endpoint url (limited to 256 characters)
+ * @param port API endpoint port
+ *
+ * @return HTTP response code
+ */
+unsigned int ControllerWiFiCheck(
   const char* url,
-  const uint32_t port 
+  const uint32_t port
 );
 
 /**

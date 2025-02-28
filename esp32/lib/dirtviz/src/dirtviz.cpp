@@ -67,7 +67,7 @@ uint16_t Dirtviz::GetPort(void) const
   return this->port;
 }
 
-uint32_t Dirtviz::Check() const {
+unsigned int Dirtviz::Check() const {
   Log.traceln("Dirtviz::Check");
   WiFiClient client;
 
@@ -121,15 +121,8 @@ uint32_t Dirtviz::Check() const {
   if (http_code != 200) {
     Log.warningln("Api health check failed! Reponse code: %d", http_code);
   }
- 
-  std::string date_str = http_client.Header("Date");
-  std::stringstream date_stream(date_str);
-  std::tm date = {0};
-  date_stream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");
 
-  std::time_t unix_epochs = std::mktime(&date);
-
-  return (uint32_t) unix_epochs;
+  return http_code;
 }
 
 HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {

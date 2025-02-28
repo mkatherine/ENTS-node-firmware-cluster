@@ -52,7 +52,11 @@ typedef enum _WiFiCommand_Type {
     /* Connect to WiFi network */
     WiFiCommand_Type_CONNECT = 0,
     /* Post data to endpoint */
-    WiFiCommand_Type_POST = 1
+    WiFiCommand_Type_POST = 1,
+    /* Check API status */
+    WiFiCommand_Type_CHECK = 2,
+    /* Timesync request */
+    WiFiCommand_Type_TIME = 3
 } WiFiCommand_Type;
 
 /* Struct definitions */
@@ -226,8 +230,8 @@ extern "C" {
 #define _TestCommand_ChangeState_ARRAYSIZE ((TestCommand_ChangeState)(TestCommand_ChangeState_REQUEST+1))
 
 #define _WiFiCommand_Type_MIN WiFiCommand_Type_CONNECT
-#define _WiFiCommand_Type_MAX WiFiCommand_Type_POST
-#define _WiFiCommand_Type_ARRAYSIZE ((WiFiCommand_Type)(WiFiCommand_Type_POST+1))
+#define _WiFiCommand_Type_MAX WiFiCommand_Type_TIME
+#define _WiFiCommand_Type_ARRAYSIZE ((WiFiCommand_Type)(WiFiCommand_Type_TIME+1))
 
 
 

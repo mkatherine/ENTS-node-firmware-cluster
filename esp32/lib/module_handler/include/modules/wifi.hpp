@@ -19,6 +19,8 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiUdp.h>
+#include <NTPClient.h>
 
 #include "dirtviz.hpp"
 
@@ -62,9 +64,14 @@ class ModuleWiFi: public ModuleHandler::Module {
   void Post(const Esp32Command& cmd);
 
   void Connect(const Esp32Command& cmd);
+  
+  void Check(const Esp32Command& cmd);
 
-  /** Timeout for wifi connect */
-  static const unsigned long connect_timeout_ms = 10000;
+  void Time(const Esp32Command& cmd);
+
+  WiFiUDP ntpUDP;
+
+  NTPClient* timeClient;
 
   /** Buffer for i2c requests */
   uint8_t request_buffer[WiFiCommand_size] = {};

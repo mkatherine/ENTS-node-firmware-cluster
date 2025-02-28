@@ -74,9 +74,9 @@ public:
   /**
    * @brief Health check for API endpoint
    *
-   * @return Timestamp in unix epchos
+   * @return HTTP code from health check
    */
-  uint32_t Check() const;
+  unsigned int Check() const;
 
   /**
    * @brief Send serialized measurement to the API

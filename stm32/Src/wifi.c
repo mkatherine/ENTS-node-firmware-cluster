@@ -41,18 +41,24 @@ void Upload(void);
  *
  * Connects to WiFi network and sets the system time. Code will block and
  * reattempt connection until successful.
+ *
+ * @return error status, false if successful, true if error
  */
-void Connect(void);
+bool Connect(void);
 
 /**
  * @brief Timesync with NTP server
+ * 
+ * @return error status, false if successful, true if error
  */
-void TimeSync(void);
+bool TimeSync(void);
 
 /**
  * @brief Check API health
+ *
+ * @return error status, false if successful, true if error
  */
-void Check(void);
+bool Check(void);
 
 /**
  * @brief Setup upload timer
@@ -61,15 +67,19 @@ void Check(void);
  */
 void StartUploads(void);
 
+/**
+ * @brief Call initialization functions for ESP32
+ *
+ * Connects to a WiFi network, checks API health, and syncs time.
+ */
+void Esp32Init(void);
+
 void WiFiInit(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "WiFi app starting\r\n");
 
-  // connect to WiFi
-  Connect();
-  // sync with NTP server
-  TimeSync();
-  // API health check
-  Check();
+  // init esp32 WiFi code
+  Esp32Init();
+
   // start timers for uploading
   StartUploads();
 }
@@ -122,40 +132,6 @@ void Upload(void) {
   } while (http_code == 0);
 }
 
-void Connect(void) {
-  //  load configurations
-  const UserConfiguration* cfg = UserConfigGet();
-
-  //const char ssid[] = "UCSC-Devices";
-  //const char* passwd = "hqWeRfvsn7eLd7MPrW";
-  
-  const char ssid[] = "HARE_Lab";
-  const char* passwd = "";
-
-
-  // initialize
-  unsigned int num_tries = 0;
-
-  uint8_t wifi_status = 0;
-
-  while (wifi_status != 3) {
-    //APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...", cfg->WiFi_SSID);
-    //wifi_status = ControllerWiFiInit(cfg->WiFi_SSID, cfg->WiFi_Password);
-    APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s...", ssid);
-    wifi_status = ControllerWiFiInit(ssid, passwd);
-
-    if (wifi_status == 3) {
-      APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
-    } else {
-      APP_LOG(TS_OFF, VLEVEL_M, "Attempt %d failed!\r\n", num_tries);
-      APP_LOG(TS_OFF, VLEVEL_M, "Retrying in 10 seconds...\r\n");
-      HAL_Delay(10000);
-    }
-
-    ++num_tries;
-  }
-}
-
 void StartUploads(void) {
   // start sensor measurements
   APP_LOG(TS_ON, VLEVEL_M, "Starting sensor measurements...\t");
@@ -170,23 +146,109 @@ void StartUploads(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "Started!\r\n");
 }
 
-void TimeSync(void) {
+bool Connect(void) {
+  //  load configurations
+  const UserConfiguration* cfg = UserConfigGet();
+
+  //const char ssid[] = "UCSC-Devices";
+  //const char* passwd = "hqWeRfvsn7eLd7MPrW";
+  
+  //const char ssid[] = "HARE_Lab";
+  //const char* passwd = "";
+  
+  //const char* ssid = cfg->WiFi_SSID;
+  //const char* passwd = cfg->WiFi_Password;
+ 
+  const char* passwd;
+  const char emtpy_passwd[] = "";
+ 
+  // NOTE temporary fix for null password
+  const char* ssid = cfg->WiFi_SSID;
+  if (cfg->WiFi_Password[0] == 'a') {
+    passwd = emtpy_passwd;
+  } else {
+    passwd = cfg->WiFi_Password;
+  }
+
+  APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s. Status: ", ssid);
+  uint8_t wifi_status = ControllerWiFiInit(ssid, passwd);
+  APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", wifi_status);
+
+  // check for errors with the following order
+  // WL_NO_SSID_AVAIL
+  // WL_CONNECT_FAILED
+  // WL_CONNECT_LOST
+  // WL_NO_SHIELD
+  if (wifi_status == 1 || wifi_status == 4 || wifi_status == 5 || wifi_status == 255) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Error connecting to WiFi!\r\n");
+    return true;
+  }
+
+  return false;
+}
+
+bool TimeSync(void) {
   SysTime_t ts = {.Seconds = -1, .SubSeconds = 0};
 
   APP_LOG(TS_OFF, VLEVEL_M, "Syncing time...\t");
   ts.Seconds = ControllerWiFiTime();
+ 
+  // check for errors
+  if (ts.Seconds == 0) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Error syncing time!\r\n");
+    return true;
+  }
+  
   SysTimeSet(ts);
+
   APP_LOG(TS_OFF, VLEVEL_M, "Done!\r\n");
   APP_LOG(TS_OFF, VLEVEL_M, "Current timestamp is %d\r\n", ts.Seconds);
+
+  return false;
 }
 
-void Check(void) {
+bool Check(void) {
   const UserConfiguration* cfg = UserConfigGet();
   
+  //const char url[] = "dirtviz.jlab.ucsc.edu";
+  //const uint32_t port = 80;
+  
   const char url[] = "dirtviz.jlab.ucsc.edu";
-  const uint32_t port = 80;
+  const uint32_t port = cfg->API_Endpoint_Port; 
 
-  APP_LOG(TS_ON, VLEVEL_M, "Checking API health...\t");
-  unsigned int http_code = ControllerWiFiCheck(url, port);
-  APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
+  // retry pinging API
+  // http code is misleading as it holds http code and the WiFi status
+  unsigned int http_code = 0;
+  while (http_code != 200) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Checking API health...\t");
+    http_code = ControllerWiFiCheck(url, port);
+    APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
+
+    // check for WiFi issues
+    if (http_code == 1 || http_code == 4 || http_code == 5) {
+      return true;
+    }
+
+    HAL_Delay(5000);
+  }
+
+  return false;
+}
+
+void Esp32Init(void) {
+  bool error = true;
+
+  while (error) {
+    // Start WiFi connection
+    error = Connect();
+    if (error) continue;
+
+    // Check WiFi connection and API health
+    error = Check();
+    if (error) continue;
+
+    // sync with NTP server
+    error = TimeSync();
+    if (error) continue;
+  }
 }

@@ -78,43 +78,15 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   Log.noticeln("ssid: %s", cmd.command.wifi_command.ssid);
   Log.noticeln("passwd: %s", cmd.command.wifi_command.passwd);
 
-  WiFi.setHostname("esp32");
-
-  // TODO fix
-  // flag to switch between connecting and checking
-  static bool conn_started = false;
+  // TODO update hostname to something sane
+  //WiFi.setHostname("esp32");
 
   // connect to WiFi
-  //WiFi.disconnect();
-  int status; 
-
-  if (!conn_started) {
-    status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
-    conn_started = true;
-  } else {
-    status = WiFi.status();
-  }
+  WiFi.disconnect();
+  int status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
 
   Log.noticeln("WiFi connection status: %d", status);
   
-  if (status == WL_CONNECTED) {
-    Log.noticeln("IP Address: %p", WiFi.localIP());
-    Log.noticeln("Gateway IP: %p", WiFi.gatewayIP());
-    Log.noticeln("Subnet Mask: %p", WiFi.subnetMask());
-    Log.noticeln("DNS: %p", WiFi.dnsIP());
-
-    // reconfigure DNS
-    WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), IPAddress(1,1,1,1));
-    
-    Log.noticeln("New DNS: %p", WiFi.dnsIP());
-
-    // start timeclient
-    timeClient->begin();
-  } else if (status == WL_CONNECT_FAILED) {
-    Log.errorln("Connection failed!");
-  } else if (status == WL_NO_SSID_AVAIL) {
-    Log.errorln("SSID not available!");
-  }
 
   // set status
   wifi_cmd.rc = status;
@@ -169,21 +141,29 @@ void ModuleWiFi::Check(const Esp32Command& cmd) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_CHECK;
 
-  // check if connected to WiFi connected
-  uint8_t wifi_status = WiFi.status();
-  if (wifi_status != WL_CONNECTED) {
-    Log.errorln("Not connected to WiFi!");
+  // set url and port
+  dirtviz.SetUrl(cmd.command.wifi_command.url);
+  dirtviz.SetPort(cmd.command.wifi_command.port);
 
-    wifi_cmd.rc = wifi_status;
-  } else {
-    // set url
-    dirtviz.SetUrl(cmd.command.wifi_command.url);
-    dirtviz.SetPort(cmd.command.wifi_command.port);
-
-    // TODO Add API status check
+  int status = WiFi.status();
+  wifi_cmd.rc = status;
+  if (status == WL_CONNECTED) {
+    Log.noticeln("IP Address: %p", WiFi.localIP());
+    Log.noticeln("Gateway IP: %p", WiFi.gatewayIP());
+    Log.noticeln("Subnet Mask: %p", WiFi.subnetMask());
+    Log.noticeln("DNS: %p", WiFi.dnsIP());
+    
     Log.notice("Checking API endpoint...\t");
     wifi_cmd.rc = dirtviz.Check();
     Log.noticeln("%d", wifi_cmd.rc);
+
+    // reconfigure DNS
+    //WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), IPAddress(1,1,1,1)); 
+    //Log.noticeln("New DNS: %p", WiFi.dnsIP());
+  } else if (status == WL_CONNECT_FAILED) {
+    Log.errorln("Connection failed!");
+  } else if (status == WL_NO_SSID_AVAIL) {
+    Log.errorln("SSID not available!");
   }
 
   request_buffer_len = EncodeWiFiCommand(
@@ -198,29 +178,21 @@ void ModuleWiFi::Time(const Esp32Command& cmd) {
 
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_TIME;
-
-  // update NTP server url
-  /*
-  if (cmd.command.wifi_command.url != NULL) {
-    Log.traceln("Upating pool name to: %s", cmd.command.wifi_command.url);
-    timeClient->setPoolServerName(cmd.command.wifi_command.url);
-  }
-  */
-  
+    
   // check if connected to WiFi connected
-  uint8_t wifi_status = WiFi.status();
+  int wifi_status = WiFi.status();
+  wifi_cmd.rc = wifi_status;
   if (wifi_status != WL_CONNECTED) {
     Log.errorln("Not connected to WiFi!");
-
-    wifi_cmd.ts = 0;
   } else {
+    // start timeclient
+    timeClient->begin();
     // force update
     if (timeClient->update()) {
       wifi_cmd.ts = timeClient->getEpochTime();
       Log.traceln("Current timestamp: %d", wifi_cmd.ts);
     } else {
       Log.traceln("Failed to get time from NTP server!");
-      wifi_cmd.ts = 0;
     }
   }
 

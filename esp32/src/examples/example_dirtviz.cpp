@@ -13,10 +13,10 @@
 /** Baud rate for serial interface */
 #define SERIAL_BAUD 115200
 
-const char ssid[] = "wifi-network-here";
-const char pass[] = "wifi-password-here";
+const char ssid[] = "TP-Link_8FE0";
+const char pass[] = "TimmysDisciples";
 
-Dirtviz api("ip address here", 8080);
+Dirtviz api("http://192.168.0.156/", 8080);
 
 const char data[] = "message-here";
 const size_t data_len = 21;

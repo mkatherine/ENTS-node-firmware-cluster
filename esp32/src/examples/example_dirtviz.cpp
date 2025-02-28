@@ -16,7 +16,7 @@
 const char ssid[] = "TP-Link_8FE0";
 const char pass[] = "TimmysDisciples";
 
-Dirtviz api("http://192.168.0.156/", 8080);
+Dirtviz api("192.168.0.156", 8080);
 
 const char data[] = "message-here";
 const size_t data_len = 21;

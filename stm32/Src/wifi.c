@@ -150,26 +150,9 @@ bool Connect(void) {
   //  load configurations
   const UserConfiguration* cfg = UserConfigGet();
 
-  //const char ssid[] = "UCSC-Devices";
-  //const char* passwd = "hqWeRfvsn7eLd7MPrW";
-  
-  //const char ssid[] = "HARE_Lab";
-  //const char* passwd = "";
-  
-  //const char* ssid = cfg->WiFi_SSID;
-  //const char* passwd = cfg->WiFi_Password;
- 
-  const char* passwd;
-  const char emtpy_passwd[] = "";
- 
-  // NOTE temporary fix for null password
   const char* ssid = cfg->WiFi_SSID;
-  if (cfg->WiFi_Password[0] == 'a') {
-    passwd = emtpy_passwd;
-  } else {
-    passwd = cfg->WiFi_Password;
-  }
-
+  const char* passwd = cfg->WiFi_Password;
+ 
   APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s. Status: ", ssid);
   uint8_t wifi_status = ControllerWiFiInit(ssid, passwd);
   APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", wifi_status);

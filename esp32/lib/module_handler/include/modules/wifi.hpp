@@ -4,34 +4,31 @@
  * @brief Module for WiFi communication
  * @version 0.1
  * @date 2024-08-23
- * 
+ *
  * The WiFi module support CONNECT and POST commands through OnReceive. The
  * CONNECT command connects to a WiFi network and returns the timestamp from the
  * server for time syncronization purposes. The POST requires sends a HTTP POST
  * to the configured hub URL and returns the data from the HTTP response.
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
-#ifndef ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_
-#define ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_
+#ifndef LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_HPP_
+#define LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_HPP_
 
 #include <Arduino.h>
+#include <NTPClient.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
-#include <NTPClient.h>
 
 #include "dirtviz.hpp"
-
-#include "template_module.hpp"
-
 #include "soil_power_sensor.pb.h"
+#include "template_module.hpp"
 #include "transcoder.h"
 
-class ModuleWiFi: public ModuleHandler::Module {
-  public:
-
+class ModuleWiFi : public ModuleHandler::Module {
+ public:
   ModuleWiFi(void);
 
   ~ModuleWiFi(void);
@@ -46,8 +43,7 @@ class ModuleWiFi: public ModuleHandler::Module {
    */
   size_t OnRequest(uint8_t* buffer);
 
-  private:
-
+ private:
   typedef enum {
     /** Receive WiFi SSID, password, and URL */
     CONNECT = 0,
@@ -57,14 +53,14 @@ class ModuleWiFi: public ModuleHandler::Module {
 
   /**
    * @brief Object interface to Dirtviz
-   * 
+   *
    */
   Dirtviz dirtviz;
 
   void Post(const Esp32Command& cmd);
 
   void Connect(const Esp32Command& cmd);
-  
+
   void Check(const Esp32Command& cmd);
 
   void Time(const Esp32Command& cmd);
@@ -78,4 +74,4 @@ class ModuleWiFi: public ModuleHandler::Module {
   size_t request_buffer_len = 0;
 };
 
-#endif // ESP32_LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_H_
+#endif  // LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_HPP_

@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef STM32_INC_WIFI_H_
-#define STM32_INC_WIFI_H_
+#ifndef INC_WIFI_H_
+#define INC_WIFI_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,4 +30,4 @@ void WiFiInit(void);
 }
 #endif
 
-#endif  // STM32_INC_WIFI_H_
+#endif  // INC_WIFI_H_

@@ -1,16 +1,17 @@
 /**
  * @see dirtviz.hpp
- * 
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-29
-*/
+ */
 
 #include "dirtviz.hpp"
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
-#include <sstream>
+
 #include <iomanip>
+#include <sstream>
 #include <vector>
 
 /** Timeout for http responses */
@@ -21,51 +22,41 @@ const size_t g_request_size = 512;
 
 Dirtviz::Dirtviz(void) : url(nullptr) {}
 
-Dirtviz::Dirtviz(const char *url, const uint16_t &port)
-{
+Dirtviz::Dirtviz(const char *url, const uint16_t &port) {
   // set parameters
   this->SetUrl(url);
   this->SetPort(port);
 }
 
-Dirtviz::~Dirtviz()
-{
+Dirtviz::~Dirtviz() {
   // free memory
   free(this->url);
 }
 
-void Dirtviz::SetUrl(const char *new_url)
-{
+void Dirtviz::SetUrl(const char *new_url) {
   // get length of new url string, add 1 for null char
   size_t url_len = strlen(new_url);
   ++url_len;
 
   // allocate memory
-  char * temp_url = (char *) realloc(this->url, url_len);
+  char *temp_url = reinterpret_cast<char *>(realloc(this->url, url_len));
 
   if (temp_url != nullptr) {
     this->url = temp_url;
-    strcpy(this->url, new_url); // strcpy is safe here because we just allocated enough space
+    strncpy(
+        this->url, new_url,
+        url_len);  // strcpy is safe here because we just allocated enough space
   } else {
-    // Handle allocation failure (e.g., set an error flag, use a default URL, etc.)
-    
+    // Handle allocation failure (e.g., set an error flag, use a default URL,
+    // etc.)
   }
 }
 
-const char *Dirtviz::GetUrl(void) const
-{
-  return this->url; 
-}
+const char *Dirtviz::GetUrl(void) const { return this->url; }
 
-void Dirtviz::SetPort(const uint16_t &new_port)
-{
-  this->port = new_port;
-}
+void Dirtviz::SetPort(const uint16_t &new_port) { this->port = new_port; }
 
-uint16_t Dirtviz::GetPort(void) const
-{
-  return this->port;
-}
+uint16_t Dirtviz::GetPort(void) const { return this->port; }
 
 unsigned int Dirtviz::Check() const {
   Log.traceln("Dirtviz::Check");
@@ -96,10 +87,10 @@ unsigned int Dirtviz::Check() const {
     // timeout
     if (millis() > timeout) {
       Log.noticeln("API Check timeout!");
-      return (uint32_t) -1;
+      return (uint32_t)-1;
     }
 
-    //Log.traceln("Delaying until available");
+    // Log.traceln("Delaying until available");
     delay(100);
   }
 
@@ -109,11 +100,11 @@ unsigned int Dirtviz::Check() const {
     char c = client.read();
     resp += c;
   }
-  
+
   // close connection
   client.flush();
-  client.stop();  
- 
+  client.stop();
+
   // read string into an object
   HttpClient http_client(resp);
 
@@ -140,10 +131,9 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   }
 
   // send data
-  
-  
+
   // format request
-  // TODO fix hardcoded api path
+  // TODO(jmadden173) fix hardcoded api path
   std::ostringstream headers;
   headers << "POST /api/sensor/ HTTP/1.1" << "\r\n";
   headers << "Host: " << url << "\r\n";
@@ -158,7 +148,8 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
 
   // copy data into request array
   std::vector<char> request;
-  std::copy(headers_str.begin(), headers_str.end(), std::back_inserter(request));
+  std::copy(headers_str.begin(), headers_str.end(),
+            std::back_inserter(request));
   std::copy(meas, meas + meas_len, std::back_inserter(request));
 
   Log.traceln("Length of request: %d", request.size());
@@ -171,21 +162,20 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   unsigned int timeout = millis() + g_resp_timeout;
   while (!client.available()) {
     // timeout
-    if (millis() >  timeout) {
+    if (millis() > timeout) {
       Log.noticeln("Send measurement timeout!");
       Log.noticeln("WiFi status: %d", WiFi.status());
       HttpClient empty_resp;
-    
+
       client.flush();
       client.stop();
 
       return empty_resp;
     }
 
-    //Log.traceln("Delaying until available");
+    // Log.traceln("Delaying until available");
     delay(100);
   }
-
 
   // read response
   std::string resp;
@@ -193,14 +183,13 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
     char c = client.read();
     resp += c;
   }
-  
+
   // close connection
   client.flush();
-  client.stop();  
- 
+  client.stop();
+
   // read string into an object
   HttpClient http_client(resp);
-  
+
   return http_client;
 }
-

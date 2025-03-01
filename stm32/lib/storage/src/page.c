@@ -2,7 +2,7 @@
 
 /**
  * @brief Block size of the i2c communication
- * 
+ *
  * This can be tuned for performance but is left at 16 to accommodate small
  * hardware buffers.
  */
@@ -45,13 +45,9 @@ void PageDeinit(void) {
   }
 }
 
-Page* PageFront(void) {
-  return front;
-}
+Page* PageFront(void) { return front; }
 
-Page* PageBack(void) {
-  return back;
-}
+Page* PageBack(void) { return back; }
 
 Page* PagePushFront(void) {
   // allocate new page
@@ -75,7 +71,7 @@ Page* PagePushFront(void) {
     front = new_page;
   }
 
-  // update counter 
+  // update counter
   ++size;
   ++file_counter;
 
@@ -87,12 +83,12 @@ void PagePopFront(void) {
   if (PageEmpty()) {
     return;
   }
-  
+
   // close file if open
   if (back->open) {
     PageClose(back);
   }
-  
+
   // NULL pointers if one element left
   if ((front == back) && (size == 1)) {
     // free memory
@@ -100,11 +96,11 @@ void PagePopFront(void) {
     // set null pointers
     front = NULL;
     back = NULL;
-  // set next to front 
+    // set next to front
   } else {
     // free memory
     free(front);
-    // store tmp pointer to next 
+    // store tmp pointer to next
     Page* front_next = front->next;
     // "remove" front from linked list
     front_next->prev = NULL;
@@ -131,14 +127,14 @@ Page* PagePushBack(void) {
   if (PageEmpty()) {
     front = new_page;
     back = new_page;
-  // normal case
+    // normal case
   } else {
     new_page->prev = back;
     back->next = new_page;
     back = new_page;
   }
 
-  // update counter 
+  // update counter
   ++size;
   ++file_counter;
 
@@ -155,7 +151,7 @@ void PagePopBack(void) {
   if (back->open) {
     PageClose(back);
   }
-  
+
   // NULL pointers if one element left
   if ((front == back) && (size == 1)) {
     // free memory
@@ -163,7 +159,7 @@ void PagePopBack(void) {
     // set null pointers
     front = NULL;
     back = NULL;
-  // set next to front 
+    // set next to front
   } else {
     // free memory
     free(back);
@@ -179,20 +175,18 @@ void PagePopBack(void) {
 }
 
 void PageOpen(Page* page) {
-  // TODO
+  // TODO(jtmadden): implement
 
   page->open = true;
 }
 
 void PageClose(Page* page) {
-  // TODO
+  // TODO(jtmadden): implement
 
   page->open = false;
 }
 
-inline size_t PageSize(void) {
-  return size;
-}
+inline size_t PageSize(void) { return size; }
 
 inline bool PageEmpty(void) {
   if ((front == NULL) && (back == NULL) && (size == 0)) {
@@ -203,9 +197,9 @@ inline bool PageEmpty(void) {
 }
 
 void PageStateSave(void) {
-  // TODO
+  // TODO(jtmadden): implement
 }
 
 void PageStateLoad(void) {
-  // TODO
+  // TODO(jtmadden): implement
 }

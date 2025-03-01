@@ -5,25 +5,24 @@
 #include "communication.h"
 #include "soil_power_sensor.pb.h"
 
-
 void ControllerInit(void) {
   const size_t buffer_size = Esp32Command_size;
 
   Buffer* tx = ControllerTx();
 
   // allocate tx buffer
-  tx->data = (uint8_t*) malloc(buffer_size);
+  tx->data = (uint8_t*)malloc(buffer_size);
   tx->size = buffer_size;
   tx->len = 0;
 
   Buffer* rx = ControllerRx();
 
   // allocate rx buffer
-  rx->data = (uint8_t*) malloc(buffer_size);
+  rx->data = (uint8_t*)malloc(buffer_size);
   rx->size = buffer_size;
   rx->len = 0;
 
-  // TODO Add check for communication
+  // TODO(jtmaden): Add check for communication
 }
 
 void ControllerDeinit(void) {

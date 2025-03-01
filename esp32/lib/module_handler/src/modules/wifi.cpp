@@ -114,7 +114,8 @@ void ModuleWiFi::Post(const Esp32Command& cmd) {
 
     // send measurement
     HttpClient resp_msg = this->dirtviz.SendMeasurement(meas, meas_len);
-    const uint8_t* resp = reinterpret_cast<const uint8_t*>(resp_msg.Data().c_str());
+    const uint8_t* resp =
+        reinterpret_cast<const uint8_t*>(resp_msg.Data().c_str());
     size_t resp_len = resp_msg.Data().length();
     unsigned int status_code = resp_msg.ResponseCode();
 

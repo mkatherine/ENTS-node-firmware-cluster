@@ -55,7 +55,6 @@ void setup() {
 }
 
 void loop() {
-
   const uint8_t *resp_data;
   size_t resp_data_len;
 

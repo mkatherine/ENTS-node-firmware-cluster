@@ -86,7 +86,8 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
     Esp32Command cmd =
         DecodeEsp32Command(receive_buffer.data, receive_buffer.len);
 
-    Log.verboseln("Forwarding message to: cmd.which_command: %d", cmd.which_command);
+    Log.verboseln("Forwarding message to: cmd.which_command: %d",
+                  cmd.which_command);
 
     // store reference to module for future OnRequest calls
     last_module = req_map.at(cmd.which_command);

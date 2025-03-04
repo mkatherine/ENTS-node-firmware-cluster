@@ -155,9 +155,6 @@ void ModuleWiFi::Check(const Esp32Command& cmd) {
     wifi_cmd.rc = dirtviz.Check();
     Log.noticeln("Response code: %d", wifi_cmd.rc);
 
-    // reconfigure DNS
-    // WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(),
-    // IPAddress(1,1,1,1)); Log.noticeln("New DNS: %p", WiFi.dnsIP());
   } else if (status == WL_CONNECT_FAILED) {
     Log.errorln("Connection failed!");
   } else if (status == WL_NO_SSID_AVAIL) {

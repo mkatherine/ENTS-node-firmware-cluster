@@ -151,9 +151,9 @@ void ModuleWiFi::Check(const Esp32Command& cmd) {
     Log.noticeln("Subnet Mask: %p", WiFi.subnetMask());
     Log.noticeln("DNS: %p", WiFi.dnsIP());
 
-    Log.notice("Checking API endpoint...\t");
+    Log.noticeln("Checking API endpoint");
     wifi_cmd.rc = dirtviz.Check();
-    Log.noticeln("%d", wifi_cmd.rc);
+    Log.noticeln("Response code: %d", wifi_cmd.rc);
 
     // reconfigure DNS
     // WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(),
@@ -185,9 +185,9 @@ void ModuleWiFi::Time(const Esp32Command& cmd) {
     // force update
     if (timeClient->update()) {
       wifi_cmd.ts = timeClient->getEpochTime();
-      Log.traceln("Current timestamp: %d", wifi_cmd.ts);
+      Log.noticeln("Current timestamp: %d", wifi_cmd.ts);
     } else {
-      Log.traceln("Failed to get time from NTP server!");
+      Log.errorln("Failed to get time from NTP server!");
     }
   }
 

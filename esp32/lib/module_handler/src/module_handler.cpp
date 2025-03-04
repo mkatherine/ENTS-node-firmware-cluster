@@ -40,7 +40,7 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
 #else
   // set continue flag to first byte
   bool msg_end = static_cast<bool>(Wire.read());
-  Log.traceln("msg_end: %T", msg_end);
+  Log.verboseln("msg_end: %T", msg_end);
 #endif
 
   // get end of buffer
@@ -61,14 +61,14 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
 #else
     // check if available
     if (!Wire.available()) {
-      Serial.printf("Specified number of bytes is not available");
+      Log.errorln("Specified number of bytes is not available");
     }
 
     // read data
     *end = Wire.read();
 #endif
 
-    Log.traceln("Wire.read -> %X", *end);
+    Log.verboseln("Wire.read -> %X", *end);
 
     // increment length
     receive_buffer.len++;
@@ -86,8 +86,7 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
     Esp32Command cmd =
         DecodeEsp32Command(receive_buffer.data, receive_buffer.len);
 
-    Log.traceln("Forwarding message");
-    Log.verboseln("cmd.which_command: %d", cmd.which_command);
+    Log.verboseln("Forwarding message to: cmd.which_command: %d", cmd.which_command);
 
     // store reference to module for future OnRequest calls
     last_module = req_map.at(cmd.which_command);
@@ -122,13 +121,12 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
     len_bytes[1] = (uint8_t)request_buffer.len & 0xFF;
     len_bytes[0] = (uint8_t)((request_buffer.len >> 8) & 0xFF);
 
-    Log.traceln("len_bytes = {%X, %X}", len_bytes[0], len_bytes[1]);
+    Log.verboseln("len_bytes = {%X, %X}", len_bytes[0], len_bytes[1]);
 
     // write to buffer
     Wire.write(len_bytes, sizeof(len_bytes));
 
     Log.traceln("Successfully sent length");
-    Log.traceln("send_length = %T", send_length);
 
     // set flag that length was sent
     send_length = false;

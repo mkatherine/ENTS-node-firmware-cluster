@@ -10,6 +10,7 @@
 #ifndef LIB_DIRTVIZ_INCLUDE_DIRTVIZ_HPP_
 #define LIB_DIRTVIZ_INCLUDE_DIRTVIZ_HPP_
 
+#include <LCBUrl.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
@@ -36,9 +37,8 @@ class Dirtviz {
    * Allows for setting of URL on initialization.
    *
    * @param url API URL
-   * @param port API port number
    */
-  Dirtviz(const char *url, const uint16_t &port);
+  explicit Dirtviz(const char *url);
 
   /**
    * @brief Frees all memory
@@ -46,39 +46,18 @@ class Dirtviz {
   ~Dirtviz();
 
   /**
-   * @brief Setter for @p url
+   * @brief Set new URL string
    *
    * @param new_url New API URL
    */
-  void SetUrl(const char *new_url);
-
-  /**
-   * @brief Getter for @p url
-   *
-   * @returns Pointer to @p url
-   */
-  const char *GetUrl(void) const;
-
-  /**
-   * @brief Setter for @p port
-   *
-   * @param new_port New port number
-   */
-  void SetPort(const uint16_t &new_port);
-
-  /**
-   * @brief Getter for @p port
-   *
-   * @returns value of @p url
-   */
-  uint16_t GetPort(void) const;
+  void SetUrl(const char *url);
 
   /**
    * @brief Health check for API endpoint
    *
    * @return HTTP code from health check
    */
-  unsigned int Check() const;
+  unsigned int Check();
 
   /**
    * @brief Send serialized measurement to the API
@@ -92,10 +71,7 @@ class Dirtviz {
 
  private:
   /** URL of API */
-  char *url = nullptr;
-
-  /** Port of API*/
-  uint16_t port;
+  LCBUrl url;
 
   /**
    * @brief Starts connection with server

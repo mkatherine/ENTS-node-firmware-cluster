@@ -142,7 +142,6 @@ void ModuleWiFi::Check(const Esp32Command& cmd) {
 
   // set url and port
   dirtviz.SetUrl(cmd.command.wifi_command.url);
-  dirtviz.SetPort(cmd.command.wifi_command.port);
 
   int status = WiFi.status();
   wifi_cmd.rc = status;

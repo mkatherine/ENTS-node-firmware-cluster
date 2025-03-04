@@ -16,7 +16,7 @@
 const char ssid[] = "wifi-network-here";
 const char pass[] = "wifi-password-here";
 
-Dirtviz api("ip address here", 8080);
+Dirtviz api("ip address here");
 
 const char data[] = "message-here";
 const size_t data_len = 21;

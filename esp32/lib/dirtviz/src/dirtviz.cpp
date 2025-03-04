@@ -20,9 +20,13 @@ unsigned int g_resp_timeout = 1000;
 /** Max size of HTTP POST request */
 const size_t g_request_size = 512;
 
+// TODO(jmadden173): update to dynamic version
+/** User agent string */
+const char g_user_agent[] = "ents/2.3.0";
+
 Dirtviz::Dirtviz(void) {}
 
-explicit Dirtviz::Dirtviz(const char* url) { SetUrl(url); }
+Dirtviz::Dirtviz(const char* url) { SetUrl(url); }
 
 Dirtviz::~Dirtviz() {}
 
@@ -49,7 +53,7 @@ unsigned int Dirtviz::Check() {
   std::ostringstream req;
   req << "GET " << "/api/" << " HTTP/1.1" << "\r\n";
   req << "Host: " << url.getHost().c_str() << "\r\n";
-  req << "User-Agent: curl/8.10.1" << "\r\n";
+  req << "User-Agent: " << g_user_agent << "\r\n";
   req << "\r\n";
 
   // send full request to server
@@ -113,7 +117,7 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t* meas, size_t meas_len) {
   std::ostringstream headers;
   headers << "POST " << "/" << url.getPath().c_str() << " HTTP/1.1" << "\r\n";
   headers << "Host: " << url.getHost().c_str() << "\r\n";
-  headers << "User-Agent: curl/8.10.1" << "\r\n";
+  headers << "User-Agent: " << g_user_agent << "\r\n";
   headers << "Content-Type: application/octet-stream" << "\r\n";
   headers << "Content-Length: " << meas_len << "\r\n";
   headers << "Connection: close" << "\r\n";

@@ -4,9 +4,9 @@
  * @brief Template file for tests
  * @version 0.1
  * @date 2024-08-12
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #include <Arduino.h>
@@ -16,9 +16,7 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
-void test_true(void) {
-  TEST_ASSERT_TRUE(true);
-}
+void test_true(void) { TEST_ASSERT_TRUE(true); }
 
 void setup() {
   // NOTE!!! Wait for >2 secs

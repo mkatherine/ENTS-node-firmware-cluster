@@ -1,10 +1,10 @@
 #include "module_handler.hpp"
 
-#include <cstring>
-
 #include <Arduino.h>
-#include <Wire.h>
 #include <ArduinoLog.h>
+#include <Wire.h>
+
+#include <cstring>
 
 #include "transcoder.h"
 
@@ -12,8 +12,7 @@ ModuleHandler::ModuleHandler::ModuleHandler() {}
 
 ModuleHandler::ModuleHandler::~ModuleHandler() {}
 
-void ModuleHandler::ModuleHandler::RegisterModule(Module *module)
-{
+void ModuleHandler::ModuleHandler::RegisterModule(Module* module) {
   // add module to map based on type
   int type = module->Type();
   req_map[type] = module;
@@ -28,24 +27,24 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
   Log.traceln("ModuleHandler::OnReceive");
 
   if (receive_buffer.len + num_bytes > receive_buffer.size) {
-    // TODO handle error
+    // TODO(jmadden173) handle error
   }
 
-  #ifdef UNIT_TEST
+#ifdef UNIT_TEST
   // Store pointer to the rx buffer
   uint8_t* module_handler_rx_buffer_idx = module_handler_rx_buffer;
   // get msg end flag
   bool msg_end = module_handler_rx_buffer_idx;
   // increment idx
   ++module_handler_rx_buffer_idx;
-  #else
+#else
   // set continue flag to first byte
-  bool msg_end = (bool) Wire.read();
+  bool msg_end = static_cast<bool>(Wire.read());
   Log.traceln("msg_end: %T", msg_end);
-  #endif
+#endif
 
   // get end of buffer
-  uint8_t* prev_end = NULL; 
+  uint8_t* prev_end = NULL;
   if (receive_buffer.len == 0) {
     prev_end = receive_buffer.data;
   } else {
@@ -54,12 +53,12 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
 
   // loop over available bytes in buffer
   for (uint8_t* end = prev_end; end < prev_end + num_bytes - 1; end++) {
-    #ifdef UNIT_TEST
+#ifdef UNIT_TEST
     // copy bytes
     *end = *module_handler_rx_buffer_idx;
     // increment idx
     module_handler_rx_buffer_idx++;
-    #else
+#else
     // check if available
     if (!Wire.available()) {
       Serial.printf("Specified number of bytes is not available");
@@ -67,7 +66,7 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
 
     // read data
     *end = Wire.read();
-    #endif
+#endif
 
     Log.traceln("Wire.read -> %X", *end);
 
@@ -84,7 +83,8 @@ void ModuleHandler::ModuleHandler::OnReceive(size_t num_bytes) {
     }
 
     // decode measurement
-    Esp32Command cmd = DecodeEsp32Command(receive_buffer.data, receive_buffer.len);
+    Esp32Command cmd =
+        DecodeEsp32Command(receive_buffer.data, receive_buffer.len);
 
     Log.traceln("Forwarding message");
     Log.verboseln("cmd.which_command: %d", cmd.which_command);
@@ -119,8 +119,8 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
 
     // send in little-endian
     uint8_t len_bytes[2] = {};
-    len_bytes[1] = (uint8_t) request_buffer.len & 0xFF;
-    len_bytes[0] = (uint8_t) ((request_buffer.len >> 8) & 0xFF);
+    len_bytes[1] = (uint8_t)request_buffer.len & 0xFF;
+    len_bytes[0] = (uint8_t)((request_buffer.len >> 8) & 0xFF);
 
     Log.traceln("len_bytes = {%X, %X}", len_bytes[0], len_bytes[1]);
 
@@ -133,24 +133,25 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
     // set flag that length was sent
     send_length = false;
 
-  // otherwise send data
+    // otherwise send data
   } else {
     Log.traceln("Sending data");
     /** Buffer size for the Wire Arduino library. Determines the max number of
      * bytes that can be communicated. Varies between platforms but avr uses a
      * buffer size of 32. */
-    static const int wire_buffer_size = 32; 
+    static const int wire_buffer_size = 32;
 
     // get number of bytes remaining
     size_t bytes_remaining = request_buffer.len - request_buffer.idx;
     Log.traceln("Bytes remaining: %d", bytes_remaining);
 
     for (int i = 0; i < request_buffer.len; i++) {
-      Log.verboseln("request_buffer[%d] = %X", request_buffer.len, request_buffer.data[i]);
+      Log.verboseln("request_buffer[%d] = %X", request_buffer.len,
+                    request_buffer.data[i]);
     }
 
     // check if length is less than buffer size
-    if (bytes_remaining < wire_buffer_size-1) {
+    if (bytes_remaining < wire_buffer_size - 1) {
       Log.traceln("Writing with finished flag");
 
       // write finished flag
@@ -172,10 +173,10 @@ void ModuleHandler::ModuleHandler::OnRequest(void) {
 
       // write block of data
       uint8_t* end = request_buffer.data + request_buffer.idx;
-      Wire.write(end, wire_buffer_size-1);
+      Wire.write(end, wire_buffer_size - 1);
 
       // increment idx
-      request_buffer.idx += wire_buffer_size-1;
+      request_buffer.idx += wire_buffer_size - 1;
     }
   }
 }

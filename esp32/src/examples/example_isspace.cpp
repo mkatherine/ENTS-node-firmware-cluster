@@ -5,13 +5,14 @@
  * @date 2024-11-06
  *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
-#include <clocale>
-#include <ctype.h>
 #include <Arduino.h>
 #include <ArduinoLog.h>
+#include <ctype.h>
+
+#include <clocale>
 
 void setup() {
   Serial.begin(115200);
@@ -21,8 +22,8 @@ void setup() {
   std::setlocale(LC_ALL, "en_US.UTF-8");
   Log.traceln("Current locale: %s", std::setlocale(LC_ALL, NULL));
 
-  for (unsigned char i=0; i < 127; i++) {
-    Log.traceln("isspace(%C) = %T", i, (bool) isspace(i));
+  for (unsigned char i = 0; i < 127; i++) {
+    Log.traceln("isspace(%C) = %T", i, static_cast<bool>(isspace(i)));
   }
 }
 

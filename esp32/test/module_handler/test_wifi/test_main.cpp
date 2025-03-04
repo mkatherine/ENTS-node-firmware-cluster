@@ -4,9 +4,9 @@
  * @brief Test WiFi code
  * @version 0.1
  * @date 2024-10-07
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #include <Arduino.h>
@@ -36,7 +36,7 @@ void test_RegisterModule(void) {
   // check if module exists in map
   try {
     ModuleHandler::Module* mod = module_handler.GetModule(2);
-  } catch(const std::out_of_range& oor) {
+  } catch (const std::out_of_range& oor) {
     mod_exist = false;
   }
 
@@ -45,8 +45,13 @@ void test_RegisterModule(void) {
 
 void test_Connect(void) {
   // send WiFi command with just type = connect
-  // sps encode --c esp32command wifi --ssid ents-testing --passwd securepassword --url 10.42.0.1 --port 8080 connect
-  uint8_t data[] = {0x1a, 0x2c, 0x12, 0xc, 0x65, 0x6e, 0x74, 0x73, 0x2d, 0x74, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67, 0x1a, 0xe, 0x73, 0x65, 0x63, 0x75, 0x72, 0x65, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x9, 0x31, 0x30, 0x2e, 0x34, 0x32, 0x2e, 0x30, 0x2e, 0x31, 0x40, 0x90, 0x3f};
+  // sps encode --c esp32command wifi --ssid ents-testing --passwd
+  // securepassword --url 10.42.0.1 --port 8080 connect
+  uint8_t data[] = {0x1a, 0x2c, 0x12, 0xc,  0x65, 0x6e, 0x74, 0x73, 0x2d, 0x74,
+                    0x65, 0x73, 0x74, 0x69, 0x6e, 0x67, 0x1a, 0xe,  0x73, 0x65,
+                    0x63, 0x75, 0x72, 0x65, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f,
+                    0x72, 0x64, 0x22, 0x9,  0x31, 0x30, 0x2e, 0x34, 0x32, 0x2e,
+                    0x30, 0x2e, 0x31, 0x40, 0x90, 0x3f};
   size_t data_len = 46;
 
   memcpy(module_handler_rx_buffer, cmd, cmd_len);
@@ -56,12 +61,10 @@ void test_Connect(void) {
   ModuleHandler::Module* mod = module_handler.GetModule(2);
   TEST_ASSERT_EQUAL(ModuleWiFi::CONNECT, mod->State());
 
-  // TODO finish tests
+  // TODO(jtmadden) finish tests
 }
 
-void test_Post(void) {
-
-}
+void test_Post(void) {}
 
 void test_DeregisterModule(void) {
   module_handler.RegisterModule(Esp32Command_wifi_command_tag);

@@ -273,7 +273,8 @@ void test_esp32_wifi() {
   TEST_ASSERT_EQUAL_STRING(url, decode.command.wifi_command.url);
   TEST_ASSERT_EQUAL(200, decode.command.wifi_command.rc);
   TEST_ASSERT_EQUAL(1600000, decode.command.wifi_command.ts);
-  TEST_ASSERT_EQUAL_INT8_ARRAY(bytes, decode.command.wifi_command.resp.bytes, sizeof(bytes));
+  TEST_ASSERT_EQUAL_INT8_ARRAY(bytes, decode.command.wifi_command.resp.bytes,
+                               sizeof(bytes));
   TEST_ASSERT_EQUAL(5, decode.command.wifi_command.resp.size);
   TEST_ASSERT_EQUAL(443, decode.command.wifi_command.port);
 }

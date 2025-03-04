@@ -1,5 +1,5 @@
-#ifndef STM32_LIB_CONTROLLER_INC_CONTROLLER_H_
-#define STM32_LIB_CONTROLLER_INC_CONTROLLER_H_
+#ifndef LIB_CONTROLLER_INCLUDE_CONTROLLER_CONTROLLER_H_
+#define LIB_CONTROLLER_INCLUDE_CONTROLLER_CONTROLLER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,16 +7,16 @@ extern "C" {
 
 /**
  * @brief Shared initialization for all esp32  modules
- * 
+ *
  * Allocates memory to the tx and rx buffers.
- * 
+ *
  * @todo Add check for communication with the esp32
  */
 void ControllerInit(void);
 
 /**
  * @brief Shared deinitialize for all esp32 modules
- * 
+ *
  * Free memory associated with the tx and rx buffers.
  */
 void ControllerDeinit(void);
@@ -25,4 +25,4 @@ void ControllerDeinit(void);
 }
 #endif
 
-#endif // STM32_LIB_CONTROLLER_INC_CONTROLLER_H_
+#endif  // LIB_CONTROLLER_INCLUDE_CONTROLLER_CONTROLLER_H_

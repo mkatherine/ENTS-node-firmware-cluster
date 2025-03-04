@@ -28,31 +28,30 @@ void ModuleWiFi::OnReceive(const Esp32Command& cmd) {
   Log.traceln("WiFiCommand type: %d", cmd.command.wifi_command.type);
 
   // switch for command types
-  switch (cmd.command.wifi_command.type)
-  {
-  case WiFiCommand_Type_CONNECT:
-    Log.traceln("Calling CONNECT");
-    Connect(cmd);
-    break;
+  switch (cmd.command.wifi_command.type) {
+    case WiFiCommand_Type_CONNECT:
+      Log.traceln("Calling CONNECT");
+      Connect(cmd);
+      break;
 
-  case WiFiCommand_Type_POST:
-    Log.traceln("Calling POST");
-    Post(cmd);
-    break;
+    case WiFiCommand_Type_POST:
+      Log.traceln("Calling POST");
+      Post(cmd);
+      break;
 
-  case WiFiCommand_Type_CHECK:
-    Log.traceln("Calling CHECK");
-    Check(cmd);
-    break;
+    case WiFiCommand_Type_CHECK:
+      Log.traceln("Calling CHECK");
+      Check(cmd);
+      break;
 
-  case WiFiCommand_Type_TIME:
-    Log.traceln("Calling TIME");
-    Time(cmd);
-    break;
-  
-  default:
-    Log.warningln("wifi command type not found!");
-    break;
+    case WiFiCommand_Type_TIME:
+      Log.traceln("Calling TIME");
+      Time(cmd);
+      break;
+
+    default:
+      Log.warningln("wifi command type not found!");
+      break;
   }
 }
 
@@ -72,26 +71,28 @@ void ModuleWiFi::Connect(const Esp32Command& cmd) {
   //  print the mac address
   uint8_t mac[6];
   WiFi.macAddress(mac);
-  Log.noticeln("MAC: %x:%x:%x:%x:%x:%x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  Log.noticeln("MAC: %x:%x:%x:%x:%x:%x", mac[0], mac[1], mac[2], mac[3], mac[4],
+               mac[5]);
 
   Log.noticeln("Connecting to WiFI...");
   Log.noticeln("ssid: %s", cmd.command.wifi_command.ssid);
   Log.noticeln("passwd: %s", cmd.command.wifi_command.passwd);
 
-  // TODO update hostname to something sane
-  //WiFi.setHostname("esp32");
+  // TODO(jmadden173) update hostname to something sane
+  // WiFi.setHostname("esp32");
 
   // connect to WiFi
   WiFi.disconnect();
-  int status = WiFi.begin(cmd.command.wifi_command.ssid, cmd.command.wifi_command.passwd);
+  int status = WiFi.begin(cmd.command.wifi_command.ssid,
+                          cmd.command.wifi_command.passwd);
 
   Log.noticeln("WiFi connection status: %d", status);
-  
 
   // set status
   wifi_cmd.rc = status;
 
-  request_buffer_len = EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
+  request_buffer_len =
+      EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
 }
 
 void ModuleWiFi::Post(const Esp32Command& cmd) {
@@ -113,7 +114,8 @@ void ModuleWiFi::Post(const Esp32Command& cmd) {
 
     // send measurement
     HttpClient resp_msg = this->dirtviz.SendMeasurement(meas, meas_len);
-    uint8_t* resp = (uint8_t*) resp_msg.Data().c_str();
+    const uint8_t* resp =
+        reinterpret_cast<const uint8_t*>(resp_msg.Data().c_str());
     size_t resp_len = resp_msg.Data().length();
     unsigned int status_code = resp_msg.ResponseCode();
 
@@ -128,11 +130,8 @@ void ModuleWiFi::Post(const Esp32Command& cmd) {
   }
 
   // encode wifi command in buffer
-  this->request_buffer_len = EncodeWiFiCommand(
-    &wifi_cmd,
-    request_buffer,
-    sizeof(request_buffer)
-  );
+  this->request_buffer_len =
+      EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
 }
 
 void ModuleWiFi::Check(const Esp32Command& cmd) {
@@ -152,25 +151,22 @@ void ModuleWiFi::Check(const Esp32Command& cmd) {
     Log.noticeln("Gateway IP: %p", WiFi.gatewayIP());
     Log.noticeln("Subnet Mask: %p", WiFi.subnetMask());
     Log.noticeln("DNS: %p", WiFi.dnsIP());
-    
+
     Log.notice("Checking API endpoint...\t");
     wifi_cmd.rc = dirtviz.Check();
     Log.noticeln("%d", wifi_cmd.rc);
 
     // reconfigure DNS
-    //WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), IPAddress(1,1,1,1)); 
-    //Log.noticeln("New DNS: %p", WiFi.dnsIP());
+    // WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(),
+    // IPAddress(1,1,1,1)); Log.noticeln("New DNS: %p", WiFi.dnsIP());
   } else if (status == WL_CONNECT_FAILED) {
     Log.errorln("Connection failed!");
   } else if (status == WL_NO_SSID_AVAIL) {
     Log.errorln("SSID not available!");
   }
 
-  request_buffer_len = EncodeWiFiCommand(
-    &wifi_cmd,
-    request_buffer,
-    sizeof(request_buffer)
-  );
+  request_buffer_len =
+      EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
 }
 
 void ModuleWiFi::Time(const Esp32Command& cmd) {
@@ -178,7 +174,7 @@ void ModuleWiFi::Time(const Esp32Command& cmd) {
 
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_TIME;
-    
+
   // check if connected to WiFi connected
   int wifi_status = WiFi.status();
   wifi_cmd.rc = wifi_status;
@@ -196,9 +192,6 @@ void ModuleWiFi::Time(const Esp32Command& cmd) {
     }
   }
 
-  request_buffer_len = EncodeWiFiCommand(
-    &wifi_cmd,
-    request_buffer,
-    sizeof(request_buffer)
-  );
+  request_buffer_len =
+      EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
 }

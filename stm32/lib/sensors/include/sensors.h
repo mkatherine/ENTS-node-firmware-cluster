@@ -113,7 +113,7 @@ int SensorsAdd(SensorsPrototypeMeasure cb);
  *
  * @see SensorsPrototypeMeasure
  */
-size_t SensorsMeasureTest(uint8_t *data);
+size_t SensorsMeasureTest(uint8_t* data);
 
 #ifdef __cplusplus
 }

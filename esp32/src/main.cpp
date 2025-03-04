@@ -1,13 +1,13 @@
 /**
  * @brief Main file for the Soil Power Sensor firmware
- * 
+ *
  * @author John Madden <jmadden173@pm.me>
  * @date 2023-11-28
  */
 
 #include <Arduino.h>
-#include <Wire.h>
 #include <ArduinoLog.h>
+#include <Wire.h>
 
 #include "module_handler.hpp"
 #include "modules/wifi.hpp"
@@ -18,7 +18,6 @@ static const uint8_t dev_addr = 0x20;
 static const int sda_pin = 0;
 /** Serial clock pin */
 static const int scl_pin = 1;
-  
 
 // create wifi module
 static ModuleHandler::ModuleHandler mh;
@@ -44,8 +43,7 @@ void onRequest() {
 }
 
 /** Startup code */
-void setup()
-{
+void setup() {
   // Start serial interface
   Serial.begin(115200);
 
@@ -59,9 +57,9 @@ RESET!
 
 -------------------------------------------------------------------------------
 )");
-  
+
   Log.noticeln("ents-node esp32 firmware, compiled at %s %s", __DATE__,
-      __TIME__);
+               __TIME__);
 
   Log.traceln("Starting i2c interface...");
 

@@ -1,12 +1,12 @@
 /**
  * @file test_main.cpp
  * @author John Madden (jmadden173@pm.me)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2024-08-12
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #include <Arduino.h>
@@ -14,7 +14,7 @@
 
 #include "module_handler.hpp"
 #include "module_test.hpp"
-  
+
 // create handler
 static ModuleHandler::ModuleHandler module_handler;
 // create test module
@@ -40,7 +40,7 @@ void TestRegister(void) {
   // check if module exists in map
   try {
     ModuleHandler::Module* mod = module_handler.GetModule(2);
-  } catch(const std::out_of_range& oor) {
+  } catch (const std::out_of_range& oor) {
     mod_exist = false;
   }
 
@@ -104,7 +104,7 @@ void TestOnRequest(void) {
 
   // simulate i2c receive
   module_handler.OnReceive(data_len);
-  
+
   // check state of module
   ModuleHandler::Module* mod = module_handler.GetModule(2);
   TEST_ASSERT_EQUAL(ModuleTest::RECEIVE, mod->State());
@@ -131,7 +131,6 @@ void setup() {
   // NOTE!!! Wait for >2 secs
   // if board doesn't support software reset via Serial.DTR/RTS
   delay(2000);
-
 
   UNITY_BEGIN();
 

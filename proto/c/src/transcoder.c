@@ -9,8 +9,8 @@
 
 #include "transcoder.h"
 
-#include "pb_encode.h"
 #include "pb_decode.h"
+#include "pb_encode.h"
 
 /**
  * @brief Encodes a measurement
@@ -27,17 +27,18 @@ size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer);
 
 /**
  * @brief Encodes a esp32command
- * 
+ *
  * Serializes a esp32command object and stores result in buffer. The resulting
  * number of bytes is returned with -1 indicating there was an error.
- * 
+ *
  * @param cmd Reference to command
  * @param buffer Buffer to store serialized esp32command
  * @param size Size of buffer
- * 
+ *
  * @return Length of buffer, -1 indicates there was an error
  */
-size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer, size_t size);
+size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer,
+                          size_t size);
 
 size_t EncodePowerMeasurement(uint32_t ts, uint32_t logger_id, uint32_t cell_id,
                               double voltage, double current, uint8_t *buffer) {
@@ -161,8 +162,7 @@ size_t EncodeMeasurement(Measurement *meas, uint8_t *buffer) {
   return ostream.bytes_written;
 }
 
-Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len)
-{
+Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len) {
   Esp32Command cmd;
 
   pb_istream_t istream = pb_istream_from_buffer(data, len);
@@ -172,8 +172,7 @@ Esp32Command DecodeEsp32Command(const uint8_t *data, const size_t len)
 }
 
 size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
-                         size_t n, uint8_t* buffer, size_t size)
-{
+                         size_t n, uint8_t *buffer, size_t size) {
   // create command object
   Esp32Command cmd = Esp32Command_init_default;
   cmd.which_command = Esp32Command_page_command_tag;
@@ -186,8 +185,7 @@ size_t EncodePageCommand(PageCommand_RequestType req, int fd, size_t bs,
 }
 
 size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
-                         uint8_t *buffer, size_t size)
-{
+                         uint8_t *buffer, size_t size) {
   Esp32Command cmd = Esp32Command_init_default;
   cmd.which_command = Esp32Command_test_command_tag;
   cmd.command.test_command.state = state;
@@ -196,7 +194,8 @@ size_t EncodeTestCommand(TestCommand_ChangeState state, int32_t data,
   return EncodeEsp32Command(&cmd, buffer, size);
 }
 
-size_t EncodeWiFiCommand(const WiFiCommand *wifi_cmd, uint8_t *buffer, size_t size) {
+size_t EncodeWiFiCommand(const WiFiCommand *wifi_cmd, uint8_t *buffer,
+                         size_t size) {
   Esp32Command cmd = Esp32Command_init_default;
 
   cmd.which_command = Esp32Command_wifi_command_tag;
@@ -207,14 +206,13 @@ size_t EncodeWiFiCommand(const WiFiCommand *wifi_cmd, uint8_t *buffer, size_t si
   return EncodeEsp32Command(&cmd, buffer, size);
 }
 
-size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer, size_t size)
-{
+size_t EncodeEsp32Command(const Esp32Command *cmd, uint8_t *buffer,
+                          size_t size) {
   // create output stream
   pb_ostream_t ostream = pb_ostream_from_buffer(buffer, size);
   // encode message and check rc
   bool status = pb_encode(&ostream, Esp32Command_fields, cmd);
-  if (!status)
-  {
+  if (!status) {
     return -1;
   }
 

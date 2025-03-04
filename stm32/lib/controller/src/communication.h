@@ -1,5 +1,5 @@
-#ifndef STM32_LIB_CONTROLLER_SRC_COMMUNICATION_H_
-#define STM32_LIB_CONTROLLER_SRC_COMMUNICATION_H_
+#ifndef LIB_CONTROLLER_SRC_COMMUNICATION_H_
+#define LIB_CONTROLLER_SRC_COMMUNICATION_H_
 
 #include <stdint.h>
 
@@ -31,21 +31,21 @@ typedef struct {
 
 /**
  * @brief Send bytes to esp32
- * 
+ *
  * @param timeout Timeout duration in ms
  */
 ControllerStatus ControllerTransmit(unsigned int timeout);
 
 /**
  * @brief Receive bytes from esp32
- * 
+ *
  * @param timeout Timeout duration in ms
  */
 ControllerStatus ControllerReceive(unsigned int timeout);
 
 /**
  * @brief Send message and receive response from esp32
- * 
+ *
  * @param timeout Timeout duration in ms
  */
 ControllerStatus ControllerTransaction(unsigned int timeout);
@@ -72,4 +72,4 @@ Buffer* ControllerRx(void);
 }
 #endif
 
-#endif // STM32_LIB_CONTROLLER_SRC_COMMUNICATION_H_
+#endif  // LIB_CONTROLLER_SRC_COMMUNICATION_H_

@@ -1,6 +1,6 @@
 /**
  * @brief Example teros12 code
- * 
+ *
  * Prints teros12 measurements over serial
  *
  * @author John Madden <jmadden173@pm.me>
@@ -96,7 +96,6 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-
     Teros12Data data = {};
     SDI12Status status = SDI12_OK;
     status = Teros12GetMeasurement('0', &data);
@@ -104,8 +103,8 @@ int main(void) {
     char print_buffer[256];
 
     snprintf(print_buffer, sizeof(print_buffer),
-             "Status code: %d; addr = %c; vwc: %f; temp: %f; ec: %d",
-             status, data.addr, data.vwc, data.temp, data.ec);
+             "Status code: %d; addr = %c; vwc: %f; temp: %f; ec: %d", status,
+             data.addr, data.vwc, data.temp, data.ec);
 
     APP_PRINTF("%s\r\n", print_buffer);
 

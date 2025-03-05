@@ -24,7 +24,7 @@ typedef struct {
  * Example real world values:
  * 0+1846.16+22.3+1
  *
- * @param buffer Raw measurement string 
+ * @param buffer Raw measurement string
  * @param data Pointer to the data structure to store the measurement
  * @return SDI12Status
  */
@@ -52,6 +52,5 @@ SDI12Status Teros12GetMeasurement(char addr, Teros12Data *data);
  *
  */
 size_t Teros12Measure(uint8_t *data);
-
 
 #endif  // LIB_SDI12_INCLUDE_TEROS12_H_

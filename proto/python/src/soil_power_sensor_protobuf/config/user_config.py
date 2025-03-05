@@ -1,16 +1,16 @@
 """
 @brief PyQt5 GUI Application for Configuring User Settings
 
-This module provides a PyQt5-based graphical interface for configuring user settings. 
-The application allows users to input configuration details, including Logger ID, Cell ID, 
-Upload Method (WiFi or LoRa), Upload Interval, Enabled Sensors, and Calibration parameters 
-for voltage and current (V/I Slope and Offset). 
+This module provides a PyQt5-based graphical interface for configuring user settings.
+The application allows users to input configuration details, including Logger ID, Cell ID,
+Upload Method (WiFi or LoRa), Upload Interval, Enabled Sensors, and Calibration parameters
+for voltage and current (V/I Slope and Offset).
 
 Key features:
 - **Save and Load**: Users can save configurations to a file or load previous configurations for easy reuse.
-- **Real-time Configuration**: By pressing the "Send Configuration" button, the settings are serialized with Protobuf 
+- **Real-time Configuration**: By pressing the "Send Configuration" button, the settings are serialized with Protobuf
   and transmitted over UART to the STM32 for direct application.
-  
+
 @file user_config.py
 @author Ahmed Hassan Falah
 @date 2024-10-10

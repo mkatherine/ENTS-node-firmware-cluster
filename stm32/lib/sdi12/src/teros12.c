@@ -5,7 +5,8 @@
 
 SDI12Status Teros12ParseMeasurement(const char *buffer, Teros12Data *data) {
   // parse string and check number of characters parsed
-  int rc = sscanf(buffer, "%1c+%f%f+%d", &data->addr, &data->vwc, &data->temp, &data->ec);
+  int rc = sscanf(buffer, "%1c+%f%f+%d", &data->addr, &data->vwc, &data->temp,
+                  &data->ec);
   if (rc < 4) {
     return SDI12_PARSING_ERROR;
   }
@@ -15,7 +16,7 @@ SDI12Status Teros12ParseMeasurement(const char *buffer, Teros12Data *data) {
 
 SDI12Status Teros12GetMeasurement(char addr, Teros12Data *data) {
   // buffer to store measurement
-  // based on the measurement range of the device the max string length is 
+  // based on the measurement range of the device the max string length is
   // 0+1846.16+22.3+20000 = 20
   char buffer[20];
 
@@ -38,7 +39,6 @@ SDI12Status Teros12GetMeasurement(char addr, Teros12Data *data) {
   }
 
   return status;
-
 }
 
 size_t Teros12Measure(uint8_t *data) {
@@ -57,10 +57,9 @@ size_t Teros12Measure(uint8_t *data) {
   // https://publications.metergroup.com/Manuals/20587_TEROS11-12_Manual_Web.pdf?_gl=1*174xdyp*_gcl_au*MTIxODkwMzcuMTc0MTIwMjU3Nw..
   float vwc_adj = (3.879e-4 * sens_data.vwc) - 0.6956;
 
-  size_t data_len =
-      EncodeTeros12Measurement(ts.Seconds, cfg->logger_id, cfg->cell_id,
-                               sens_data.vwc, vwc_adj, sens_data.temp, sens_data.ec, data);
+  size_t data_len = EncodeTeros12Measurement(
+      ts.Seconds, cfg->logger_id, cfg->cell_id, sens_data.vwc, vwc_adj,
+      sens_data.temp, sens_data.ec, data);
 
   return data_len;
-
 }

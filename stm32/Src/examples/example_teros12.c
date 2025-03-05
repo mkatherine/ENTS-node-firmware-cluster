@@ -19,9 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sdi12.h"
 #include "sys_app.h"
-#include "teros21.h"
+#include "teros12.h"
 
 /* USER CODE END Includes */
 
@@ -98,27 +97,22 @@ int main(void) {
   /* USER CODE BEGIN WHILE */
   while (1) {
 
-    char buffer[20];
-    Teros12_Data data = {};
+    Teros12Data data = {};
     SDI12Status status = SDI12_OK;
-    SDI12_Measure_TypeDef measurement_info;
-    status = SDI12GetMeasurment('0', &measurement_info, buffer, 1000);
+    status = Teros12GetMeasurement('0', &data);
 
-    APP_PRINTF("Status code: %d\r\n", status);
+    char print_buffer[256];
 
-    APP_PRINTF("%s\r\n", buffer);
+    snprintf(print_buffer, sizeof(print_buffer),
+             "Status code: %d; addr = %c; vwc: %f; temp: %f; ec: %d",
+             status, data.addr, data.vwc, data.temp, data.ec);
 
-    double raw = 2600.0;
-    double vwc = 6.771e-10 * (raw * raw * raw) - 5.105e-6 * (raw * raw) + 1.302e-2 * raw - 10.848;
-    char print_buffer[50];
-    snprintf(print_buffer, sizeof(print_buffer), "vwc (hardcoded): %f\r\n", vwc);
-    APP_PRINTF("%s", print_buffer);
+    APP_PRINTF("%s\r\n", print_buffer);
 
     // Sleep
     for (int i = 0; i <= 4000000; i++) {
       asm("nop");
     };
-    // HAL_Delay(DELAY);
   }
 }
 
@@ -207,7 +201,7 @@ void Error_Handler(void) {
 void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line
-     number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
+     number, ex printf("Wrong parameters value: file %s on line %d\r\n", file,
      line) */
   /* USER CODE END 6 */
 }

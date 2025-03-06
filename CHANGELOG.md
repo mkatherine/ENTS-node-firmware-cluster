@@ -13,12 +13,14 @@ firmware versions for a hardware version.
 ### Added
 
 - WiFi upload method [#46](i46)
+- Support for the Teros12 sensor [#172](i172)
 
 ### Changed
 
 - Fixed issue with buffer addressing [#174](i174)
 
 [i46]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/46
+[i172]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/172
 [i174]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/174
 
 ## [2.3.0] - 2025-02-26

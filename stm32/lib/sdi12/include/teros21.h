@@ -1,3 +1,10 @@
+/**
+ * @file teros21.h
+ * @author John Madden <jmadden173@pm.me>
+ * @brief Drives for reading measurements from Teros21 sensor
+ * @date 2025-03-05
+ */
+
 #ifndef LIB_SDI12_INCLUDE_TEROS21_H_
 #define LIB_SDI12_INCLUDE_TEROS21_H_
 

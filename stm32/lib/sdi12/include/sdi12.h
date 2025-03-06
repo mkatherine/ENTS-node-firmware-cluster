@@ -41,15 +41,6 @@ typedef struct {
   uint8_t NumValues;
 } SDI12_Measure_TypeDef;
 
-/* The relevant data for a TEROS-12 sensor*/
-typedef struct {
-  int ec;
-  float vwc_raw;
-  float vwc_adj;
-  float tmp;
-  int addr;
-} Teros12_Data;
-
 /**
 ******************************************************************************
 * @brief    Wake all sensors on the data line.

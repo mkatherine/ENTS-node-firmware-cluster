@@ -35,7 +35,6 @@
 #include <stdbool.h>
 
 #include "ads.h"
-#include "sdi12.h"
 #include "phytos31.h"
 #include "bme280_sensor.h"
 #include "rtc.h"
@@ -44,6 +43,7 @@
 #include "controller/controller.h"
 #include "controller/wifi.h"
 #include "userConfig.h"
+#include "teros12.h"
 #include "teros21.h"
 /* USER CODE END Includes */
 
@@ -130,12 +130,8 @@ int main(void)
   UserConfigPrint();
 
   // required for SDI-12
-  //MX_USART2_UART_Init();
-  //MX_TIM1_Init();
-  /* USER CODE BEGIN 2 */
-
-  // init external adc
-  //MX_RTC_Init();
+  MX_USART2_UART_Init();
+  MX_TIM1_Init();
 
   // initialize the user config interrupt
   UserConfig_InitAdvanceTrace();
@@ -176,8 +172,8 @@ int main(void)
       APP_LOG(TS_OFF, VLEVEL_M, "ADS Enabled!\n");
     }
     if (sensor == EnabledSensor_Teros12) {
-      APP_LOG(TS_OFF, VLEVEL_M, "Teros12 not implemented!\n");
-      //SensorsAdd(SDI12_Teros12Measure);
+      APP_LOG(TS_OFF, VLEVEL_M, "Teros12 Enabled!\n");
+      SensorsAdd(Teros12Measure);
     }
     if (sensor == EnabledSensor_BME280) {
       BME280Init();

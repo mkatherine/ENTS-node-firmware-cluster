@@ -114,22 +114,19 @@ void Upload(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
 
   // posts data to website
-  int http_code = 0;
-  do {
-    APP_LOG(TS_ON, VLEVEL_M, "Uploading data...\t");
-    uint8_t resp[256];
-    size_t resp_len = 0;
-    http_code = ControllerWiFiPost(buffer, buffer_len, resp, &resp_len);
-    APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
+  APP_LOG(TS_ON, VLEVEL_M, "Uploading data...\t");
+  uint8_t resp[256];
+  size_t resp_len = 0;
+  int http_code = ControllerWiFiPost(buffer, buffer_len, resp, &resp_len);
+  APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", http_code);
+  
+  // reconnect and retry if general error
+  if (http_code != 200) {
+    APP_LOG(TS_ON, VLEVEL_M, "Error with WiFi connection!\r\n");
+    APP_LOG(TS_ON, VLEVEL_M, "Attempting Reconnect before next upload\r\n");
     
-    // reconnect and retry if general error
-    if (http_code != 200) {
-      APP_LOG(TS_ON, VLEVEL_M, "Error with WiFi connection!\r\n");
-      APP_LOG(TS_ON, VLEVEL_M, "Attempting Reconnect\t");
-      
-      Connect();
-    }
-  } while (http_code == 0);
+    Connect();
+  }
 }
 
 void StartUploads(void) {
@@ -150,26 +147,9 @@ bool Connect(void) {
   //  load configurations
   const UserConfiguration* cfg = UserConfigGet();
 
-  //const char ssid[] = "UCSC-Devices";
-  //const char* passwd = "hqWeRfvsn7eLd7MPrW";
-  
-  //const char ssid[] = "HARE_Lab";
-  //const char* passwd = "";
-  
-  //const char* ssid = cfg->WiFi_SSID;
-  //const char* passwd = cfg->WiFi_Password;
- 
-  const char* passwd;
-  const char emtpy_passwd[] = "";
- 
-  // NOTE temporary fix for null password
   const char* ssid = cfg->WiFi_SSID;
-  if (cfg->WiFi_Password[0] == 'a') {
-    passwd = emtpy_passwd;
-  } else {
-    passwd = cfg->WiFi_Password;
-  }
-
+  const char* passwd = cfg->WiFi_Password;
+ 
   APP_LOG(TS_OFF, VLEVEL_M, "Connecting to %s. Status: ", ssid);
   uint8_t wifi_status = ControllerWiFiInit(ssid, passwd);
   APP_LOG(TS_OFF, VLEVEL_M, "%d\r\n", wifi_status);
@@ -213,7 +193,7 @@ bool Check(void) {
   //const char url[] = "dirtviz.jlab.ucsc.edu";
   //const uint32_t port = 80;
   
-  const char url[] = "dirtviz.jlab.ucsc.edu";
+  const char* url = cfg->API_Endpoint_URL;
   const uint32_t port = cfg->API_Endpoint_Port; 
 
   // retry pinging API

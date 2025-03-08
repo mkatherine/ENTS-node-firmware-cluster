@@ -48,7 +48,7 @@ void setup() {
   Serial.begin(115200);
 
   // Create logging interfface
-  Log.begin(LOG_LEVEL_VERBOSE, &Serial);
+  Log.begin(LOG_LEVEL_NOTICE, &Serial);
 
   Log.verbose(R"(
 -------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ RESET!
   Log.noticeln("ents-node esp32 firmware, compiled at %s %s", __DATE__,
                __TIME__);
 
-  Log.traceln("Starting i2c interface...");
+  Log.noticeln("Starting i2c interface...");
 
   // create adn register the WiFi module
   static ModuleWiFi wifi;
@@ -73,9 +73,9 @@ RESET!
   bool i2c_status = Wire.begin(dev_addr, sda_pin, scl_pin, 100000);
 
   if (i2c_status) {
-    Log.traceln("Success!");
+    Log.noticeln("Success!");
   } else {
-    Log.traceln("Failed!");
+    Log.noticeln("Failed!");
   }
 }
 

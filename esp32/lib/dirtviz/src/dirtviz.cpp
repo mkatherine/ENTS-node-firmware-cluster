@@ -20,49 +20,30 @@ unsigned int g_resp_timeout = 1000;
 /** Max size of HTTP POST request */
 const size_t g_request_size = 512;
 
-Dirtviz::Dirtviz(void) : url(nullptr) {}
+// TODO(jmadden173): update to dynamic version
+/** User agent string */
+const char g_user_agent[] = "ents/2.3.0";
 
-Dirtviz::Dirtviz(const char *url, const uint16_t &port) {
-  // set parameters
-  this->SetUrl(url);
-  this->SetPort(port);
+Dirtviz::Dirtviz(void) {}
+
+Dirtviz::Dirtviz(const char* url) { SetUrl(url); }
+
+Dirtviz::~Dirtviz() {}
+
+void Dirtviz::SetUrl(const char* url) {
+  Log.traceln("Dirtviz::SetUrl");
+  Log.traceln("Setting URL to %s", url);
+  this->url.setUrl(url);
+  Log.traceln("URL stored is %s", this->url.getUrl().c_str());
 }
 
-Dirtviz::~Dirtviz() {
-  // free memory
-  free(this->url);
-}
-
-void Dirtviz::SetUrl(const char *new_url) {
-  // get length of new url string, add 1 for null char
-  size_t url_len = strlen(new_url);
-  ++url_len;
-
-  // allocate memory
-  char *temp_url = reinterpret_cast<char *>(realloc(this->url, url_len));
-
-  if (temp_url != nullptr) {
-    this->url = temp_url;
-    strncpy(
-        this->url, new_url,
-        url_len);  // strcpy is safe here because we just allocated enough space
-  } else {
-    // Handle allocation failure (e.g., set an error flag, use a default URL,
-    // etc.)
-  }
-}
-
-const char *Dirtviz::GetUrl(void) const { return this->url; }
-
-void Dirtviz::SetPort(const uint16_t &new_port) { this->port = new_port; }
-
-uint16_t Dirtviz::GetPort(void) const { return this->port; }
-
-unsigned int Dirtviz::Check() const {
+unsigned int Dirtviz::Check() {
   Log.traceln("Dirtviz::Check");
   WiFiClient client;
 
-  if (!client.connect(url, port)) {
+  Log.noticeln("Connecting to %s:%d", url.getHost().c_str(), url.getPort());
+
+  if (!client.connect(url.getHost().c_str(), (uint16_t)url.getPort())) {
     return 0;
   }
 
@@ -70,23 +51,21 @@ unsigned int Dirtviz::Check() const {
 
   // format request
   std::ostringstream req;
-  req << "GET /api/ HTTP/1.1" << "\r\n";
-  req << "Host: " << url << "\r\n";
-  req << "User-Agent: curl/8.10.1" << "\r\n";
+  req << "GET " << "/api/" << " HTTP/1.1" << "\r\n";
+  req << "Host: " << url.getHost().c_str() << "\r\n";
+  req << "User-Agent: " << g_user_agent << "\r\n";
   req << "\r\n";
 
   // send full request to server
   int bytes_written = client.write(req.str().c_str());
-  Log.traceln("Wrote %d bytes", bytes_written);
-
-  Log.traceln("Done!");
+  Log.noticeln("Wrote %d bytes to server", bytes_written);
 
   // wait until there's bytes available with timeout
   unsigned int timeout = millis() + g_resp_timeout;
   while (!client.available()) {
     // timeout
     if (millis() > timeout) {
-      Log.noticeln("API Check timeout!");
+      Log.errorln("API Check timeout!");
       return (uint32_t)-1;
     }
 
@@ -110,22 +89,23 @@ unsigned int Dirtviz::Check() const {
 
   unsigned int http_code = http_client.ResponseCode();
   if (http_code != 200) {
-    Log.warningln("Api health check failed! Reponse code: %d", http_code);
+    Log.errorln("Api health check failed! Reponse code: %d", http_code);
   }
 
   return http_code;
 }
 
-HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
+HttpClient Dirtviz::SendMeasurement(const uint8_t* meas, size_t meas_len) {
   WiFiClient client;
 
   char buffer[100];
 
-  Log.noticeln("WiFi status: %d", WiFi.status());
+  Log.noticeln("Sending measurement");
+  Log.traceln("WiFi status: %d", WiFi.status());
 
   // connect to server
-  if (!client.connect(url, port)) {
-    Log.errorln("Connection to %s:%d failed!", url, port);
+  if (!client.connect(url.getHost().c_str(), (uint16_t)url.getPort())) {
+    Log.errorln("Connection to %s:%d failed!", url.getHost(), url.getPort());
     HttpClient empty;
     return empty;
   }
@@ -133,11 +113,10 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   // send data
 
   // format request
-  // TODO(jmadden173) fix hardcoded api path
   std::ostringstream headers;
-  headers << "POST /api/sensor/ HTTP/1.1" << "\r\n";
-  headers << "Host: " << url << "\r\n";
-  headers << "User-Agent: curl/8.10.1" << "\r\n";
+  headers << "POST " << "/" << url.getPath().c_str() << " HTTP/1.1" << "\r\n";
+  headers << "Host: " << url.getHost().c_str() << "\r\n";
+  headers << "User-Agent: " << g_user_agent << "\r\n";
   headers << "Content-Type: application/octet-stream" << "\r\n";
   headers << "Content-Length: " << meas_len << "\r\n";
   headers << "Connection: close" << "\r\n";
@@ -145,6 +124,8 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
 
   // copy stream to string
   std::string headers_str = headers.str();
+
+  Log.verboseln("Headers:\r\n----\r\n%s\r\n----\r\n", headers_str.c_str());
 
   // copy data into request array
   std::vector<char> request;
@@ -154,7 +135,7 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
 
   Log.traceln("Length of request: %d", request.size());
   int bytes_written = client.write(request.data(), request.size());
-  Log.traceln("Wrote %d bytes", bytes_written);
+  Log.noticeln("Wrote %d bytes to server", bytes_written);
 
   // read response
 
@@ -163,8 +144,8 @@ HttpClient Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   while (!client.available()) {
     // timeout
     if (millis() > timeout) {
-      Log.noticeln("Send measurement timeout!");
-      Log.noticeln("WiFi status: %d", WiFi.status());
+      Log.warningln("Send measurement timeout!");
+      Log.warningln("WiFi status: %d", WiFi.status());
       HttpClient empty_resp;
 
       client.flush();

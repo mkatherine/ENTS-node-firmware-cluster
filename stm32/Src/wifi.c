@@ -9,6 +9,7 @@
 #include "fifo.h"
 #include "controller/wifi.h"
 #include "userConfig.h"
+#include "status_led.h"
 
 /**
  * @brief Timer for uploads
@@ -127,6 +128,8 @@ void Upload(void) {
     
     Connect();
   }
+
+  StatusLedOff();
 }
 
 void StartUploads(void) {

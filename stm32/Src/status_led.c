@@ -20,7 +20,7 @@ void StatusLedInit(void) {
 
   // set pin to output
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  GPIO_InstStruct.Pin = USER_LED_Pin;
+  GPIO_InitStruct.Pin = USER_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -51,15 +51,19 @@ void StatusLedFlashFast(void) {
 }
 
 void StatusLedOff(void) {
-  // stop timer
-  UTIL_TIMER_Stop(&StatusLedTimer);
-  // turn on LED  
-  HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_RESET);
+  if (HAL_GPIO_ReadPin(USER_LED_GPIO_Port, USER_LED_Pin) != GPIO_PIN_RESET) {
+    // stop timer
+    UTIL_TIMER_Stop(&StatusLedTimer);
+    // turn on LED  
+    HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_RESET);
+  }
 }
 
-void StatusLedOn(void) {  
-  // stop timer
-  UTIL_TIMER_Stop(&StatusLedTimer);
-  // turn on LED
-  HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_SET);
+void StatusLedOn(void) {
+  if (HAL_GPIO_ReadPin(USER_LED_GPIO_Port, USER_LED_Pin) != GPIO_PIN_SET) {
+    // stop timer
+    UTIL_TIMER_Stop(&StatusLedTimer);
+    // turn on LED
+    HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_SET);
+  }
 }

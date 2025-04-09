@@ -144,6 +144,7 @@ int main(void)
 
   // Debug message, gets printed after init code
   APP_PRINTF("Soil Power Sensor Wio-E5 firmware, compiled on %s %s\n", __DATE__, __TIME__);
+  APP_PRINTF("Git SHA: %s\n", GIT_REV);
 
   // configure sensors
   //SensorsAdd(SensorsMeasureTest);

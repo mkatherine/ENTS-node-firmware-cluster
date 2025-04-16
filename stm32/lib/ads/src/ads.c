@@ -44,13 +44,13 @@ static double current_calibration_m = 0.0;
 static double current_calibration_b = 0.0;
 
 /**
-  * Control register breakdown.
-  *  7:5 MUX (default)
-  *  4   Gain (default)
-  *  3:2 Data rate (default)
-  *  1   Conversion mode (default)
-  *  0   VREF (External reference 3.3V)
-  */
+ * Control register breakdown.
+ *  7:5 MUX (default)
+ *  4   Gain (default)
+ *  3:2 Data rate (default)
+ *  1   Conversion mode (default)
+ *  0   VREF (External reference 3.3V)
+ */
 typedef union {
   uint8_t value;
   union {
@@ -107,7 +107,7 @@ void PowerDown(void);
  *
  * @return Raw measurement from adc
  */
-HAL_StatusTypeDef Measure(int32_t *meas);
+HAL_StatusTypeDef Measure(int32_t* meas);
 
 /**
  * @brief This function reconfigures the ADS1219 based on the parameter reg_data
@@ -126,20 +126,15 @@ HAL_StatusTypeDef ADC_init(void) {
   current_calibration_m = cfg->Current_Slope;
   current_calibration_b = cfg->Current_Offset;
 
-  //uint8_t code = ADS12_RESET_CODE;
-  uint8_t register_data[2] = {0x40, 0x03};
   HAL_StatusTypeDef ret = HAL_OK;
 
-
-
   // Send the reset code
-  //code = ADS12_RESET_CODE;
   ret = HAL_I2C_Master_Transmit(&hi2c2, addrls, &cmd_reset, 1, g_timeout);
   if (ret != HAL_OK) {
     return ret;
   }
 
-  // wait minimum 500 us to reach steady state 
+  // wait minimum 500 us to reach steady state
   HAL_Delay(1);
 
   return ret;
@@ -148,7 +143,8 @@ HAL_StatusTypeDef ADC_init(void) {
 HAL_StatusTypeDef Configure(const ConfigReg reg_data) {
   HAL_StatusTypeDef ret;
   const uint8_t i2c_data[2] = {cmd_wreg, reg_data.value};
-  ret = HAL_I2C_Master_Transmit(&hi2c2, addrls, i2c_data, sizeof(i2c_data), g_timeout);
+  ret = HAL_I2C_Master_Transmit(&hi2c2, addrls, i2c_data, sizeof(i2c_data),
+                                g_timeout);
   return ret;
 }
 
@@ -166,18 +162,12 @@ double ADC_readVoltage(void) {
     return -1;
   }
 
-  // start conversion
-  HAL_I2C_Master_Transmit(&hi2c2, addrls, &cmd_start, 1, g_timeout);
-
-  // wait for conversion
-  HAL_Delay(60);
-
   ret = Measure(&raw);
   if (ret != HAL_OK) {
     return -1;
   }
 
-  meas = (double) raw;
+  meas = (double)raw;
 
 #ifndef CALIBRATION
   meas = (voltage_calibration_m * raw) + voltage_calibration_b;
@@ -201,18 +191,12 @@ double ADC_readCurrent(void) {
     return -1;
   }
 
-  // start conversion
-  HAL_I2C_Master_Transmit(&hi2c2, addrls, &cmd_start, 1, g_timeout);
-
-  // wait for conversion
-  HAL_Delay(60);
-
   ret = Measure(&raw);
   if (ret != HAL_OK) {
     return -1;
   }
 
-  meas = (double) raw;
+  meas = (double)raw;
 
 #ifndef CALIBRATION
   meas = (current_calibration_m * raw) + current_calibration_b;
@@ -257,14 +241,20 @@ void PowerOff(void) {
   HAL_GPIO_WritePin(POWERDOWN_GPIO_Port, POWERDOWN_Pin, GPIO_PIN_RESET);
 }
 
-HAL_StatusTypeDef Measure(int32_t *meas) {
+HAL_StatusTypeDef Measure(int32_t* meas) {
   HAL_StatusTypeDef ret = HAL_OK;
   uint8_t rx_data[3] = {0x00, 0x00, 0x00};
-  
+
   PowerOn();
+  
+  // start conversion
+  HAL_I2C_Master_Transmit(&hi2c2, addrls, &cmd_start, 1, g_timeout);
+
+  // wait for conversion
+  HAL_Delay(60);
 
   // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
-  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin));
+  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)) {}
 
   // send read data command
   ret = HAL_I2C_Master_Transmit(&hi2c2, addrls, &cmd_rdata, 1, g_timeout);
@@ -282,7 +272,7 @@ HAL_StatusTypeDef Measure(int32_t *meas) {
 
   // Combine the 3 bytes into a 24-bit value
   *meas = ((int32_t)rx_data[0] << 16) | ((int32_t)rx_data[1] << 8) |
-                 ((int32_t)rx_data[2]);
+          ((int32_t)rx_data[2]);
   // Check if the sign bit (24th bit) is set
   if (*meas & 0x800000) {
     // Extend the sign to 32 bits

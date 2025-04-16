@@ -24,12 +24,6 @@ extern "C" {
 #include "transcoder.h"
 #include "usart.h"
 
-#define ADS12_WRITE 0x80
-#define ADS12_READ 0x81
-
-#define ADS12_START_CODE 0x08
-#define ADS12_RESET_CODE 0x06
-#define ADS12_READ_DATA_CODE 0x10
 
 /**
 ******************************************************************************
@@ -46,17 +40,6 @@ extern "C" {
 */
 HAL_StatusTypeDef ADC_init(void);
 
-/**
-******************************************************************************
-* @brief    This function reconfigures the ADS1219 based on the parameter
-*reg_data
-*
-*
-* @param    reg_data
-* @return   HAL_StatusTypeDef
-******************************************************************************
-*/
-HAL_StatusTypeDef ADC_configure(uint8_t reg_data);
 
 /**
 ******************************************************************************

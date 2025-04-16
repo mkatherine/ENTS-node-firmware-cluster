@@ -7,6 +7,7 @@
  * This file provides a function to read from the ADS1219.
  *
  * TODO (jmadden173): Improve lib with big bang for regs
+ * TODO (jmadden173): Add offset calibration at startup
  **/
 
 #include "ads.h"
@@ -42,14 +43,22 @@ static double voltage_calibration_b = 0.0;
 static double current_calibration_m = 0.0;
 static double current_calibration_b = 0.0;
 
+/**
+  * Control register breakdown.
+  *  7:5 MUX (default)
+  *  4   Gain (default)
+  *  3:2 Data rate (default)
+  *  1   Conversion mode (default)
+  *  0   VREF (External reference 3.3V)
+  */
 typedef union {
   uint8_t value;
   union {
-    uint8_t mux : 3;   // MUX
-    uint8_t gain : 1;  // Gain
-    uint8_t dr : 2;    // Data rate
-    uint8_t mode : 1;  // Conversion mode
-    uint8_t vref : 1;  // VREF
+    uint8_t mux : 3;
+    uint8_t gain : 1;
+    uint8_t dr : 2;
+    uint8_t mode : 1;
+    uint8_t vref : 1;
   } bits;
 } ConfigReg;
 
@@ -121,12 +130,6 @@ HAL_StatusTypeDef ADC_init(void) {
   uint8_t register_data[2] = {0x40, 0x03};
   HAL_StatusTypeDef ret = HAL_OK;
 
-  // Control register breakdown.
-  //  7:5 MUX (default)
-  //  4   Gain (default)
-  //  3:2 Data rate (default)
-  //  1   Conversion mode (default)
-  //  0   VREF (External reference 3.3V)
 
 
   // Send the reset code
@@ -135,30 +138,9 @@ HAL_StatusTypeDef ADC_init(void) {
   if (ret != HAL_OK) {
     return ret;
   }
-  
-  /*
 
-  // Set the control register, leaving everything at default except for the
-  // VREF, which will be set to external reference mode
-  ret = HAL_I2C_Master_Transmit(&hi2c2, addrls, register_data, 2, g_timeout);
-  if (ret != HAL_OK) {
-    return ret;
-  }
-
-  // send a start code
-  code = ADS12_START_CODE;
-  ret = HAL_I2C_Master_Transmit(&hi2c2, ADS12_WRITE, &cmd_start, 1, g_timeout);
-  if (ret != HAL_OK) {
-    return ret;
-  }
-
-  */
-
-  // Delay to allow ADC start up, not really sure why this is
-  // neccesary, or why the minimum is 300
-  HAL_Delay(500);  
-
-  // TODO (jmadden173): Add offset calibration at startup
+  // wait minimum 500 us to reach steady state 
+  HAL_Delay(1);
 
   return ret;
 }
@@ -266,7 +248,7 @@ size_t ADC_measure(uint8_t* data) {
 void PowerOn(void) {
   // set high
   HAL_GPIO_WritePin(POWERDOWN_GPIO_Port, POWERDOWN_Pin, GPIO_PIN_SET);
-  // delay for settling
+  // delay for settling of analog components
   HAL_Delay(1);
 }
 

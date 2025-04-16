@@ -100,11 +100,9 @@ int main(void) {
   MX_USART1_UART_Init();
   MX_I2C2_Init();
 
-  /*Initialize timer and RTC*/
-  /*Have to be initilized in example files because LoRaWan cannot be initialized
-   * like in main*/
-  __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_MSI);
-  UTIL_TIMER_Init();
+  SystemApp_Init();
+
+  UserConfigLoad();
 
   // TIMER_IF_Init();
   /* USER CODE BEGIN 2 */

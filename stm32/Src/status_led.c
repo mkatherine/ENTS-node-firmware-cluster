@@ -2,11 +2,21 @@
 
 #include "stm32_seq.h"
 #include "stm32_timer.h"
-#include "gpio.h"
+#include "main.h"
 
-const static fast_period = 100;  // ms
-const static slow_period = 500;  // ms
-                                 //
+const static unsigned int fast_period = 100;  // ms
+const static unsigned int slow_period = 500;  // ms
+
+/** States of the status led */
+typedef enum {
+  LED_OFF,
+  LED_ON,
+  LED_FLASH
+} StatusLedState;
+
+static StatusLedState led_state = LED_OFF;
+
+//
 static UTIL_TIMER_Object_t StatusLedTimer;
 
 /**
@@ -16,7 +26,8 @@ void StatusLedFlashToggle(void);
 
 void StatusLedInit(void) {
   // set default state to off
-  HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_SET);
+  led_state = LED_OFF;
 
   // set pin to output
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -41,6 +52,8 @@ void StatusLedFlashSlow(void) {
   UTIL_TIMER_SetPeriod(&StatusLedTimer, slow_period);
   // start timer
   UTIL_TIMER_Start(&StatusLedTimer);
+
+  led_state = LED_FLASH;
 }
 
 void StatusLedFlashFast(void) {
@@ -48,22 +61,30 @@ void StatusLedFlashFast(void) {
   UTIL_TIMER_SetPeriod(&StatusLedTimer, fast_period); 
   // start timer
   UTIL_TIMER_Start(&StatusLedTimer);
+  
+  led_state = LED_FLASH;
 }
 
 void StatusLedOff(void) {
-  if (HAL_GPIO_ReadPin(USER_LED_GPIO_Port, USER_LED_Pin) != GPIO_PIN_RESET) {
-    // stop timer
+  // stop timer
+  if (led_state == LED_FLASH) {
     UTIL_TIMER_Stop(&StatusLedTimer);
-    // turn on LED  
-    HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_RESET);
   }
+
+  // turn on LED  
+  HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_SET);
+
+  led_state = LED_OFF;
 }
 
 void StatusLedOn(void) {
-  if (HAL_GPIO_ReadPin(USER_LED_GPIO_Port, USER_LED_Pin) != GPIO_PIN_SET) {
-    // stop timer
+  // stop timer
+  if (led_state == LED_FLASH) {
     UTIL_TIMER_Stop(&StatusLedTimer);
-    // turn on LED
-    HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_SET);
   }
+
+  // turn on LED
+  HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_RESET);
+
+  led_state = LED_ON;
 }

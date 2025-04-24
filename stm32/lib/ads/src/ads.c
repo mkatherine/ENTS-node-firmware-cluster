@@ -246,7 +246,7 @@ HAL_StatusTypeDef Measure(int32_t* meas) {
   uint8_t rx_data[3] = {0x00, 0x00, 0x00};
 
   PowerOn();
-  
+
   // start conversion
   HAL_I2C_Master_Transmit(&hi2c2, addrls, &cmd_start, 1, g_timeout);
 
@@ -254,7 +254,8 @@ HAL_StatusTypeDef Measure(int32_t* meas) {
   HAL_Delay(60);
 
   // Wait for the DRDY pin on the ADS12 to go low, this means data is ready
-  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)) {}
+  while (HAL_GPIO_ReadPin(data_ready_port, data_ready_pin)) {
+  }
 
   // send read data command
   ret = HAL_I2C_Master_Transmit(&hi2c2, addrls, &cmd_rdata, 1, g_timeout);

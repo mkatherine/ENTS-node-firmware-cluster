@@ -46,11 +46,11 @@ class Simulation:
         if len(self.metrics["latency"]) > 0:
             last = self.metrics["latency"][-1]
 
-        return "total: {}, failed: {}, avg latency: {}, last: {}".format(
+        return "total: {}, failed: {}, avg (ms): {}, last (ms): {}".format(
             self.metrics["total_requests"],
             self.metrics["failed_requests"],
-            avg,
-            last,
+            avg * 100,
+            last * 100,
         )
 
     def send_next(self, url: str) -> bool:
@@ -69,8 +69,8 @@ class Simulation:
         except IndexError as _:
             return False
 
-        result = requests.post(url, data=meas)
-        print(result)
+        headers = {'Content-Type': 'application/octet-stream'}
+        result = requests.post(url, data=meas, headers=headers)
 
         # store result
         self.responses.append(result)

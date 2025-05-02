@@ -150,8 +150,8 @@ HAL_StatusTypeDef Configure(const ConfigReg reg_data) {
 
 double ADC_readVoltage(void) {
   HAL_StatusTypeDef ret = HAL_OK;
-  int32_t raw;
-  double meas;
+  int32_t raw = 0;
+  double meas = 0.0;
 
   ConfigReg reg_data = {0};
   reg_data.bits.vref = 1;
@@ -167,10 +167,11 @@ double ADC_readVoltage(void) {
     return -1;
   }
 
-  meas = (double)raw;
-
-#ifndef CALIBRATION
+#ifdef CALIBRATION
+  meas = (double) raw;
+#else
   meas = (voltage_calibration_m * raw) + voltage_calibration_b;
+  meas /= 1000;
 #endif
 
   return meas;
@@ -178,8 +179,8 @@ double ADC_readVoltage(void) {
 
 double ADC_readCurrent(void) {
   HAL_StatusTypeDef ret = HAL_OK;
-  int32_t raw;
-  double meas;
+  int32_t raw = 0;
+  double meas = 0.0;
 
   ConfigReg reg_data = {0};
   reg_data.bits.mux = 0b001;
@@ -196,10 +197,11 @@ double ADC_readCurrent(void) {
     return -1;
   }
 
+#ifdef CALIBRATION
   meas = (double)raw;
-
-#ifndef CALIBRATION
+#else
   meas = (current_calibration_m * raw) + current_calibration_b;
+  meas /= 1000;
 #endif
 
   return meas;

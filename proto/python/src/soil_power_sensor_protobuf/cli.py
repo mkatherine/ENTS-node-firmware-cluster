@@ -38,10 +38,176 @@ def entry():
     create_encode_parser(subparsers)
     create_decode_parser(subparsers)
     create_calib_parser(subparsers)
+    create_sim_parser(subparsers)
 
     args = parser.parse_args()
     args.func(args)
 
+
+def create_sim_parser(subparsers):
+    """Creates the simulation subparser
+
+    Args:
+        subparsers: Reference to subparser group
+    Returns:
+        Reference to new subparser
+    """
+
+    sim_p = subparsers.add_parser("sim", help="Simluate sensor uploads")
+    sim_p.add_argument(
+        "url",
+        type=str,
+        help="URL of the dirtviz instance (default: http://localhost:8000)",
+    )
+    sim_p.add_argument(
+        "mode",
+        choices=["batch", "stream"],
+        type=str,
+        help="Upload mode"
+    )
+    sim_p.add_argument(
+        "sensor",
+        choices=["power", "teros12", "teros21", "bme280"],
+        type=str,
+        nargs="+",
+    )
+    sim_p.add_argument(
+        "cell",
+        type=int,
+        help="Cell Id"
+    )
+    sim_p.add_argument(
+        "logger",
+        type=int,
+        help="Logger Id"
+    )
+    sim_p.add_argument(
+        "--start",
+        type=str,
+        help="Start date"
+    )
+    sim_p.add_argument(
+        "--end",
+        type=str,
+        help="End date"
+    )
+    sim_p.add_argument(
+        "--freq",
+        default=10.0,
+        type=float,
+        help="Frequency of uploads (default: 10s)"
+    )
+    sim_p.set_defaults(simulate)
+
+    return sim_p
+
+
+def simulate(args):
+    if args.mode == "batch":
+        if (args.start is None) or (args.end is None):
+            raise ValueError("Start and end date must be provided for batch mode.")
+
+        # format dates
+        curr_dt = datetime.fromisoformat(args.start)
+        end_dt = datetime.fromisoformat(args.end)
+
+        # create list of measurements
+        measurements = []
+        while curr_dt <= end_dt:
+            ts = int(curr_dt.timestamp())
+            measurements += measure(ts, args.cell, args.logger, args.sensor)
+            curr_dt += timedelta(seconds=args.freq)
+
+        # send measurements
+        send(measurements, args.url)
+
+        # print summary
+
+    elif args.mode == "stream":
+        print("Use CTRL+D to stop the simulation")
+        try:
+            while True:
+                dt = datetime.now()
+                ts = int(dt.timestamp())
+                measurements = measure(ts, args.cell, args.logger, args.sensor)
+                send(measurements, args.url)
+                print("Sent measurements")
+                time.sleep(args.freq)
+        except EODError as e:
+            print("Stopping simulation")
+
+
+def measure(ts: int, cell: int, logger: int, sensors: list[str]):
+    """Simulate measurements
+
+    Args:
+        cell: Cell Id
+        logger: Logger Id
+        sensors: List of sensors to simulate
+
+    Returns:
+        List of serialized measurements
+    """
+
+    measurements = []
+
+    if "power" in args.sensor:
+        meas = encode_power_measurement(
+            ts=ts,
+            cell_id=cell,
+            logger_id=logger,
+            voltage=args.voltage,
+            current=args.current,
+        )
+        measurements.append(meas)
+
+    if "teros12" in args.sensor:
+        meas = encode_teros12_measurement(
+            ts=ts,
+            cell_id=cell,
+            logger_id=logger,
+            vwc_raw=args.vwc_raw,
+            vwc_adj=args.vwc_adj,
+            temp=args.temp,
+            ec=args.ec,
+        )
+        measurements.append(meas)
+
+    if "teros21" in args.sensor:
+        meas = encode_teros21_measurement(
+            ts=ts,
+            cell_id=cell,
+            logger_id=logger,
+            waterPot = args.waterPot,
+            temp=args.temp,
+        )
+        measurements.append(meas)
+
+    if "bme280" in args.sensor:
+        meas = encode_bme280_measurement(
+            ts=ts,
+            cell_id=cell,
+            logger_id=logger,
+            temp=args.temp,
+            humidity=args.humidity,
+            pressure=args.pressure,
+        )
+        measurements.append(meas)
+
+    return measurements
+
+
+def send(measurements: list[bytes], url: str) -> dict:
+    """Sends measurements to a dirtviz instance
+
+    Args:
+        measurements: List of serialized measurements
+        url: URL of the dirtviz instance
+
+    Returns:
+        Dictionary of the response with latency metrics
+    """
+    pass
 
 def create_calib_parser(subparsers):
     """Creates the calibration subparser

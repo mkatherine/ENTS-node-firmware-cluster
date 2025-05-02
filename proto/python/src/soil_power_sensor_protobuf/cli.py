@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import time
 
 from .calibrate.recorder import Recorder
 from .calibrate.linear_regression import (
@@ -137,18 +138,16 @@ def simulate(args):
         print("Done!")
 
     elif args.mode == "stream":
-        print("Use CTRL+D to stop the simulation")
+        print("Use CTRL+C to stop the simulation")
         try:
             while True:
                 dt = datetime.now()
                 ts = int(dt.timestamp())
                 simulation.measure(ts)
-                print(f"{dt}: Sending measurements")
                 while (simulation.send_next(args.url)):
                     print(simulation)
-                print(f"{datetime.now()}: Sleeping for {args.freq} seconds\n")
                 time.sleep(args.freq)
-        except EODError as e:
+        except KeyboardInterrupt as _:
             print("Stopping simulation")
 
 def create_calib_parser(subparsers):

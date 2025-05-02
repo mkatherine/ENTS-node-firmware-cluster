@@ -44,7 +44,7 @@ static const uint8_t kBufferSize = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
 /** Periodic timer for querying sensors */
 static UTIL_TIMER_Object_t MeasureTimer;
 
-static uint32_t measure_period = MEASUREMENT_PERIOD;
+static uint32_t measure_period = 0;
 
 /**
  * @brief Measures sensors and adds to tx buffer

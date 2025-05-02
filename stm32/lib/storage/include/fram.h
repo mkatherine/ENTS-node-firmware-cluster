@@ -92,32 +92,6 @@ FramStatus FramRead(FramAddr addr, size_t len, uint8_t *data);
  */
 FramAddr FramSize(void);
 
-/**
- * @brief Get number of pages
- *
- * A page is defined as a space of memory requiring the change of address.
- *
- * @return Number of pages
- */
-unsigned int FramPages(void);
-
-/**
- * @brief Gets the size of a segment
- *
- * @return Number of bytes in each segment
- */
-unsigned int FramSegmentSize(void);
-
-/**
- * @brief This function reads the user configurable settings from
- * non-volatile memory.
- *
- * @return configuration, an instance of the typedef struct
- * user_configurations.  Containing all the user defined settings to be
- * stored in non-volatile memory.
- */
-configuration ReadSettings(void);
-
 //
 /**
  * @brief This function reads the entirety of non-volatile memory and

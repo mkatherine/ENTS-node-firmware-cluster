@@ -3,6 +3,7 @@ import argparse
 import os
 import pandas as pd
 import numpy as np
+from datetime import datetime, timedelta
 
 from .calibrate.recorder import Recorder
 from .calibrate.linear_regression import (
@@ -27,6 +28,7 @@ from .proto.encode import (
 from .proto.decode import decode_measurement, decode_response
 from .proto.esp32 import encode_esp32command, decode_esp32command
 
+from .sim.simulation import Simulation
 
 def entry():
     """Command line interface entry point"""
@@ -55,29 +57,34 @@ def create_sim_parser(subparsers):
 
     sim_p = subparsers.add_parser("sim", help="Simluate sensor uploads")
     sim_p.add_argument(
-        "url",
+        "--url",
+        required=True,
         type=str,
         help="URL of the dirtviz instance (default: http://localhost:8000)",
     )
     sim_p.add_argument(
-        "mode",
+        "--mode",
+        required=True,
         choices=["batch", "stream"],
         type=str,
         help="Upload mode"
     )
     sim_p.add_argument(
-        "sensor",
+        "--sensor",
+        required=True,
         choices=["power", "teros12", "teros21", "bme280"],
         type=str,
         nargs="+",
     )
     sim_p.add_argument(
-        "cell",
+        "--cell",
+        required=True,
         type=int,
         help="Cell Id"
     )
     sim_p.add_argument(
-        "logger",
+        "--logger",
+        required=True,
         type=int,
         help="Logger Id"
     )
@@ -97,7 +104,7 @@ def create_sim_parser(subparsers):
         type=float,
         help="Frequency of uploads (default: 10s)"
     )
-    sim_p.set_defaults(simulate)
+    sim_p.set_defaults(func=simulate)
 
     return sim_p
 
@@ -124,10 +131,10 @@ def simulate(args):
             curr_dt += timedelta(seconds=args.freq)
 
         # send measurements
-        simulation.send(args.url)
+        while (simulation.send_next(args.url)):
+            print(simulation)
 
-        # print summary
-        print(simulation)
+        print("Done!")
 
     elif args.mode == "stream":
         print("Use CTRL+D to stop the simulation")
@@ -136,9 +143,9 @@ def simulate(args):
                 dt = datetime.now()
                 ts = int(dt.timestamp())
                 simulation.measure(ts)
-                simulation.send(args.url)
                 print(f"{dt}: Sending measurements")
-                print(simulation)
+                while (simulation.send_next(args.url)):
+                    print(simulation)
                 print(f"{datetime.now()}: Sleeping for {args.freq} seconds\n")
                 time.sleep(args.freq)
         except EODError as e:

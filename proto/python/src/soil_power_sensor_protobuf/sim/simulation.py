@@ -1,6 +1,9 @@
 from math import sin
 from datetime import datetime
 
+import requests
+import numpy as np
+
 from ..proto.encode import (
     encode_power_measurement,
     encode_teros12_measurement,
@@ -16,14 +19,14 @@ class Simulation:
     # all measurements uploaded
     measurements = []
     # all responses
-    responses: [],
+    responses = []
 
     # metrics for uploads
     metrics = {
-        total_requests: 0,
-        failed_requests: 0,
-        successful_requests: 0,
-        latency: [],
+        "total_requests": 0,
+        "failed_requests": 0,
+        "successful_requests": 0,
+        "latency": [],
     }
 
     def __init__(self, cell: int, logger: int, sensors: list[str], fn = sin):
@@ -33,20 +36,52 @@ class Simulation:
         self.fn = fn
 
     def __str__(self):
-        return f"Simulation(cell={self.cell}, logger={self.logger},
-    sensors={self.sensors})"
+        """String representation of the simulation class
 
-    def send(self, measurements: list[bytes], url: str) -> dict:
+        Shows the current upload metrics
+        """
+        avg = np.array(self.metrics["latency"]).mean()
+
+        last = 0
+        if len(self.metrics["latency"]) > 0:
+            last = self.metrics["latency"][-1]
+
+        return "total: {}, failed: {}, avg latency: {}, last: {}".format(
+            self.metrics["total_requests"],
+            self.metrics["failed_requests"],
+            avg,
+            last,
+        )
+
+    def send_next(self, url: str) -> bool:
         """Sends measurements to a dirtviz instance
 
         Args:
-            measurements: List of serialized measurements
             url: URL of the dirtviz instance
 
         Returns:
-            Dictionary of the response with latency metrics
+            True if there are measurements to send, False otherwise
         """
-        pass
+
+        # get next measurement
+        try:
+            meas = self.measurements.pop()
+        except IndexError as _:
+            return False
+
+        result = requests.post(url, data=meas)
+        print(result)
+
+        # store result
+        self.responses.append(result)
+        self.metrics["total_requests"] += 1
+        if result.status_code == 200:
+            self.metrics["successful_requests"] += 1
+        else:
+            self.metrics["failed_requests"] += 1
+        self.metrics["latency"].append(result.elapsed.total_seconds())
+
+        return True
 
     def measure(self, ts: int):
         """Simulate measurements
@@ -58,7 +93,7 @@ class Simulation:
             None
         """
 
-        if "power" in args.sensor:
+        if "power" in self.sensors:
 
             voltage = self.fn(ts) * 2
             current = self.fn(ts) * 0.5
@@ -73,7 +108,7 @@ class Simulation:
             self.measurements.append(meas)
             self.measurement_buffer.append(meas)
 
-        if "teros12" in args.sensor:
+        if "teros12" in self.sensors:
 
             vwc_raw = self.fn(ts) * 300 + 2500
             vwc_adj = self.fn(ts) * 0.05 + 0.2
@@ -92,7 +127,7 @@ class Simulation:
             self.measurements.append(meas)
             self.measurement_buffer.append(meas)
 
-        if "teros21" in args.sensor:
+        if "teros21" in self.sensors:
 
             waterPot = self.fn(ts) * 200 + 1000
             temp = self.fn(ts) * 5 + 25
@@ -107,7 +142,7 @@ class Simulation:
             self.measurements.append(meas)
             self.measurement_buffer.append(meas)
 
-        if "bme280" in args.sensor:
+        if "bme280" in self.sensors:
 
             temp = self.fn(ts) * 50 + 250
             humidity = self.fn(ts) * 200 + 2000
@@ -123,5 +158,3 @@ class Simulation:
             )
             self.measurements.append(meas)
             self.measurement_buffer.append(meas)
-
-        return measurements

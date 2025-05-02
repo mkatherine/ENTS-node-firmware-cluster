@@ -103,6 +103,12 @@ def create_sim_parser(subparsers):
 
 
 def simulate(args):
+    simulation = Simulation(
+        cell=args.cell,
+        logger=args.logger,
+        sensors=args.sensor,
+    )
+
     if args.mode == "batch":
         if (args.start is None) or (args.end is None):
             raise ValueError("Start and end date must be provided for batch mode.")
@@ -112,16 +118,16 @@ def simulate(args):
         end_dt = datetime.fromisoformat(args.end)
 
         # create list of measurements
-        measurements = []
         while curr_dt <= end_dt:
             ts = int(curr_dt.timestamp())
-            measurements += measure(ts, args.cell, args.logger, args.sensor)
+            simulation.measure(ts)
             curr_dt += timedelta(seconds=args.freq)
 
         # send measurements
-        send(measurements, args.url)
+        simulation.send(args.url)
 
         # print summary
+        print(simulation)
 
     elif args.mode == "stream":
         print("Use CTRL+D to stop the simulation")
@@ -129,85 +135,14 @@ def simulate(args):
             while True:
                 dt = datetime.now()
                 ts = int(dt.timestamp())
-                measurements = measure(ts, args.cell, args.logger, args.sensor)
-                send(measurements, args.url)
-                print("Sent measurements")
+                simulation.measure(ts)
+                simulation.send(args.url)
+                print(f"{dt}: Sending measurements")
+                print(simulation)
+                print(f"{datetime.now()}: Sleeping for {args.freq} seconds\n")
                 time.sleep(args.freq)
         except EODError as e:
             print("Stopping simulation")
-
-
-def measure(ts: int, cell: int, logger: int, sensors: list[str]):
-    """Simulate measurements
-
-    Args:
-        cell: Cell Id
-        logger: Logger Id
-        sensors: List of sensors to simulate
-
-    Returns:
-        List of serialized measurements
-    """
-
-    measurements = []
-
-    if "power" in args.sensor:
-        meas = encode_power_measurement(
-            ts=ts,
-            cell_id=cell,
-            logger_id=logger,
-            voltage=args.voltage,
-            current=args.current,
-        )
-        measurements.append(meas)
-
-    if "teros12" in args.sensor:
-        meas = encode_teros12_measurement(
-            ts=ts,
-            cell_id=cell,
-            logger_id=logger,
-            vwc_raw=args.vwc_raw,
-            vwc_adj=args.vwc_adj,
-            temp=args.temp,
-            ec=args.ec,
-        )
-        measurements.append(meas)
-
-    if "teros21" in args.sensor:
-        meas = encode_teros21_measurement(
-            ts=ts,
-            cell_id=cell,
-            logger_id=logger,
-            waterPot = args.waterPot,
-            temp=args.temp,
-        )
-        measurements.append(meas)
-
-    if "bme280" in args.sensor:
-        meas = encode_bme280_measurement(
-            ts=ts,
-            cell_id=cell,
-            logger_id=logger,
-            temp=args.temp,
-            humidity=args.humidity,
-            pressure=args.pressure,
-        )
-        measurements.append(meas)
-
-    return measurements
-
-
-def send(measurements: list[bytes], url: str) -> dict:
-    """Sends measurements to a dirtviz instance
-
-    Args:
-        measurements: List of serialized measurements
-        url: URL of the dirtviz instance
-
-    Returns:
-        Dictionary of the response with latency metrics
-    """
-    pass
 
 def create_calib_parser(subparsers):
     """Creates the calibration subparser

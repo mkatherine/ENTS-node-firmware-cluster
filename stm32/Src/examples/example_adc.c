@@ -101,7 +101,6 @@ int main(void) {
   // init systemapp
   SystemApp_Init();
 
-
   UserConfigLoad();
 
   /*Initialize timer and RTC*/

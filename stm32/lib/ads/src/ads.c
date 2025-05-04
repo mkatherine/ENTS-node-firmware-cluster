@@ -172,7 +172,7 @@ double ADC_readVoltage(void) {
   }
 
 #ifdef CALIBRATION
-  meas = (double) raw;
+  meas = (double)raw;
 #else
   meas = (voltage_calibration_m * raw) + voltage_calibration_b;
   meas /= 1000;

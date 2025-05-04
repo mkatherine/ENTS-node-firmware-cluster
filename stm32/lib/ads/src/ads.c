@@ -45,6 +45,10 @@ static double current_calibration_b = 0.0;
 
 /**
  * Control register breakdown.
+ *
+ * The implementation for the bit field uses the first value as the LSB. Aka
+ * vref is the LSB and mux is the MSB.
+ *
  *  7:5 MUX (default)
  *  4   Gain (default)
  *  3:2 Data rate (default)
@@ -53,12 +57,12 @@ static double current_calibration_b = 0.0;
  */
 typedef union {
   uint8_t value;
-  union {
-    uint8_t mux : 3;
-    uint8_t gain : 1;
-    uint8_t dr : 2;
-    uint8_t mode : 1;
+  struct {
     uint8_t vref : 1;
+    uint8_t mode : 1;
+    uint8_t dr : 2;
+    uint8_t gain : 1;
+    uint8_t mux : 3;
   } bits;
 } ConfigReg;
 
@@ -168,7 +172,7 @@ double ADC_readVoltage(void) {
   }
 
 #ifdef CALIBRATION
-  meas = (double) raw;
+  meas = (double)raw;
 #else
   meas = (voltage_calibration_m * raw) + voltage_calibration_b;
   meas /= 1000;
@@ -201,7 +205,6 @@ double ADC_readCurrent(void) {
   meas = (double)raw;
 #else
   meas = (current_calibration_m * raw) + current_calibration_b;
-  meas /= 1000;
 #endif
 
   return meas;

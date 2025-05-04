@@ -44,7 +44,7 @@ typedef struct {
  * @param status HAL status code
  * @return Fram status code
  */
-inline FramStatus ConvertStatus(HAL_StatusTypeDef status) {
+static inline FramStatus ConvertStatus(HAL_StatusTypeDef status) {
   switch (status) {
     case HAL_OK:
       return FRAM_OK;

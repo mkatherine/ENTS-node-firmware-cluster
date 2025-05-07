@@ -15,11 +15,11 @@ class Simulation:
     """Simulation class to simulate measurements for different sensors"""
 
     # temporary storage for measurements to be uploaded
-    measurement_buffer = []
+    measurement_buffer: list[bytes] = []
     # all measurements uploaded
-    measurements = []
+    measurements: list[bytes] = []
     # all responses
-    responses = []
+    responses: list[str] = []
 
     # metrics for uploads
     metrics = {
@@ -73,7 +73,7 @@ class Simulation:
         result = requests.post(url, data=meas, headers=headers)
 
         # store result
-        self.responses.append(result)
+        self.responses.append(result.text)
         self.metrics["total_requests"] += 1
         if result.status_code == 200:
             self.metrics["successful_requests"] += 1

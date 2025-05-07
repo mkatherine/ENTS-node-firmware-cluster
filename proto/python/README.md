@@ -126,7 +126,7 @@ The examples below can be tested standalone (without ents-backend), by running t
 #### Upload a days worth of power measurements on a 60 second interval
 
 ```shell
-ents sim --url http://localhost:8080/ --mode batch --sensor power --cell 200 --logger 200 --start 2025-05-01 --end 2025-05-02 --freq 60
+ents sim --url http://localhost:8080/sensor/api --mode batch --sensor power --cell 200 --logger 200 --start 2025-05-01 --end 2025-05-02 --freq 60
 ```
 
 ```

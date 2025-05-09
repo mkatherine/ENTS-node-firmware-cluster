@@ -27,6 +27,7 @@ firmware versions for a hardware version.
 [i174]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/174
 [i197]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/197
 [i199]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/199
+[i202]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/202
 
 ## [2.3.0] - 2025-02-26
 

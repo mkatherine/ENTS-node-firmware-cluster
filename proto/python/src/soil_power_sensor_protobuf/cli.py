@@ -3,6 +3,8 @@ import argparse
 import os
 import pandas as pd
 import numpy as np
+from datetime import datetime, timedelta
+import time
 
 from .calibrate.recorder import Recorder
 from .calibrate.linear_regression import (
@@ -27,6 +29,8 @@ from .proto.encode import (
 from .proto.decode import decode_measurement, decode_response
 from .proto.esp32 import encode_esp32command, decode_esp32command
 
+from .simulator.node import NodeSimulator
+
 
 def entry():
     """Command line interface entry point"""
@@ -38,9 +42,93 @@ def entry():
     create_encode_parser(subparsers)
     create_decode_parser(subparsers)
     create_calib_parser(subparsers)
+    create_sim_parser(subparsers)
 
     args = parser.parse_args()
     args.func(args)
+
+
+def create_sim_parser(subparsers):
+    """Creates the simulation subparser
+
+    Args:
+        subparsers: Reference to subparser group
+    Returns:
+        Reference to new subparser
+    """
+
+    sim_p = subparsers.add_parser("sim", help="Simluate sensor uploads")
+    sim_p.add_argument(
+        "--url",
+        required=True,
+        type=str,
+        help="URL of the dirtviz instance (default: http://localhost:8000)",
+    )
+    sim_p.add_argument(
+        "--mode",
+        required=True,
+        choices=["batch", "stream"],
+        type=str,
+        help="Upload mode",
+    )
+    sim_p.add_argument(
+        "--sensor",
+        required=True,
+        choices=["power", "teros12", "teros21", "bme280"],
+        type=str,
+        nargs="+",
+    )
+    sim_p.add_argument("--cell", required=True, type=int, help="Cell Id")
+    sim_p.add_argument("--logger", required=True, type=int, help="Logger Id")
+    sim_p.add_argument("--start", type=str, help="Start date")
+    sim_p.add_argument("--end", type=str, help="End date")
+    sim_p.add_argument(
+        "--freq", default=10.0, type=float, help="Frequency of uploads (default: 10s)"
+    )
+    sim_p.set_defaults(func=simulate)
+
+    return sim_p
+
+
+def simulate(args):
+    simulation = NodeSimulator(
+        cell=args.cell,
+        logger=args.logger,
+        sensors=args.sensor,
+    )
+
+    if args.mode == "batch":
+        if (args.start is None) or (args.end is None):
+            raise ValueError("Start and end date must be provided for batch mode.")
+
+        # format dates
+        curr_dt = datetime.fromisoformat(args.start)
+        end_dt = datetime.fromisoformat(args.end)
+
+        # create list of measurements
+        while curr_dt <= end_dt:
+            ts = int(curr_dt.timestamp())
+            simulation.measure(ts)
+            curr_dt += timedelta(seconds=args.freq)
+
+        # send measurements
+        while simulation.send_next(args.url):
+            print(simulation)
+
+        print("Done!")
+
+    elif args.mode == "stream":
+        print("Use CTRL+C to stop the simulation")
+        try:
+            while True:
+                dt = datetime.now()
+                ts = int(dt.timestamp())
+                simulation.measure(ts)
+                while simulation.send_next(args.url):
+                    print(simulation)
+                time.sleep(args.freq)
+        except KeyboardInterrupt as _:
+            print("Stopping simulation")
 
 
 def create_calib_parser(subparsers):

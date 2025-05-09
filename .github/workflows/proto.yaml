@@ -10,10 +10,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run linter
-        working-directory: ./stm32
+        working-directory: ./proto
         run: >
           clang-format -n -i -Werror --verbose --style=Google
-          proto/c/include/transcoder.h
-          proto/c/src/transcoder.c
-          proto/**/*.proto
+          ./c/include/transcoder.h
+          ./c/src/transcoder.c
+          ./*.proto
 

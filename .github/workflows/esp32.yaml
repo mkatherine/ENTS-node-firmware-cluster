@@ -66,9 +66,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run linter
-        working-directory: ./stm32
+        working-directory: ./esp32
         run: >
           clang-format -n -i -Werror --verbose --fallback-style=Google
-          esp32/**/*.cpp
-          esp32/**/*.hpp
+          ./esp32/**/*.cpp
+          ./esp32/**/*.hpp
 

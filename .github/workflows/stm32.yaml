@@ -67,9 +67,9 @@ jobs:
         working-directory: ./stm32
         run: >
           clang-format -n -i -Werror --verbose --fallback-style=Google
-          stm32/Src/examples/*.c
-          stm32/lib/**/*.h
-          stm32/lib/**/*.c
-          stm32/test/**/*.h
-          stm32/test/**/*.c
+          ./Src/examples/*.c
+          ./lib/**/*.h
+          ./lib/**/*.c
+          ./test/**/*.h
+          ./test/**/*.c
 

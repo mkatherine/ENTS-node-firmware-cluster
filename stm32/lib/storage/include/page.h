@@ -161,4 +161,4 @@ void PageStateLoad(void);
 }
 #endif
 
-#endif // LIB_STORAGE_INCLUDE_PAGE_H_
+#endif  // LIB_STORAGE_INCLUDE_PAGE_H_

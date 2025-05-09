@@ -56,4 +56,4 @@ FramStatus Mb85rc1mtRead(FramAddr addr, size_t len, uint8_t *data);
 }
 #endif
 
-#endif // LIB_STORAGE_SRC_MB85RC1MT_H_
+#endif  // LIB_STORAGE_SRC_MB85RC1MT_H_

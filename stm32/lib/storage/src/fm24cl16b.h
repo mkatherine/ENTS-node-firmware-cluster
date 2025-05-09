@@ -54,4 +54,4 @@ FramStatus Fm24cl16bRead(FramAddr addr, size_t len, uint8_t *data);
 }
 #endif
 
-#endif // LIB_STORAGE_SRC_FM24CL16B_H_
+#endif  // LIB_STORAGE_SRC_FM24CL16B_H_

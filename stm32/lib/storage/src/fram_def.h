@@ -46,10 +46,10 @@ typedef struct {
  */
 static inline FramStatus ConvertStatus(HAL_StatusTypeDef status) {
   switch (status) {
-  case HAL_OK:
-    return FRAM_OK;
-  default:
-    return FRAM_ERROR;
+    case HAL_OK:
+      return FRAM_OK;
+    default:
+      return FRAM_ERROR;
   }
 }
 
@@ -57,4 +57,4 @@ static inline FramStatus ConvertStatus(HAL_StatusTypeDef status) {
 }
 #endif
 
-#endif // LIB_STORAGE_SRC_FRAM_DEF_H_
+#endif  // LIB_STORAGE_SRC_FRAM_DEF_H_

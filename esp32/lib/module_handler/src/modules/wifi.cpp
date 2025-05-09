@@ -29,29 +29,29 @@ void ModuleWiFi::OnReceive(const Esp32Command &cmd) {
 
   // switch for command types
   switch (cmd.command.wifi_command.type) {
-  case WiFiCommand_Type_CONNECT:
-    Log.traceln("Calling CONNECT");
-    Connect(cmd);
-    break;
+    case WiFiCommand_Type_CONNECT:
+      Log.traceln("Calling CONNECT");
+      Connect(cmd);
+      break;
 
-  case WiFiCommand_Type_POST:
-    Log.traceln("Calling POST");
-    Post(cmd);
-    break;
+    case WiFiCommand_Type_POST:
+      Log.traceln("Calling POST");
+      Post(cmd);
+      break;
 
-  case WiFiCommand_Type_CHECK:
-    Log.traceln("Calling CHECK");
-    Check(cmd);
-    break;
+    case WiFiCommand_Type_CHECK:
+      Log.traceln("Calling CHECK");
+      Check(cmd);
+      break;
 
-  case WiFiCommand_Type_TIME:
-    Log.traceln("Calling TIME");
-    Time(cmd);
-    break;
+    case WiFiCommand_Type_TIME:
+      Log.traceln("Calling TIME");
+      Time(cmd);
+      break;
 
-  default:
-    Log.warningln("wifi command type not found!");
-    break;
+    default:
+      Log.warningln("wifi command type not found!");
+      break;
   }
 }
 

@@ -23,4 +23,4 @@ void SystemClock_Config(void);
 
 void assert_failed(uint8_t *file, uint32_t line);
 
-#endif // TEST_MAIN_HELPER_H_
+#endif  // TEST_MAIN_HELPER_H_

@@ -91,4 +91,4 @@ size_t ADC_measure(uint8_t *data);
 }
 #endif
 
-#endif // LIB_ADS_INCLUDE_ADS_H_
+#endif  // LIB_ADS_INCLUDE_ADS_H_

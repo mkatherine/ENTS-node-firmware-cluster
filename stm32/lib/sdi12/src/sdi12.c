@@ -31,8 +31,8 @@ SDI12Status ParseMeasurementResponse(const char *responseBuffer, char addr,
 SDI12Status ParseServiceRequest(const char *requestBuffer, char addr);
 
 void SDI12WakeSensors(void) {
-  HAL_LIN_SendBreak(&huart2);                           // Send a break
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET); // Send the marking
+  HAL_LIN_SendBreak(&huart2);                            // Send a break
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);  // Send the marking
   // HAL_Delay(20); // Need an extra 10ms to account for the fact
   // that HAL_LIN_SendBreak is nonblocking
   for (int i = 0; i <= 40000; i++) {
@@ -46,7 +46,7 @@ SDI12Status SDI12SendCommand(const char *command, uint8_t size) {
   SDI12WakeSensors();
   ret = HAL_UART_Transmit(&huart2, (const uint8_t *)command, size,
                           SEND_COMMAND_TIMEOUT);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);  // Set to RX mode
   if (ret == HAL_OK) {
     return SDI12_OK;
   } else {
@@ -57,7 +57,7 @@ SDI12Status SDI12SendCommand(const char *command, uint8_t size) {
 SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize,
                           uint16_t timeoutMillis) {
   HAL_StatusTypeDef ret;
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET); // Set to RX mode
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);  // Set to RX mode
   __HAL_UART_FLUSH_DRREGISTER(&huart2);
   ret = HAL_UART_Receive(&huart2, (uint8_t *)buffer, bufferSize, timeoutMillis);
   if (ret == HAL_OK) {
@@ -76,9 +76,9 @@ SDI12Status ParseMeasurementResponse(const char *responseBuffer, char addr,
   // Parse the response and populate the structure
   // Check if the response address matches the expected address
   if (measurement_info->Address == addr) {
-    return SDI12_OK; // Return success
+    return SDI12_OK;  // Return success
   } else {
-    return SDI12_PARSING_ERROR; // Return error - Address mismatch
+    return SDI12_PARSING_ERROR;  // Return error - Address mismatch
   }
 }
 
@@ -135,7 +135,7 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
   size = snprintf(sendData, sizeof(sendData), "%cD0!", addr);
 
   // optimization
-  if (measurment_info->Time == 0) { // If data is ready now
+  if (measurment_info->Time == 0) {  // If data is ready now
     SDI12SendCommand(sendData, size);
     // hard coded for a teros measurment response size
     ret = SDI12ReadData(measurment_data, MEASURMENT_DATA_SIZE, timeoutMillis);

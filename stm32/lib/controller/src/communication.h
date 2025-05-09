@@ -72,4 +72,4 @@ Buffer *ControllerRx(void);
 }
 #endif
 
-#endif // LIB_CONTROLLER_SRC_COMMUNICATION_H_
+#endif  // LIB_CONTROLLER_SRC_COMMUNICATION_H_

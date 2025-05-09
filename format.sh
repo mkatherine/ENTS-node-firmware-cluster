@@ -17,7 +17,7 @@ clang-format --fallback-style=Google -i --verbose \
 echo "Done."
 
 echo "Formatting protobuf code..."
-clang-format --fallback-style=Google -i --verbose \
+clang-format --style=Google -i --verbose \
   proto/c/include/transcoder.h \
   proto/c/src/transcoder.c \
   proto/**/*.proto

@@ -71,4 +71,4 @@ size_t Phytos31_measure(uint8_t *data);
 }
 #endif
 
-#endif // LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
+#endif  // LIB_PHYTOS31_INCLUDE_PHYTOS31_H_

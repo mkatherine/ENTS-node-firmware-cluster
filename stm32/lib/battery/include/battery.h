@@ -41,4 +41,4 @@ unsigned int battery_voltage(void);
 }
 #endif
 
-#endif // LIB_BATTERY_INCLUDE_BATTERY_H_
+#endif  // LIB_BATTERY_INCLUDE_BATTERY_H_

@@ -24,7 +24,7 @@
  * @brief HTTP interface for Dirtviz API
  */
 class Dirtviz {
-public:
+ public:
   /**
    * @brief Construct a new Dirtviz object
    *
@@ -69,7 +69,7 @@ public:
    */
   HttpClient SendMeasurement(const uint8_t *meas, size_t meas_len);
 
-private:
+ private:
   /** URL of API */
   LCBUrl url;
 
@@ -81,4 +81,4 @@ private:
   bool ClientConnect();
 };
 
-#endif // LIB_DIRTVIZ_INCLUDE_DIRTVIZ_HPP_
+#endif  // LIB_DIRTVIZ_INCLUDE_DIRTVIZ_HPP_

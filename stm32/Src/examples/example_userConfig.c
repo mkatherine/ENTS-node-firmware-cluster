@@ -128,21 +128,21 @@ int main(void) {
     for (int i = 0; i < config->enabled_sensors_count; i++) {
       const char *sensor_name;
       switch (config->enabled_sensors[i]) {
-      case 0:
-        sensor_name = "Voltage";
-        break;
-      case 1:
-        sensor_name = "Current";
-        break;
-      case 2:
-        sensor_name = "Teros12";
-        break;
-      case 3:
-        sensor_name = "Teros21";
-        break;
-      case 4:
-        sensor_name = "BME280";
-        break;
+        case 0:
+          sensor_name = "Voltage";
+          break;
+        case 1:
+          sensor_name = "Current";
+          break;
+        case 2:
+          sensor_name = "Teros12";
+          break;
+        case 3:
+          sensor_name = "Teros21";
+          break;
+        case 4:
+          sensor_name = "BME280";
+          break;
       }
       sprintf(uart_buf, "Enabled Sensor %d: %s\r\n", i + 1, sensor_name);
       HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, strlen(uart_buf),

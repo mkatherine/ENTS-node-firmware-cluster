@@ -119,4 +119,4 @@ size_t SensorsMeasureTest(uint8_t *data);
 }
 #endif
 
-#endif // LIB_SENSORS_INCLUDE_SENSORS_H_
+#endif  // LIB_SENSORS_INCLUDE_SENSORS_H_

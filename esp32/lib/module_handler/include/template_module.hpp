@@ -18,7 +18,7 @@
 
 namespace ModuleHandler {
 class Module {
-public:
+ public:
   /**
    * @brief Construct a new Module object
    *
@@ -71,13 +71,13 @@ public:
    */
   void Reset(void);
 
-protected:
+ protected:
   /** Integer representing current state */
   int state = 0;
 
   /** Integer for message type */
   int type = 0;
 };
-} // namespace ModuleHandler
+}  // namespace ModuleHandler
 
-#endif // LIB_MODULE_HANDLER_INCLUDE_TEMPLATE_MODULE_HPP_
+#endif  // LIB_MODULE_HANDLER_INCLUDE_TEMPLATE_MODULE_HPP_

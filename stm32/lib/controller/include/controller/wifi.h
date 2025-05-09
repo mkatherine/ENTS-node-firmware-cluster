@@ -61,4 +61,4 @@ int ControllerWiFiPost(const uint8_t *data, size_t data_len, uint8_t *resp,
 }
 #endif
 
-#endif // LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_
+#endif  // LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_

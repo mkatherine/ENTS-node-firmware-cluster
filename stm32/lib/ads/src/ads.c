@@ -161,7 +161,7 @@ double ADC_readVoltage(void) {
   reg_data.bits.vref = 1;
 
   // 0x21 is single shot and 0x23 is continuos
-  ret = Configure(reg_data); // configure to read current
+  ret = Configure(reg_data);  // configure to read current
   if (ret != HAL_OK) {
     return -1;
   }
@@ -191,7 +191,7 @@ double ADC_readCurrent(void) {
   reg_data.bits.vref = 1;
 
   // 0x21 is single shot and 0x23 is continuos
-  ret = Configure(reg_data); // configure to read current
+  ret = Configure(reg_data);  // configure to read current
   if (ret != HAL_OK) {
     return -1;
   }

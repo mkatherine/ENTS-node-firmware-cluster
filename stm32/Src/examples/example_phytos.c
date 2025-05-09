@@ -147,7 +147,7 @@ int main(void) {
     // }
 
     HAL_Delay(
-        1000); // I guess HAL_Delay is broken somehow, don't understand why
+        1000);  // I guess HAL_Delay is broken somehow, don't understand why
     // for (int i = 0; i < 1000000; i++){
     //   asm("nop");
     // }

@@ -53,13 +53,13 @@ int main(void) {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;  // Set as push-pull output
-  GPIO_InitStruct.Pull = GPIO_NOPULL;          // No pull-up or pull-down
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; // Low frequency for LED
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;   // Set as push-pull output
+  GPIO_InitStruct.Pull = GPIO_NOPULL;           // No pull-up or pull-down
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;  // Low frequency for LED
 
   FramStatus status;
 
-  const uint8_t test_data[] = {0x11, 0x22, 0x33}; // Example data
+  const uint8_t test_data[] = {0x11, 0x22, 0x33};  // Example data
   for (int i = 0; i < 10; i++) {
     status = FramPut(test_data, sizeof(test_data));
   }

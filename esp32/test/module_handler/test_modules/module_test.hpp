@@ -5,7 +5,7 @@
 #include "template_module.hpp"
 
 class ModuleTest : public ModuleHandler::Module {
-public:
+ public:
   /**
    * @brief Construct a new Module Test object
    *
@@ -47,7 +47,7 @@ public:
    */
   size_t OnRequest(uint8_t *buffer);
 
-private:
+ private:
   /** Internal buffer for byte array from int32 */
   uint8_t buffer[32] = {};
   /** Length of buffer */
@@ -62,4 +62,4 @@ private:
   void Int32ToByteArray(int32_t value, uint8_t *buffer);
 };
 
-#endif // TEST_MODULE_HANDLER_TEST_MODULES_MODULE_TEST_HPP_
+#endif  // TEST_MODULE_HANDLER_TEST_MODULES_MODULE_TEST_HPP_

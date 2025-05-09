@@ -242,8 +242,8 @@ int DecodeUserConfiguration(const uint8_t *data, const size_t len,
   // Decode the UserConfiguration message and check if successful
   bool status = pb_decode(&istream, UserConfiguration_fields, config);
   if (!status) {
-    return -1; // Return -1 if there was a decoding error
+    return -1;  // Return -1 if there was a decoding error
   }
 
-  return 0; // Return 0 on success
+  return 0;  // Return 0 on success
 }

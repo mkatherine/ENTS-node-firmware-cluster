@@ -120,4 +120,4 @@ FramStatus FIFO_Init(void);
 }
 #endif
 
-#endif // LIB_STORAGE_INCLUDE_FIFO_H_
+#endif  // LIB_STORAGE_INCLUDE_FIFO_H_

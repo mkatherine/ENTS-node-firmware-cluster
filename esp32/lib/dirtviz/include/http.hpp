@@ -12,7 +12,7 @@
 #include <string>
 
 class HttpClient {
-public:
+ public:
   /**
    * @brief Default constructor
    *
@@ -64,7 +64,7 @@ public:
    */
   std::string Data();
 
-private:
+ private:
   /** Http version */
   std::string version;
 
@@ -128,4 +128,4 @@ private:
   void RemoveSpace(std::string *str);
 };
 
-#endif // LIB_DIRTVIZ_INCLUDE_HTTP_HPP_
+#endif  // LIB_DIRTVIZ_INCLUDE_HTTP_HPP_

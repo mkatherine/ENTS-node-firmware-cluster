@@ -22,7 +22,7 @@ void tearDown(void) {}
 
 void test_GetTick(void) {
   uint32_t ticks = HAL_GetTick();
-  TEST_ASSERT_NOT_EQUAL(ticks, 0); // if zero, it means timer was never started
+  TEST_ASSERT_NOT_EQUAL(ticks, 0);  // if zero, it means timer was never started
 }
 
 /**

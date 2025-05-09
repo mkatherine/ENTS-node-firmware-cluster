@@ -28,7 +28,7 @@
 #include "transcoder.h"
 
 class ModuleWiFi : public ModuleHandler::Module {
-public:
+ public:
   ModuleWiFi(void);
 
   ~ModuleWiFi(void);
@@ -43,7 +43,7 @@ public:
    */
   size_t OnRequest(uint8_t *buffer);
 
-private:
+ private:
   typedef enum {
     /** Receive WiFi SSID, password, and URL */
     CONNECT = 0,
@@ -74,4 +74,4 @@ private:
   size_t request_buffer_len = 0;
 };
 
-#endif // LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_HPP_
+#endif  // LIB_MODULE_HANDLER_INCLUDE_MODULES_WIFI_HPP_

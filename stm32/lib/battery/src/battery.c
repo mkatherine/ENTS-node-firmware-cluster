@@ -27,13 +27,11 @@ volatile uint32_t adc_reading = 0;
 HAL_StatusTypeDef battery_init(void) {
   // Calibrate and start conversion process
   rc = HAL_ADCEx_Calibration_Start(&hadc);
-  if (rc != HAL_OK)
-    Error_Handler();
+  if (rc != HAL_OK) Error_Handler();
 
   // Start continuous measurements
   rc = HAL_ADC_Start_DMA(&hadc, (uint32_t *)&adc_reading, 1);
-  if (rc != HAL_OK)
-    Error_Handler();
+  if (rc != HAL_OK) Error_Handler();
 
   return rc;
 }

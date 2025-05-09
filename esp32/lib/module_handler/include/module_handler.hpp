@@ -37,7 +37,7 @@ static uint8_t module_handler_tx_buffer[module_handler_buffer_size] = {};
 
 namespace ModuleHandler {
 class ModuleHandler {
-public:
+ public:
   /**
    * @brief Construct a new Module Handler object
    *
@@ -95,7 +95,7 @@ public:
    */
   void OnRequest(void);
 
-private:
+ private:
   /** Map of request types to modules */
   std::map<int, Module *> req_map;
 
@@ -122,6 +122,6 @@ private:
   /** Flag to write length on request before sending data */
   bool send_length = true;
 };
-} // namespace ModuleHandler
+}  // namespace ModuleHandler
 
-#endif // LIB_MODULE_HANDLER_INCLUDE_MODULE_HANDLER_HPP_
+#endif  // LIB_MODULE_HANDLER_INCLUDE_MODULE_HANDLER_HPP_

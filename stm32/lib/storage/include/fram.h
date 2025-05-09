@@ -116,4 +116,4 @@ FramStatus FramDump(uint16_t linesize, uint8_t displayformat, uint8_t omitjunk,
 }
 #endif
 
-#endif  // LIB_STORAGE_INCLUDE_FRAM_H_
+#endif // LIB_STORAGE_INCLUDE_FRAM_H_

@@ -37,7 +37,7 @@ void test_FramWrite_ValidData(void) {
 
 void test_FramWrite_OutOfRange(void) {
   uint8_t data[] = {1, 2, 3, 4, 5};
-  FramAddr addr = FramSize() + 1;  // Address out of range
+  FramAddr addr = FramSize() + 1; // Address out of range
 
   FramStatus status = FramWrite(addr, data, sizeof(data));
 

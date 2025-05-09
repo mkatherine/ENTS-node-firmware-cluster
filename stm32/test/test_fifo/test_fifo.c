@@ -213,7 +213,7 @@ void test_FramBuffer_Wraparound(void) {
   uint8_t oob_after = 0;
   const uint8_t oob_check = 0xFF;
   status = FramRead(FRAM_BUFFER_END + 1, 1,
-                    &oob_before);  // to be restored afterwards
+                    &oob_before); // to be restored afterwards
   TEST_ASSERT_EQUAL(FRAM_OK, status);
   status = FramWrite(FRAM_BUFFER_END + 1, &oob_check, 1);
   TEST_ASSERT_EQUAL(FRAM_OK, status);
@@ -273,7 +273,7 @@ void test_FramBuffer_Wraparound(void) {
   status = FramRead(FRAM_BUFFER_END + 1, 1, &oob_after);
   TEST_ASSERT_EQUAL(FRAM_OK, status);
   TEST_ASSERT_EQUAL(oob_after, oob_check);
-  status = FramWrite(FRAM_BUFFER_END + 1, &oob_before, 1);  // restore
+  status = FramWrite(FRAM_BUFFER_END + 1, &oob_before, 1); // restore
   TEST_ASSERT_EQUAL(FRAM_OK, status);
 
   // status = FramPut(zeros, block_size);

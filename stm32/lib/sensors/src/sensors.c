@@ -63,7 +63,7 @@ void SensorsRun(void);
 
 void SensorsInit(void) {
   // set upload interval
-  const UserConfiguration* cfg = UserConfigGet();
+  const UserConfiguration *cfg = UserConfigGet();
   // convert to ms
   measure_period = cfg->Upload_interval * 1000;
 
@@ -127,7 +127,7 @@ void SensorsMeasure(void) {
   }
 }
 
-size_t SensorsMeasureTest(uint8_t* data) {
+size_t SensorsMeasureTest(uint8_t *data) {
   uint8_t static_data[] = {0xa,  0xc,  0x8,  0xc8, 0x1,  0x10, 0xc8, 0x1,  0x18,
                            0x88, 0xba, 0xf3, 0xba, 0x6,  0x12, 0x9,  0x11, 0xd9,
                            0xce, 0xf7, 0x53, 0x3,  0x88, 0xb7, 0xc0};

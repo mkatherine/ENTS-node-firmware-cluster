@@ -122,9 +122,9 @@ int main(void) {
 
   // check for first chararcter in "check"
   if (check_input[0] == 'c') {
-    status = HAL_UART_Transmit(
-        &huart1, (uint8_t *)check_result, size_check,
-        uart_timeout);  // send response to the 'check' command
+    status =
+        HAL_UART_Transmit(&huart1, (uint8_t *)check_result, size_check,
+                          uart_timeout); // send response to the 'check' command
     if (status != HAL_OK) {
       Error_Handler();
     }
@@ -143,8 +143,8 @@ int main(void) {
     // block until receive request for measurement
     status = HAL_UART_Receive(
         &huart1, (uint8_t *)controller_input, 1,
-        HAL_MAX_DELAY);  // On every other iteration, send the encoded
-                         // measurment in response to the '0' command
+        HAL_MAX_DELAY); // On every other iteration, send the encoded
+                        // measurment in response to the '0' command
     if (status != HAL_OK) {
       continue;
     }
@@ -152,8 +152,8 @@ int main(void) {
     // check command input
     if (controller_input[0] == '0') {
       size_t measurement_size = ADC_measure(
-          encoded_measurment);  // Read the measurment, and store it's size in
-                                // measurement_size (size int 64)
+          encoded_measurment); // Read the measurment, and store it's size in
+                               // measurement_size (size int 64)
       if (measurement_size == -1) {
         continue;
       }

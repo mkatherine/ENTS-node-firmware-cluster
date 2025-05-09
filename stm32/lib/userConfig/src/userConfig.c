@@ -40,18 +40,19 @@ void UserConfig_RxCallback(uint8_t *pData, uint16_t Size, uint8_t Error) {
     charRx = *pData;
 
     if (!checked) {
-      RQFlag = charRx;  // First byte received
+      RQFlag = charRx; // First byte received
       checked = true;
-      if (RQFlag == 0x01) return;  // Early return to avoid unnecessary checks.
+      if (RQFlag == 0x01)
+        return; // Early return to avoid unnecessary checks.
     }
 
     switch (RQFlag) {
-      case 0x01:  // Receive configuration data from GUI.
-        UserConfig_InterruptHandler();
-        break;
-      case 0x02:  // Send current configuration data to GUI.
-        UserConfig_SendCurrentUserConfig();
-        break;
+    case 0x01: // Receive configuration data from GUI.
+      UserConfig_InterruptHandler();
+      break;
+    case 0x02: // Send current configuration data to GUI.
+      UserConfig_SendCurrentUserConfig();
+      break;
     }
   }
 }
@@ -155,8 +156,8 @@ void UserConfig_InterruptHandler(void) {
 
 // Processes incoming user configuration data via UART using polling.
 void UserConfig_ProcessDataPolling(void) {
-  uint8_t length_buf[2];     // Buffer to store received data length in bytes
-  uint16_t data_length = 0;  // Length received data
+  uint8_t length_buf[2];    // Buffer to store received data length in bytes
+  uint16_t data_length = 0; // Length received data
 
   // Poll to receive the length of the encoded data (2 bytes)
   if (HAL_UART_Receive(&huart1, length_buf, 2, 30000) == HAL_OK) {
@@ -243,7 +244,7 @@ UserConfigStatus UserConfigLoad(void) {
     return USERCONFIG_DECODE_ERROR;
   }
 
-  return USERCONFIG_OK;  // Return success if decoding is successful
+  return USERCONFIG_OK; // Return success if decoding is successful
 }
 
 // Get a reference to the loaded user configuration data in RAM.
@@ -267,21 +268,21 @@ void UserConfigPrint(void) {
   for (int i = 0; i < config->enabled_sensors_count; i++) {
     const char *sensor_name;
     switch (config->enabled_sensors[i]) {
-      case 0:
-        sensor_name = "Voltage";
-        break;
-      case 1:
-        sensor_name = "Current";
-        break;
-      case 2:
-        sensor_name = "Teros12";
-        break;
-      case 3:
-        sensor_name = "Teros21";
-        break;
-      case 4:
-        sensor_name = "BME280";
-        break;
+    case 0:
+      sensor_name = "Voltage";
+      break;
+    case 1:
+      sensor_name = "Current";
+      break;
+    case 2:
+      sensor_name = "Teros12";
+      break;
+    case 3:
+      sensor_name = "Teros21";
+      break;
+    case 4:
+      sensor_name = "BME280";
+      break;
     }
     APP_PRINTF("Enabled Sensor %d: %s\r\n", i + 1, sensor_name);
   }

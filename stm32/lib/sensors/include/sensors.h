@@ -76,7 +76,7 @@ extern "C" {
  *
  * @return Number of bytes in data
  */
-typedef size_t (*SensorsPrototypeMeasure)(uint8_t* data);
+typedef size_t (*SensorsPrototypeMeasure)(uint8_t *data);
 
 /**
  * @brief Registers the measurement task with the sequencer
@@ -113,10 +113,10 @@ int SensorsAdd(SensorsPrototypeMeasure cb);
  *
  * @see SensorsPrototypeMeasure
  */
-size_t SensorsMeasureTest(uint8_t* data);
+size_t SensorsMeasureTest(uint8_t *data);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // LIB_SENSORS_INCLUDE_SENSORS_H_
+#endif // LIB_SENSORS_INCLUDE_SENSORS_H_

@@ -60,4 +60,4 @@ SDI12Status Teros12GetMeasurement(char addr, Teros12Data *data);
  */
 size_t Teros12Measure(uint8_t *data);
 
-#endif  // LIB_SDI12_INCLUDE_TEROS12_H_
+#endif // LIB_SDI12_INCLUDE_TEROS12_H_

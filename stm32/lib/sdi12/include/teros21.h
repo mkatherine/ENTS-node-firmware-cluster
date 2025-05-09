@@ -54,4 +54,4 @@ size_t Teros21Measure(uint8_t *data);
 }
 #endif
 
-#endif  // LIB_SDI12_INCLUDE_TEROS21_H_
+#endif // LIB_SDI12_INCLUDE_TEROS21_H_

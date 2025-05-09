@@ -18,7 +18,7 @@
 
 namespace ModuleHandler {
 class Module {
- public:
+public:
   /**
    * @brief Construct a new Module object
    *
@@ -36,7 +36,7 @@ class Module {
    *
    * @param num_bytes Number of bytes received from controller
    */
-  virtual void OnReceive(const Esp32Command& cmd) = 0;
+  virtual void OnReceive(const Esp32Command &cmd) = 0;
 
   /**
    * @brief Arduino I2C onRequest
@@ -45,7 +45,7 @@ class Module {
    *
    * @returns Number of bytes in buffer
    */
-  virtual size_t OnRequest(uint8_t* buffer) = 0;
+  virtual size_t OnRequest(uint8_t *buffer) = 0;
 
   /**
    * @brief Get the current state of the module
@@ -71,13 +71,13 @@ class Module {
    */
   void Reset(void);
 
- protected:
+protected:
   /** Integer representing current state */
   int state = 0;
 
   /** Integer for message type */
   int type = 0;
 };
-}  // namespace ModuleHandler
+} // namespace ModuleHandler
 
-#endif  // LIB_MODULE_HANDLER_INCLUDE_TEMPLATE_MODULE_HPP_
+#endif // LIB_MODULE_HANDLER_INCLUDE_TEMPLATE_MODULE_HPP_

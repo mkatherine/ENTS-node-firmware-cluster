@@ -42,7 +42,7 @@ void test_battery_voltage_stability(void) {
   // Calling battery_voltage() function multiple times with delay between
   // readings
   unsigned int voltage1 = battery_voltage();
-  HAL_Delay(1000);  // Delay 1sec
+  HAL_Delay(1000); // Delay 1sec
   unsigned int voltage2 = battery_voltage();
 
   // Assert that the change in voltage is within the threshold

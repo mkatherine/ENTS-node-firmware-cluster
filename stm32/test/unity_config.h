@@ -14,7 +14,7 @@
 
 #ifndef NULL
 #ifndef __cplusplus
-#define NULL (void*)0
+#define NULL (void *)0
 #else
 #define NULL 0
 #endif
@@ -46,6 +46,6 @@ void UnityOutputChar(char c);
 
 #ifdef __cplusplus
 }
-#endif  // extern "C"
+#endif // extern "C"
 
-#endif  // TEST_UNITY_CONFIG_H_
+#endif // TEST_UNITY_CONFIG_H_

@@ -25,7 +25,7 @@ extern "C" {
  *
  * @return WiFi status code
  */
-uint8_t ControllerWiFiInit(const char* ssid, const char* passwd);
+uint8_t ControllerWiFiInit(const char *ssid, const char *passwd);
 
 /**
  * @brief Get the current time from the NTP server
@@ -42,7 +42,7 @@ uint32_t ControllerWiFiTime(void);
  *
  * @return HTTP response code
  */
-unsigned int ControllerWiFiCheck(const char* url, const uint32_t port);
+unsigned int ControllerWiFiCheck(const char *url, const uint32_t port);
 
 /**
  * @brief Post data to the configured endpoint
@@ -54,11 +54,11 @@ unsigned int ControllerWiFiCheck(const char* url, const uint32_t port);
  *
  * @return HTTP response code
  */
-int ControllerWiFiPost(const uint8_t* data, size_t data_len, uint8_t* resp,
-                       uint8_t* resp_len);
+int ControllerWiFiPost(const uint8_t *data, size_t data_len, uint8_t *resp,
+                       uint8_t *resp_len);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_
+#endif // LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_

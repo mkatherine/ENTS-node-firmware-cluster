@@ -225,4 +225,4 @@ int DecodeUserConfiguration(const uint8_t *data, const size_t len,
 }
 #endif
 
-#endif  // PROTO_C_INCLUDE_TRANSCODER_H_
+#endif // PROTO_C_INCLUDE_TRANSCODER_H_

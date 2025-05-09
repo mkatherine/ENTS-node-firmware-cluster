@@ -199,4 +199,4 @@ void UserConfigPrint(void);
 }
 #endif
 
-#endif  // LIB_USERCONFIG_INCLUDE_USERCONFIG_H_
+#endif // LIB_USERCONFIG_INCLUDE_USERCONFIG_H_

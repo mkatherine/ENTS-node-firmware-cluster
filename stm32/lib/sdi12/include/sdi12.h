@@ -95,4 +95,4 @@ SDI12Status SDI12GetMeasurment(uint8_t addr,
 }
 #endif
 
-#endif  // LIB_SDI12_INCLUDE_SDI12_H_
+#endif // LIB_SDI12_INCLUDE_SDI12_H_

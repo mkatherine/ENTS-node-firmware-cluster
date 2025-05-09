@@ -122,22 +122,22 @@ class Simulation:
                 vwc_raw=vwc_raw,
                 vwc_adj=vwc_adj,
                 temp=temp,
-                ec=ec,
+                ec=int(ec),
             )
             self.measurements.append(meas)
             self.measurement_buffer.append(meas)
 
         if "teros21" in self.sensors:
 
-            waterPot = self.fn(ts) * 200 + 1000
+            matric_pot = self.fn(ts) * 200 + 1000
             temp = self.fn(ts) * 5 + 25
 
             meas = encode_teros21_measurement(
                 ts=ts,
                 cell_id=self.cell,
                 logger_id=self.logger,
-                waterPot = args.waterPot,
-                temp=args.temp,
+                matric_pot=matric_pot,
+                temp=temp,
             )
             self.measurements.append(meas)
             self.measurement_buffer.append(meas)
@@ -152,9 +152,9 @@ class Simulation:
                 ts=ts,
                 cell_id=self.cell,
                 logger_id=self.logger,
-                temp=temp,
-                humidity=humidity,
-                pressure=pressure,
+                temperature=int(temp),
+                humidity=int(humidity),
+                pressure=int(pressure),
             )
             self.measurements.append(meas)
             self.measurement_buffer.append(meas)

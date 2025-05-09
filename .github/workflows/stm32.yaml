@@ -66,7 +66,7 @@ jobs:
       - name: Run linter
         working-directory: ./stm32
         run: >
-          clang-format -n -i -Werror --verbose --fallback-style=Google
+          clang-format -n -i --Wno-error=unknown -Werror --verbose --fallback-style=Google
           ./Src/examples/*.c
           ./lib/**/*.h
           ./lib/**/*.c

@@ -68,7 +68,7 @@ jobs:
       - name: Run linter
         working-directory: ./esp32
         run: >
-          clang-format -n -i -Werror --verbose --fallback-style=Google
+          clang-format -n -i --Wno-error=unknown -Werror --verbose --fallback-style=Google
           ./esp32/**/*.cpp
           ./esp32/**/*.hpp
 

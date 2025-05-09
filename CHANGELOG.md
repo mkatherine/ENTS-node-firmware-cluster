@@ -8,6 +8,14 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
+## [Unreleased] - TBD
+
+### Added
+
+- Simulation utility for WiFi uploads [#217][i217]
+
+[i217]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/217
+
 ## [2.3.1] - 2025-05-09
 
 ### Added

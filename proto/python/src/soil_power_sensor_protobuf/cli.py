@@ -29,7 +29,7 @@ from .proto.encode import (
 from .proto.decode import decode_measurement, decode_response
 from .proto.esp32 import encode_esp32command, decode_esp32command
 
-from .sim.simulation import Simulation
+from .simulator.node import NodeSimulator
 
 
 def entry():
@@ -91,7 +91,7 @@ def create_sim_parser(subparsers):
 
 
 def simulate(args):
-    simulation = Simulation(
+    simulation = NodeSimulator(
         cell=args.cell,
         logger=args.logger,
         sensors=args.sensor,

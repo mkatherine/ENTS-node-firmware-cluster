@@ -68,7 +68,8 @@ jobs:
       - name: Run linter
         working-directory: ./esp32
         run: >
+          find .
+          \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" \)
+          -type f -print0 |
           clang-format -n -i -Werror --verbose --style=Google
-          ./**/*.cpp
-          ./**/*.hpp
 

@@ -1,16 +1,15 @@
 """Testing simulation code
 
 Tests the functionality of the NodeSimulator class uploading data to a sample
-server. A HTTP server to handle post request must be running at localhost:8080.
+server. A HTTP server to handle post request is started on a per test basis at
+localhost:8080. Ensure there is not another process using this port.
 """
 
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-# import threading
+from multiprocessing import Process
 from datetime import datetime, timedelta
-
-# from time import sleep
 
 from soil_power_sensor_protobuf.simulator.node import NodeSimulator
 
@@ -18,7 +17,9 @@ from soil_power_sensor_protobuf.simulator.node import NodeSimulator
 class Backend(BaseHTTPRequestHandler):
     """Backend simulator"""
 
-    simulate_error = 0
+    def log_message(self, format, *args):
+        """Override to not print to stdout"""
+        pass
 
     def do_POST(self):
         """Return 200 from a POST request"""
@@ -28,16 +29,10 @@ class Backend(BaseHTTPRequestHandler):
         # data = self.rfile.read(content_length)
 
         # send response
-        if self.server.simulate_error:
-            self.send_response(418)
-            self.send_header("Content-type", "text/octet-stream")
-            self.end_headers()
-            self.wfile.write(b"I'm a teapot not a coffee maker!")
-        else:
-            self.send_response(200)
-            self.send_header("Content-type", "text/octet-stream")
-            self.end_headers()
-            self.wfile.write(b"The world is your oyster!")
+        self.send_response(200)
+        self.send_header("Content-type", "text/octet-stream")
+        self.end_headers()
+        self.wfile.write(b"The world is your oyster!")
 
 
 def run_server():
@@ -50,6 +45,17 @@ def run_server():
 
 class TestNodeSimulator(unittest.TestCase):
     url = "http://localhost:8080/"
+
+    def setUp(self):
+        """Start webserver in separate process"""
+
+        self.backend = Process(target=run_server)
+        self.backend.start()
+
+    def tearDown(self):
+        """Terminate process"""
+
+        self.backend.terminate()
 
     def test_power(self):
         sim = NodeSimulator(1, 2, "power")
@@ -90,16 +96,5 @@ class TestNodeSimulator(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TODO (jmadden173):  fix HTTP server, likely do the the same process
-    # bding to the same socket. Alternative is to use a subprocess
-    #
-    # start async http server
-    # backend = threading.Thread(target=run_server, daemon=True)
-    # backend.start()
-
-    # wait for server to start
-    # sleep(5)
-
-    # import pdb; pdb.set_trace()
     # run unittests
     unittest.main()

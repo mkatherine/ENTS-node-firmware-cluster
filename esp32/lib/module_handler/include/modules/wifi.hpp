@@ -36,12 +36,12 @@ class ModuleWiFi : public ModuleHandler::Module {
   /**
    * @see ModuleHandler::Module.OnReceive
    */
-  void OnReceive(const Esp32Command& cmd);
+  void OnReceive(const Esp32Command &cmd);
 
   /**
    * @see ModuleHandler::Module.OnRequest
    */
-  size_t OnRequest(uint8_t* buffer);
+  size_t OnRequest(uint8_t *buffer);
 
  private:
   typedef enum {
@@ -57,17 +57,17 @@ class ModuleWiFi : public ModuleHandler::Module {
    */
   Dirtviz dirtviz;
 
-  void Post(const Esp32Command& cmd);
+  void Post(const Esp32Command &cmd);
 
-  void Connect(const Esp32Command& cmd);
+  void Connect(const Esp32Command &cmd);
 
-  void Check(const Esp32Command& cmd);
+  void Check(const Esp32Command &cmd);
 
-  void Time(const Esp32Command& cmd);
+  void Time(const Esp32Command &cmd);
 
   WiFiUDP ntpUDP;
 
-  NTPClient* timeClient;
+  NTPClient *timeClient;
 
   /** Buffer for i2c requests */
   uint8_t request_buffer[WiFiCommand_size] = {};

@@ -71,7 +71,7 @@ typedef union {
  *
  * @see data_ready_pin
  */
-const GPIO_TypeDef* data_ready_port = GPIOC;
+const GPIO_TypeDef *data_ready_port = GPIOC;
 
 /**
  * @brief GPIO pin for adc data ready line
@@ -111,7 +111,7 @@ void PowerDown(void);
  *
  * @return Raw measurement from adc
  */
-HAL_StatusTypeDef Measure(int32_t* meas);
+HAL_StatusTypeDef Measure(int32_t *meas);
 
 /**
  * @brief This function reconfigures the ADS1219 based on the parameter reg_data
@@ -122,7 +122,7 @@ HAL_StatusTypeDef Measure(int32_t* meas);
 HAL_StatusTypeDef Configure(const ConfigReg reg_data);
 
 HAL_StatusTypeDef ADC_init(void) {
-  const UserConfiguration* cfg = UserConfigGet();
+  const UserConfiguration *cfg = UserConfigGet();
 
   // read calibration values
   voltage_calibration_m = cfg->Voltage_Slope;
@@ -216,7 +216,7 @@ HAL_StatusTypeDef probeADS12(void) {
   return ret;
 }
 
-size_t ADC_measure(uint8_t* data) {
+size_t ADC_measure(uint8_t *data) {
   // get timestamp
   SysTime_t ts = SysTimeGet();
 
@@ -224,7 +224,7 @@ size_t ADC_measure(uint8_t* data) {
   double adc_voltage = ADC_readVoltage();
   double adc_current = ADC_readCurrent();
 
-  const UserConfiguration* cfg = UserConfigGet();
+  const UserConfiguration *cfg = UserConfigGet();
 
   // encode measurement
   size_t data_len = EncodePowerMeasurement(
@@ -246,7 +246,7 @@ void PowerOff(void) {
   HAL_GPIO_WritePin(POWERDOWN_GPIO_Port, POWERDOWN_Pin, GPIO_PIN_RESET);
 }
 
-HAL_StatusTypeDef Measure(int32_t* meas) {
+HAL_StatusTypeDef Measure(int32_t *meas) {
   HAL_StatusTypeDef ret = HAL_OK;
   uint8_t rx_data[3] = {0x00, 0x00, 0x00};
 

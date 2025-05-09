@@ -1,5 +1,4 @@
 from math import sin
-from datetime import datetime
 
 import requests
 import numpy as np
@@ -11,7 +10,8 @@ from ..proto.encode import (
     encode_bme280_measurement,
 )
 
-class Simulation:
+
+class NodeSimulator:
     """Simulation class to simulate measurements for different sensors"""
 
     # temporary storage for measurements to be uploaded
@@ -22,14 +22,15 @@ class Simulation:
     responses: list[str] = []
 
     # metrics for uploads
-    metrics = {
+    metrics: dict[str, int] = {
         "total_requests": 0,
         "failed_requests": 0,
         "successful_requests": 0,
-        "latency": [],
     }
 
-    def __init__(self, cell: int, logger: int, sensors: list[str], fn = sin):
+    latency: list[float] = []
+
+    def __init__(self, cell: int, logger: int, sensors: list[str], fn=sin):
         self.cell = cell
         self.logger = logger
         self.sensors = sensors
@@ -40,11 +41,11 @@ class Simulation:
 
         Shows the current upload metrics
         """
-        avg = np.array(self.metrics["latency"]).mean()
+        avg = np.array(self.latency).mean()
 
         last = 0
-        if len(self.metrics["latency"]) > 0:
-            last = self.metrics["latency"][-1]
+        if len(self.latency) > 0:
+            last = self.latency[-1]
 
         return "total: {}, failed: {}, avg (ms): {}, last (ms): {}".format(
             self.metrics["total_requests"],
@@ -69,7 +70,7 @@ class Simulation:
         except IndexError as _:
             return False
 
-        headers = {'Content-Type': 'application/octet-stream'}
+        headers = {"Content-Type": "application/octet-stream"}
         result = requests.post(url, data=meas, headers=headers)
 
         # store result
@@ -79,7 +80,7 @@ class Simulation:
             self.metrics["successful_requests"] += 1
         else:
             self.metrics["failed_requests"] += 1
-        self.metrics["latency"].append(result.elapsed.total_seconds())
+        self.latency.append(result.elapsed.total_seconds())
 
         return True
 

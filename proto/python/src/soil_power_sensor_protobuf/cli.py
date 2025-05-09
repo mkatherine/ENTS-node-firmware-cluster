@@ -31,6 +31,7 @@ from .proto.esp32 import encode_esp32command, decode_esp32command
 
 from .sim.simulation import Simulation
 
+
 def entry():
     """Command line interface entry point"""
 
@@ -68,7 +69,7 @@ def create_sim_parser(subparsers):
         required=True,
         choices=["batch", "stream"],
         type=str,
-        help="Upload mode"
+        help="Upload mode",
     )
     sim_p.add_argument(
         "--sensor",
@@ -77,33 +78,12 @@ def create_sim_parser(subparsers):
         type=str,
         nargs="+",
     )
+    sim_p.add_argument("--cell", required=True, type=int, help="Cell Id")
+    sim_p.add_argument("--logger", required=True, type=int, help="Logger Id")
+    sim_p.add_argument("--start", type=str, help="Start date")
+    sim_p.add_argument("--end", type=str, help="End date")
     sim_p.add_argument(
-        "--cell",
-        required=True,
-        type=int,
-        help="Cell Id"
-    )
-    sim_p.add_argument(
-        "--logger",
-        required=True,
-        type=int,
-        help="Logger Id"
-    )
-    sim_p.add_argument(
-        "--start",
-        type=str,
-        help="Start date"
-    )
-    sim_p.add_argument(
-        "--end",
-        type=str,
-        help="End date"
-    )
-    sim_p.add_argument(
-        "--freq",
-        default=10.0,
-        type=float,
-        help="Frequency of uploads (default: 10s)"
+        "--freq", default=10.0, type=float, help="Frequency of uploads (default: 10s)"
     )
     sim_p.set_defaults(func=simulate)
 
@@ -132,7 +112,7 @@ def simulate(args):
             curr_dt += timedelta(seconds=args.freq)
 
         # send measurements
-        while (simulation.send_next(args.url)):
+        while simulation.send_next(args.url):
             print(simulation)
 
         print("Done!")
@@ -144,11 +124,12 @@ def simulate(args):
                 dt = datetime.now()
                 ts = int(dt.timestamp())
                 simulation.measure(ts)
-                while (simulation.send_next(args.url)):
+                while simulation.send_next(args.url):
                     print(simulation)
                 time.sleep(args.freq)
         except KeyboardInterrupt as _:
             print("Stopping simulation")
+
 
 def create_calib_parser(subparsers):
     """Creates the calibration subparser

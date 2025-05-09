@@ -8,12 +8,15 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
-## [Unreleased] - TDB
+## [2.3.1] - 2025-05-09
 
 ### Added
 
 - WiFi upload method [#46](i46)
 - Support for the Teros12 sensor [#172](i172)
+- LED status indicator [#197](i197)
+- Define for commit sha [#199](i199)
+- Turn off analog circuit when not in use [#202](i202)
 
 ### Changed
 
@@ -22,6 +25,8 @@ firmware versions for a hardware version.
 [i46]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/46
 [i172]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/172
 [i174]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/174
+[i197]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/197
+[i199]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/199
 
 ## [2.3.0] - 2025-02-26
 

@@ -16,8 +16,16 @@ You can also install the package from source with the following:
 ```bash
 # install package
 pip install .
+```
+
+If you are planning to develop the package we recommend you install the package
+in editable mode with development dependencies. This allows you to make changes
+to the source code and have them reflected in the package without needing to
+reinstall it.
+
+```bash
 # install development dependencies
-pip install .[dev]
+pip install -e .[dev]
 ```
 
 ## Usage

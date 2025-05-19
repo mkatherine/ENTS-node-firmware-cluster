@@ -9,4 +9,4 @@ pio check
 cd ..
 
 # lint python code
-ruff check proto/python
+ruff check python

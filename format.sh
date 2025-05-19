@@ -25,5 +25,5 @@ echo "Done."
 
 # format python code
 echo "Formattting Python code..."
-black proto/python
+black python
 echo "Done."

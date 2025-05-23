@@ -1,10 +1,3 @@
-# Extra Documentation
+# Documentation for the project
 
-This folder stores any extra documentation that is useful for the overall project but does not fall into a specific category. Below is a list of extra documentation
-
-- @subpage create-pio-cubemx
-- @subpage rg191
-- @subpage add-device-to-ttn
-- @subpage bsp-components
-- @subpage remote-dev
-- @subpage controller
+This folder holds the documentation for *using* the ents-node. For code documentation, see the [Doxygen documentation](https://jlab-sensing.github.io/ENTS-node-firmware/) for working with the firmware and TBD for using the python module.

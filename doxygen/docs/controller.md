@@ -1,5 +1,4 @@
-# Controller Interface {#controller}
-
+# Controller Interface
 The `controller` library runs on the I2C *controller* devices to add functionality from externally connection microcontroller. Communication is performed over the I2C bus with a protobuf protocol to format data. For the ents system, we use library to add support for WiFi communication and additional storage through a micro SD card. Thus, the `controller` on the stm32 is written ontop STM Hardware Abstraction Layer (HAL) libraries that interface with the I2C peripherals.
 
 The `module_handler` library runs on the external devices that provides the interface with the host. The device is configured as an I2C *target* devices and accepts protobuf encoded commands. The library is implemented using the [Arduino Wire library](https://docs.arduino.cc/language-reference/en/functions/communication/wire/).

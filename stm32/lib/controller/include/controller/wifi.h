@@ -1,3 +1,10 @@
+/**
+ * @file wifi.h
+ * @date 2024-10-13
+ * @author John Madden <jmadden173@pm.me>
+ * @brief WiFi interface implementation with the esp32
+ */
+
 #ifndef LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_
 #define LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_
 
@@ -7,6 +14,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @ingroup controller
+ * @defgroup controllerWiFi WiFi
+ * @brief WiFi interface for the esp32
+ * @{
+ */
 
 /**
  * @brief Initialize WiFi settings on the esp32
@@ -56,6 +70,10 @@ unsigned int ControllerWiFiCheck(const char *url, const uint32_t port);
  */
 int ControllerWiFiPost(const uint8_t *data, size_t data_len, uint8_t *resp,
                        uint8_t *resp_len);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

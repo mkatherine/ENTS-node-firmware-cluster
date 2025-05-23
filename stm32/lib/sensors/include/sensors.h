@@ -3,6 +3,25 @@
  * @author John Madden (jtmadden@ucsc.edu)
  * @brief Queries sensors and adds measurements to the upload queue
  * @date 2024-04-01
+ */
+
+#ifndef LIB_SENSORS_INCLUDE_SENSORS_H_
+#define LIB_SENSORS_INCLUDE_SENSORS_H_
+
+#include "fifo.h"
+#include "lora_app.h"
+#include "stm32_seq.h"
+#include "stm32_timer.h"
+#include "sys_app.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @defgroup sensors Sensors
+ * @brief Sensors library provides the interface between taking measurements
+ * and uploading them to the server
  *
  * Provides an interface for querying sensors and adding the measurements to the
  * transmit buffer. Functions to query sensors are registered and called on a
@@ -21,43 +40,8 @@
  * value should be an order of magnitude greater than the upload frequency that
  * is defined by APP_TX_DUTY_CYCLE.
  *
- * @copyright
- *
- * MIT License
- *
- * Copyright (c) 2024 jLab in Smart Sensing at UCSC
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * @{
  */
-
-#ifndef LIB_SENSORS_INCLUDE_SENSORS_H_
-#define LIB_SENSORS_INCLUDE_SENSORS_H_
-
-#include "fifo.h"
-#include "lora_app.h"
-#include "stm32_seq.h"
-#include "stm32_timer.h"
-#include "sys_app.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef MAX_SENSORS
 /** Max number of sensors that can be added*/
@@ -114,6 +98,10 @@ int SensorsAdd(SensorsPrototypeMeasure cb);
  * @see SensorsPrototypeMeasure
  */
 size_t SensorsMeasureTest(uint8_t *data);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

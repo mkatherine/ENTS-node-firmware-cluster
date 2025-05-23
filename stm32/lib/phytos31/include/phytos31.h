@@ -1,7 +1,6 @@
 // Copyright 2024 Jlab sensing
 
 /**
- ******************************************************************************
  * @file     phytos31.h
  * @author   Stephen Taylor
  * @brief    This file contains all the function prototypes for
@@ -11,7 +10,6 @@
  *           sensor from METER.
  *           https://metergroup.com/products/phytos-31/
  * @date     4/18/2024
- ******************************************************************************
  */
 
 #ifndef LIB_PHYTOS31_INCLUDE_PHYTOS31_H_
@@ -25,6 +23,18 @@ extern "C" {
 #include <stdlib.h>
 
 #include "ads.h"
+
+/**
+ * @defgroup phytos31 Phytos31
+ * @brief Library for interfacing with the PHYTOS-31 sensor
+ *
+ * This library is designed to read measurements from a PHYTOS-31 sensor from
+ * METER.
+ *
+ * https://metergroup.com/products/phytos-31/
+ *
+ * @{
+ */
 
 typedef struct {
   double phytos31_raw;
@@ -66,6 +76,10 @@ phytos_measurments Phytos31GetMeasurment(void);
  * @see SensorsPrototypeMeasure
  */
 size_t Phytos31_measure(uint8_t *data);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

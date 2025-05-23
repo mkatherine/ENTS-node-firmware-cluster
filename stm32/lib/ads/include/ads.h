@@ -25,6 +25,21 @@ extern "C" {
 #include "usart.h"
 
 /**
+ * @defgroup ads ADS1219
+ * @brief Library for interfacing with the ADS1219 ADC
+ *
+ * This library is designed to read measurements from the ADS1219 ADC. When not
+ * actively taking measurements, the analog frontend is power down to reduce
+ * parasitic current.
+ *
+ * Library expected I2C and GPIO to be initialized before use.
+ *
+ * Datasheet: https://www.ti.com/product/ADS1219
+ *
+ * @{
+ */
+
+/**
 ******************************************************************************
 * @brief    This function starts up the ADS1219
 *
@@ -86,6 +101,10 @@ HAL_StatusTypeDef ADC_probe(void);
 *******************************************f***********************************
 */
 size_t ADC_measure(uint8_t *data);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

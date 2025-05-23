@@ -22,7 +22,7 @@ typedef enum {
 
 typedef struct {
   /** State in buffer */
-  uint8_t* data;
+  uint8_t *data;
   /** Size of buffer */
   size_t size;
   /** Length of data in buffer */
@@ -57,7 +57,7 @@ ControllerStatus ControllerTransaction(unsigned int timeout);
  *
  * @return Pointer to transmit buffer
  */
-Buffer* ControllerTx(void);
+Buffer *ControllerTx(void);
 
 /**
  * @brief Get reference to receive buffer
@@ -66,7 +66,7 @@ Buffer* ControllerTx(void);
  *
  * @return Pointer to receive buffer
  */
-Buffer* ControllerRx(void);
+Buffer *ControllerRx(void);
 
 #ifdef __cplusplus
 }

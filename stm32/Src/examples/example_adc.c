@@ -101,6 +101,8 @@ int main(void) {
   // init systemapp
   SystemApp_Init();
 
+  UserConfigLoad();
+
   /*Initialize timer and RTC*/
   /*Have to be initilized in example files because LoRaWan cannot be initialized
    * like in main*/

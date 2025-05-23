@@ -20,7 +20,7 @@
 
 static const uint16_t REQUEST_MEASURMENT_RESPONSE_SIZE = 7;
 static const uint16_t SERVICE_REQUEST_SIZE = 3;
-static const uint16_t MEASURMENT_DATA_SIZE = 18;
+static const uint16_t MEASURMENT_DATA_SIZE = 30;
 static const uint16_t SEND_COMMAND_TIMEOUT = 1000;
 
 /* Helper function to parse the sensor's response to a get measurment command*/

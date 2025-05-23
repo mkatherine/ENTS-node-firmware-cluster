@@ -24,8 +24,8 @@ class DirtvizRequestHandler(BaseHTTPRequestHandler):
         print("Headers:")
         print(self.headers)
         print()
-        print("Received data:")
-        print(data.decode('utf-8'))
+        print(f"Received data {type(data)}:")
+        print(data)
 
         # send response
         if self.server.simulate_error:

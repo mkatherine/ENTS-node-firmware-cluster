@@ -56,7 +56,7 @@ class ModuleHandler {
    * @param module Pointer to module object
    * @param type Message type
    */
-  void RegisterModule(Module* module);
+  void RegisterModule(Module *module);
 
   /**
    * @brief Deregister a module
@@ -72,7 +72,7 @@ class ModuleHandler {
    *
    * @returns Reference to module associated with the type
    */
-  Module* GetModule(int type);
+  Module *GetModule(int type);
 
   /**
    * @brief Resets all modules
@@ -97,10 +97,10 @@ class ModuleHandler {
 
  private:
   /** Map of request types to modules */
-  std::map<int, Module*> req_map;
+  std::map<int, Module *> req_map;
 
   /** Store reference to last module */
-  Module* last_module;
+  Module *last_module;
 
   typedef struct {
     /** Size of receive/request buffer */

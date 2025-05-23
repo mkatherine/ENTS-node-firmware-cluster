@@ -25,6 +25,7 @@ extern "C" {
 #include "ads.h"
 
 /**
+ * @ingroup stm32
  * @defgroup phytos31 Phytos31
  * @brief Library for interfacing with the PHYTOS-31 sensor
  *

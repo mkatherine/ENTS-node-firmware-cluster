@@ -14,6 +14,7 @@
  */
 
 /**
+ * @ingroup stm32
  * @defgroup storage Storage
  * @brief Library for storing data on non-volatile memory
  */

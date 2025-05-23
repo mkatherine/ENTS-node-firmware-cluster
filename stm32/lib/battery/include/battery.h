@@ -15,6 +15,7 @@ extern "C" {
 #include "stm32wlxx_hal.h"
 
 /**
+ * @ingroup stm32
  * @defgroup battery Battery (Not functional)
  * @brief Battery monitoring interface
  * 

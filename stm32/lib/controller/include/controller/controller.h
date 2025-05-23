@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup stm32
  * @defgroup controller Controller
  * @brief Controller library for communication between stm32 and esp32
  */

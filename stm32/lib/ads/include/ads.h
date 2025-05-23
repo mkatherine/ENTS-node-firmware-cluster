@@ -25,6 +25,7 @@ extern "C" {
 #include "usart.h"
 
 /**
+ * @ingroup stm32
  * @defgroup ads ADS1219
  * @brief Library for interfacing with the ADS1219 ADC
  *

@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 /**
+ * @ingroup stm32
  * @defgroup sensors Sensors
  * @brief Sensors library provides the interface between taking measurements
  * and uploading them to the server

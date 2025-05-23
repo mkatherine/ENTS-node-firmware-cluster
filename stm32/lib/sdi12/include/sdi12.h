@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup stm32
  * @defgroup sdi12 SDI-12 Sensors
  * @brief Library for interfacing with SDI-12 sensors
  */

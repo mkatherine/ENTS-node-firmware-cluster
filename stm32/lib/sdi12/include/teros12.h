@@ -1,7 +1,7 @@
 /**
  * @file teros12.h
  * @author John Madden <jmadden173@pm.me>
- * @brief Drives for reading measurements from Teros12 sensor
+ * @brief Drivers for reading measurements from Teros12 sensor
  * @date 2025-03-05
  */
 
@@ -13,6 +13,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @ingroup sdi12
+ * @defgroup teros12 Teros12
+ * @brief Library for interfacing with Teros12 sensors
+ *
+ * This library is designed to read measurements from Teros12 sensors.
+ *
+ * Datasheet: https://metergroup.com/products/teros-12/
+ *
+ * @{
+ */
 
 typedef struct {
   char addr;
@@ -59,5 +71,9 @@ SDI12Status Teros12GetMeasurement(char addr, Teros12Data *data);
  *
  */
 size_t Teros12Measure(uint8_t *data);
+
+/**
+ * @}
+ */
 
 #endif  // LIB_SDI12_INCLUDE_TEROS12_H_

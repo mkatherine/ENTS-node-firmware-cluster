@@ -1,14 +1,14 @@
 /**
- ******************************************************************************
- * Copyright 2024 jLab
  * @file     sdi12.h
  * @author   Stephen Taylor
- * @brief    This file contains all the driver functions for communication to a
- *           TEROS-12 sensor via SDI-12.
- *           https://www.sdi-12.org/
- *
+ * @brief    Interface for sdi12 sensors
  * @date     4/1/2024
- ******************************************************************************
+ * Copyright 2024 jLab
+ */
+
+/**
+ * @defgroup sdi12 SDI-12 Sensors
+ * @brief Library for interfacing with SDI-12 sensors
  */
 
 #ifndef LIB_SDI12_INCLUDE_SDI12_H_
@@ -25,6 +25,19 @@ extern "C" {
 #include "lptim.h"
 #include "tim.h"
 #include "usart.h"
+
+/**
+ * @ingroup sdi12
+ * @defgroup sdi12Interface Interface
+ * @brief Library for interfacing with SDI-12 sensors
+ *
+ * This library is designed to read measurements from SDI-12 sensors.
+ *
+ * Protocol Specification: https://www.sdi-12.org/
+ * Implemented hardware interface: https://www.osti.gov/servlets/purl/1214143
+ *
+ * @{
+ */
 
 /** Status codes for the Fram library*/
 typedef enum {
@@ -90,6 +103,10 @@ SDI12Status SDI12ReadData(char *buffer, uint16_t bufferSize,
 SDI12Status SDI12GetMeasurment(uint8_t addr,
                                SDI12_Measure_TypeDef *measurment_info,
                                char *measurment_data, uint16_t timeoutMillis);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

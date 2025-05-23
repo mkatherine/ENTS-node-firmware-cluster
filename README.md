@@ -108,19 +108,13 @@ doxygen Doxyfile
 
 Online version of the documentation for the `main` branch is available at https://jlab-sensing.github.io/ents-node-firmware/
 
-## Resources
-
-Below is a list of resources that served as references throughout the design and implementation for the project.
-
-- https://github.com/Seeed-Studio/LoRaWan-E5-Node
-
-## Support
-
-For issues relating to software create an issue in this repository. For hardware issues, create an issue in the [hardware repository](https://github.com/jlab-sensing/soil_power_sensor).
-
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+If you have a bug or feature request, please create an issue in the [issues tab](https://github.com/jlab-sensing/ENTS-node-firmware/issues). For hardware issues, create an issue in the [hardware repository](https://github.com/jlab-sensing/soil_power_sensor).
+
+We have a public zulip channel for discussion of the project. You can join the channel [here](https://ents.zulipchat.com/). It is primarily used for discussion of the development of the project and is a good place to ask questions about the project. The channel is open to all and we encourage you to join if you are interested in the project.
 
 ## Code of Conduct
 

@@ -71,6 +71,32 @@ jobs:
         pip install --user . &&
         python -m unittest discover tests
 
+  publish-to-aws:
+    needs:
+      - build
+      - test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Login to AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+    - name: Upload python package to S3
+      run: aws s3 cp dist/ s3://ents-python-package/${{ github.sha }}/ 
+
+    - name: Show path to uploaded package
+      run: echo "Test" >> $GITHUB_STEP_SUMMARY
+
   publish-to-pypi:
     name: >-
       Publish Python distribution to PyPI

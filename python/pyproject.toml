@@ -40,7 +40,7 @@ dev = [
 ents = "ents.cli:entry"
 
 [project.gui-scripts]
-gui = "ents.config.user_config:main"
+ents-gui = "ents.config.user_config:main"
 
 [project.urls]
 Homepage = "https://github.com/jlab-sensing/soil-power-sensor-firmware"

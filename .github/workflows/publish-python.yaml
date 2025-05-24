@@ -92,10 +92,13 @@ jobs:
         aws-region: us-west-2
 
     - name: Upload python package to S3
-      run: aws s3 cp dist/* s3://ents-python-package/${{ github.sha }}/ 
+      run: aws s3 cp dist/* s3://ents-python-package/${{ github.sha }}/ --recursive
 
     - name: Show path to uploaded package
-      run: echo "Test" >> $GITHUB_STEP_SUMMARY
+      run: |
+        for file in dist/*; do
+          echo "File uploaded to S3: https://ents-python-package.s3.amazonaws.com/${{ github.sha }}/$(basename $file)\n" >> $GITHUB_STEP_SUMMARY
+        done
 
   publish-to-pypi:
     name: >-

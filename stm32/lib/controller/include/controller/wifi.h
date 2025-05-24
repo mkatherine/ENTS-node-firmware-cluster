@@ -24,7 +24,7 @@ extern "C" {
  * The *WiFiCommand* message is used to control the WiFi hardware on the esp32
  * module. There are two types: (1) `CONNECT` which is used to connect to the
  * WiFi network and (2) `POST` which sends data to an API endpoint.
- 
+
  * @image html WiFiCommand.png "WiFiCommand Message Structure" width=60%
  *
  * The return code (`rc`) message serves dual purpose based on the type and

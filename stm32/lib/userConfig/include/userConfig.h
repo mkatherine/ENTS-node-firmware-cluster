@@ -35,7 +35,7 @@ extern "C" {
  * @ingroup stm32
  * @defgroup userConfig User Configuration
  * @brief   Soil Power Sensor userConfig library
- *  
+ *
  * This file provides functions for managing user configuration data
  * via UART communication and storage in FRAM. It includes functions
  * for handling UART interrupts for receiving data, writing and
@@ -43,7 +43,7 @@ extern "C" {
  *
  * The library initializes UART for interrupt-based receiving and handles
  * incoming data in an interrupt service routine.
- * 
+ *
  * It supports both interrupt-driven and polling methods for receiving data.
  *
  * The received data length is stored alongside the encoded data in FRAM to

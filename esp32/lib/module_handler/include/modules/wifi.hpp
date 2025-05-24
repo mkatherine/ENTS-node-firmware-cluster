@@ -25,7 +25,7 @@
 /**
  * @ingroup moduleHandler
  * @brief WiFi module for the esp32
- 
+
  * The WiFi module support CONNECT and POST commands through OnReceive. The
  * CONNECT command connects to a WiFi network and returns the timestamp from the
  * server for time syncronization purposes. The POST requires sends a HTTP POST

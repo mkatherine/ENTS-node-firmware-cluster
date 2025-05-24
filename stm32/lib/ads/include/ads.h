@@ -24,7 +24,6 @@ extern "C" {
 #include "transcoder.h"
 #include "usart.h"
 
-
 /**
  * @ingroup stm32
  * @defgroup ads ADS1219

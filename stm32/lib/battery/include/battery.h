@@ -18,7 +18,7 @@ extern "C" {
  * @ingroup stm32
  * @defgroup battery Battery (Not functional)
  * @brief Battery monitoring interface
- * 
+ *
  * @note This library is currently not functional. There was some difficulty in
  * getting the ADC to work properly since it is preconfigured as part of the
  * LoRaWAN stack.

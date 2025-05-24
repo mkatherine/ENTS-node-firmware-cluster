@@ -41,9 +41,11 @@ extern "C" {
  * The buffer operates as a circular queue with three pointers:
  *
  * - Read Pointer: Points to the address of the next measurement to be uploaded.
- * - Write Pointer: Points to the address where the next measurement will be stored.
- * - Clear Pointer: Points to the last measurement that has been confirmed by the backend.
- * 
+ * - Write Pointer: Points to the address where the next measurement will be
+ * stored.
+ * - Clear Pointer: Points to the last measurement that has been confirmed by
+ * the backend.
+ *
  * Unlike traditional circular buffers that maintain only read and write
  * pointers with overflow protection, the ENTS design adds a clear pointer to
  * track backend uplink confirmations. This pointer ensures that unacknowledged

@@ -1,6 +1,6 @@
 /**
  * @example  example_status_led.c
- * 
+ *
  * Example code for using the status LED on the Wio-E5 board. Changes through
  * all statuses of the LED and prints the state to the console.
  *

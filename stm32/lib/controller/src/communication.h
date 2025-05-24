@@ -5,7 +5,7 @@
  * @date 2024-10-13
  *
  * This file implements the i2c communication interface for the controller
- * module. 
+ * module.
  */
 
 #ifndef LIB_CONTROLLER_SRC_COMMUNICATION_H_

@@ -30,7 +30,7 @@ extern "C" {
  * METER.
  *
  * https://metergroup.com/products/phytos-31/
- 
+
  * Examples:
  * - @ref example_phytos.c
  *

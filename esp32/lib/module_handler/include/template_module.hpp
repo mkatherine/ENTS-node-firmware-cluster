@@ -18,7 +18,7 @@
 
 namespace ModuleHandler {
 
-  /**
+/**
  * @ingroup moduleHandler
  * @brief Class prototype for modules
  *

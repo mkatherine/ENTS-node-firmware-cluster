@@ -3,6 +3,7 @@ from .proto.encode import (
     encode_power_measurement,
     encode_teros12_measurement,
     encode_phytos31_measurement,
+    encode_bme280_measurement,
 )
 
 from .proto.decode import decode_response, decode_measurement
@@ -14,6 +15,7 @@ __all__ = [
     "encode_power_measurement",
     "encode_teros12_measurement",
     "encode_phytos31_measurement",
+    "encode_bme280_measurement",
     "decode_response",
     "decode_measurement",
     "encode_esp32command",

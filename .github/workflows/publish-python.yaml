@@ -92,7 +92,7 @@ jobs:
         aws-region: us-west-2
 
     - name: Upload python package to S3
-      run: aws s3 cp dist/* s3://ents-python-package/${{ github.sha }}/ --recursive
+      run: aws s3 sync dist/ s3://ents-python-package/${{ github.sha }}/
 
     - name: Show path to uploaded package
       run: |

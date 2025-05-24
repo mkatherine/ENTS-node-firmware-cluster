@@ -100,10 +100,10 @@ test_speed = 115200
 
 ## Generation documentation
 
-This project use [Doxygen](https://www.doxygen.nl/) for its code documentation. HTML documentation is automatically generated through Github Actions and is updated whenever there is a change to the `main` branch. To generate documentation locally in the `docs/` folder, run the following from the root directory:
+This project use [Doxygen](https://www.doxygen.nl/) for its code documentation. HTML documentation is automatically generated through Github Actions and is updated whenever there is a change to the `main` branch. To generate documentation locally in the `doxygen/build/html/` folder, run the following from the root directory:
 
 ```bash
-doxygen Doxyfile
+doxygen doxygen/Doxyfile
 ```
 
 Online version of the documentation for the `main` branch is available at https://jlab-sensing.github.io/ents-node-firmware/
@@ -128,11 +128,15 @@ Code in this repository is licensed under the MIT License unless specified in th
 
 ## Maintainers
 
-- [John Madden](mailto:jtmadden@ucsc.edu)
+- [John Madden](mailto:jtmadden@ucsc.edu) (UCSC)
 
 ## Contributors
 
-- [Steve Taylor](mailto:sgtaylor@ucsc.edu)
-- [Varun Sreedharan](mailto:vasreedh@ucsc.edu)
+- [Steve Taylor](mailto:sgtaylor@ucsc.edu) (UCSD)
+- Jack Lin (UCSC)
+- Ahmed Falah (GSOC)
+- Caden Jacobs (UCSC)
+- Ella Ferraz (UCSC)
+- [Varun Sreedharan](mailto:vasreedh@ucsc.edu) (UCSC)
 
 [pio]: https://platformio.org/

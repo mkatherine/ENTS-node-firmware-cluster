@@ -23,11 +23,14 @@ dependencies = [
   'pyserial',
   'scikit-learn',
   'tqdm',
-  'PyQt5',
   'requests',
 ]
 
 [project.optional-dependencies]
+gui = [
+  'PyQt5',
+]
+
 dev = [
   "black",
   "ruff",

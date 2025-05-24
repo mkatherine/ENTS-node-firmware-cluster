@@ -8,13 +8,13 @@ In VSCode PlatformIO extension requires a folder with a `platformio.ini` file fo
 
 > Following the instructions [here](configuring-ports.md) to set your local ports in `platformio.ini` for both the `stm32` and `esp32` environments.
 
-The Wio-E5 relies on a ST-Link JTAG interface with detailed instructions available at [stm/README.md](stm32/README.md). Using the cli you can flash the firmware with the following command:
+The Wio-E5 relies on a ST-Link JTAG interface with detailed instructions available at [stm/README.md](../stm32/README.md). Using the cli you can flash the firmware with the following command:
 
 ```bash
 pio run -e stm32 -t upload -t monitor
 ```
 
-The esp32 uses a built in a bootloader that can be accessed over UART, detailed instructions are available at [eps32/README.md](esp32/README.md).
+The esp32 uses a built in a bootloader that can be accessed over UART, detailed instructions are available at [eps32/README.md](../esp32/README.md).
 
 ```bash
 pio run -e release -t upload -t monitor

@@ -8,7 +8,7 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
-## [Unreleased] - TBD
+## [2.3.2] - 2025-05-23
 
 ### Added
 

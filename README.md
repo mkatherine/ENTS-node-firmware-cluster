@@ -31,7 +31,7 @@ The following paths are the major parts of the project. Each individual folder h
 
 How to use the *ents-node* is documented in various markdown files. See [docs/README.md](docs/README.md) for links to the documentation.
 
-Online version of the code documentation for the `main` branch is available at https://jlab-sensing.github.io/ents-node-firmware/
+Online version of the code documentation for the `main` branch is available at https://jlab-sensing.github.io/ENTS-node-firmware/
 
 ### Generating Documentation Locally
 

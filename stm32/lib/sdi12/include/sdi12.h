@@ -37,6 +37,9 @@ extern "C" {
  * Protocol Specification: https://www.sdi-12.org/
  * Implemented hardware interface: https://www.osti.gov/servlets/purl/1214143
  *
+ * Examples:
+ * - @ref example_sdi12.c
+ *
  * @{
  */
 

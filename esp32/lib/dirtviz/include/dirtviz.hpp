@@ -31,6 +31,9 @@
  * Assumes that WiFi interface is connected to the network. Uses @ref http to
  * read http requests. Requests are formatted ad-hoc.
  *
+ * Examples:
+ * - @ref example_dirtviz.cpp
+ *
  * @{
  */
 

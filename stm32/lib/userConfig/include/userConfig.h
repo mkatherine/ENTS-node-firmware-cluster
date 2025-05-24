@@ -49,6 +49,10 @@ extern "C" {
  * The received data length is stored alongside the encoded data in FRAM to
  * facilitate data retrieval upon startup.
  *
+ * Examples:
+ * - @ref example_gui.c
+ * - @ref example_userConfig.c
+ *
  * @{
  */
 

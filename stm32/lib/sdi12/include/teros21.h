@@ -25,6 +25,10 @@ extern "C" {
  *
  * Datasheet: https://metergroup.com/products/teros-21/
  *
+ * Examples:
+ * - @ref example_teros21.c
+ * - @ref example_rawTeros21.c
+ *
  * @{
  */
 

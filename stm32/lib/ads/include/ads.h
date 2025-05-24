@@ -24,6 +24,7 @@ extern "C" {
 #include "transcoder.h"
 #include "usart.h"
 
+
 /**
  * @ingroup stm32
  * @defgroup ads ADS1219
@@ -35,7 +36,10 @@ extern "C" {
  *
  * Library expected I2C and GPIO to be initialized before use.
  *
+ * Example: @ref example_adc.c
+ *
  * Datasheet: https://www.ti.com/product/ADS1219
+ *
  *
  * @{
  */

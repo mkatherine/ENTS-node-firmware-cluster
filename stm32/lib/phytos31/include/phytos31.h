@@ -6,9 +6,6 @@
  * @brief    This file contains all the function prototypes for
  *           the phytos31.c file.
  *
- *           This library is designed to read measurements from a PHYTOS-31
- *           sensor from METER.
- *           https://metergroup.com/products/phytos-31/
  * @date     4/18/2024
  */
 
@@ -33,6 +30,9 @@ extern "C" {
  * METER.
  *
  * https://metergroup.com/products/phytos-31/
+ 
+ * Examples:
+ * - @ref example_phytos.c
  *
  * @{
  */

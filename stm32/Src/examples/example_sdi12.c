@@ -1,16 +1,10 @@
 /**
- * Copyright 2024 jLab
- * @file test_battery.c
- * @brief Prints out battery voltage levels
+ * @example example_sdi12.c
  *
- * In an infinite loop the battery voltage level is retrieved then outputted
- * over serial. The user should check if the voltage levels are expected. When
- * connected to USB the voltage should be ~5V. The battery voltage level should
- * be checked and compared to a multimeter measurement.
+ * Reads the measurement from a SDI-12 sensor and prints the raw measurement
+ * over serial on a loop. Change the address to match the connected sensor.
  *
- * @see battery.h
- *
- * @author John Madden <jmadden173@pm.me>
+ * @author John Madden
  * @date 2023-11-17
  */
 

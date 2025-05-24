@@ -1,20 +1,13 @@
-/* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
+ * @example example_phytos.c
  *
- * Copyright (c) 2023 STMicroelectronics.
- * All rights reserved.
+ * Connect the PHYTOS-31 sensor to the analog input of the ents-node*. An
+ * infinite loop will read the sensor and print the measurement over serial.
  *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
+ * @author Stephen Taylor
+ * @date NA
  */
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>

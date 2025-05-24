@@ -17,6 +17,9 @@
  *
  * This library is used to parse HTTP requests and responses.
  *
+ * Examples:
+ * - @ref example_http.cpp
+ *
  * @todo Add support for encoding for http requests
  *
  * @{

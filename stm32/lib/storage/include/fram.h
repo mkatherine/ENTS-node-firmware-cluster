@@ -39,6 +39,9 @@ extern "C" {
  * Function calls for read/write ensures data does not exceed size of the
  * buffers.
  *
+ * Examples:
+ * - @ref example_retrieve_data.c
+ *
  * @{
  */
 

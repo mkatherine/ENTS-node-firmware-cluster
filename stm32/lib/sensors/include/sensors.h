@@ -37,9 +37,9 @@ extern "C" {
  * to be dynamically added or removed during firmware runtime. Also new sensors
  * will require updates to the firmware binaries.
  *
- * MEASUREMENT_PERIOD defines the amount of time between measurements. This
- * value should be an order of magnitude greater than the upload frequency that
- * is defined by APP_TX_DUTY_CYCLE.
+ * The measurement interval is determined by the user. This value should be an
+ * order of magnitude greater than the upload frequency that is defined by
+ * APP_TX_DUTY_CYCLE.
  *
  * @{
  */

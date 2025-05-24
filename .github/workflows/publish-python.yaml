@@ -97,7 +97,7 @@ jobs:
     - name: Show path to uploaded package
       run: |
         for file in dist/*; do
-          echo "File uploaded to S3: https://ents-python-package.s3.amazonaws.com/${{ github.sha }}/$(basename $file)\n" >> $GITHUB_STEP_SUMMARY
+          echo "https://ents-python-package.s3.amazonaws.com/${{ github.sha }}/$(basename $file)" >> $GITHUB_STEP_SUMMARY
         done
 
   publish-to-pypi:

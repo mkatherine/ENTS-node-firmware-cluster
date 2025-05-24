@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
  * @file           : main.c
@@ -15,6 +14,14 @@
  *
  ******************************************************************************
  */
+
+/**
+ * @example example_adv_trace.c
+ *
+ * Example showing transmission and reception of data using the Advance Trace
+ * library.
+ */
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"

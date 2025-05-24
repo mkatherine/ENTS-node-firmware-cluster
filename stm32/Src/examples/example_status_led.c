@@ -1,9 +1,11 @@
 /**
- * @file example_status_led.c
- * @brief Example code for using the status LED on the Wio-E5 board.
+ * @example  example_status_led.c
+ *
+ * Example code for using the status LED on the Wio-E5 board. Changes through
+ * all statuses of the LED and prints the state to the console.
+ *
  * @author John Madde <jmadden173@pm.me>
  * @date 2025-04-17
- *
  */
 
 #include <stdbool.h>

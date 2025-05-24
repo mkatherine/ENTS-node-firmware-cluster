@@ -12,17 +12,21 @@ firmware versions for a hardware version.
 
 ### Added
 
-- Simulation utility for WiFi uploads [#217][i217]
+- Simulation utility for WiFi uploads [#217](i217)
 
 ### Updated
 
-- Restructured python code [#226][pr226]
-- Renamed `soil-power-sensor-firmware` to `ents` [#151][i151]
-- Renamed `gui` to `ents-gui` [#235][pr235]
+- Restructured python code [#226](pr226)
+- Made the doxygen documentation usable [#205](i205)
+- Getting started guide [#119](i119)
+- Renamed `soil-power-sensor-firmware` to `ents` [#151](i151)
+- Renamed `gui` to `ents-gui` [#235](pr235)
 
-[i217]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/217
-[i226]: https://github.com/jlab-sensing/ENTS-node-firmware/pull/226
+[i119]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/119
 [i151]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/151
+[i205]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/205
+[i217]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/217
+[pr226]: https://github.com/jlab-sensing/ENTS-node-firmware/pull/226
 [pr235]: https://github.com/jlab-sensing/ENTS-node-firmware/pull/235
 
 ## [2.3.1] - 2025-05-09

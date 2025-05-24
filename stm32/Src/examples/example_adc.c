@@ -15,6 +15,13 @@
  *
  ******************************************************************************
  */
+
+/**
+ * @example example_adc.c
+ *
+ * Example continuously reading voltage and current from the ADC.
+ */
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>

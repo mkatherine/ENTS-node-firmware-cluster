@@ -76,7 +76,7 @@ ControllerWiFiStatus ControllerWiFiCheckWiFi(void) {
   return resp.rc;
 }
 
-int ControllerWiFiNtpSync(void) {
+bool ControllerWiFiNtpSync(void) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_NTP_SYNC;
 
@@ -101,21 +101,21 @@ uint32_t ControllerWiFiTime(void) {
   return resp.ts;
 }
 
-unsigned int ControllerWiFiCheckApi(const char *url) {
+bool ControllerWiFiCheckApi(const char *url) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_CHECK;
   strncpy(wifi_cmd.url, url, sizeof(wifi_cmd.url));
-  wifi_cmd.port = port;
 
   WiFiCommand resp = WiFiCommand_init_zero;
 
-  WiFiCommandTransaction(&wifi_cmd, &resp);
+  if (WiFiCommandTransaction(&wifi_cmd, &resp) != CONTROLLER_SUCCESS) {
+    return false;
+  }
 
-  // return http code
-  return (unsigned int) resp.rc 
+  return true;
 }
 
-int ControllerWiFiPost(const uint8_t *data, size_t data_len) {
+bool ControllerWiFiPost(const uint8_t *data, size_t data_len) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_POST;
   wifi_cmd.resp.size = data_len;
@@ -132,7 +132,7 @@ int ControllerWiFiPost(const uint8_t *data, size_t data_len) {
   return true;
 }
 
-ControllerWiFiHttpResponse ControllerWiFiCheckRequest(void) {
+ControllerWiFiResponse ControllerWiFiCheckRequest(void) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_CHECK;
 
@@ -142,13 +142,13 @@ ControllerWiFiHttpResponse ControllerWiFiCheckRequest(void) {
   WiFiCommandTransaction(&wifi_cmd, &resp);
 
   // copy the response
-  ControllerWiFiResponse resp = {};
-  resp.http_code = resp.rc;
-  resp.size = resp.resp.size;
-  if (resp.size > 0) {
-    memcpy(resp.bytes, resp.resp.bytes, resp.size)
+  ControllerWiFiResponse http_resp = {};
+  http_resp.http_code = resp.rc;
+  http_resp.size = resp.resp.size;
+  if (http_resp.size > 0) {
+    memcpy(http_resp.bytes, resp.resp.bytes, http_resp.size);
   }
 
   // return timestamp
-  return resp
+  return http_resp;
 }

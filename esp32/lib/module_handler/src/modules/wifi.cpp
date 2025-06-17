@@ -51,12 +51,12 @@ void ModuleWiFi::OnReceive(const Esp32Command &cmd) {
 
     case WiFiCommand_Type_DISCONNECT:
       Log.traceln("Calling DISCONNECT");
-      Disconect();
+      Disconnect(cmd);
       break;
 
     case WiFiCommand_Type_CHECK_WIFI:
       Log.traceln("Calling CHECK_WIFI");
-      CheckWiFi();
+      CheckWiFi(cmd);
       break;
 
     case WiFiCommand_Type_CHECK_API:
@@ -66,7 +66,7 @@ void ModuleWiFi::OnReceive(const Esp32Command &cmd) {
 
     case WiFiCommand_Type_NTP_SYNC:
       Log.traceln("Calling NTP_SYNC");
-      NtpSync();
+      NtpSync(cmd);
       break;
 
     default:
@@ -139,7 +139,7 @@ void ModuleWiFi::CheckRequest(const Esp32Command &cmd) {
   wifi_cmd.type = WiFiCommand_Type_CHECK;
 
   // set url and port
-  HttpClient resp = dirtviz.GetResponse();
+  HttpClient resp_msg = dirtviz.GetResponse();
 
   const uint8_t *resp =
       reinterpret_cast<const uint8_t *>(resp_msg.Data().c_str());
@@ -159,7 +159,7 @@ void ModuleWiFi::CheckRequest(const Esp32Command &cmd) {
       EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
 }
 
-void NtpSync(const Esp32Command &cmd) {
+void ModuleWiFi::NtpSync(const Esp32Command &cmd) {
   Log.traceln("ModuleWiFi::NtpSync");
 
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;

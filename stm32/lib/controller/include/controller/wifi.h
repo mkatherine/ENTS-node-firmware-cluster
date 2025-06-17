@@ -10,6 +10,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,7 +80,7 @@ typedef struct {
   uint8_t bytes[256];
   /** Size of bytes */
   size_t size;
-} ControllerWiFiHttpResponse;
+} ControllerWiFiResponse;
 
 /**
  * @brief Initialize WiFi settings on the esp32

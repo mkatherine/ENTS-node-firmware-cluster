@@ -80,11 +80,30 @@ bool Check(void);
 void StartUploads(void);
 
 /**
+ * @brief Stop upload timer
+ */
+void StopUploads(void);
+
+/**
+ * @brief Resumes upload timer
+ */
+void ResumeUploads(void);
+
+/**
+ * @brief Error handler
+ *
+ * Turns on LEDs, waits for a reconnection, and resumes uploads.
+ */
+void ErrorHandler(void);
+
+/**
  * @brief Call initialization functions for ESP32
  *
  * Connects to a WiFi network, checks API health, and syncs time.
+ *
+ * @returns true if successful, false if error
  */
-void Esp32Init(void);
+bool Esp32Init(void);
 
 void WiFiInit(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "WiFi app starting\r\n");
@@ -128,9 +147,9 @@ void Upload(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
  
   // posts data to website
-  APP_LOG(TS_ON, VLEVEL_M, "Uploading data.\t", retries, max_retries);
+  APP_LOG(TS_ON, VLEVEL_M, "Uploading data.\t");
   if (!ControllerWiFiPost(buffer, buffer_len)) {
-    APP_LOG(TS_OFF, LEVEL_M, "Error! Could not communicate with esp32!\r\n");
+    APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
   }
     
   for (unsigned int retries = 0;; retries++) { 
@@ -209,7 +228,7 @@ void ErrorHandler(void) {
   // first disconnect, then retry until connected to wifi
   do {
     Disconnect();
-  } while (!WiFiInit());
+  } while (!Esp32Init());
 
   ResumeUploads();
 }
@@ -223,7 +242,8 @@ bool Connect(void) {
  
   APP_LOG(TS_ON, VLEVEL_M, "Connecting to %s.", ssid);
   if (!ControllerWiFiConnect(ssid, passwd)) {
-    APP_LOG(TS_OFF, LEVEL_M, "Error! Could not communicate with esp32!\r\n");
+    APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
+    return false;
   }
 
   for (unsigned int retries=0; ; retries++) {
@@ -256,7 +276,7 @@ bool Connect(void) {
 }
 
 bool Disconnect(void) {
-  APP_LOG(TS_ON, VLEVEL_M, "Disconnecting from WiFi\t", );
+  APP_LOG(TS_ON, VLEVEL_M, "Disconnecting from WiFi\t");
   if (!ControllerWiFiDisconnect()) {
     APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
     return false;
@@ -287,7 +307,8 @@ bool TimeSync(void) {
 
   APP_LOG(TS_OFF, VLEVEL_M, "Syncing time.\t");
   if (!ControllerWiFiNtpSync()) {
-    APP_LOG(TS_OFF, LEVEL_M, "Error! Could not communicate with esp32!\r\n");
+    APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
+    return false;
   }
 
   for (unsigned int retries = 0; ; retries++) {
@@ -323,15 +344,11 @@ bool Check(void) {
   //const uint32_t port = 80;
   
   const char* url = cfg->API_Endpoint_URL;
-  const uint32_t port = cfg->API_Endpoint_Port; 
-
-  // retry pinging API
-  // http code is misleading as it holds http code and the WiFi status
-  unsigned int http_code = 0;
 
   APP_LOG(TS_OFF, VLEVEL_M, "Checking API health.\t");
-  if (!ControllerWiFiCheckApi(url, port)) {
-    APP_LOG(TS_OFF, LEVEL_M, "Error! Could not communicate with esp32!\r\n");
+  if (!ControllerWiFiCheckApi(url)) {
+    APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
+    return false;
   }
   
   for (unsigned int retries = 0;; retries++) { 

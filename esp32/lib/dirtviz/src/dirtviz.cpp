@@ -70,8 +70,6 @@ unsigned int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   // connect to server
   if (!client.connect(url.getHost().c_str(), (uint16_t)url.getPort())) {
     Log.errorln("Connection to %s:%d failed!", url.getHost(), url.getPort());
-    HttpClient empty;
-    return empty;
   }
 
   // send data
@@ -104,7 +102,7 @@ unsigned int Dirtviz::SendMeasurement(const uint8_t *meas, size_t meas_len) {
   return bytes_written;
 }
 
-HttpClient GetResponse() {
+HttpClient Dirtviz::GetResponse() {
   // wait until there's bytes available with timeout
   unsigned int timeout = millis() + g_resp_timeout;
   while (!client.available()) {
@@ -141,4 +139,3 @@ HttpClient GetResponse() {
   return http_client;
 }
 
-}

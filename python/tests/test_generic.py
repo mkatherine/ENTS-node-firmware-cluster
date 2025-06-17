@@ -120,8 +120,8 @@ class TestDecode(unittest.TestCase):
         self.assertEqual(123, meas_dict["data"]["ec"])
         self.assertEqual(int, meas_dict["data_type"]["ec"])
 
-    def test_phytos31(self):
-        """Test decoding of Phytos31 measurement"""
+    def test_bme280(self):
+        """Test decoding of bme280 measurement"""
 
         meas = Measurement()
         meas.meta.CopyFrom(self.meta)

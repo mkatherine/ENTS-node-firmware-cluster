@@ -6,7 +6,7 @@
 /** Timeout for i2c communication with esp32 */
 unsigned int g_controller_i2c_timeout = 10000;
 
-uint8_t ControllerWiFiInit(const char *ssid, const char *passwd) {
+bool ControllerWiFiConnect(const char *ssid, const char *passwd) {
   // get reference to tx and rx buffers
   Buffer *tx = ControllerTx();
   Buffer *rx = ControllerRx();
@@ -39,6 +39,100 @@ uint8_t ControllerWiFiInit(const char *ssid, const char *passwd) {
   return cmd.command.wifi_command.rc;
 }
 
+bool ControllerWiFiDisconnect(void) {
+  // get reference to tx and rx buffers
+  Buffer *tx = ControllerTx();
+  Buffer *rx = ControllerRx();
+
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_DISCONNECT;
+
+  // encode command
+  tx->len = EncodeWiFiCommand(&wifi_cmd, tx->data, tx->size);
+
+  // send transaction
+  ControllerStatus status = CONTROLLER_SUCCESS;
+  status = ControllerTransaction(g_controller_i2c_timeout);
+  if (status != CONTROLLER_SUCCESS) {
+    return -1;
+  }
+
+  // check for errors
+  if (rx->len == 0) {
+    return -1;
+  }
+
+  // decode command
+  Esp32Command cmd = Esp32Command_init_default;
+  cmd = DecodeEsp32Command(rx->data, rx->len);
+
+  // return timestamp
+  return cmd.command.wifi_command.rc;
+}
+
+int ControllerWiFiCheckWiFi(void) {
+  // get reference to tx and rx buffers
+  Buffer *tx = ControllerTx();
+  Buffer *rx = ControllerRx();
+
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_CHECK_WIFI;
+
+  // encode command
+  tx->len = EncodeWiFiCommand(&wifi_cmd, tx->data, tx->size);
+
+  // send transaction
+  ControllerStatus status = CONTROLLER_SUCCESS;
+  status = ControllerTransaction(g_controller_i2c_timeout);
+  if (status != CONTROLLER_SUCCESS) {
+    return -1;
+  }
+
+  // check for errors
+  if (rx->len == 0) {
+    return -1;
+  }
+
+  // decode command
+  Esp32Command cmd = Esp32Command_init_default;
+  cmd = DecodeEsp32Command(rx->data, rx->len);
+
+  // return timestamp
+  return cmd.command.wifi_command.rc;
+}
+
+int ControllerWiFiNtpSync(void) {
+  // get reference to tx and rx buffers
+  Buffer *tx = ControllerTx();
+  Buffer *rx = ControllerRx();
+
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_NTP_SYNC;
+
+  // encode command
+  tx->len = EncodeWiFiCommand(&wifi_cmd, tx->data, tx->size);
+
+  // send transaction
+  ControllerStatus status = CONTROLLER_SUCCESS;
+  status = ControllerTransaction(g_controller_i2c_timeout);
+  if (status != CONTROLLER_SUCCESS) {
+    return -1;
+  }
+
+  // check for errors
+  if (rx->len == 0) {
+    return -1;
+  }
+
+  // decode command
+  Esp32Command cmd = Esp32Command_init_default;
+  cmd = DecodeEsp32Command(rx->data, rx->len);
+
+  // return timestamp
+  return cmd.command.wifi_command.rc;
+}
+
+
 uint32_t ControllerWiFiTime(void) {
   // get reference to tx and rx buffers
   Buffer *tx = ControllerTx();
@@ -69,7 +163,7 @@ uint32_t ControllerWiFiTime(void) {
   return cmd.command.wifi_command.ts;
 }
 
-unsigned int ControllerWiFiCheck(const char *url, const uint32_t port) {
+unsigned int ControllerWiFiCheckApi(const char *url) {
   // get reference to tx and rx buffers
   Buffer *tx = ControllerTx();
   Buffer *rx = ControllerRx();
@@ -101,8 +195,7 @@ unsigned int ControllerWiFiCheck(const char *url, const uint32_t port) {
   return cmd.command.wifi_command.rc;
 }
 
-int ControllerWiFiPost(const uint8_t *data, size_t data_len, uint8_t *resp,
-                       uint8_t *resp_len) {
+int ControllerWiFiPost(const uint8_t *data, size_t data_len) {
   // return code
   int rc = 0;
 
@@ -112,8 +205,10 @@ int ControllerWiFiPost(const uint8_t *data, size_t data_len, uint8_t *resp,
 
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_POST;
-  memcpy(wifi_cmd.resp.bytes, data, data_len);
   wifi_cmd.resp.size = data_len;
+  if (data_len > 0) {
+    memcpy(wifi_cmd.resp.bytes, data, data_len);
+  }
 
   // encode command
   tx->len = EncodeWiFiCommand(&wifi_cmd, tx->data, tx->size);
@@ -144,4 +239,43 @@ int ControllerWiFiPost(const uint8_t *data, size_t data_len, uint8_t *resp,
 
   // return http code
   return rc;
+}
+
+ControllerWiFiHttpResponse ControllerWiFiCheckRequest(void) {
+  // get reference to tx and rx buffers
+  Buffer *tx = ControllerTx();
+  Buffer *rx = ControllerRx();
+
+  WiFiCommand wifi_cmd = WiFiCommand_init_zero;
+  wifi_cmd.type = WiFiCommand_Type_CHECK;
+
+  // encode command
+  tx->len = EncodeWiFiCommand(&wifi_cmd, tx->data, tx->size);
+
+  // send transaction
+  ControllerStatus status = CONTROLLER_SUCCESS;
+  status = ControllerTransaction(g_controller_i2c_timeout);
+  if (status != CONTROLLER_SUCCESS) {
+    return -1;
+  }
+
+  // check for errors
+  if (rx->len == 0) {
+    return -1;
+  }
+
+  // decode command
+  Esp32Command cmd = Esp32Command_init_default;
+  cmd = DecodeEsp32Command(rx->data, rx->len);
+
+  // copy the response
+  ControllerWiFiResponse resp = {};
+  resp.http_code = cmd.command.wifi_command.rc;
+  resp.size = cmd.command.wifi_command.resp.size;
+  if (resp.size > 0) {
+    memcpy(resp.bytes, cmd.command.wifi_command.resp.bytes, resp.size)
+  }
+
+  // return timestamp
+  return resp
 }

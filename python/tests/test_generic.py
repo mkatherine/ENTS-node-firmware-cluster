@@ -229,6 +229,7 @@ class TestDecode(unittest.TestCase):
 
         self.assertIn("ec", meas_dict["data"])
 
+
 class TestEsp32(unittest.TestCase):
     def test_cmd_not_implemented(self):
         """Checks that an exception is raised when a non-existing command is

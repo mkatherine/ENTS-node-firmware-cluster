@@ -46,9 +46,13 @@ extern "C" {
 /**
  * @brief WiFi status
  *
- * The enum is copied from the Arduino WiFi library 
- *
+ * The enum is copied from the Arduino WiFi library. See the following for the
+ * definitions:
  * https://github.com/arduino-libraries/WiFi/blob/e0e655793d73bfe5c8616bf753c3662dcdf98ad9/src/utility/wl_definitions.h#L59
+ *
+ * The meaning of these can be ambiguous. See the following forum for the
+ * sequence of status during connect and disconnect events:
+ * https://forum.arduino.cc/t/serial-println-wifi-status-codes-meaning/486265/5
  */
 typedef enum {
   CONTROLLER_WIFI_NO_SHIELD = 255,

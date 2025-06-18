@@ -103,7 +103,7 @@ uint32_t ControllerWiFiTime(void) {
 
 bool ControllerWiFiCheckApi(const char *url) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
-  wifi_cmd.type = WiFiCommand_Type_CHECK;
+  wifi_cmd.type = WiFiCommand_Type_CHECK_API;
   strncpy(wifi_cmd.url, url, sizeof(wifi_cmd.url));
 
   WiFiCommand resp = WiFiCommand_init_zero;

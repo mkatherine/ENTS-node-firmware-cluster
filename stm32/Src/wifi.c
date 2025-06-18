@@ -147,12 +147,13 @@ void Upload(void) {
   APP_LOG(TS_OFF, VLEVEL_M, "\r\n");
  
   // posts data to website
-  APP_LOG(TS_ON, VLEVEL_M, "Uploading data.\t");
+  APP_LOG(TS_ON, VLEVEL_M, "Uploading data.");
   if (!ControllerWiFiPost(buffer, buffer_len)) {
     APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
   }
     
   for (unsigned int retries = 0;; retries++) { 
+    HAL_Delay(retry_delay);
     APP_LOG(TS_OFF, VLEVEL_M, ".");
 
     ControllerWiFiResponse resp = ControllerWiFiCheckRequest();
@@ -176,7 +177,6 @@ void Upload(void) {
       }
     }
 
-    HAL_Delay(retry_delay);
   }
   
   if (FramBufferLen() > 0) {
@@ -247,6 +247,7 @@ bool Connect(void) {
   }
 
   for (unsigned int retries=0; ; retries++) {
+    HAL_Delay(retry_delay);
     APP_LOG(TS_OFF, VLEVEL_M, ".")
 
     ControllerWiFiStatus status = ControllerWiFiCheckWiFi();
@@ -267,8 +268,6 @@ bool Connect(void) {
       
       return false;
     }
-
-    HAL_Delay(retry_delay);
   }
   APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
 
@@ -283,6 +282,7 @@ bool Disconnect(void) {
   }
 
   for (unsigned int retries=0; ; retries++) {
+    HAL_Delay(retry_delay);
     APP_LOG(TS_OFF, VLEVEL_M, ".")
 
     ControllerWiFiStatus status = ControllerWiFiCheckWiFi();
@@ -295,7 +295,6 @@ bool Disconnect(void) {
       return false;
     }
 
-    HAL_Delay(retry_delay);
   }
   APP_LOG(TS_OFF, VLEVEL_M, "Done!\r\n");
 
@@ -305,19 +304,20 @@ bool Disconnect(void) {
 bool TimeSync(void) {
   SysTime_t ts = {.Seconds = -1, .SubSeconds = 0};
 
-  APP_LOG(TS_OFF, VLEVEL_M, "Syncing time.\t");
+  APP_LOG(TS_OFF, VLEVEL_M, "Syncing time.");
   if (!ControllerWiFiNtpSync()) {
     APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
     return false;
   }
 
   for (unsigned int retries = 0; ; retries++) {
+    HAL_Delay(retry_delay);
     APP_LOG(TS_OFF, VLEVEL_M, ".");
 
     ts.Seconds = ControllerWiFiTime();
   
     // check for errors
-    if (ts.Seconds == 0) {
+    if (ts.Seconds != 0) {
       break;
     } else {
       if (retries >= max_retries) {
@@ -326,7 +326,6 @@ bool TimeSync(void) {
       }
     }
 
-    HAL_Delay(retry_delay);
   } 
   
   SysTimeSet(ts);
@@ -345,7 +344,7 @@ bool Check(void) {
   
   const char* url = cfg->API_Endpoint_URL;
 
-  APP_LOG(TS_OFF, VLEVEL_M, "Checking API health.\t");
+  APP_LOG(TS_OFF, VLEVEL_M, "Checking API health.");
   if (!ControllerWiFiCheckApi(url)) {
     APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
     return false;

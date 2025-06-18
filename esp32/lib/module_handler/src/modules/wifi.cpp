@@ -102,7 +102,7 @@ void ModuleWiFi::Connect(const Esp32Command &cmd) {
   // WiFi.setHostname("esp32");
 
   // connect to WiFi
-  //WiFi.disconnect();
+  // WiFi.disconnect();
   int status = WiFi.begin(cmd.command.wifi_command.ssid,
                           cmd.command.wifi_command.passwd);
 
@@ -240,4 +240,3 @@ void ModuleWiFi::CheckApi(const Esp32Command &cmd) {
   request_buffer_len =
       EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));
 }
-

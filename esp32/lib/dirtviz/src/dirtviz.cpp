@@ -138,4 +138,3 @@ HttpClient Dirtviz::GetResponse() {
 
   return http_client;
 }
-

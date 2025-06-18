@@ -30,23 +30,22 @@ static bool checked;
 
 #ifdef TEST_USER_CONFIG
 const static UserConfiguration testConfig = {
-  .logger_id = 200,
-  .cell_id = 200,
-  .Upload_method = Uploadmethod_WiFi,
-  .Upload_interval = 10,
-  .enabled_sensors_count = 1,
-  .enabled_sensors = {EnabledSensor_Voltage},
-  // calibration values are taken from 2.2.3-033
-  .Voltage_Slope = -0.00039326,
-  .Voltage_Offset = 4.92916378e-05,
-  .Current_Slope = -1.18693164e-10,
-  .Current_Offset = 4.14518594e-05,
-  .WiFi_SSID = "HARE_Lab",
-  .WiFi_Password = "",
-  .API_Endpoint_URL = "http://dirtviz.jlab.ucsc.edu/api/sensor/",
-  // port is not used
-  .API_Endpoint_Port = 80
-};
+    .logger_id = 200,
+    .cell_id = 200,
+    .Upload_method = Uploadmethod_WiFi,
+    .Upload_interval = 10,
+    .enabled_sensors_count = 1,
+    .enabled_sensors = {EnabledSensor_Voltage},
+    // calibration values are taken from 2.2.3-033
+    .Voltage_Slope = -0.00039326,
+    .Voltage_Offset = 4.92916378e-05,
+    .Current_Slope = -1.18693164e-10,
+    .Current_Offset = 4.14518594e-05,
+    .WiFi_SSID = "HARE_Lab",
+    .WiFi_Password = "",
+    .API_Endpoint_URL = "http://dirtviz.jlab.ucsc.edu/api/sensor/",
+    // port is not used
+    .API_Endpoint_Port = 80};
 #endif  // TEST_USER_CONFIG
 
 // Initialize Advance Trace for interrupt-based receiving

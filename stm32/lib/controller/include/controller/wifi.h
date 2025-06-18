@@ -8,9 +8,9 @@
 #ifndef LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_
 #define LIB_CONTROLLER_INCLUDE_CONTROLLER_WIFI_H_
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,7 +126,7 @@ bool ControllerWiFiNtpSync(void);
 
 /**
  * @brief Get the current time from the NTP server
- * 
+ *
  * Errors are indicated by a 0 return value.
  *
  * @return Timestamp indicated by the NTP server

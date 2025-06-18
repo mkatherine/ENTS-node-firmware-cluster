@@ -105,7 +105,7 @@ class Dirtviz {
    * @return Returns true if the connection succeeds, false if not
    */
   bool ClientConnect();
- 
+
   WiFiClient client;
 };
 

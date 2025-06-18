@@ -6,7 +6,8 @@
 /** Timeout for i2c communication with esp32 */
 unsigned int g_controller_i2c_timeout = 10000;
 
-ControllerStatus WiFiCommandTransaction(const WiFiCommand *input, WiFiCommand *output) {
+ControllerStatus WiFiCommandTransaction(const WiFiCommand *input,
+                                        WiFiCommand *output) {
   // get reference to tx and rx buffers
   Buffer *tx = ControllerTx();
   Buffer *rx = ControllerRx();
@@ -89,7 +90,6 @@ bool ControllerWiFiNtpSync(void) {
   return true;
 }
 
-
 uint32_t ControllerWiFiTime(void) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_TIME;
@@ -97,7 +97,7 @@ uint32_t ControllerWiFiTime(void) {
   WiFiCommand resp = WiFiCommand_init_zero;
 
   WiFiCommandTransaction(&wifi_cmd, &resp);
-  
+
   return resp.ts;
 }
 

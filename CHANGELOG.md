@@ -8,7 +8,7 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
-## [Unreleased]
+## [2.3.3] - 2025-06-18
 
 - Fixed missing fields when decoding messages [#243](i243)
 - Refactored WiFi code [#164](i164)

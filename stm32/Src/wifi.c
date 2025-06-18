@@ -25,7 +25,7 @@ const unsigned int max_retries = 5;
 /**
  * @brief Delay in milliseconds between retries
  */
-const unsigned int retry_delay = 100;
+const unsigned int retry_delay = 1000;
 
 
 /**
@@ -256,17 +256,16 @@ bool Connect(void) {
     } else if (status == CONTROLLER_WIFI_DISCONNECTED) {
       continue;
     } else {
-      if (status == CONTROLLER_WIFI_NO_SSID_AVAIL) {
-        APP_LOG(TS_OFF, VLEVEL_M, "Error! No SSID available!\r\n");
-      } else if (status == CONTROLLER_WIFI_CONNECT_FAILED) {
-        APP_LOG(TS_OFF, VLEVEL_M, "Error! Connect failed!\r\n");
-      } else {
-        if (retries >= max_retries) {
+      if (retries >= max_retries) {
+        if (status == CONTROLLER_WIFI_NO_SSID_AVAIL) {
+          APP_LOG(TS_OFF, VLEVEL_M, "Error! No SSID available!\r\n");
+        } else if (status == CONTROLLER_WIFI_CONNECT_FAILED) {
+          APP_LOG(TS_OFF, VLEVEL_M, "Error! Connect failed!\r\n");
+        } else {
           APP_LOG(TS_OFF, VLEVEL_M, "Error! Timeout after %d retries!\r\n", retries);
         }
+        return false;
       }
-      
-      return false;
     }
   }
   APP_LOG(TS_OFF, VLEVEL_M, "Connected!\r\n");
@@ -275,7 +274,7 @@ bool Connect(void) {
 }
 
 bool Disconnect(void) {
-  APP_LOG(TS_ON, VLEVEL_M, "Disconnecting from WiFi\t");
+  APP_LOG(TS_ON, VLEVEL_M, "Disconnecting from WiFi.");
   if (!ControllerWiFiDisconnect()) {
     APP_LOG(TS_OFF, VLEVEL_M, "Error! Could not communicate with esp32!\r\n");
     return false;
@@ -288,13 +287,14 @@ bool Disconnect(void) {
     ControllerWiFiStatus status = ControllerWiFiCheckWiFi();
     if (status == CONTROLLER_WIFI_IDLE_STATUS) {
       break;
+    } else if (status == CONTROLLER_WIFI_DISCONNECTED) {
+      break;
     } else {
       if (retries >= max_retries) {
         APP_LOG(TS_OFF, VLEVEL_M, "Error! Timeout after %d retries!\r\n", retries);
+        return false;
       }
-      return false;
     }
-
   }
   APP_LOG(TS_OFF, VLEVEL_M, "Done!\r\n");
 

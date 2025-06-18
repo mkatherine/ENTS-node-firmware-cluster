@@ -11,7 +11,10 @@ firmware versions for a hardware version.
 ## [Unreleased]
 
 - Fixed missing fields when decoding messages [#243](i243)
+- Refactored WiFi code [#164](i164)
+    - Part of this include `-DTEST_USER_CONFIG` to hardcoded values
 
+[i164]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/164
 [i243]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/243
 
 ## [2.3.2] - 2025-05-23

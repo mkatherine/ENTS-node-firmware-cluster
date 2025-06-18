@@ -8,6 +8,12 @@ and this project adheres to
 minor versions follow hardware versioning with patches used to iterate on
 firmware versions for a hardware version.
 
+## [Unreleased]
+
+- Fixed missing fields when decoding messages [#243](i243)
+
+[i243]: https://github.com/jlab-sensing/ENTS-node-firmware/issues/243
+
 ## [2.3.2] - 2025-05-23
 
 ### Added

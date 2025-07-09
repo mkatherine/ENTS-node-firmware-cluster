@@ -1,5 +1,4 @@
-# Board Support Package (BSP) for Wio-E5 mini {#bsp-components}
-
+# Board Support Package (BSP) for Wio-E5 mini
 The BSP components are copied from the example [Seeed-Studio/LoRaWan-E5-Node](https://github.com/Seeed-Studio/LoRaWan-E5-Node). Future updates will have to be performed manually.
 
 The include for the BSP also needs to be manually updated in `platform.h`. This code will get overwritten if source code is regenerated from CubeMX.

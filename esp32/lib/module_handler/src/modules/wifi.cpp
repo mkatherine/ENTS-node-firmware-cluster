@@ -178,12 +178,14 @@ void ModuleWiFi::Time(const Esp32Command &cmd) {
   WiFiCommand wifi_cmd = WiFiCommand_init_zero;
   wifi_cmd.type = WiFiCommand_Type_TIME;
 
-  if (timeClient->isTimeSet()) {
-    wifi_cmd.ts = timeClient->getEpochTime();
-    Log.noticeln("Current timestamp: %d", wifi_cmd.ts);
-  } else {
-    Log.errorln("Failed to get time from NTP server!");
-  }
+  wifi_cmd.ts = millis()/1000; //rough time stamp MK added 7/11/2025
+  //MK commented to enable offline data logging
+  // if (timeClient->isTimeSet()) {
+  //   wifi_cmd.ts = timeClient->getEpochTime(); //uses internet
+  //   Log.noticeln("Current timestamp: %d", wifi_cmd.ts);
+  // } else {
+  //   Log.errorln("Failed to get time from NTP server!");
+  // }
 
   request_buffer_len =
       EncodeWiFiCommand(&wifi_cmd, request_buffer, sizeof(request_buffer));

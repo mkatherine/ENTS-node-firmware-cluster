@@ -155,7 +155,7 @@ int8_t bme280_interface_selection(struct bme280_dev *dev, uint8_t intf)
         /* Bus configuration : I2C */
         if (intf == BME280_I2C_INTF)
         {
-            dev_addr = BME280_I2C_ADDR_SEC;
+            dev_addr = BME280_I2C_ADDR_PRIM; //MK changed to PRIM for Chinese BME280
             dev->read = bme280_i2c_read;
             dev->write = bme280_i2c_write;
             dev->intf = BME280_I2C_INTF;
